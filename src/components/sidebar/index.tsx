@@ -23,8 +23,7 @@ export const SideBar = () => {
 
   return (
     <Stack>
-      <Heading as='h1' size='lg'> Moz Proenergia prototype</Heading>
-      <Separator />
+      <Heading as='h1' size='lg'> Proenergia Prototype</Heading>
 
       {/* Layers Section */}
       <Heading as='h2' size='md'> Layers</Heading>
@@ -45,7 +44,7 @@ export const SideBar = () => {
             <Heading as='h3' size='sm'>{filterConfig.label}</Heading>
             <RangeSlider
               value={state.rangeFilters[filterConfig.id]}
-              onChange={(value) => actions.setRangeFilter(filterConfig.id, value)}
+              onChangeEnd={(value) => actions.setRangeFilter(filterConfig.id, value)}
               min={filterConfig.min}
               max={filterConfig.max}
               step={filterConfig.step}
