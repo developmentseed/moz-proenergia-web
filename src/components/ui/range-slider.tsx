@@ -39,6 +39,7 @@ export const RangeSlider = ({
         </Slider.Track>
         <Slider.Thumbs />
       </Slider.Control>
+      <Slider.ValueText />
     </Slider.Root>
   )
 }

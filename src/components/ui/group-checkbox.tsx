@@ -1,13 +1,9 @@
 import { Fieldset, For, CheckboxGroup} from '@chakra-ui/react';
 import { Checkbox } from "./checkbox"
-
-type CheckboxOption = {
-  label: string;
-  value: string;
-}
+import { type CheckboxOptionConfig } from '@/types/sidebar';
 
 interface GroupCheckboxProps {
-  options: CheckboxOption[];
+  options: CheckboxOptionConfig[];
   value?: string[];
   onChange?: (value: string[]) => void;
   name?: string;
@@ -29,7 +25,7 @@ export const GroupCheckbox = ({
         <Fieldset.Content>
           <For each={options}>
             {(option) => (
-              <Checkbox key={option.value} option={option} />
+              <Checkbox key={option.id} option={option} />
             )}
           </For>
         </Fieldset.Content>

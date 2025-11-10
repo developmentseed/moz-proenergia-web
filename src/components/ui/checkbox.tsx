@@ -1,26 +1,25 @@
-import { Checkbox as ChakraCheckbox } from "@chakra-ui/react"
-
-type CheckboxOption = {
-  label: string;
-  value: string;
-}
-
+import { Checkbox as ChakraCheckbox, type CheckboxRootProps } from "@chakra-ui/react"
+import { type CheckboxOptionConfig } from '@/types/sidebar';
 interface CheckboxProps {
-  option: CheckboxOption;
+  option: CheckboxOptionConfig;
   checked?: boolean;
   onChange?: (checked: boolean) => void;
 }
 
+type OnCheckedChangeType = CheckboxRootProps['onCheckedChange'];
+type HandleChangeEventParameter = Parameters<NonNullable<OnCheckedChangeType>>[0];
+
 export const Checkbox = ({ option, checked, onChange }: CheckboxProps) => {
-  const handleCheckedChange = (details) => {
+
+  const handleCheckedChange = (details: HandleChangeEventParameter) => {
     if (onChange) {
-      onChange(details.checked);
+      onChange(!!details.checked);
     }
   };
 
   return (
     <ChakraCheckbox.Root
-      value={option.value}
+      value={option.id}
       checked={checked}
       onCheckedChange={handleCheckedChange}
     >

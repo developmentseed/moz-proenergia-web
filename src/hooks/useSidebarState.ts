@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import type {
   SidebarFormState,
   SidebarFormActions,
@@ -7,18 +7,22 @@ import type {
 } from '@/types/sidebar';
 
 /**
- * Custom hook for managing sidebar form state
+ * Custom hook for managing sidebar form state with dynamic filters
  *
- * @param config - Configuration object with initial values and callbacks
+ * @param config - Configuration object with filter definitions and callbacks
  * @returns Object containing state and actions
  *
  * @example
  * ```tsx
  * const { state, actions } = useSidebarState({
  *   initialLayers: ['layer1', 'layer2'],
- *   initialRangeFilter1: [20, 60],
- *   initialRangeFilter2: [0, 100],
- *   initialBinaryFilter: false,
+ *   rangeFilters: [
+ *     { id: 'elevation', label: 'Elevation', min: 0, max: 3000, defaultValue: [100, 2000] },
+ *     { id: 'slope', label: 'Slope', min: 0, max: 90, defaultValue: [0, 45] }
+ *   ],
+ *   checkboxFilters: [
+ *     { id: 'showGrid', label: 'Show Grid', defaultValue: false }
+ *   ],
  *   onApply: (state) => console.log('Filters applied:', state)
  * });
  * ```
@@ -26,67 +30,93 @@ import type {
 export const useSidebarState = (config: SidebarFormConfig = {}): UseSidebarStateReturn => {
   const {
     initialLayers = [],
-    initialRangeFilter1 = [20, 60],
-    initialRangeFilter2 = [0, 100],
-    initialBinaryFilter = false,
+    rangeFilters = [],
+    checkboxFilters = [],
     onApply,
   } = config;
 
-  // Store initial values for reset functionality
-  const initialState: SidebarFormState = {
-    layers: initialLayers,
-    rangeFilter1: initialRangeFilter1,
-    rangeFilter2: initialRangeFilter2,
-    binaryFilter: initialBinaryFilter,
-  };
+  // Build initial state from config
+  const initialRangeFilters = useMemo(
+    () =>
+      rangeFilters.reduce(
+        (acc, filter) => {
+          acc[filter.id] = filter.defaultValue;
+          return acc;
+        },
+        {} as Record<string, [number, number]>
+      ),
+    [rangeFilters]
+  );
+
+  const initialCheckboxFilters = useMemo(
+    () =>
+      checkboxFilters.reduce(
+        (acc, filter) => {
+          acc[filter.id] = filter.defaultValue;
+          return acc;
+        },
+        {} as Record<string, boolean>
+      ),
+    [checkboxFilters]
+  );
 
   // State management
   const [layers, setLayers] = useState<string[]>(initialLayers);
-  const [rangeFilter1, setRangeFilter1] = useState<[number, number]>(initialRangeFilter1);
-  const [rangeFilter2, setRangeFilter2] = useState<[number, number]>(initialRangeFilter2);
-  const [binaryFilter, setBinaryFilter] = useState<boolean>(initialBinaryFilter);
+  const [rangeFilterValues, setRangeFilterValues] = useState<Record<string, [number, number]>>(
+    initialRangeFilters
+  );
+  const [checkboxFilterValues, setCheckboxFilterValues] = useState<Record<string, boolean>>(
+    initialCheckboxFilters
+  );
+
+  // Update a specific range filter
+  const setRangeFilter = useCallback((id: string, value: [number, number]) => {
+    setRangeFilterValues((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  }, []);
+
+  // Update a specific checkbox filter
+  const setCheckboxFilter = useCallback((id: string, value: boolean) => {
+    setCheckboxFilterValues((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  }, []);
 
   // Memoized reset function
   const resetFilters = useCallback(() => {
-    setLayers(initialState.layers);
-    setRangeFilter1(initialState.rangeFilter1);
-    setRangeFilter2(initialState.rangeFilter2);
-    setBinaryFilter(initialState.binaryFilter);
-  }, [
-    initialState.layers,
-    initialState.rangeFilter1,
-    initialState.rangeFilter2,
-    initialState.binaryFilter,
-  ]);
+    setLayers(initialLayers);
+    setRangeFilterValues(initialRangeFilters);
+    setCheckboxFilterValues(initialCheckboxFilters);
+  }, [initialLayers, initialRangeFilters, initialCheckboxFilters]);
 
   // Memoized apply function
   const applyFilters = useCallback(() => {
     const currentState: SidebarFormState = {
       layers,
-      rangeFilter1,
-      rangeFilter2,
-      binaryFilter,
+      rangeFilters: rangeFilterValues,
+      checkboxFilters: checkboxFilterValues,
     };
 
     if (onApply) {
       onApply(currentState);
     }
-  }, [layers, rangeFilter1, rangeFilter2, binaryFilter, onApply]);
+  }, [layers, rangeFilterValues, checkboxFilterValues, onApply]);
 
   // Combine state
   const state: SidebarFormState = {
     layers,
-    rangeFilter1,
-    rangeFilter2,
-    binaryFilter,
+    rangeFilters: rangeFilterValues,
+    checkboxFilters: checkboxFilterValues,
   };
 
   // Combine actions
   const actions: SidebarFormActions = {
     setLayers,
-    setRangeFilter1,
-    setRangeFilter2,
-    setBinaryFilter,
+    setRangeFilter,
+    setCheckboxFilter,
     resetFilters,
     applyFilters,
   };
