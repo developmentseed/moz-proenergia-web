@@ -4,10 +4,29 @@ type CheckboxOption = {
   label: string;
   value: string;
 }
-export const Checkbox = ({option}: {option: CheckboxOption}) => {
-  return (              <ChakraCheckbox.Root key={option.value} value={option.value}>
-                  <ChakraCheckbox.HiddenInput />
-                  <ChakraCheckbox.Control />
-                  <ChakraCheckbox.Label>{option.label}</ChakraCheckbox.Label>
-                </ChakraCheckbox.Root>)
+
+interface CheckboxProps {
+  option: CheckboxOption;
+  checked?: boolean;
+  onChange?: (checked: boolean) => void;
+}
+
+export const Checkbox = ({ option, checked, onChange }: CheckboxProps) => {
+  const handleCheckedChange = (details) => {
+    if (onChange) {
+      onChange(details.checked);
+    }
+  };
+
+  return (
+    <ChakraCheckbox.Root
+      value={option.value}
+      checked={checked}
+      onCheckedChange={handleCheckedChange}
+    >
+      <ChakraCheckbox.HiddenInput />
+      <ChakraCheckbox.Control />
+      <ChakraCheckbox.Label>{option.label}</ChakraCheckbox.Label>
+    </ChakraCheckbox.Root>
+  )
 }

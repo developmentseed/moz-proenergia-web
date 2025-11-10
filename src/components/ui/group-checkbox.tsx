@@ -6,10 +6,26 @@ type CheckboxOption = {
   value: string;
 }
 
-export const GroupCheckbox = ({ options }: { options: CheckboxOption[] }) => {
+interface GroupCheckboxProps {
+  options: CheckboxOption[];
+  value?: string[];
+  onChange?: (value: string[]) => void;
+  name?: string;
+}
+
+export const GroupCheckbox = ({
+  options,
+  value,
+  onChange,
+  name = "layers"
+}: GroupCheckboxProps) => {
   return (
     <Fieldset.Root>
-      <CheckboxGroup defaultValue={[]} name="layers">
+      <CheckboxGroup
+        value={value}
+        onValueChange={onChange}
+        name={name}
+      >
         <Fieldset.Content>
           <For each={options}>
             {(option) => (
