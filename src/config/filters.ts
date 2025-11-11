@@ -38,8 +38,8 @@ export const checkboxFilterConfigs: CheckboxFilterConfig[] = [
   },
   // Add more checkbox filters as needed
   // {
-  //   id: 'showLabels',
-  //   label: 'Show Labels',
+  //   id: 'binary-filter-2',
+  //   label: 'Binary Filter 2',
   //   defaultValue: true,
   // },
 ];

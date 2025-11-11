@@ -1,5 +1,5 @@
 
-import { Stack, Separator, Heading, For } from "@chakra-ui/react"
+import { Stack, Separator, Heading, For, Box } from "@chakra-ui/react"
 import { GroupCheckbox } from "@/components/ui/group-checkbox"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RangeSlider } from "@/components/ui/range-slider"
@@ -24,19 +24,20 @@ export const SideBar = () => {
   return (
     <Stack>
       <Heading as='h1' size='lg'> Proenergia Prototype</Heading>
-
-      {/* Layers Section */}
-      <Heading as='h2' size='md'> Layers</Heading>
-      <GroupCheckbox
-        options={layerOptionConfigs}
-        value={state.layers}
-        onChange={actions.setLayers}
-      />
+      <Box marginBottom="3">
+        {/* Layers Section */}
+        <Heading as='h2' size='md' marginBottom="1"> Layers</Heading>
+        <GroupCheckbox
+          options={layerOptionConfigs}
+          value={state.layers}
+          onChange={actions.setLayers}
+        />
+      </Box>
       <Separator />
-
+    <Box marginBottom="3">
       {/* Filters Section */}
-      <Heading as='h2' size='md'> Filters</Heading>
-
+      <Heading as='h2' size='md' marginBottom="1"> Filters</Heading>
+    <Box marginBottom="2">
       {/* Dynamic Range Filters */}
       <For each={rangeFilterConfigs}>
         {(filterConfig) => (
@@ -53,21 +54,22 @@ export const SideBar = () => {
           </div>
         )}
       </For>
-
-      {/* Dynamic Checkbox Filters */}
-      <For each={checkboxFilterConfigs}>
-        {(filterConfig) => (
-          <Checkbox
-            key={filterConfig.id}
-            option={{ label: filterConfig.label, value: filterConfig.id }}
-            checked={state.checkboxFilters[filterConfig.id]}
-            onChange={(value) => actions.setCheckboxFilter(filterConfig.id, value)}
-          />
-        )}
-      </For>
-
-      <Separator />
-      <ActionButton onClick={actions.applyFilters} />
+    </Box>
+      <Box marginBottom="2">
+        {/* Dynamic Binary Filters */}
+        <For each={checkboxFilterConfigs}>
+          {(filterConfig) => (
+            <Checkbox
+              key={filterConfig.id}
+              option={{ label: filterConfig.label, value: filterConfig.id }}
+              checked={state.checkboxFilters[filterConfig.id]}
+              onChange={(value) => actions.setCheckboxFilter(filterConfig.id, value)}
+            />
+          )}
+        </For>
+      </Box>
+    </Box>
+    <ActionButton onClick={actions.applyFilters} />
     </Stack>
   )
 }
