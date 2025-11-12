@@ -63,10 +63,21 @@ export const additionalLayers = [{
   }] as const;
 
 export const filters = [{
-  "layerId": "substation-point",
-  "filterKey": "point-opacity",
-  "getFilterValue": (on: boolean) => {
-      return on? '0.0': '1.0'
+  "layerId": "model-fill",
+  "filterId": "range",
+  "filterKey": "fill-opacity",
+  "propertyName": "Population",
+  "getFilterValue": (range: [number, number], propertyName: string) => {
+      return [
+        'case',
+        [
+          'all',
+          ['>=', ['get', propertyName], range[0]],
+          ['<=', ['get', propertyName], range[1]]
+        ],
+        1, // fill-opacity when property is in range
+        0  // fill-opacity when property is out of range
+      ];
     }
   }
 ] as const;

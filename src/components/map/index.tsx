@@ -4,7 +4,7 @@ import { Box } from '@chakra-ui/react'
 import * as pmtiles from 'pmtiles';
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { additionalSources, additionalLayers, modelLayers, modelSource } from '@/config/map';
+import { additionalSources, additionalLayers, modelLayers, modelSource, filters } from '@/config/map';
 import type { SidebarFormState } from '@/types/sidebar';
 
 const COORDS = [-25.9692, 32.5732]
@@ -14,8 +14,7 @@ interface MapVisualizationProps {
 }
 
 export default function MapVisualization({ state }: MapVisualizationProps) {
-  console.log(state);
-  const { layers: visibleLayers } = state;
+  const { layers: visibleLayers, rangeFilters } = state;
     // Attach pmtile protocol to MapLibre
   useEffect(() => {
     const protocol = new pmtiles.Protocol()
@@ -39,7 +38,22 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
           {/* Model Source/Layer */}
           <Source {...modelSource}>
               {modelLayers.map(layer => {
-                return (<Layer key={layer.id} {...layer} />)
+                const matchingFilter = filters.find(f => f.layerId === layer.id)!;
+                if (matchingFilter) {
+                const matchingRange = rangeFilters[matchingFilter.filterId];
+                const matchingPaintStyle = {
+                  [matchingFilter.filterKey]: matchingFilter?.getFilterValue(matchingRange, matchingFilter.propertyName)
+                }
+                const layerConfig = {
+                  ...layer,
+                  paint: { 
+                    ...layer.paint,
+                    ...matchingPaintStyle
+                  }
+                }
+                 {/* @ts-expect-error leaving it temporarily */}
+                return (<Layer key={layer.id} {...layerConfig} />)
+                } else return <Layer key={layer.id} {...layer} />
               })
             }
           </Source>

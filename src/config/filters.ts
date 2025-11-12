@@ -8,10 +8,10 @@ export const layerOptionConfigs: CheckboxOptionConfig[] = [
 export const rangeFilterConfigs: RangeFilterConfig[] = [
   {
     id: 'range',
-    label: 'Range Filter 1',
+    label: 'Population',
     min: 0,
-    max: 3000,
-    defaultValue: [100, 2000],
+    max: 50000,
+    defaultValue: [0, 20000],
     step: 10,
     minStepsBetweenThumbs: 10,
   },
