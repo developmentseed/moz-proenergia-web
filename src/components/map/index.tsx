@@ -1,12 +1,25 @@
+import { useEffect } from 'react';
 import Map, { Source, Layer } from 'react-map-gl/maplibre'
 import { Box } from '@chakra-ui/react'
+import * as pmtiles from 'pmtiles';
+import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-
+import { sources, layers } from '@/config/map';
 
 const COORDS = [-25.9692, 32.5732]
 
 export default function MapVisualization() {
-return (<Box w='100%' className="map-container">
+    // Attach pmtile protocol to MapLibre
+  useEffect(() => {
+    const protocol = new pmtiles.Protocol()
+    maplibregl.addProtocol('pmtiles', protocol.tile)
+
+    return () => {
+      maplibregl.removeProtocol('pmtiles')
+    }
+  },[])
+
+  return (<Box w='100%' className="map-container">
         <Map
           initialViewState={{
             longitude: COORDS[1],
@@ -15,32 +28,18 @@ return (<Box w='100%' className="map-container">
           }}
           style={{ width: '100%', height: '100vh' }}
           mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
-          // onLoad={initializeTerraDrawOnLoad}
         >
-          
-            <Source
-              id="population-tiles"
-              type="raster"
-              tiles={[]}
-              tileSize={256}
-              maxzoom={18}
-            >
-              <Layer
-                id="population-layer"
-                type="raster"
-                paint={{
-                  'raster-opacity': 0.8
-                }}
-              />
-            </Source>
-          
-          
-          {/* {useGeotiff && (
-            <GeoTiffViewer
-              cogUrl={cogUrl}
-
-            />
-          )} */}
+        {sources.map(source => {
+          const matchingLayers = layers.filter(l => l.source === source.id);
+          return (
+            <Source key={source.id} {...source}>
+              
+              {matchingLayers.map(layer => {
+                return (<Layer key={layer.id} {...layer} />)
+              })
+            }</Source>
+          )
+        })}
         </Map>
       </Box>)
 }
