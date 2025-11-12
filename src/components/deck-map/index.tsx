@@ -6,29 +6,28 @@ import { additionalSources, modelSource } from '@/config/map';
 import type { SidebarFormState } from '@/types/sidebar';
 import { MVTLoader } from "@loaders.gl/mvt";
 import { parse } from "@loaders.gl/core";
-import { TileLayer } from "@deck.gl/geo-layers";
+import { TileLayer, type _TileLoadProps } from "@deck.gl/geo-layers";
 import { GeoJsonLayer } from "@deck.gl/layers";
 
 import * as pmtiles from "pmtiles";
+import type { PMTiles } from 'pmtiles';
 
-const getZXY = async (source, z, x, y) => {
+async function getZXY(source: PMTiles, z: number, x: number, y: number) {
   const response = await source.getZxy(z, x, y);
 
-  if (response.data) {
+  if (response?.data) {
     return new Uint8Array(response.data);
   } else {
     return new Uint8Array();
   }
 };
 
-async function getTileData(tile) {
-  console.log(tile);
-    const { x, y, z } = tile.index ? tile.index : tile;
+async function getTileData({ index, url }: _TileLoadProps) {
+    const { x, y, z } = index;
 
-    const source = new pmtiles.PMTiles(tile.url);
+    const source = new pmtiles.PMTiles(url as string);
     const data = await getZXY(source, z, x, y);
-    //console.log(data);
-    return parse(data, MVTLoader, {
+    return parse(data.buffer, MVTLoader, {
       loadOptions: { worker: true },
       mvt: {
         coordinates: "wgs84",

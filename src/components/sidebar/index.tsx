@@ -54,7 +54,7 @@ export const SideBar = ({ state, actions }: SideBarProps) => {
           {(filterConfig) => (
             <Checkbox
               key={filterConfig.id}
-              option={{ label: filterConfig.label, value: filterConfig.id }}
+              option={filterConfig}
               checked={state.checkboxFilters[filterConfig.id]}
               onChange={(value) => actions.setCheckboxFilter(filterConfig.id, value)}
             />
