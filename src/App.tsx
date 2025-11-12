@@ -4,7 +4,7 @@ import { SideBar } from '@/components/sidebar'
 import { Grid, GridItem, Container} from '@chakra-ui/react'
 import { useSidebarState } from '@/hooks/useSidebarState'
 import { rangeFilterConfigs, checkboxFilterConfigs } from '@/config/filters'
-
+// import DeckMap from '@/components/deck-map'
 import './index.css'
 
 function App() {
