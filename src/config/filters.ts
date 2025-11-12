@@ -1,13 +1,13 @@
-import type { RangeFilterConfig, CheckboxFilterConfig, CheckboxOptionConfig } from '@/types/sidebar';
+import type { RangeFilterConfig, CheckboxOptionConfig } from '@/types/sidebar';
 
 export const layerOptionConfigs: CheckboxOptionConfig[] = [
-  { label: 'Layer A', id: 'layer-a', defaultValue: false },
-  { label: 'Layer B', id: 'layer-b' , defaultValue: false }
+  { label: 'Substations', id: 'substation', defaultValue: false },
+  { label: 'Transmission Network', id: 'transmission-network' , defaultValue: false }
 ];
 
 export const rangeFilterConfigs: RangeFilterConfig[] = [
   {
-    id: 'range-filter-1',
+    id: 'range',
     label: 'Range Filter 1',
     min: 0,
     max: 3000,
@@ -30,7 +30,7 @@ export const rangeFilterConfigs: RangeFilterConfig[] = [
  * Configuration for all checkbox filters
  * Add or remove filters here to dynamically change the sidebar
  */
-export const checkboxFilterConfigs: CheckboxFilterConfig[] = [
+export const checkboxFilterConfigs: CheckboxOptionConfig[] = [
   {
     id: 'binary-filter-1',
     label: 'Binary Filter 1',

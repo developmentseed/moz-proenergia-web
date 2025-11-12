@@ -4,22 +4,15 @@ import { GroupCheckbox } from "@/components/ui/group-checkbox"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RangeSlider } from "@/components/ui/range-slider"
 import { ActionButton } from "@/components/ui/action-button"
-import { useSidebarState } from "@/hooks/useSidebarState"
 import { layerOptionConfigs, rangeFilterConfigs, checkboxFilterConfigs } from "@/config/filters"
+import type { SidebarFormState, SidebarFormActions } from '@/types/sidebar'
 
+interface SideBarProps {
+  state: SidebarFormState;
+  actions: SidebarFormActions;
+}
 
-export const SideBar = () => {
-  // Use the custom hook with dynamic filter configuration
-  const { state, actions } = useSidebarState({
-    initialLayers: [],
-    rangeFilters: rangeFilterConfigs,
-    checkboxFilters: checkboxFilterConfigs,
-    onApply: (formState) => {
-      // This callback is triggered when the action button is clicked
-      console.log('Filters applied:', formState);
-      // Here you can pass the state to your map component or make API calls
-    }
-  });
+export const SideBar = ({ state, actions }: SideBarProps) => {
 
   return (
     <Stack>

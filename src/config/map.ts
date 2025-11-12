@@ -1,30 +1,14 @@
 
 const bucketUrl = 'https://mozsebar.s3.us-east-1.amazonaws.com/prototype/data'
 
-export const sources = [
-  {
+export const modelSource =   {
     "id": "model",
     "type": "vector",
     "url": `pmtiles://${bucketUrl}/clusters.pmtiles`,
     minzoom: 4,
     maxzoom: 15
-  },
-  {
-    "id": "substation",
-    "type": "vector",
-    "url": `pmtiles://${bucketUrl}/substation.pmtiles`,
-    minzoom: 4,
-    maxzoom: 15
-  },
-  {
-    "id": "transmission-network",
-    "type": "vector",
-    "url": `pmtiles://${bucketUrl}/transmission-network.pmtiles`,
-    minzoom: 4,
-    maxzoom: 15
-  }]
-
-export const layers = [{
+  }
+export const modelLayers = [{
     "id": "model-fill",
     "source": "model",
     "source-layer": "data",
@@ -40,8 +24,25 @@ export const layers = [{
     "paint": {
       'line-color':  '#333'
     }
+  }];
+
+export const additionalSources = [
+  {
+    id: "substation",
+    type: "vector",
+    url: `pmtiles://${bucketUrl}/substation.pmtiles`,
+    minzoom: 4,
+    maxzoom: 15
   },
   {
+    "id": "transmission-network",
+    "type": "vector",
+    "url": `pmtiles://${bucketUrl}/transmission-network.pmtiles`,
+    minzoom: 4,
+    maxzoom: 15
+  }]
+
+export const additionalLayers = [{
     "id": "substation-point",
     "source": "substation",
     "source-layer": "data",
@@ -59,3 +60,12 @@ export const layers = [{
       'line-color': '#3f3'
     }
   }]
+
+const filters = [{
+  "layerId": "substation-point",
+  "filterKey": "point-opacity",
+  "getFilterValue": (on) => {
+      return on? '0.0': '1.0'
+    }
+  }
+]
