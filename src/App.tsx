@@ -2,7 +2,7 @@ import { Provider as ChakraProvider } from "@/components/ui/provider"
 import Map from "@/components/map"
 import { SideBar } from '@/components/sidebar'
 import { Grid, GridItem, Container} from '@chakra-ui/react'
-import { useSidebarState } from '@/hooks/useSidebarState'
+import { useSidebarState } from '@/hooks/use-sidebar'
 import { rangeFilterConfigs, checkboxFilterConfigs } from '@/config/filters'
 // import DeckMap from '@/components/deck-map'
 import './index.css'
