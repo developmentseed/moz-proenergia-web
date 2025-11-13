@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Map, { Source, Layer } from 'react-map-gl/maplibre'
 import { Box } from '@chakra-ui/react'
 import * as pmtiles from 'pmtiles';
@@ -31,21 +31,35 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
   // Mocking some types of remote data
   const { data: remoteData } = useRemoteData();
   const range = rangeFilters['range-filter-2']
-    
-    const values: (string | number | boolean | string[])[] =[]
-    for (const row of remoteData) {
-      const show = row['CurrentMVLineDist'] > range[0] && row['CurrentMVLineDist'] < range[1] 
-      values.push(parseInt(row['fid']), show);
-    }
-    const matched = [
-      "match",
-      ["get", "fid"],
-      ...values,
-      true
-    ];
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [matched, setMatched] = useState<(string | number | boolean | string[])[]>([
+        "match",
+        ["get", "fid"],
+        "true"
+      ]);
+  
+  useEffect(() => {
+    const worker = new Worker(new URL('./worker.ts', import.meta.url));
+    
+    worker.onmessage = (e) => {
+      const matchExpression = [
+        "match",
+        ["get", "fid"],
+        ...e.data,
+        true
+      ];
+      setMatched(matchExpression);
+      setIsLoading(false);
+    };
+    
+    worker.postMessage({ remoteData, range });
+    setIsLoading(true);
+    return () => worker.terminate();
+  }, [remoteData, range]);
 
   return (<Box w='100%' className="map-container">
+          {isLoading && <Box position={'absolute'} top={2} right={2} zIndex={150000} p={2} background={'white'}> Loading...</Box>}
         <Map
           initialViewState={{
             longitude: COORDS[1],
@@ -55,6 +69,7 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
           style={{ width: '100%', height: '100vh' }}
           mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
         >
+          
           {/* Model Source/Layer */}
           <Source {...modelSource}>
               {modelLayers.map(layer => {
