@@ -6,6 +6,7 @@ import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { additionalSources, additionalLayers, modelLayers, modelSource, filters } from '@/config/map';
 import type { SidebarFormState } from '@/types/sidebar';
+import { useRemoteData } from '@/hooks/use-remote-data'
 
 const COORDS = [-25.9692, 32.5732]
 
@@ -14,8 +15,10 @@ interface MapVisualizationProps {
 }
 
 export default function MapVisualization({ state }: MapVisualizationProps) {
+
   const { layers: visibleLayers, rangeFilters } = state;
-    // Attach pmtile protocol to MapLibre
+  
+  // Attach pmtile protocol to MapLibre
   useEffect(() => {
     const protocol = new pmtiles.Protocol()
     maplibregl.addProtocol('pmtiles', protocol.tile)
@@ -24,6 +27,23 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
       maplibregl.removeProtocol('pmtiles')
     }
   },[])
+
+  // Mocking some types of remote data
+  const { data: remoteData } = useRemoteData();
+  const range = rangeFilters['range-filter-2']
+    
+    const values: (string | number | boolean | string[])[] =[]
+    for (const row of remoteData) {
+      const show = row['CurrentMVLineDist'] > range[0] && row['CurrentMVLineDist'] < range[1] 
+      values.push(parseInt(row['fid']), show);
+    }
+    const matched = [
+      "match",
+      ["get", "fid"],
+      ...values,
+      true
+    ];
+
 
   return (<Box w='100%' className="map-container">
         <Map
@@ -49,7 +69,8 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
                   paint: { 
                     ...layer.paint,
                     ...matchingPaintStyle
-                  }
+                  },
+                  filter: matched
                 }
                  {/* @ts-expect-error leaving it temporarily */}
                 return (<Layer key={layer.id} {...layerConfig} />)

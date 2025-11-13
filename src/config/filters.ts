@@ -6,6 +6,7 @@ export const layerOptionConfigs: CheckboxOptionConfig[] = [
 ];
 
 export const rangeFilterConfigs: RangeFilterConfig[] = [
+  // This is from tile
   {
     id: 'range',
     label: 'Population',
@@ -13,13 +14,14 @@ export const rangeFilterConfigs: RangeFilterConfig[] = [
     max: 50000,
     defaultValue: [0, 20000],
     step: 10,
-    minStepsBetweenThumbs: 10,
+    minStepsBetweenThumbs: 100,
   },
+  // This is from a separate file
   {
     id: 'range-filter-2',
-    label: 'Range Filter 2',
+    label: 'Current Distance to MV Line',
     min: 0,
-    max: 90,
+    max: 115,
     defaultValue: [0, 45],
     step: 1,
     minStepsBetweenThumbs: 5,
