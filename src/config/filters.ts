@@ -11,9 +11,9 @@ export const rangeFilterConfigs: RangeFilterConfig[] = [
     id: 'range',
     label: 'Population',
     min: 0,
-    max: 50000,
-    defaultValue: [0, 20000],
-    step: 10,
+    max: 450000,
+    defaultValue: [0, 300000],
+    step: 100,
     minStepsBetweenThumbs: 100,
   },
   // This is from a separate file

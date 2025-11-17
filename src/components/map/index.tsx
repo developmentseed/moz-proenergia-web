@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Map, { Source, Layer } from 'react-map-gl/maplibre'
+import  { Map, Popup, Source, Layer } from 'react-map-gl/maplibre'
 import { Box } from '@chakra-ui/react'
 import * as pmtiles from 'pmtiles';
 import * as maplibregl from 'maplibre-gl';
@@ -7,7 +7,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { additionalSources, additionalLayers, modelLayers, modelSource, filters } from '@/config/map';
 import type { SidebarFormState } from '@/types/sidebar';
 import { useRemoteData } from '@/hooks/use-remote-data'
-
+import { usePopup } from'./use-popup';
 const COORDS = [-25.9692, 32.5732]
 
 interface MapVisualizationProps {
@@ -17,7 +17,27 @@ interface MapVisualizationProps {
 export default function MapVisualization({ state }: MapVisualizationProps) {
 
   const { layers: visibleLayers, rangeFilters } = state;
-  
+  const { hoverInfo, setHoverInfo, onHover,  } = usePopup();
+
+  // Mocking some types of remote data
+  const { data: remoteData } = useRemoteData('/filter.csv');
+  const { data: remoteVizData } = useRemoteData('/popup.csv');
+  const range = rangeFilters['range-filter-2'];
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [matched, setMatched] = useState<(string | number | boolean | string[])[]>([
+        "match",
+        ["get", "fid"],
+        "true"
+      ]);
+  const [firstFillExpression, setFirstFillExpression] = useState<(string | number | boolean | string[])[]>([
+        "match",
+        ["get", "fid"],
+        "", "#ccc",
+        "#ccc"
+      ]);
+  // @ts-expect-error ingore for now
+  const matching = {...remoteData.find(f => f.fid == hoverInfo?.fid), ...remoteVizData.find(f => f.fid == hoverInfo?.fid)};
   // Attach pmtile protocol to MapLibre
   useEffect(() => {
     const protocol = new pmtiles.Protocol()
@@ -28,19 +48,27 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
     }
   },[])
 
-  // Mocking some types of remote data
-  const { data: remoteData } = useRemoteData();
-  const range = rangeFilters['range-filter-2']
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [matched, setMatched] = useState<(string | number | boolean | string[])[]>([
-        "match",
-        ["get", "fid"],
-        "true"
-      ]);
-  
   useEffect(() => {
-    const worker = new Worker(new URL('./worker.ts', import.meta.url));
+
+    if (!remoteVizData.length) return;
+    const colorWorker = new Worker(new URL('./color-worker.ts', import.meta.url));
+    
+    colorWorker.onmessage = (e) => {
+      const matchExpression = ['match', ['get', 'fid'],
+          ...e.data,
+          '#ccc'
+        ]
+      setFirstFillExpression(matchExpression);
+      setIsLoading(false);
+    };
+    
+    colorWorker.postMessage({ remoteData: remoteVizData });
+    setIsLoading(true);
+    return () => colorWorker.terminate();
+  }, [remoteVizData]);
+
+  useEffect(() => {
+    const worker = new Worker(new URL('./filter-worker.ts', import.meta.url));
     
     worker.onmessage = (e) => {
       const matchExpression = [
@@ -58,6 +86,7 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
     return () => worker.terminate();
   }, [remoteData, range]);
 
+
   return (<Box w='100%' className="map-container">
           {isLoading && <Box position={'absolute'} top={2} right={2} zIndex={150000} p={2} background={'white'}> Loading...</Box>}
         <Map
@@ -67,7 +96,9 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
             zoom: 6
           }}
           style={{ width: '100%', height: '100vh' }}
+          onClick={onHover}
           mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+          interactiveLayerIds={['model-fill', 'model-line']}
         >
           
           {/* Model Source/Layer */}
@@ -83,7 +114,8 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
                   ...layer,
                   paint: { 
                     ...layer.paint,
-                    ...matchingPaintStyle
+                    ...matchingPaintStyle,
+                    "fill-color": firstFillExpression
                   },
                   filter: matched
                 }
@@ -105,6 +137,17 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
               }</Source>
             )
           })}
+        {hoverInfo?.fid && (
+          <Popup
+            longitude={hoverInfo.longitude}
+            latitude={hoverInfo.latitude}
+            closeButton={true}
+            closeOnClick={false}
+            onClose={() => setHoverInfo(null)}
+          >
+            {`fid: ${hoverInfo.fid} | Population: ${hoverInfo.population} | Distance to MV line: ${matching && matching['CurrentMVLineDist']} | LCOE 2027: ${matching && matching['MinimumOverallLCOE2027']}`} 
+          </Popup>
+        )}
         </Map>
       </Box>)
 }
