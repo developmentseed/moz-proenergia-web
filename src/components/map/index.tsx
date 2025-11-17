@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Map, { Source, Layer } from 'react-map-gl/maplibre'
+import  { Map, Popup, Source, Layer } from 'react-map-gl/maplibre'
 import { Box } from '@chakra-ui/react'
 import * as pmtiles from 'pmtiles';
 import * as maplibregl from 'maplibre-gl';
@@ -7,6 +7,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { additionalSources, additionalLayers, modelLayers, modelSource, filters } from '@/config/map';
 import type { SidebarFormState } from '@/types/sidebar';
 import { useRemoteData } from '@/hooks/use-remote-data'
+import { usePopup } from'./use-popup';
 
 const COORDS = [-25.9692, 32.5732]
 
@@ -17,7 +18,21 @@ interface MapVisualizationProps {
 export default function MapVisualization({ state }: MapVisualizationProps) {
 
   const { layers: visibleLayers, rangeFilters } = state;
-  
+  const { hoverInfo, setHoverInfo, onHover,  } = usePopup();
+
+  // Mocking some types of remote data
+  const { data: remoteData } = useRemoteData('/filter.csv');
+  const range = rangeFilters['range-filter-2'];
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [matched, setMatched] = useState<(string | number | boolean | string[])[]>([
+        "match",
+        ["get", "fid"],
+        "true"
+      ]);
+
+  // @ts-expect-error ingore for now
+  const matching = remoteData.find(f => f.fid == hoverInfo?.fid)
   // Attach pmtile protocol to MapLibre
   useEffect(() => {
     const protocol = new pmtiles.Protocol()
@@ -28,19 +43,8 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
     }
   },[])
 
-  // Mocking some types of remote data
-  const { data: remoteData } = useRemoteData();
-  const range = rangeFilters['range-filter-2']
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [matched, setMatched] = useState<(string | number | boolean | string[])[]>([
-        "match",
-        ["get", "fid"],
-        "true"
-      ]);
-  
   useEffect(() => {
-    const worker = new Worker(new URL('./worker.ts', import.meta.url));
+    const worker = new Worker(new URL('./filter-worker.ts', import.meta.url));
     
     worker.onmessage = (e) => {
       const matchExpression = [
@@ -67,7 +71,9 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
             zoom: 6
           }}
           style={{ width: '100%', height: '100vh' }}
+          onClick={onHover}
           mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+          interactiveLayerIds={['model-fill', 'model-line']}
         >
           
           {/* Model Source/Layer */}
@@ -105,6 +111,17 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
               }</Source>
             )
           })}
+        {hoverInfo?.fid && (
+          <Popup
+            longitude={hoverInfo.longitude}
+            latitude={hoverInfo.latitude}
+            closeButton={true}
+            closeOnClick={false}
+            onClose={() => setHoverInfo(null)}
+          >
+            {`fid: ${hoverInfo.fid} | Population: ${hoverInfo.population} | Distance to MV line: ${matching && matching['CurrentMVLineDist']}}`} 
+          </Popup>
+        )}
         </Map>
       </Box>)
 }
