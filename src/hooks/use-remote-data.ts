@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import * as d3 from 'd3';
 
 export function useRemoteData(path:string) {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<Record<string, unknown>[]>([]);
 
   useEffect(() => {
     if (data.length) return;

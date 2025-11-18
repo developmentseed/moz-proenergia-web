@@ -3,7 +3,6 @@ import { Stack, Separator, Heading, For, Box } from "@chakra-ui/react"
 import { GroupCheckbox } from "@/components/ui/group-checkbox"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RangeSlider } from "@/components/ui/range-slider"
-import { ActionButton } from "@/components/ui/action-button"
 import { layerOptionConfigs, rangeFilterConfigs, checkboxFilterConfigs } from "@/config/filters"
 import type { SidebarFormState, SidebarFormActions } from '@/types/sidebar'
 
@@ -29,12 +28,12 @@ export const SideBar = ({ state, actions }: SideBarProps) => {
       <Separator />
     <Box marginBottom="3">
       {/* Filters Section */}
-      <Heading as='h2' size='md' marginBottom="1"> Filters</Heading>
-    <Box marginBottom="2">
+      <Heading as='h2' size='md' marginBottom="2"> Filters</Heading>
+    <Box marginBottom="4">
       {/* Dynamic Range Filters */}
       <For each={rangeFilterConfigs}>
         {(filterConfig) => (
-          <div key={filterConfig.id}>
+          <Box key={filterConfig.id} marginBottom='4'>
             <Heading as='h3' size='sm'>{filterConfig.label}</Heading>
             <RangeSlider
               value={state.rangeFilters[filterConfig.id]}
@@ -44,11 +43,11 @@ export const SideBar = ({ state, actions }: SideBarProps) => {
               step={filterConfig.step}
               minStepsBetweenThumbs={filterConfig.minStepsBetweenThumbs}
             />
-          </div>
+          </Box>
         )}
       </For>
     </Box>
-      <Box marginBottom="2">
+      <Box marginBottom="4">
         {/* Dynamic Binary Filters */}
         <For each={checkboxFilterConfigs}>
           {(filterConfig) => (
@@ -62,7 +61,7 @@ export const SideBar = ({ state, actions }: SideBarProps) => {
         </For>
       </Box>
     </Box>
-    <ActionButton onClick={actions.applyFilters} />
+    {/* <ActionButton onClick={actions.applyFilters} /> */}
     </Stack>
   )
 }

@@ -1,13 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import  { Map, Popup, Source, Layer } from 'react-map-gl/maplibre'
 import { Box } from '@chakra-ui/react'
 import * as pmtiles from 'pmtiles';
 import * as maplibregl from 'maplibre-gl';
+import { type FillLayerSpecification, type FilterSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { additionalSources, additionalLayers, modelLayers, modelSource, filters } from '@/config/map';
+import { additionalSources, additionalLayers, modelPopupLayer, modelFillLayer, modelLineLayer, modelSource, LEGEND, getRangeFilter } from '@/config/map';
 import type { SidebarFormState } from '@/types/sidebar';
 import { useRemoteData } from '@/hooks/use-remote-data'
 import { usePopup } from'./use-popup';
+import { Legend } from './legend';
+import { PopupContent } from './popup';
 
 const COORDS = [-25.9692, 32.5732]
 
@@ -15,24 +18,10 @@ interface MapVisualizationProps {
   state: SidebarFormState;
 }
 
+
+
 export default function MapVisualization({ state }: MapVisualizationProps) {
 
-  const { layers: visibleLayers, rangeFilters } = state;
-  const { hoverInfo, setHoverInfo, onHover,  } = usePopup();
-
-  // Mocking some types of remote data
-  const { data: remoteData } = useRemoteData('/filter.csv');
-  const range = rangeFilters['range-filter-2'];
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [matched, setMatched] = useState<(string | number | boolean | string[])[]>([
-        "match",
-        ["get", "fid"],
-        "true"
-      ]);
-
-  // @ts-expect-error ingore for now
-  const matching = remoteData.find(f => f.fid == hoverInfo?.fid)
   // Attach pmtile protocol to MapLibre
   useEffect(() => {
     const protocol = new pmtiles.Protocol()
@@ -43,27 +32,35 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
     }
   },[])
 
-  useEffect(() => {
-    const worker = new Worker(new URL('./filter-worker.ts', import.meta.url));
-    
-    worker.onmessage = (e) => {
-      const matchExpression = [
-        "match",
-        ["get", "fid"],
-        ...e.data,
-        true
-      ];
-      setMatched(matchExpression);
-      setIsLoading(false);
-    };
-    
-    worker.postMessage({ remoteData, range });
-    setIsLoading(true);
-    return () => worker.terminate();
-  }, [remoteData, range]);
+  const { layers: visibleLayers, rangeFilters } = state;
+  const { hoverInfo, setHoverInfo, onHover,  } = usePopup();
 
-  return (<Box w='100%' className="map-container">
-          {isLoading && <Box position={'absolute'} top={2} right={2} zIndex={150000} p={2} background={'white'}> Loading...</Box>}
+  // Mocking some types of remote data
+  const { data: remoteData } = useRemoteData('/filter.csv');
+
+  const currentFilters = Object.keys(rangeFilters).map(filterKey => {
+    return getRangeFilter(rangeFilters[filterKey], filterKey)
+  }).flat();
+  
+  const layerPropertiesWFilter = {
+    ...modelFillLayer,
+    filter: [
+      "case",
+      [
+        "all",
+        ...currentFilters
+      ],
+      true,
+      false
+    ]
+  };
+
+  const matchingCluster = remoteData.find(f => f.fid == hoverInfo?.data.id)
+  const popupData = matchingCluster && hoverInfo? {...hoverInfo.data, ...matchingCluster} : null;
+
+  return (<Box w='100%' className="map-container" position="relative">
+          {/* {isLoading && <Box position={'absolute'} top={2} right={2} zIndex={150000} p={2} background={'white'}> Loading...</Box>} */}
+        <Legend items={LEGEND} />
         <Map
           initialViewState={{
             longitude: COORDS[1],
@@ -73,31 +70,16 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
           style={{ width: '100%', height: '100vh' }}
           onClick={onHover}
           mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
-          interactiveLayerIds={['model-fill', 'model-line']}
+          interactiveLayerIds={['model-popup']}
         >
           
           {/* Model Source/Layer */}
           <Source {...modelSource}>
-              {modelLayers.map(layer => {
-                const matchingFilter = filters.find(f => f.layerId === layer.id)!;
-                if (matchingFilter) {
-                const matchingRange = rangeFilters[matchingFilter.filterId];
-                const matchingPaintStyle = {
-                  [matchingFilter.filterKey]: matchingFilter?.getFilterValue(matchingRange, matchingFilter.propertyName)
-                }
-                const layerConfig = {
-                  ...layer,
-                  paint: { 
-                    ...layer.paint,
-                    ...matchingPaintStyle
-                  },
-                  filter: matched
-                }
-                 {/* @ts-expect-error leaving it temporarily */}
-                return (<Layer key={layer.id} {...layerConfig} />)
-                } else return <Layer key={layer.id} {...layer} />
-              })
-            }
+            <Layer {...modelLineLayer} />
+            <Layer {...modelPopupLayer} />
+            {/* @ts-expect-error Some types are wrong with filter specification. Ignoring for now */}
+            <Layer {...layerPropertiesWFilter} />
+
           </Source>
           {additionalSources.map(source => {
             const matchingLayers = additionalLayers.filter(l => l.source === source.id).filter(l => {
@@ -111,7 +93,7 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
               }</Source>
             )
           })}
-        {hoverInfo?.fid && (
+        {hoverInfo && (
           <Popup
             longitude={hoverInfo.longitude}
             latitude={hoverInfo.latitude}
@@ -119,7 +101,7 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
             closeOnClick={false}
             onClose={() => setHoverInfo(null)}
           >
-            {`fid: ${hoverInfo.fid} | Population: ${hoverInfo.population} | Distance to MV line: ${matching && matching['CurrentMVLineDist']}}`} 
+            <PopupContent data={popupData} />
           </Popup>
         )}
         </Map>

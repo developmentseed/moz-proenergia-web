@@ -2,11 +2,18 @@ import { useState, useCallback, useMemo, type Dispatch, type SetStateAction } fr
 import type { MapLayerMouseEvent } from 'react-map-gl/maplibre';
 import type { ExpressionSpecification } from 'maplibre-gl';
 
+interface ClusterProperties {
+  id: number;
+  MinimumOverall2027?: 'SA_PV2027'| 'MG_PV_Hybrid2027'| 'Grid2027';
+  CurrentMVLineDist?: number;
+  NewConnections2027?: number;
+  Pop?: number;
+}
+
 interface HoverInfo {
   longitude: number;
   latitude: number;
-  fid: string;
-  population: string;
+  data: ClusterProperties
 }
 
 interface UsePopupReturn {
@@ -20,21 +27,22 @@ export function usePopup(): UsePopupReturn {
   const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null);
 
   const onHover = useCallback((event: MapLayerMouseEvent) => {
-    const county = event.features && event.features[0];
-    setHoverInfo({
+    const cluster = event.features && event.features[0];
+    
+    const featureInfo = cluster? {
       longitude: event.lngLat.lng,
       latitude: event.lngLat.lat,
-      fid: county && county.properties.id, // fid from original data is float, use id instead
-      population: county && county.properties.Population,
-    });
+      data: cluster.properties as ClusterProperties
+    }: null;
+    setHoverInfo(featureInfo)
   }, []);
 
-  const selectedCounty = (hoverInfo && hoverInfo.fid ) || '';
+  const selectedCluster = (hoverInfo && hoverInfo.data.id ) || '';
 
   // To show selected region
   const filter: ExpressionSpecification = useMemo(
-    () => ['in', selectedCounty || 'N/A', ['get', 'name']],
-    [selectedCounty]
+    () => ['in', selectedCluster || 'N/A', ['get', 'name']],
+    [selectedCluster]
   );
 
   return {
