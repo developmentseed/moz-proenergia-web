@@ -4,6 +4,7 @@ import { Box } from '@chakra-ui/react'
 import * as pmtiles from 'pmtiles';
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import FPSControl from './fps-control';
 import { additionalSources, additionalLayers, modelLayers, modelSource, filters } from '@/config/map';
 import type { SidebarFormState } from '@/types/sidebar';
 import { useRemoteData } from '@/hooks/use-remote-data'
@@ -100,7 +101,8 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
           mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
           interactiveLayerIds={['model-fill', 'model-line']}
         >
-          
+          <FPSControl position="top-right" />
+
           {/* Model Source/Layer */}
           <Source {...modelSource}>
               {modelLayers.map(layer => {
