@@ -73,7 +73,7 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
           mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
           interactiveLayerIds={['model-popup']}
         >
-              <FPSControl position="top-right" />
+          {/* <FPSControl position="top-right" /> */}
 
           {/* Model Source/Layer */}
           <Source {...modelSource}>
