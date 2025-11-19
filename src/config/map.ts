@@ -61,7 +61,18 @@ export const modelLineLayer = {
   "paint": {
     'line-color': '#aaa'
   }
-}  as const;
+} as const;
+
+export const modelHighlightLayer = {
+  "id": "model-highlight",
+  "source": "model",
+  "source-layer": "clusters",
+  "type": "line",
+  "paint": {
+    'line-color': '#a33',
+    'line-width': 2
+  }
+} as const;
 
 export const modelLayers = [modelFillLayer, modelLineLayer ] as const;
 

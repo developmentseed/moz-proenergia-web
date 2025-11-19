@@ -5,7 +5,7 @@ import * as pmtiles from 'pmtiles';
 import * as maplibregl from 'maplibre-gl';
 
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { additionalSources, additionalLayers, modelPopupLayer, modelFillLayer, modelLineLayer, modelSource, LEGEND, getRangeFilter } from '@/config/map';
+import { additionalSources, additionalLayers, modelPopupLayer, modelFillLayer, modelLineLayer,modelHighlightLayer, modelSource, LEGEND, getRangeFilter } from '@/config/map';
 import type { SidebarFormState } from '@/types/sidebar';
 import { useRemoteData } from '@/hooks/use-remote-data'
 import { usePopup } from'./use-popup';
@@ -18,8 +18,6 @@ const COORDS = [-25.9692, 32.5732]
 interface MapVisualizationProps {
   state: SidebarFormState;
 }
-
-
 
 export default function MapVisualization({ state }: MapVisualizationProps) {
 
@@ -34,8 +32,8 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
   },[])
 
   const { layers: visibleLayers, rangeFilters } = state;
-  const { hoverInfo, setHoverInfo, onHover,  } = usePopup();
-
+  const { hoverInfo, setHoverInfo, onHover, hoverFilter } = usePopup();
+  
   // Mocking some types of remote data
   const { data: remoteData } = useRemoteData('/sample.csv');
 
@@ -79,6 +77,7 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
             <Layer {...modelPopupLayer} />
             {/* @ts-expect-error Some types are wrong with filter specification. Ignoring for now */}
             <Layer {...layerPropertiesWFilter} />
+            <Layer {...modelHighlightLayer} filter={hoverFilter} />
 
           </Source>
           {additionalSources.map(source => {

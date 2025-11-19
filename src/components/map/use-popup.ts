@@ -3,7 +3,7 @@ import type { MapLayerMouseEvent } from 'react-map-gl/maplibre';
 import type { ExpressionSpecification } from 'maplibre-gl';
 
 interface ClusterProperties {
-  id: number | string; // Cast id to string so it doesn't get treated like number
+  id: string; // Cast id to string so it doesn't get treated like number
   MinimumOverall2027?: 'SA_PV2027'| 'MG_PV_Hybrid2027'| 'Grid2027';
   CurrentMVLineDist?: number;
   NewConnections2027?: number;
@@ -33,17 +33,17 @@ export function usePopup(): UsePopupReturn {
       longitude: event.lngLat.lng,
       latitude: event.lngLat.lat,
       // Cast id here, so it still works with integer ID in tiles, but displays as string in popup
-      data: { ...cluster.properties,  id: cluster.properties.id.toString()} as ClusterProperties
+      data: { ...cluster.properties, id: cluster.properties.id.toString()} as ClusterProperties
     }: null;
     setHoverInfo(featureInfo)
   }, []);
 
-  const selectedCluster = (hoverInfo && hoverInfo.data.id ) || '';
+  const selectedClusterId = (hoverInfo && hoverInfo.data.id) || '';
 
   // To show selected region
   const filter: ExpressionSpecification = useMemo(
-    () => ['in', selectedCluster || 'N/A', ['get', 'name']],
-    [selectedCluster]
+    () => ['==', ['get', 'id'], parseInt(selectedClusterId)],
+    [selectedClusterId]
   );
 
   return {
