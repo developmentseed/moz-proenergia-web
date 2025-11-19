@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import  { Map, Popup, Source, Layer } from 'react-map-gl/maplibre'
+import { useEffect, useMemo } from 'react';
+import  { Map, Source, Layer } from 'react-map-gl/maplibre'
 import { Box } from '@chakra-ui/react'
 import * as pmtiles from 'pmtiles';
 import * as maplibregl from 'maplibre-gl';
@@ -11,7 +11,7 @@ import { useRemoteData } from '@/hooks/use-remote-data'
 import { usePopup } from'./use-popup';
 import { Legend } from './legend';
 import { SummaryWithContent } from './summary';
-import { DataTable } from './popup';
+// import { DataTable } from './popup';
 // import FPSControl from './fps-control';
 
 const COORDS = [-25.9692, 32.5732]
@@ -33,10 +33,25 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
   },[])
 
   const { layers: visibleLayers, rangeFilters } = state;
-  const { hoverInfo, setHoverInfo, onHover, hoverFilter } = usePopup();
+  const { hoverInfo, onHover, hoverFilter } = usePopup();
   
   // Mocking some types of remote data
   const { data: remoteData } = useRemoteData('/sample.csv');
+  
+  const nationalSummary = useMemo(() =>{
+    if (!remoteData.length) return null;
+    const summaryObj = {
+      'CurrentMVLineDist': 0,
+      'NewConnections2027': 0
+    }
+    for (let i = 0; i < remoteData.length; i++) {
+        summaryObj['CurrentMVLineDist'] += parseFloat(remoteData[i]['CurrentMVLineDist'] as string);
+        summaryObj['NewConnections2027'] += parseFloat(remoteData[i]['NewConnections2027'] as string);
+    }
+    return summaryObj;
+  },[remoteData]);
+
+
 
   const currentFilters = Object.keys(rangeFilters).map(filterKey => {
     return getRangeFilter(rangeFilters[filterKey], filterKey)
@@ -58,8 +73,12 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
   const matchingCluster = remoteData.find(f => f.fid == hoverInfo?.data.id)
   const popupData = matchingCluster && hoverInfo? {...hoverInfo.data, ...matchingCluster} : null;
   
+  const isNational = !popupData;
+  const title = isNational? 'National' : `Cluster ${popupData.id}`
+  const displayData = isNational? nationalSummary: popupData;
+  
   return (<Box w='100%' className="map-container" position="relative">
-        <SummaryWithContent data={popupData} />
+        <SummaryWithContent title={title} data={displayData} />
         <Legend items={LEGEND} />
         <Map
           initialViewState={{
@@ -94,7 +113,7 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
               }</Source>
             )
           })}
-        {hoverInfo && (
+        {/* {hoverInfo && (
           <Popup
             longitude={hoverInfo.longitude}
             latitude={hoverInfo.latitude}
@@ -104,7 +123,7 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
           >
             {popupData && <DataTable data={popupData} />}
           </Popup>
-        )}
+        )} */}
         </Map>
       </Box>)
 }

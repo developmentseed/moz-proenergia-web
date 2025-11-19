@@ -1,5 +1,4 @@
 import { Box, VStack, Text } from '@chakra-ui/react';
-import { Graph } from './graph';
 import { DataTable } from './popup';
 
 interface SummaryProps {
@@ -25,7 +24,7 @@ function SummaryShell({ title = 'Summary', children }: SummaryProps) {
         </Text>
         {children || (
           <Text fontSize="sm" color="gray.600">
-            No summary data available
+            Loading Data
           </Text>
         )}
       </VStack>
@@ -33,15 +32,11 @@ function SummaryShell({ title = 'Summary', children }: SummaryProps) {
   );
 }
 
-export function SummaryWithContent ({ data }) {
-  const nationalData = {'label': 'a','value': 'b','key': 'b'}
-  const isNational = !data;
-  const title = isNational? 'National' : `Cluster ${data.id}`
-  const displayData = isNational? nationalData: data;
+export function SummaryWithContent ({ data, title }: {data: Record<string, string|number>, title: string}) {
   return (
     <SummaryShell title={title}>
-      <Graph />
-      <DataTable data={displayData} />
+      {/* <Graph /> */}
+      {data && <DataTable data={data} />}
     </SummaryShell>
   )
 }
