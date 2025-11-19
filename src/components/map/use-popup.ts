@@ -6,7 +6,8 @@ interface ClusterProperties {
   id: string; // Cast id to string so it doesn't get treated like number
   MinimumOverall2027?: 'SA_PV2027'| 'MG_PV_Hybrid2027'| 'Grid2027';
   CurrentMVLineDist?: number;
-  NewConnections2027?: number;
+  NewConnections2027: number;
+  NewConnections2030: number;
   Pop?: number;
 }
 

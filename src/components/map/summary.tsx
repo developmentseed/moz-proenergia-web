@@ -1,5 +1,6 @@
 import { Box, VStack, Text } from '@chakra-ui/react';
 import { DataTable } from './popup';
+import { Graph } from './graph';
 
 interface SummaryProps {
   title?: string;
@@ -19,11 +20,11 @@ function SummaryShell({ title = 'Summary', children }: SummaryProps) {
       minW="200px"
     >
       <VStack align="stretch" gap={2}>
-        <Text fontWeight="semibold" fontSize="sm" mb={1}>
+        <Text fontWeight="semibold" fontSize="md" mb={1}>
           {title}
         </Text>
         {children || (
-          <Text fontSize="sm" color="gray.600">
+          <Text fontSize="xs" color="gray.600">
             Loading Data
           </Text>
         )}
@@ -32,10 +33,10 @@ function SummaryShell({ title = 'Summary', children }: SummaryProps) {
   );
 }
 
-export function SummaryWithContent ({ data, title }: {data: Record<string, string|number>, title: string}) {
+export function SummaryWithContent ({ data, title, graphData }: {data: Record<string, string|number> | null, title: string, graphData: number[]| null}) {
   return (
     <SummaryShell title={title}>
-      {/* <Graph /> */}
+      {graphData&& <><Text fontSize="sm">New Connections per year</Text> <Graph data={graphData} /></>}
       {data && <DataTable data={data} />}
     </SummaryShell>
   )

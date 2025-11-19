@@ -8,10 +8,11 @@ interface GraphProps {
   height?: number;
 }
 
-const defaultYears = [2021, 2022, 2023, 2024];
-const defaultData = [100, 140, 170, 120];
+const defaultYears = [2027, 2030];
+const defaultData = [100, 140];
 
 const BAR_COLOR = '#377eb8';
+
 export const Graph = ({
   years = defaultYears,
   data = defaultData,
@@ -24,15 +25,23 @@ export const Graph = ({
 
   const { bars, yTicks, xTicks } = useMemo(() => {
     const maxData = Math.max(...data);
-    const barWidth = innerWidth / years.length * 0.6; // 60% of available space per bar
-    const barSpacing = innerWidth / years.length;
+    const minYear = Math.min(...years);
+    const maxYear = Math.max(...years);
+
+    
+    const minimumBuffer = 2; // Always give at least 2 yearas of bufer
+    const yearRange = maxYear - minYear + minimumBuffer;
+    const xScale = (year: number) => ((year - minYear + minimumBuffer/2)  / yearRange) * innerWidth;
 
     // Scale function for y values
     const yScale = (value: number) => innerHeight - (value / maxData) * innerHeight;
 
+    const barWidth = 30;
+
     // Calculate bars
     const bars = data.map((value, i) => {
-      const x = i * barSpacing + (barSpacing - barWidth) / 2;
+      const centerX = xScale(years[i]);
+      const x = centerX - barWidth/2;
       const y = yScale(value);
       const height = innerHeight - y;
 
@@ -57,11 +66,23 @@ export const Graph = ({
       };
     });
 
-    // X axis ticks (centered under each bar)
-    const xTicks = years.map((year, i) => ({
-      year,
-      x: i * barSpacing + barSpacing / 2
-    }));
+    // X axis ticks at regular intervals
+    const tickInterval = yearRange > 20 ? 5 : yearRange > 10 ? 2 : 1;
+    const firstTick = Math.ceil(minYear / tickInterval) * tickInterval;
+    const xTicks = [];
+    for (let year = firstTick; year <= maxYear; year += tickInterval) {
+      xTicks.push({
+        year,
+        x: xScale(year)
+      });
+    }
+    // Always include min and max years if not already included
+    if (xTicks.length === 0 || xTicks[0].year > minYear) {
+      xTicks.unshift({ year: minYear, x: xScale(minYear) });
+    }
+    if (xTicks[xTicks.length - 1].year < maxYear) {
+      xTicks.push({ year: maxYear, x: xScale(maxYear) });
+    }
 
     return { bars, yTicks, xTicks };
   }, [years, data, innerWidth, innerHeight]);

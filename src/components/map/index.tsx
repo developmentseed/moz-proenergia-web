@@ -11,8 +11,6 @@ import { useRemoteData } from '@/hooks/use-remote-data'
 import { usePopup } from'./use-popup';
 import { Legend } from './legend';
 import { SummaryWithContent } from './summary';
-// import { DataTable } from './popup';
-// import FPSControl from './fps-control';
 
 const COORDS = [-25.9692, 32.5732]
 
@@ -42,11 +40,13 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
     if (!remoteData.length) return null;
     const summaryObj = {
       'CurrentMVLineDist': 0,
-      'NewConnections2027': 0
+      'NewConnections2027': 0,
+      'NewConnections2030': 0
     }
     for (let i = 0; i < remoteData.length; i++) {
         summaryObj['CurrentMVLineDist'] += parseFloat(remoteData[i]['CurrentMVLineDist'] as string);
         summaryObj['NewConnections2027'] += parseFloat(remoteData[i]['NewConnections2027'] as string);
+        summaryObj['NewConnections2030'] += parseFloat(remoteData[i]['NewConnections2030'] as string);
     }
     return summaryObj;
   },[remoteData]);
@@ -76,9 +76,10 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
   const isNational = !popupData;
   const title = isNational? 'National' : `Cluster ${popupData.id}`
   const displayData = isNational? nationalSummary: popupData;
+  const graphData = displayData && [displayData['NewConnections2027'], displayData['NewConnections2030']];
   
   return (<Box w='100%' className="map-container" position="relative">
-        <SummaryWithContent title={title} data={displayData} />
+        <SummaryWithContent title={title} data={displayData} graphData = {graphData} />
         <Legend items={LEGEND} />
         <Map
           initialViewState={{
