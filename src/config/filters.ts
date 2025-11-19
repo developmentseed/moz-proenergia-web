@@ -10,8 +10,8 @@ export const rangeFilterConfigs: RangeFilterConfig[] = [
     id: 'Pop',
     label: 'Population',
     min: 0,
-    max: 300000,
-    defaultValue: [0, 150000],
+    max: 3000000,
+    defaultValue: [0, 2818735],
     step: 100,
     minStepsBetweenThumbs: 100,
   },
@@ -29,10 +29,10 @@ export const rangeFilterConfigs: RangeFilterConfig[] = [
     id: 'NewConnections2027',
     label: 'New Connections',
     min: 0,
-    max: 70000,
+    max: 360000,
     defaultValue: [0, 70000],
     step: 100,
-    minStepsBetweenThumbs: 50,
+    minStepsBetweenThumbs: 100,
   }
 ];
 
