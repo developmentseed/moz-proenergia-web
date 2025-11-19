@@ -10,7 +10,8 @@ import type { SidebarFormState } from '@/types/sidebar';
 import { useRemoteData } from '@/hooks/use-remote-data'
 import { usePopup } from'./use-popup';
 import { Legend } from './legend';
-import { PopupContent } from './popup';
+import { SummaryWithContent } from './summary';
+import { DataTable } from './popup';
 // import FPSControl from './fps-control';
 
 const COORDS = [-25.9692, 32.5732]
@@ -56,8 +57,9 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
 
   const matchingCluster = remoteData.find(f => f.fid == hoverInfo?.data.id)
   const popupData = matchingCluster && hoverInfo? {...hoverInfo.data, ...matchingCluster} : null;
-
+  
   return (<Box w='100%' className="map-container" position="relative">
+        <SummaryWithContent data={popupData} />
         <Legend items={LEGEND} />
         <Map
           initialViewState={{
@@ -100,7 +102,7 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
             closeOnClick={false}
             onClose={() => setHoverInfo(null)}
           >
-            {popupData && <PopupContent data={popupData} />}
+            {popupData && <DataTable data={popupData} />}
           </Popup>
         )}
         </Map>

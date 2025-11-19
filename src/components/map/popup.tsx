@@ -17,7 +17,7 @@ const formatValue = ( value: string|number): string => {
   return value.toLocaleString();
 };
 
-export function PopupContent({ data }: PopupContentProps) {
+export function DataTable({ data }: PopupContentProps) {
   const rows: DataRow[] = Object.entries(data)
     .map(([key, value]) => ({
       key,

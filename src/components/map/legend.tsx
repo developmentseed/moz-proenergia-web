@@ -13,8 +13,8 @@ export function Legend({ items }: LegendProps) {
   return (
     <Box
       position="absolute"
-      bottom="54px"
-      right={4}
+      bottom={2}
+      left={2}
       bg="white"
       p={3}
       boxShadow="md"
