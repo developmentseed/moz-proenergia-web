@@ -3,7 +3,6 @@ import  { Map, Popup, Source, Layer } from 'react-map-gl/maplibre'
 import { Box } from '@chakra-ui/react'
 import * as pmtiles from 'pmtiles';
 import * as maplibregl from 'maplibre-gl';
-// import FPSControl from './fps-control';
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { additionalSources, additionalLayers, modelPopupLayer, modelFillLayer, modelLineLayer, modelSource, LEGEND, getRangeFilter } from '@/config/map';
@@ -12,6 +11,7 @@ import { useRemoteData } from '@/hooks/use-remote-data'
 import { usePopup } from'./use-popup';
 import { Legend } from './legend';
 import { PopupContent } from './popup';
+// import FPSControl from './fps-control';
 
 const COORDS = [-25.9692, 32.5732]
 
@@ -60,7 +60,6 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
   const popupData = matchingCluster && hoverInfo? {...hoverInfo.data, ...matchingCluster} : null;
 
   return (<Box w='100%' className="map-container" position="relative">
-          {/* {isLoading && <Box position={'absolute'} top={2} right={2} zIndex={150000} p={2} background={'white'}> Loading...</Box>} */}
         <Legend items={LEGEND} />
         <Map
           initialViewState={{
@@ -74,7 +73,6 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
           interactiveLayerIds={['model-popup']}
         >
           {/* <FPSControl position="top-right" /> */}
-
           {/* Model Source/Layer */}
           <Source {...modelSource}>
             <Layer {...modelLineLayer} />
