@@ -18,7 +18,7 @@ export const SideBar = ({ state, actions }: SideBarProps) => {
       <Heading as='h1' size='lg'> Proenergia Prototype</Heading>
       <Box marginBottom="3">
         {/* Layers Section */}
-        <Heading as='h2' size='md' marginBottom="1"> Additional Layers</Heading>
+        <Heading as='h2' size='md' marginBottom="2"> Additional Layers</Heading>
         <GroupCheckbox
           options={layerOptionConfigs}
           value={state.layers}

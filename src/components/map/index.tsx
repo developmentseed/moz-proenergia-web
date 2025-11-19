@@ -66,7 +66,7 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
           initialViewState={{
             longitude: COORDS[1],
             latitude: COORDS[0],
-            zoom: 6
+            zoom: 7
           }}
           style={{ width: '100%', height: '100vh' }}
           onClick={onHover}

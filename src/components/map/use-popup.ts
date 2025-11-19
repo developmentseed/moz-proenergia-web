@@ -3,7 +3,7 @@ import type { MapLayerMouseEvent } from 'react-map-gl/maplibre';
 import type { ExpressionSpecification } from 'maplibre-gl';
 
 interface ClusterProperties {
-  id: number;
+  id: number | string; // Cast id to string so it doesn't get treated like number
   MinimumOverall2027?: 'SA_PV2027'| 'MG_PV_Hybrid2027'| 'Grid2027';
   CurrentMVLineDist?: number;
   NewConnections2027?: number;
@@ -32,7 +32,8 @@ export function usePopup(): UsePopupReturn {
     const featureInfo = cluster? {
       longitude: event.lngLat.lng,
       latitude: event.lngLat.lat,
-      data: cluster.properties as ClusterProperties
+      // Cast id here, so it still works with integer ID in tiles, but displays as string in popup
+      data: { ...cluster.properties,  id: cluster.properties.id.toString()} as ClusterProperties
     }: null;
     setHoverInfo(featureInfo)
   }, []);
