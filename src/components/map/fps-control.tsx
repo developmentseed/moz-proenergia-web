@@ -1,5 +1,5 @@
-import { useEffect, useRef, useCallback } from 'react';
 import { useControl } from 'react-map-gl/maplibre';
+import type { ControlPosition } from 'maplibre-gl';
 import type { MapInstance } from 'react-map-gl/maplibre';
 
 interface FPSControlOptions {
@@ -56,7 +56,6 @@ class FPSControl {
     const dpr = window.devicePixelRatio || 1;
     const {
       width,
-      graphWidth,
       graphHeight,
       color,
       background,
@@ -207,7 +206,7 @@ class FPSControl {
     );
   };
 
-  getDefaultPosition(): string {
+  getDefaultPosition(): ControlPosition {
     return 'top-right';
   }
 }
@@ -223,7 +222,7 @@ export function FPSControlComponent({ position = 'top-right', ...options }: FPSC
       position: position
     }
   );
-
+ 
   return null;
 }
 

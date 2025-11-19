@@ -3,7 +3,8 @@ import  { Map, Popup, Source, Layer } from 'react-map-gl/maplibre'
 import { Box } from '@chakra-ui/react'
 import * as pmtiles from 'pmtiles';
 import * as maplibregl from 'maplibre-gl';
-import { type FillLayerSpecification, type FilterSpecification } from 'maplibre-gl';
+import FPSControl from './fps-control';
+
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { additionalSources, additionalLayers, modelPopupLayer, modelFillLayer, modelLineLayer, modelSource, LEGEND, getRangeFilter } from '@/config/map';
 import type { SidebarFormState } from '@/types/sidebar';
@@ -72,7 +73,8 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
           mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
           interactiveLayerIds={['model-popup']}
         >
-          
+              <FPSControl position="top-right" />
+
           {/* Model Source/Layer */}
           <Source {...modelSource}>
             <Layer {...modelLineLayer} />
@@ -101,7 +103,7 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
             closeOnClick={false}
             onClose={() => setHoverInfo(null)}
           >
-            <PopupContent data={popupData} />
+            {popupData && <PopupContent data={popupData} />}
           </Popup>
         )}
         </Map>
