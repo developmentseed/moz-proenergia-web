@@ -3,7 +3,7 @@ import  { Map, Popup, Source, Layer } from 'react-map-gl/maplibre'
 import { Box } from '@chakra-ui/react'
 import * as pmtiles from 'pmtiles';
 import * as maplibregl from 'maplibre-gl';
-import FPSControl from './fps-control';
+// import FPSControl from './fps-control';
 
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { additionalSources, additionalLayers, modelPopupLayer, modelFillLayer, modelLineLayer, modelSource, LEGEND, getRangeFilter } from '@/config/map';
@@ -37,7 +37,7 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
   const { hoverInfo, setHoverInfo, onHover,  } = usePopup();
 
   // Mocking some types of remote data
-  const { data: remoteData } = useRemoteData('/filter.csv');
+  const { data: remoteData } = useRemoteData('/sample.csv');
 
   const currentFilters = Object.keys(rangeFilters).map(filterKey => {
     return getRangeFilter(rangeFilters[filterKey], filterKey)
