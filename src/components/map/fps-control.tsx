@@ -1,5 +1,5 @@
-import { useEffect, useRef, useCallback } from 'react';
 import { useControl } from 'react-map-gl/maplibre';
+import type { ControlPosition } from 'maplibre-gl';
 import type { MapInstance } from 'react-map-gl/maplibre';
 
 interface FPSControlOptions {
@@ -12,6 +12,8 @@ interface FPSControlOptions {
   graphTop?: number;
   graphRight?: number;
   width?: number;
+  showGraph?: boolean;
+  onToggleGraph?: (show: boolean) => void;
 }
 
 interface FPSStats {
@@ -26,7 +28,8 @@ class FPSControl {
   private container: HTMLDivElement | null = null;
   private canvas: HTMLCanvasElement | null = null;
   private readOutput: HTMLDivElement | null = null;
-  private options: Required<FPSControlOptions>;
+  private toggleButton: HTMLButtonElement | null = null;
+  private options: Required<Omit<FPSControlOptions, 'showGraph' | 'onToggleGraph'>> & { showGraph: boolean; onToggleGraph?: (show: boolean) => void };
   private stats: FPSStats = {
     frames: 0,
     totalTime: 0,
@@ -46,7 +49,9 @@ class FPSControl {
       graphWidth: options.graphWidth ?? 90 * dpr,
       graphTop: options.graphTop ?? 0,
       graphRight: options.graphRight ?? 5 * dpr,
-      width: options.width ?? 100 * dpr
+      width: options.width ?? 100 * dpr,
+      showGraph: options.showGraph ?? false,
+      onToggleGraph: options.onToggleGraph
     };
   }
 
@@ -56,7 +61,6 @@ class FPSControl {
     const dpr = window.devicePixelRatio || 1;
     const {
       width,
-      graphWidth,
       graphHeight,
       color,
       background,
@@ -68,16 +72,45 @@ class FPSControl {
     el.className = 'maplibregl-ctrl maplibregl-ctrl-fps';
     el.style.backgroundColor = background;
     el.style.borderRadius = '6px';
+    el.style.display = 'flex';
+    el.style.flexDirection = 'column';
     this.container = el;
+
+    // Create header with text output and toggle button
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.alignItems = 'center';
+    header.style.justifyContent = 'space-between';
+    header.style.padding = '0 5px 5px';
 
     // Create text output
     this.readOutput = document.createElement('div');
     this.readOutput.style.color = color;
     this.readOutput.style.fontFamily = font;
-    this.readOutput.style.padding = '0 5px 5px';
     this.readOutput.style.fontSize = '9px';
     this.readOutput.style.fontWeight = 'bold';
     this.readOutput.textContent = 'Waiting…';
+
+    // Create toggle button
+    this.toggleButton = document.createElement('button');
+    this.toggleButton.textContent = this.options.showGraph ? '▼' : '▶';
+    this.toggleButton.style.background = 'none';
+    this.toggleButton.style.border = 'none';
+    this.toggleButton.style.color = color;
+    this.toggleButton.style.cursor = 'pointer';
+    this.toggleButton.style.fontSize = '8px';
+    this.toggleButton.style.padding = '0 2px';
+    this.toggleButton.onclick = () => {
+      this.options.showGraph = !this.options.showGraph;
+      this.toggleButton!.textContent = this.options.showGraph ? '▼' : '▶';
+      this.updateGraphVisibility();
+      if (this.options.onToggleGraph) {
+        this.options.onToggleGraph(this.options.showGraph);
+      }
+    };
+
+    header.appendChild(this.readOutput);
+    header.appendChild(this.toggleButton);
 
     // Create canvas
     this.canvas = document.createElement('canvas');
@@ -85,8 +118,9 @@ class FPSControl {
     this.canvas.width = width;
     this.canvas.height = graphHeight;
     this.canvas.style.cssText = `width: ${width / dpr}px; height: ${graphHeight / dpr}px;`;
+    this.canvas.style.display = this.options.showGraph ? 'block' : 'none';
 
-    el.appendChild(this.readOutput);
+    el.appendChild(header);
     el.appendChild(this.canvas);
 
     // Attach event listeners
@@ -94,6 +128,12 @@ class FPSControl {
     this.map.on('moveend', this.onMoveEnd);
 
     return this.container;
+  };
+
+  private updateGraphVisibility = (): void => {
+    if (this.canvas) {
+      this.canvas.style.display = this.options.showGraph ? 'block' : 'none';
+    }
   };
 
   onRemove = (): void => {
@@ -207,7 +247,7 @@ class FPSControl {
     );
   };
 
-  getDefaultPosition(): string {
+  getDefaultPosition(): ControlPosition {
     return 'top-right';
   }
 }
@@ -216,7 +256,7 @@ export interface FPSControlProps extends FPSControlOptions {
   position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 }
 
-export function FPSControlComponent({ position = 'top-right', ...options }: FPSControlProps) {
+function FPSControlComponent({ position = 'top-right', ...options }: FPSControlProps) {
   useControl<FPSControl>(
     () => new FPSControl(options),
     {
