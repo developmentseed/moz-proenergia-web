@@ -19,13 +19,14 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
 
   const { layers: visibleLayers, rangeFilters } = state;
   const { hoverInfo, setHoverInfo, onHover,  } = usePopup();
+  const [firstIdle, setFirstIdle] = useState(false)
+  const [debugPerformanceMeasure, setDebugPerforamnceMeasure] = useState(performance.now())
 
   // Mocking some types of remote data
   const { data: remoteData } = useRemoteData('/filter.csv');
   const { data: remoteVizData } = useRemoteData('/popup.csv');
   const range = rangeFilters['range-filter-2'];
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [matched, setMatched] = useState<(string | number | boolean | string[])[]>([
         "match",
         ["get", "fid"],
@@ -41,9 +42,9 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
   const matching = {...remoteData.find(f => f.fid == hoverInfo?.fid), ...remoteVizData.find(f => f.fid == hoverInfo?.fid)};
   // Attach pmtile protocol to MapLibre
   useEffect(() => {
+    setDebugPerforamnceMeasure(performance.now())
     const protocol = new pmtiles.Protocol()
     maplibregl.addProtocol('pmtiles', protocol.tile)
-
     return () => {
       maplibregl.removeProtocol('pmtiles')
     }
@@ -60,11 +61,9 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
           '#ccc'
         ]
       setFirstFillExpression(matchExpression);
-      setIsLoading(false);
     };
     
     colorWorker.postMessage({ remoteData: remoteVizData });
-    setIsLoading(true);
     return () => colorWorker.terminate();
   }, [remoteVizData]);
 
@@ -79,17 +78,14 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
         true
       ];
       setMatched(matchExpression);
-      setIsLoading(false);
     };
     
     worker.postMessage({ remoteData, range });
-    setIsLoading(true);
     return () => worker.terminate();
   }, [remoteData, range]);
 
-
   return (<Box w='100%' className="map-container">
-          {isLoading && <Box position={'absolute'} top={2} right={2} zIndex={150000} p={2} background={'white'}> Loading...</Box>}
+          <Box position={'absolute'} top={8} right={2} zIndex={150000} p={2} background={'white'}> time that took until first idle state: {!firstIdle && <span>Loading</span>} {firstIdle && <span> {debugPerformanceMeasure} </span>}</Box>
         <Map
           initialViewState={{
             longitude: COORDS[1],
@@ -98,6 +94,12 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
           }}
           style={{ width: '100%', height: '100vh' }}
           onClick={onHover}
+          onIdle={() => {
+            if (!firstIdle) {
+              setDebugPerforamnceMeasure(prev => performance.now() - prev);
+              setFirstIdle(true);
+            }
+          }}
           mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
           interactiveLayerIds={['model-fill', 'model-line']}
         >
