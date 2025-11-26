@@ -17,6 +17,8 @@ function SummaryShell({ title = 'Summary', children }: SummaryProps) {
       p={3}
       boxShadow="md"
       zIndex={1000}
+      maxHeight={'500px'}
+      overflowY={'scroll'}
       minW="200px"
     >
       <VStack align="stretch" gap={2}>
