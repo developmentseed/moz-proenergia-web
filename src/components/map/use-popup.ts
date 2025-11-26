@@ -34,7 +34,7 @@ export function usePopup(): UsePopupReturn {
       longitude: event.lngLat.lng,
       latitude: event.lngLat.lat,
       // Cast id here, so it still works with integer ID in tiles, but displays as string in popup
-      data: { ...cluster.properties, id: cluster.properties.id.toString()} as ClusterProperties
+      data: { ...cluster.properties, id: cluster.properties.fid?.toString()} as ClusterProperties
     }: null;
     setHoverInfo(featureInfo)
   }, []);
@@ -43,7 +43,7 @@ export function usePopup(): UsePopupReturn {
 
   // To show selected region
   const filter: ExpressionSpecification = useMemo(
-    () => ['==', ['get', 'id'], parseInt(selectedClusterId)],
+    () => ['==', ['get', 'fid'], parseInt(selectedClusterId)],
     [selectedClusterId]
   );
 
