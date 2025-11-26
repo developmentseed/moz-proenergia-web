@@ -11,6 +11,7 @@ import { useRemoteData } from '@/hooks/use-remote-data'
 import { usePopup } from'./use-popup';
 import { Legend } from './legend';
 import { SummaryWithContent } from './summary';
+import FPSControl from './fps-control';
 
 const COORDS = [-25.9692, 32.5732]
 
@@ -92,7 +93,7 @@ export default function MapVisualization({ state }: MapVisualizationProps) {
           mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
           interactiveLayerIds={['model-popup']}
         >
-          {/* <FPSControl position="top-right" /> */}
+          <FPSControl position="top-right" />
           {/* Model Source/Layer */}
           <Source {...modelSource}>
             <Layer {...modelLineLayer} />

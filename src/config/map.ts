@@ -19,7 +19,7 @@ export const LEGEND = [{
 export const modelSource =   {
     "id": "model",
     "type": "vector",
-    "url":`pmtiles://${bucketUrl}/clusters-w-filter.pmtiles`,
+    "url":`pmtiles://https://mozsebar.s3.us-east-1.amazonaws.com/prototype/data/incremental/mozambique-cols-31.pmtiles`,
     // "url": `pmtiles://${bucketUrl}/clusters.pmtiles`,
     minzoom: 5,
     maxzoom: 15
