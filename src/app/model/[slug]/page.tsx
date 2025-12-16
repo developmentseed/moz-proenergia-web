@@ -3,6 +3,16 @@ import { promises as fs } from 'fs';
 import { HStack, Box } from "@chakra-ui/react";
 import Sidebar from '@/components/ui/sidebar';
 
+// For dynamic route + ssg: fetch all the possible params
+export async function generateStaticParams() {
+  const file = await fs.readFile(process.cwd() + '/src/app/mock/models/data.json', 'utf8');
+  const models = JSON.parse(file);
+ 
+  return models.map((model) => ({
+    slug: model.id
+  }))
+}
+
 export default async function ModelPage({
   params,
 }: {

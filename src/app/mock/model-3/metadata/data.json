@@ -1,0 +1,5 @@
+{
+  "id": "model-3",
+  "title": "Model 3",
+  "scenarios": [{"label": "Scenario 1", "id": "scenario-1"},{"label": "Scenario 2", "id": "scenario-2"}, {"label": "Scenario 3", "id": "scenario-3"}]
+}
