@@ -1,36 +1,43 @@
 
 import { Tab } from "@/components/chakra"
 import { Box } from "@chakra-ui/react"
-import { RangeSlider, RadioOptions, Select } from "@/components/chakra"
-import { ScenarioMetadata, ScenarioFilter, ScenarioLayer } from "@/app/types"
+import { Layer } from "@/app/types"
+import { FilterControl } from './filters/filter-control';
+import { useModel } from "@/utils/context/model";
 
-const LayersPanel = ({ layers }: { layers: ScenarioLayer[]}) => {
+const LayersPanel = () => {
+  const { activeLayers } = useModel();
   return <Box>
-    {layers.map(layer => <Box key={layer.id}>{layer.label} </Box>)}
-
+    {activeLayers.map(layer => <Box key={layer}>{layer} </Box>)} 
   </Box>
 }
 
-const ControlsPanel = ({ filters }: { filters: ScenarioFilter[] }) => {
+const ControlsPanel =  () => {
+  const { model, filters, setFilters } = useModel();
+
+  if (!filters) return;
   return <Box>
-    {filters.map(filter => {
-      const MatchingComponent = filter.type === 'numeric'? RangeSlider : filter.type === 'option'? RadioOptions: Select
-      return <MatchingComponent key={filter.id} title={filter.label} items={filter.values} />
+    {Object.keys(filters).map(fid => {
+      const matchingFilter = model.filters[fid];
+      const setFilterOnChange = (e) =>{
+        if (e.target) setFilters({[fid]: e.target.value})
+        else setFilters({[fid]: e.value})
+      }
+      const currentFilter = filters[fid];
+      return <FilterControl key={fid} config={matchingFilter} value={currentFilter} onChange={setFilterOnChange} />
     })}
   </Box>
 }
 
-const Control = ({ scenarioData }: {scenarioData: ScenarioMetadata}) => {
+const Control = () => {
 const tabItems = [{
   id: 'controls',
   label: 'Controls',
-  Component: ControlsPanel,
-  componentProps: { filters: scenarioData.filters }
+  Component: ControlsPanel
 }, {
   id: 'layers',
   label: 'Layers',
-  Component: LayersPanel, 
-  componentProps: { layers: scenarioData.layers }
+  Component: LayersPanel
 }]
   return <Tab items={tabItems} />
 }

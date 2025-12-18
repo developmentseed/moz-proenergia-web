@@ -1,5 +1,71 @@
 {
   "id": "model-1",
   "title": "Model 1",
-  "scenarios": [{"label": "Scenario 1", "id": "scenario-1"},{"label": "Scenario 2", "id": "scenario-2"}]
+  "scenarios": [{
+    "label": "Scenario 1",
+    "id": "scenario-1",
+    "description": "Description for Scenario 1",
+    "tileUrl": ["some-tile-url"]
+  },{
+    "label": "Scenario 2",
+    "id": "scenario-2",
+    "description": "Description for Scenario 2",
+    "tileUrl": ["some-tile-url"]
+  },{
+    "label": "Scenario 3",
+    "id": "scenario-3",
+    "description": "Description for Scenario 3",
+    "tileUrl": ["some-tile-url"]
+  }],
+  "main": {
+    "id": "lcoe",
+    "label": "Main Attribute",
+    "description": "Some description",
+    "type": "categorical",
+    "values": [{"label": "High", "id":"high", "color": "#ff0000" }, {"label": "Medium", "id":"medium", "color": "#00ff00" }, {"label": "Low", "id":"low", "color": "#f0000f" }]
+  },
+  "filters": {
+    "example-1" : {
+    "id": "example-1",
+    "label": "Example Numeric Filter",
+    "description": "Some description",
+    "type": "numeric",
+    "values": [10,60000]
+  },
+  "example-2" : {
+    "id": "example-2",
+    "label": "Example Optional Filter",
+    "description": "Some description",
+    "type": "option",
+    "values": [{"label": "Option A","id": "option-a"}, {"label": "Option B","id":"option-b"},{"label": "Option C", "id": "option-c"}]
+  },
+  "example-3" :  {
+    "id": "example-3",
+    "label": "Example Categorical Filter",
+    "description": "Some description",
+    "type": "categorical",
+    "values": [{"label": "Category A","id": "category-a"}, {"label": "Category B","id":"category-b"},{"label": "Category C", "id": "category-c"}]
+  }},
+  "layers": {
+    "additional-layer-1": {
+    "tileUrl": [""],
+    "id":"additional-layer-1",
+    "label": "Additional Layer 1",
+    "type": "point",
+    "description": "description for additional layer 1"
+  }, 
+  "additional-layer-2": {
+    "tileUrl": [""],
+    "id":"additional-layer-2",
+    "label": "Additional Layer 2",
+    "type": "line",
+    "description": "description for additional layer 2"
+  }, 
+  "additional-layer-3": {
+    "tileUrl": [""],
+    "id":"additional-layer-3",
+    "label": "Additional Layer 3",
+    "type": "polygon",
+    "description": "description for additional layer 3"
+  }}
 }

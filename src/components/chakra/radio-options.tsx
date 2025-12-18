@@ -1,10 +1,10 @@
 import { Group, RadioCard } from "@chakra-ui/react"
 
 
-const RadioOptions = ({ title, items }) => {
-  console.log(items);
+
+const RadioOptions = ({ title, items, onChange, value }) => {
   return (
-    <RadioCard.Root defaultValue={items[0].id} gap="4" maxW="sm">
+    <RadioCard.Root defaultValue={items[0].id} gap="4" maxW="sm" onChange={onChange} value={value}>
       <RadioCard.Label>{title}</RadioCard.Label>
       <Group attached orientation="vertical">
         {items.map((item) => (

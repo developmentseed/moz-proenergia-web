@@ -25,25 +25,25 @@ interface OptionScenarioFilter extends BaseScenarioFilter {
   values: ItemUnit[];
 }
 
-export type ScenarioFilter = NumericScenarioFilter | CategoricalScenarioFilter | OptionScenarioFilter;
+export type Filter = NumericScenarioFilter | CategoricalScenarioFilter | OptionScenarioFilter;
 
-export interface ScenarioLayer {
+export interface Scenario {
   tileUrl: string[];
   id: string;
   label: string;
   description?: string;
 }
 
+export interface Layer extends Scenario {
+  downloadLink?: string;
+  color?: string; // only main one? or also contextural layer?
+}
+
 export interface ModelMetadata {
   id: string;
   title: string;
-  scenarios: ItemUnit[];
-}
-
-export interface ScenarioMetadata {
-  name: string;
-  id: string;
-  tileUrl: string;
-  filters: ScenarioFilter[];
-  layers: ScenarioLayer[];
+  scenarios: Scenario[];
+  main: Layer;
+  filters: Record<string, Filter>,
+  layers: Record<string, Layer>,
 }
