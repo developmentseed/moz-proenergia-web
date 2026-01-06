@@ -1,75 +1,79 @@
 'use client';
 
 import { createContext, useContext, ReactNode, useMemo } from 'react';
-import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger } from 'nuqs';
-import { ModelMetadata, Filter } from '@/app/types';
+import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger, type UseQueryStatesKeysMap, type SetValues } from 'nuqs';
+import { ModelMetadata, Filter, FilterType } from '@/app/types';
+
+const createFilterParsers = (filters: Filter[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const parsers = filters.reduce<UseQueryStatesKeysMap<any>>((acc, filter) => {
+    switch (filter.type) {
+      case FilterType.numeric:
+        acc[filter.id] = parseAsArrayOf(parseAsInteger)
+          .withDefault(filter.values as [number, number]);
+        return acc;
+      // Option and Categorical value doens't have default
+      case FilterType.select:
+        acc[filter.id] = parseAsString;
+        return acc;
+      case FilterType.checkbox:
+        acc[filter.id] = parseAsArrayOf(parseAsString).withDefault(filter.options.map(o => o.value));
+        return acc;
+      default:
+        return acc;
+    }
+  }, {});
+
+  return parsers;
+};
+
+type DynamicFilterParsers = ReturnType<typeof createFilterParsers>;
 
 type ModelContextType = {
   model: ModelMetadata
   mainAttribute: string | null;
   setMainAttribute: (value: string | null) => void;
-  filters: Record<string, any>;
-  setFilters: (updates: Record<string, any>) => void;
-  clearAllFilters: () => void;
+  filters: Record<string, [number, number] | string[] | null>;
+  setFilters: SetValues<DynamicFilterParsers>;
+  resetAllFilters: () => void;
   activeLayers: string[];
   setActiveLayers: (layers: string[]) => void;
-  toggleLayer: (layerId: string) => void;
+  toggleLayer: (param: { [x: string]: boolean; }) => void;
 };
 
 const ModelContext = createContext<ModelContextType | null>(null);
 
-const createFilterParsers = (filters: Record<string, Filter>) => {
-  const parsers: Record<string, any> = {};
-
-  Object.keys(filters).map(filterKey => {
-    const filter = filters[filterKey];
-    switch (filter.type) {
-      case 'numeric':
-        parsers[filter.id] = parseAsArrayOf(parseAsInteger)
-          .withDefault(filter.values as [number, number]);
-        break;
-      case 'option':
-        parsers[filter.id] = parseAsString.withDefault(filter.values[0].id);
-        break;
-      case 'categorical':
-        parsers[filter.id] = parseAsString.withDefault(filter.values[0].id);
-        break;
-    }
-  });
-  
-  return parsers;
-};
-
-export function ModelProvider({ 
-  children,
-  model
-}: { 
-  children: ReactNode;
+export function ModelProvider({
+  model,
+  children
+}: {
   model: ModelMetadata;
+  children: ReactNode;
 }) {
   // Create parsers from scenario
   const filterParsers = useMemo(
     () => createFilterParsers(model.filters),
     [model.filters]
   );
-  
-  // Main attribute state
+
+  // Main attribute state (main visualization component - this won't be manipulated through UI)
   const [mainAttribute, setMainAttribute] = useQueryStates({
     main: parseAsString.withDefault(model.main.id),
   });
-  
-  // Filter state - NOTE: These are separate from 'scenario' query param
-  const [filters, setFilters] = useQueryStates(filterParsers, {
+
+  // Filter state
+  const [filters, setFilters] = useQueryStates<DynamicFilterParsers>(filterParsers, {
     history: 'replace',
     shallow: true
   });
 
   // Layer state
   const [layerState, setLayerState] = useQueryStates({
-    layers: parseAsArrayOf(parseAsString).withDefault(Object.keys(model.layers)),
+    layers: parseAsArrayOf(parseAsString).withDefault([]),
   });
 
-  const clearAllFilters = () => {
+  // @ TODO: There is no "clear" - this needs to be resetting to be default status
+  const resetAllFilters = () => {
     const resetState = Object.keys(filterParsers).reduce((acc, key) => {
       acc[key] = null;
       return acc;
@@ -77,14 +81,16 @@ export function ModelProvider({
     setFilters(resetState);
   };
 
-  const toggleLayer = (layerId: string) => {
-    if (layerState.layers.includes(layerId)) {
-      setLayerState({ 
-        layers: layerState.layers.filter(id => id !== layerId) 
+  const toggleLayer = (layer: { [x: string]: boolean; }) => {
+    const [layerId, displayValue] = Object.entries(layer)[0];
+    if (displayValue) {
+      setLayerState({
+        layers: [...layerState.layers, layerId]
       });
+
     } else {
-      setLayerState({ 
-        layers: [...layerState.layers, layerId] 
+      setLayerState({
+        layers: layerState.layers.filter(id => id !== layerId)
       });
     }
   };
@@ -97,7 +103,7 @@ export function ModelProvider({
         setMainAttribute: (value) => setMainAttribute({ main: value }),
         filters,
         setFilters,
-        clearAllFilters,
+        resetAllFilters,
         activeLayers: layerState.layers,
         setActiveLayers: (layers) => setLayerState({ layers }),
         toggleLayer,

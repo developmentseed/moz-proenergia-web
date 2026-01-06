@@ -5,62 +5,111 @@
     "label": "Scenario 1",
     "id": "scenario-1",
     "description": "Description for Scenario 1",
-    "tileUrl": ["some-tile-url"]
+    "source": {
+      "type": "vector",
+      "minZoom": 4,
+      "maxZoom": 15,
+      "url": "pmtiles://https://mozsebar.s3.us-east-1.amazonaws.com/prototype/data/mozambique-test.pmtiles"
+    },
+    "layer": {
+      "source-layer": "clusters",
+      "type": "fill"
+    }
   },{
     "label": "Scenario 2",
     "id": "scenario-2",
-    "description": "Description for Scenario 2",
-    "tileUrl": ["some-tile-url"]
+    "type": "vector",
+    "source": {
+      "type": "vector",
+      "minZoom": 4,
+      "maxZoom": 15,
+      "url": "pmtiles://https://mozsebar.s3.us-east-1.amazonaws.com/prototype/data/mozambique-test.pmtiles"
+    },
+    "layer": {
+      "source-layer": "clusters",
+      "type": "fill"
+    }
   }],
   "main": {
-    "id": "lcoe",
+    "id": "minimum-2027",
     "label": "Main Attribute",
+    "column": "Technology2030",
     "description": "Some description",
-    "type": "categorical",
-    "values": [{"label": "High", "id":"high", "color": "#ff0000" }, {"label": "Medium", "id":"medium", "color": "#00ff00" }, {"label": "Low", "id":"low", "color": "#f0000f" }]
+    "type": "cateogorical",
+    "options": [{"label": "SHS", "value":"SHS", "color": "#ff0000" }, {"label": "Mini Grid PV", "value":"MiniGrid_PV", "color": "#00ff00" }, {"label": "Existing Grid", "value":"ExistingGrid", "color": "#ff60ff" }, {"label": "Grid Extension", "value":"GridExtension", "color": "#ff6006" }]
   },
-  "filters": {
-    "example-1" : {
-    "id": "example-1",
-    "label": "Example Numeric Filter",
+  "filters": [{
+    "id": "population",
+    "column": "PopStartYear",
+    "label": "Population Filter",
     "description": "Some description",
     "type": "numeric",
-    "values": [10,60000]
+    "values": [0,500000]
   },
-  "example-3" :  {
-    "id": "example-3",
-    "label": "Example Categorical Filter",
-    "description": "Some description",
-    "type": "categorical",
-    "values": [{"label": "Category A","id": "category-a"}, {"label": "Category B","id":"category-b"},{"label": "Category C", "id": "category-c"}]
+  {
+    "id": "connections",
+    "column": "NewHHConnectionsTotal",
+    "label": "Connections",
+    "description": "Some description for Connection",
+    "type": "numeric",
+    "values": [0, 200 ]
   },
-  "example-2" : {
-    "id": "example-2",
-    "label": "Example Optional Filter",
+  {
+    "id": "elecstatus",
+    "column": "ElecStart",
+    "label": "Electrificastion Status",
     "description": "Some description",
-    "type": "option",
-    "values": [{"label": "Option A","id": "option-a"}, {"label": "Option B","id":"option-b"},{"label": "Option C", "id": "option-c"}]
-  }},
-  "layers": {
-    "additional-layer-1": {
-    "tileUrl": [""],
-    "id":"additional-layer-1",
-    "label": "Additional Layer 1",
-    "type": "point",
-    "description": "description for additional layer 1"
+    "type": "checkbox",
+    "options": [{"label": "Unelectrified","value": "0"}, {"label": "Electrified","value":"1"}]
+  }],
+  "layers": [
+    {
+    "id":"substations",
+    "label": "Substations",
+    "description": "description for additional layer 1",
+    "downlodLink": "",
+    "source": {
+      "type": "vector",
+      "minZoom": 4,
+      "maxZoom": 15,
+      "url": "pmtiles://https://mozsebar.s3.us-east-1.amazonaws.com/prototype/data/substation.pmtiles"
+    },
+    "layer": {
+      "source-layer": "clusters",
+      "type": "point"
+    }
   }, 
-  "additional-layer-2": {
-    "tileUrl": [""],
-    "id":"additional-layer-2",
-    "label": "Additional Layer 2",
-    "type": "line",
-    "description": "description for additional layer 2"
+  {
+    "id":"transimission-network",
+    "label": "Transmission Network",
+    "description": "description for additional layer 2",
+    "downlodLink": "",
+    "source": {
+      "type": "vector",
+      "minZoom": 4,
+      "maxZoom": 15,
+      "url": "pmtiles://https://mozsebar.s3.us-east-1.amazonaws.com/prototype/data/transmission-network.pmtiles"
+    },
+    "layer": {
+      "source-layer": "clusters",
+      "type": "point"
+    }
   }, 
-  "additional-layer-3": {
-    "tileUrl": [""],
+  {
     "id":"additional-layer-3",
     "label": "Additional Layer 3",
     "type": "polygon",
-    "description": "description for additional layer 3"
-  }}
+    "description": "description for additional layer 3",
+    "downlodLink": "",
+    "source": {
+      "type": "vector",
+      "minZoom": 4,
+      "maxZoom": 15,
+      "url": ""
+    },
+    "layer": {
+      "source-layer": "clusters",
+      "type": "point"
+    }
+  }]
 }

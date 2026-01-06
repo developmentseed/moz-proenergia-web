@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["@chakra-ui/react"],
   },
   typescript: {
-    ignoreBuildErrors: true,
+    // ignoreBuildErrors: true,
   },
 };
 

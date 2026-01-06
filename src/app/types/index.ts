@@ -1,37 +1,54 @@
 export interface ItemUnit {
-  id: string;
+  value: string;
   label: string;
+  description?: string;
 }
 
-enum FilterType { numeric = 'numeric', categorical = 'categorical', option = 'option'};
+export interface MapItemUnit extends ItemUnit {
+  color: string;
+}
+
+export enum FilterType { numeric = 'numeric', select = 'select', checkbox = 'checkbox'};
+enum MainType {categorical = 'categorical', linear='linear'};
 
 interface BaseScenarioFilter {
   id: string;
+  column: string;
   label: string;
   description?: string;
-  type: FilterType,
 }
 interface NumericScenarioFilter extends BaseScenarioFilter {
   type: FilterType.numeric;
   values: [number, number]
 }
 interface CategoricalScenarioFilter extends BaseScenarioFilter {
-  type: FilterType.categorical;
-  values: ItemUnit[];
+  type: FilterType.select;
+  options: ItemUnit[];
 }
 
 interface OptionScenarioFilter extends BaseScenarioFilter {
-  type: FilterType.option;
-  values: ItemUnit[];
+  type: FilterType.checkbox;
+  options: ItemUnit[];
 }
 
 export type Filter = NumericScenarioFilter | CategoricalScenarioFilter | OptionScenarioFilter;
 
+export type FilterEventValueType = number[] | string[] | string;
+
 export interface Scenario {
-  tileUrl: string[];
   id: string;
   label: string;
   description?: string;
+  source: {
+    type: 'vector';
+    minZoom: number;
+    maxZoom: number;
+    url: string;
+  },
+  layer: {
+    'source-layer': string;
+    type: string;
+  }
 }
 
 export interface Layer extends Scenario {
@@ -39,11 +56,22 @@ export interface Layer extends Scenario {
   color?: string; // only main one? or also contextural layer?
 }
 
+export interface Main extends BaseScenarioFilter {
+  type: MainType;
+  options: MapItemUnit[];
+}
+
 export interface ModelMetadata {
   id: string;
   title: string;
   scenarios: Scenario[];
-  main: Layer;
-  filters: Record<string, Filter>,
-  layers: Record<string, Layer>,
+  main: Main;
+  filters: Filter[],
+  layers: Layer[]
+}
+
+export interface ModelGroupMetadata {
+  id: string;
+  name: string;
+  description: string;
 }

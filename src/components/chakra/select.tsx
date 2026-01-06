@@ -1,7 +1,7 @@
-'use client'
-import { type ChangeEventHandler } from "react"
-import { Field, NativeSelect } from "@chakra-ui/react"
-import { ItemUnit } from "@/app/types"
+'use client';
+import { type ChangeEventHandler } from "react";
+import { Field, NativeSelect } from "@chakra-ui/react";
+import { ItemUnit } from "@/app/types";
 
 interface SelectProps {
   title: string;
@@ -10,21 +10,21 @@ interface SelectProps {
   onChange: ChangeEventHandler<HTMLSelectElement >
 }
 
-const Select  = ({ title, items, value, onChange }: SelectProps) => {
+const Select = ({ title, items, value, onChange }: SelectProps) => {
   return (
     <Field.Root>
-    <Field.Label>{title}</Field.Label>
+      <Field.Label>{title}</Field.Label>
       <NativeSelect.Root size="sm">
-      <NativeSelect.Field
-        value={value}
-        onChange={onChange}
+        <NativeSelect.Field
+          value={value}
+          onChange={onChange}
       >
-        {items.map(item => <option value={item.id} key={item.id}>{item.label}</option>)}
-      </NativeSelect.Field>
-      <NativeSelect.Indicator />
-    </NativeSelect.Root>
+          {items.map(item => <option value={item.value} key={item.value}>{item.label}</option>)}
+        </NativeSelect.Field>
+        <NativeSelect.Indicator />
+      </NativeSelect.Root>
     </Field.Root>
-  )
-}
+  );
+};
 
-export { Select }
+export { Select };

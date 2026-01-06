@@ -1,4 +1,5 @@
 
+import { Suspense } from 'react';
 import { promises as fs } from 'fs';
 import { HStack } from "@chakra-ui/react";
 import MainPanel from '@/components/ui/main-panel';
@@ -21,12 +22,13 @@ export default async function ModelPage({
 }) {
   const { slug } = await params;
   const metadataFile = await fs.readFile(process.cwd() + `/src/app/mock/${slug}/metadata/data.json`, 'utf8');
-  console.log(metadataFile)
   const metadata = JSON.parse(metadataFile);
   
   return (
       <HStack width={'100vw'} height='full'>
-        <MainPanel modelData={metadata} />
+        <Suspense>
+          <MainPanel modelData={metadata} />
+        </Suspense>
       </HStack>
   );
 }

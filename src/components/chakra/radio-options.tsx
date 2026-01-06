@@ -1,14 +1,21 @@
-import { Group, RadioCard } from "@chakra-ui/react"
+import { Group, RadioCard } from "@chakra-ui/react";
+import { type FormEventHandler } from "react";
+import { type ItemUnit } from "@/app/types";
 
+interface RadioOptionsProps {
+  title: string;
+  items: ItemUnit[];
+  onChange: FormEventHandler<HTMLDivElement>
+  value: string;
+}
 
-
-const RadioOptions = ({ title, items, onChange, value }) => {
+const RadioOptions = ({ title, items, onChange, value }: RadioOptionsProps) => {
   return (
-    <RadioCard.Root defaultValue={items[0].id} gap="4" maxW="sm" onChange={onChange} value={value}>
+    <RadioCard.Root defaultValue={items[0].value} gap="4" maxW="sm" onChange={onChange} value={value}>
       <RadioCard.Label>{title}</RadioCard.Label>
       <Group attached orientation="vertical">
         {items.map((item) => (
-          <RadioCard.Item key={item.id} value={item.id} width="full">
+          <RadioCard.Item key={item.value} value={item.value} width="full">
             <RadioCard.ItemHiddenInput />
             <RadioCard.ItemControl>
               <RadioCard.ItemIndicator />
@@ -23,7 +30,7 @@ const RadioOptions = ({ title, items, onChange, value }) => {
         ))}
       </Group>
     </RadioCard.Root>
-  )
-}
+  );
+};
 
-export { RadioOptions }
+export { RadioOptions };

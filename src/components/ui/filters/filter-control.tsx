@@ -1,9 +1,11 @@
-import { RangeSlider, RadioOptions, Select } from "@/components/chakra"
+import { RangeSlider, Select, CheckboxGroup } from "@/components/chakra";
+import { type Filter
 
+ } from "@/app/types";
 type FilterControlProps = {
   config: Filter;
-  value: any;
-  onChange: (value: any) => void;
+  value: unknown;
+  onChange: (param:unknown) => void;
 };
 
 export function FilterControl({ config, value, onChange }: FilterControlProps) {
@@ -12,33 +14,34 @@ export function FilterControl({ config, value, onChange }: FilterControlProps) {
       return (
         <RangeSlider
           title={config.label}
-          description={config.description}
+          // description={config.description}
           items={config.values}
           min={config.values[0]}
           max={config.values[1]}
-          value={value}
+          value={value as number[]}
           onChange={onChange}
         />
       );
-    
-    case 'option':
+
+    case 'checkbox':
       return (
-        <RadioOptions
+        <CheckboxGroup
           title={config.label}
-          description={config.description}
-          items={config.values}
-          value={value}
+          label={config.label}
+          // description={config.description}
+          items={config.options}
+          value={value as string[]}
           onChange={onChange}
         />
       );
-    
-    case 'categorical':
+
+    case 'select':
       return (
         <Select
           title={config.label}
-          description={config.description}
-          items={config.values}
-          value={value}
+          // description={config.description}
+          items={config.options}
+          value={value as string}
           onChange={onChange}
         />
       );
