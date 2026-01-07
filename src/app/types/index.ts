@@ -1,3 +1,4 @@
+import { type LayerProps, type SourceProps } from "react-map-gl/maplibre";
 export interface ItemUnit {
   value: string;
   label: string;
@@ -39,16 +40,8 @@ export interface Scenario {
   id: string;
   label: string;
   description?: string;
-  source: {
-    type: 'vector';
-    minZoom: number;
-    maxZoom: number;
-    url: string;
-  },
-  layer: {
-    'source-layer': string;
-    type: string;
-  }
+  source: SourceProps,
+  layer: LayerProps
 }
 
 export interface Layer extends Scenario {

@@ -10,6 +10,7 @@ import { useCoordinates } from './hooks/use-coordinates';
 import { type Scenario, type Main } from '@/app/types';
 import { buildExpressionWithFilter } from '@/utils/map/filter';
 import { Legend } from './legend';
+import { ContextualLayer } from './contextual-layer';
 
 interface MainMapProps {
 scenario: Scenario;
@@ -28,7 +29,10 @@ const MainMap = ({ scenario, main }: MainMapProps) => {
     };
   },[]);
 
-  const { model, filters } = useModel();
+  const { model, filters, activeLayers } = useModel();
+
+  const additionalLayers = model.layers.filter(l => activeLayers.includes(l.id));
+
   const mapFilter = useMemo(() => {
     return buildExpressionWithFilter(model.filters, filters);
   }, [filters, model.filters]);
@@ -47,7 +51,7 @@ const MainMap = ({ scenario, main }: MainMapProps) => {
       },
       ...(mapFilter ? { filter: mapFilter } : {})
   };
-
+  console.log(additionalLayers);
   return <Box w='100%' h='100%' className="map-container" position="relative">
     <Legend items={main.options} />
     <Map
@@ -62,12 +66,14 @@ const MainMap = ({ scenario, main }: MainMapProps) => {
       mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
       interactiveLayerIds={[main.id]}
         >
+      <ContextualLayer layers={additionalLayers} />
       <Source
         id={scenario.id}
         {...scenario.source}
           >
         <MapLayer {...mainLayer}></MapLayer>
       </Source>
+
     </Map>
   </Box>;
 };
