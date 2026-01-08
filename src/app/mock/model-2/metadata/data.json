@@ -1,6 +1,6 @@
 {
-  "id": "model-2",
-  "title": "Model 2",
+  "id": "model-1",
+  "title": "Model 1",
   "scenarios": [{
     "label": "Scenario 1",
     "id": "scenario-1",
@@ -12,6 +12,7 @@
       "url": "pmtiles://https://mozsebar.s3.us-east-1.amazonaws.com/prototype/data/mozambique-test.pmtiles"
     },
     "layer": {
+      "source": "scenario-1",
       "source-layer": "clusters",
       "type": "fill"
     }
@@ -69,14 +70,19 @@
     "description": "description for additional layer 1",
     "downlodLink": "",
     "source": {
+      "id": "substations",
       "type": "vector",
       "minZoom": 4,
       "maxZoom": 15,
       "url": "pmtiles://https://mozsebar.s3.us-east-1.amazonaws.com/prototype/data/substation.pmtiles"
     },
     "layer": {
-      "source-layer": "clusters",
-      "type": "point"
+      "source": "substations",
+      "source-layer": "data",
+      "type": "circle",
+      "paint": {
+        "circle-color":  "#377eb8"
+      }
     }
   }, 
   {
@@ -85,14 +91,20 @@
     "description": "description for additional layer 2",
     "downlodLink": "",
     "source": {
+      "id": "transimission-network",
       "type": "vector",
       "minZoom": 4,
       "maxZoom": 15,
       "url": "pmtiles://https://mozsebar.s3.us-east-1.amazonaws.com/prototype/data/transmission-network.pmtiles"
     },
     "layer": {
-      "source-layer": "clusters",
-      "type": "point"
+      "source": "transmission-network",
+      "source-layer": "data",
+      "type": "line",
+      "paint": {
+        "line-color":  "#b83777",
+        "line-width": 1
+      }
     }
   }, 
   {
