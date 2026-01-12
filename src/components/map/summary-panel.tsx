@@ -41,15 +41,10 @@ const SummaryPanel = ({ clusterId }: SummaryPanelProps) => {
     <Box
       background='white'
       position='absolute'
-      bottom='8'
+      bottom='10'
       right='4'
       zIndex={100000}
-      borderRadius='md'
-      boxShadow='lg'
       p={4}
-      minW='400px'
-      maxH='600px'
-      overflowY='auto'
     >
       <Text fontSize='lg' fontWeight='bold' mb={3}>
         Cluster {clusterId} Summary
@@ -62,26 +57,20 @@ const SummaryPanel = ({ clusterId }: SummaryPanelProps) => {
       )}
 
       {isError && (
-
-      <Alert.Root status="error">
-        <Alert.Indicator />
-        <Alert.Content>
-          <Alert.Title>Failed to load the data</Alert.Title>
-          <Alert.Description>
-            Please try it again later.
-          </Alert.Description>
-        </Alert.Content>
-      </Alert.Root>
-      )}
+        <Alert.Root status="error">
+          <Alert.Indicator />
+          <Alert.Content>
+            <Alert.Title>Failed to load the data</Alert.Title>
+            <Alert.Description>
+              Please try it again later.
+            </Alert.Description>
+          </Alert.Content>
+        </Alert.Root>
+        )}
 
       {!isLoading && !isError && clusterData && (
       <Table.Root>
         <Table.Caption />
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeader />
-          </Table.Row>
-        </Table.Header>
         <Table.Body>
           {Object.entries(clusterData).map(([key, value]) => (
             <Table.Row key={key}>
@@ -94,11 +83,6 @@ const SummaryPanel = ({ clusterId }: SummaryPanelProps) => {
             </Table.Row>
         ))}
         </Table.Body>
-        <Table.Footer>
-          <Table.Row>
-            <Table.Cell />
-          </Table.Row>
-        </Table.Footer>
       </Table.Root>
       )}
     </Box>
