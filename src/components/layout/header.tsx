@@ -6,7 +6,7 @@ import Modal from '../chakra/modal';
 import LoginForm from './login-form';
 import Image from 'next/image';
 
-interface NavigationItem {
+export interface NavigationItem {
   label: string;
   href: string;
 }

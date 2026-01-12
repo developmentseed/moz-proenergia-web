@@ -1,6 +1,14 @@
-import { Box, Text, CloseButton, Button, Dialog, Portal } from '@chakra-ui/react';
+import { type ReactNode } from 'react';
+import { CloseButton, Button, Dialog, Portal } from '@chakra-ui/react';
+import { type NavigationItem } from '../layout/header';
 
-const Modal = ({ item, modalTitle, modalContent }) => {
+type ModalProps = {
+  item: NavigationItem;
+  modalTitle: string;
+  modalContent?: ReactNode
+}
+
+const Modal = ({ item, modalTitle, modalContent }: ModalProps) => {
   return <Dialog.Root>
     <Dialog.Trigger asChild>
       <Button
@@ -9,7 +17,7 @@ const Modal = ({ item, modalTitle, modalContent }) => {
         fontSize="md"
         fontWeight="medium"
         color="gray.700"
-        _hover={{color: 'blue.600',}}
+        _hover={{ color: 'blue.600', }}
       >
         {item.label}
       </Button>
