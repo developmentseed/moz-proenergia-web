@@ -26,12 +26,12 @@ body {
 }
 
 header {
-  height:80px;
+  height: 72px;
   background: var(--background);
   color: var(--foreground);
 }
 main {
-  height: calc(100vh - 180px);
+  height: calc(100vh - 172px);
 }
 footer {
   height: 100px;

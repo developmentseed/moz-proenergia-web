@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Provider } from "@/components/chakra/provider"
-import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { Provider } from "@/components/chakra/provider";
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import Header from "@/components/layout/header";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,12 +17,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-         <NuqsAdapter>
+        <NuqsAdapter>
           <Provider>
-            <header>Header</header>
-              <main>
-                {children}
-              </main>
+            <Header />
+            <main>
+              {children}
+            </main>
             <footer> Footer</footer>
           </Provider>
         </NuqsAdapter>
