@@ -41,7 +41,11 @@ export interface Scenario {
   label: string;
   description?: string;
   source: SourceProps,
-  layer: LayerProps
+  layer: {
+    "source": string;
+    "source-layer": string;
+    "type": "fill" | "line" | "circle";
+  }
 }
 
 export interface Layer extends Scenario {

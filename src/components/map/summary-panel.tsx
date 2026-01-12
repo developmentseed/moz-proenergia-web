@@ -28,7 +28,7 @@ async function fetchClusterData(clusterId: string): Promise<ClusterData> {
 
 const SummaryPanel = ({ clusterId }: SummaryPanelProps) => {
 
-  const { data, isLoading, error, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['cluster', clusterId],
     queryFn: () => fetchClusterData(clusterId!),
     enabled: !!clusterId,
@@ -36,7 +36,6 @@ const SummaryPanel = ({ clusterId }: SummaryPanelProps) => {
 
   if (!clusterId) return null;
   const clusterData = data && data.length && data[0];
-  console.log(clusterData);
 
   return (
     <Box
@@ -58,7 +57,7 @@ const SummaryPanel = ({ clusterId }: SummaryPanelProps) => {
 
       {isLoading && (
         <Box display='flex' alignItems='center' justifyContent='center' py={8}>
-          <Spinner size='xl' thickness='4px' speed='0.65s' color='blue.500' />
+          <Spinner size='xl' />
         </Box>
       )}
 
@@ -75,7 +74,7 @@ const SummaryPanel = ({ clusterId }: SummaryPanelProps) => {
       </Alert.Root>
       )}
 
-      {!isLoading && !isError && data && (
+      {!isLoading && !isError && clusterData && (
       <Table.Root>
         <Table.Caption />
         <Table.Header>

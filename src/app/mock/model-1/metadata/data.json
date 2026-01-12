@@ -45,7 +45,7 @@
     "label": "Population Filter",
     "description": "Some description",
     "type": "numeric",
-    "values": [0,500000]
+    "values": [0,50000000]
   },
   {
     "id": "connections",
@@ -53,7 +53,7 @@
     "label": "Connections",
     "description": "Some description for Connection",
     "type": "numeric",
-    "values": [0, 200 ]
+    "values": [0, 2000000 ]
   },
   {
     "id": "elecstatus",

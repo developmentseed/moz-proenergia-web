@@ -1,6 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Map, Source, Layer as MapLayer, ViewStateChangeEvent } from 'react-map-gl/maplibre';
-import { type LayerSpecification } from 'maplibre-gl';
+import { useEffect, useMemo } from 'react';
+import { Map, ViewStateChangeEvent } from 'react-map-gl/maplibre';
 import { Box } from '@chakra-ui/react';
 import * as pmtiles from 'pmtiles';
 import * as maplibregl from 'maplibre-gl';
@@ -8,11 +7,13 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { useModel } from "@/utils/context/model";
 import { useCoordinates } from './hooks/use-coordinates';
 import { useCluster } from './hooks/use-cluster';
+import { useMouseEvent } from './hooks/use-mouse-event';
 import { type Scenario, type Main } from '@/app/types';
 import { buildExpressionWithFilter } from '@/utils/map/filter';
 import SummaryPanel from './summary-panel';
 import { Legend } from './legend';
 import { ContextualLayer } from './contextual-layer';
+import { MainLayer } from './main-layer';
 
 interface MainMapProps {
 scenario: Scenario;
@@ -21,8 +22,7 @@ scenario: Scenario;
 
 const MainMap = ({ scenario, main }: MainMapProps) => {
     const [{ lat, lng, zoom }, setCoordinates] = useCoordinates();
-    const [hoveredCluster, setHoveredCluster] = useState(null);
-    const { clusterId, setClusterId } = useCluster();
+    const { selected, hovered, onHover, onClick } = useMouseEvent();
 
   // Attach pmtile protocol to MapLibre
   useEffect(() => {
@@ -41,64 +41,6 @@ const MainMap = ({ scenario, main }: MainMapProps) => {
     return buildExpressionWithFilter(model.filters, filters);
   }, [filters, model.filters]);
 
-  const mainLayer:LayerSpecification = {
-    id: main.id,
-      ...scenario.layer,
-      paint: {
-        // @ts-expect-error how should I handle this?
-        'fill-color': [
-          "match",
-          ["get", main.column],
-          ...main.options.flatMap (val => [val.value, val.color]),
-          "#CCCCCC"
-        ]
-      },
-      ...(mapFilter ? { filter: mapFilter } : {})
-  };
-  const backgroundMainLayer:LayerSpecification = {
-    id: main.id + 'bg',
-      ...scenario.layer,
-      paint: {
-        'fill-color': "#CCCCCC"
-      }
-  };
-  const selectedClusterLayer:LayerSpecification = {
-    id: main.id + 'selected',
-      ...scenario.layer,
-      "type": "line",
-      paint: {
-        'line-color': "#533",
-        'line-width': 2
-      },
-      filter:  ['==', ['get', 'id'], clusterId]
-  };
-
-  const hoveredClusterLayer:LayerSpecification = {
-    id: main.id + 'hovered',
-      ...scenario.layer,
-      "type": "line",
-      paint: {
-        'line-color': "#979",
-        'line-width': 2
-      },
-      filter:  ['==', ['get', 'id'], hoveredCluster],
-
-  };
-
-  const onHover = (event: MapLayerMouseEvent) => {
-    const cluster = event.features && event.features[0];
-    if (cluster) setHoveredCluster(cluster.properties.id);
-    else setHoveredCluster(null);
-
-  };
-  const onClick = (e) => {
-    if (e.features.length) {
-      setClusterId(e.features[0].properties.id);
-    } else {
-      setClusterId(null);
-    }
-  };
-
   return <Box w='100%' h='100%' className="map-container" position="relative">
     <Legend items={main.options} />
     <Map
@@ -115,19 +57,15 @@ const MainMap = ({ scenario, main }: MainMapProps) => {
       interactiveLayerIds={[main.id]}
         >
       <ContextualLayer layers={additionalLayers} />
-      <Source
-        id={scenario.id}
-        {...scenario.source}
-          >
-        <MapLayer {...backgroundMainLayer}></MapLayer>
-        <MapLayer {...mainLayer}></MapLayer>
-        {clusterId && <MapLayer {...selectedClusterLayer}></MapLayer>}
-        <MapLayer {...hoveredClusterLayer}></MapLayer>
-
-      </Source>
-
+      <MainLayer
+        scenario={scenario}
+        main={main}
+        mapFilter={mapFilter}
+        clusterId={selected}
+        hoveredCluster={hovered}
+      />
     </Map>
-    <SummaryPanel clusterId={clusterId} />
+    <SummaryPanel clusterId={selected} />
   </Box>;
 };
 
