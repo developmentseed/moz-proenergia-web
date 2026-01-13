@@ -123,6 +123,8 @@ export function ModelProvider({
       return acc;
     }, {} as Record<string, null>);
     setFilters(resetState);
+    // Also clear any pending filter state
+    setPendingFilters(null);
   };
 
   const toggleLayer = (layer: { [x: string]: boolean; }) => {

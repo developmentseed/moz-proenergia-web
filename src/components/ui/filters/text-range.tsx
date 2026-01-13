@@ -24,6 +24,13 @@ export const TextRange = ({
   const [minText, setMinText] = useState<number>(value[0] || min);
   const [maxText, setMaxText] = useState<number>(value[1] || max);
 
+  // Reset values when page navigates to new model
+  useEffect(() => {
+    setLocalValue(value);
+    setMinText(value[0]);
+    setMaxText(value[1]);
+  },[value]);
+
   const commonPropsForTextInput = {
       min: min,
       max:max,
