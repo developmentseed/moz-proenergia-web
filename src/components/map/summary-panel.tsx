@@ -5,7 +5,7 @@ import {
   Text,
   Alert
 } from "@chakra-ui/react";
-
+import { useModel } from "@/utils/context/model";
 import { useQuery } from '@tanstack/react-query';
 
 interface ClusterData {
@@ -14,10 +14,7 @@ interface ClusterData {
 
 interface SummaryPanelProps {
   clusterId: string | null;
-}
-
-async function fetchFilteredData(filters): Promise<unknown> {
-  return { data: Math.random(), ...filters };
+  filters: Record<string, [number, number] | string[] | null>;
 }
 
 async function fetchClusterData(clusterId: string): Promise<ClusterData> {
@@ -31,6 +28,12 @@ async function fetchClusterData(clusterId: string): Promise<ClusterData> {
 }
 
 const SummaryPanel = ({ clusterId, filters }: SummaryPanelProps) => {
+  const { setSummaryDataLoading, setSummaryDataError } = useModel();
+
+  async function fetchFilteredData(filters: Record<string, [number, number] | string[] | null>): Promise<unknown> {
+     await new Promise(resolve => setTimeout(resolve, 1000));
+    return { data: Math.random(), ...filters };
+  }
 
   const { data: clusterRawData, isLoading: clusterIsLoading, isError: clusterIsError } = useQuery({
     queryKey: ['cluster', clusterId],
@@ -43,6 +46,9 @@ const SummaryPanel = ({ clusterId, filters }: SummaryPanelProps) => {
     queryFn: () => fetchFilteredData(filters),
     // enabled: !!clusterId,
   });
+  console.log(summaryIsLoading);
+  setSummaryDataLoading(summaryIsLoading);
+  setSummaryDataError(summaryIsError);
 
   const clusterData = clusterId && clusterRawData && clusterRawData.length && clusterRawData[0];
   const dataToDisplay = clusterData || summaryData;

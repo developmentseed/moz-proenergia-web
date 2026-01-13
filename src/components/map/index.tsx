@@ -6,7 +6,6 @@ import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useModel } from "@/utils/context/model";
 import { useCoordinates } from './hooks/use-coordinates';
-import { useCluster } from './hooks/use-cluster';
 import { useMouseEvent } from './hooks/use-mouse-event';
 import { type Scenario, type Main } from '@/app/types';
 import { buildExpressionWithFilter } from '@/utils/map/filter';
