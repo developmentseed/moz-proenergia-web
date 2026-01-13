@@ -33,10 +33,10 @@ const Modal = ({ item, modalTitle, modalContent }: ModalProps) => {
             {modalContent}
           </Dialog.Body>
           <Dialog.Footer>
-            <Dialog.ActionTrigger asChild>
+            {/* <Dialog.ActionTrigger asChild>
               <Button variant="outline">Cancel</Button>
             </Dialog.ActionTrigger>
-            <Button>Save</Button>
+            <Button>Save</Button> */}
           </Dialog.Footer>
           <Dialog.CloseTrigger asChild>
             <CloseButton size="sm" />

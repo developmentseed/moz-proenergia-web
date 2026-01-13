@@ -23,7 +23,7 @@ export default function RootLayout({
             <main>
               {children}
             </main>
-            <footer> Footer</footer>
+            {/* <footer> Footer</footer> */}
           </Provider>
         </NuqsAdapter>
       </body>

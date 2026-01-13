@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Slider, type SliderValueChangeDetails } from "@chakra-ui/react";
 
-interface RangeSliderProps { 
+interface RangeSliderProps {
   title: string;
   items: number[];
   min: number;
