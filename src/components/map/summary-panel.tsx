@@ -12,6 +12,9 @@ interface ClusterData {
   [key: string]: { [clusterId: string]: string | number };
 }
 
+interface SummaryData {
+  [key: string]: string | number ;
+}
 interface SummaryPanelProps {
   clusterId: string | null;
   filters: Record<string, [number, number] | string[] | null>;
@@ -30,7 +33,7 @@ async function fetchClusterData(clusterId: string): Promise<ClusterData> {
 const SummaryPanel = ({ clusterId, filters }: SummaryPanelProps) => {
   const { setSummaryDataLoading, setSummaryDataError } = useModel();
 
-  async function fetchFilteredData(filters: Record<string, [number, number] | string[] | null>): Promise<unknown> {
+  async function fetchFilteredData(filters: Record<string, [number, number] | string[] | null>): Promise<SummaryData> {
      await new Promise(resolve => setTimeout(resolve, 1000));
     return { data: Math.random(), ...filters };
   }

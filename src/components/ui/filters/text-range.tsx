@@ -24,6 +24,14 @@ export const TextRange = ({
   const [minText, setMinText] = useState<number>(value[0] || min);
   const [maxText, setMaxText] = useState<number>(value[1] || max);
 
+  const commonPropsForTextInput = {
+      min: min,
+      max:max,
+      step: step,
+      width: "80px",
+      size: "sm" as const
+  };
+
   const handleSliderChange = (details: SliderValueChangeDetails) => {
     const newValue = details.value;
     setLocalValue(newValue);
@@ -94,47 +102,39 @@ export const TextRange = ({
         {title}
       </Text>
 
-      <Flex gap={3} align="center">
+      <Box width="full">
+        <Slider.Root
+          width="full"
+          value={localValue}
+          min={min}
+          max={max}
+          step={step}
+          onValueChange={handleSliderChange}
+        >
+          <Slider.Control>
+            <Slider.Track>
+              <Slider.Range />
+            </Slider.Track>
+            <Slider.Thumbs />
+          </Slider.Control>
+        </Slider.Root>
+      </Box>
+
+      <Flex gap={3} align="center" justify="space-between">
         <Input
           value={formatNumber(minText)}
           onChange={handleMinTextChange}
           onBlur={handleMinTextBlur}
           onKeyDown={handleMinTextKeyDown}
-          min={min}
-          max={max}
-          step={step}
-          width="80px"
-          size="sm"
+          {...commonPropsForTextInput}
         />
-
-        <Box flex={1}>
-          <Slider.Root
-            width="full"
-            value={localValue}
-            min={min}
-            max={max}
-            step={step}
-            onValueChange={handleSliderChange}
-          >
-            <Slider.Control>
-              <Slider.Track>
-                <Slider.Range />
-              </Slider.Track>
-              <Slider.Thumbs />
-            </Slider.Control>
-          </Slider.Root>
-        </Box>
 
         <Input
           value={formatNumber(maxText)}
           onChange={handleMaxTextChange}
           onBlur={handleMaxTextBlur}
           onKeyDown={handleMaxTextKeyDown}
-          min={min}
-          max={max}
-          step={step}
-          width="80px"
-          size="sm"
+          {...commonPropsForTextInput}
         />
       </Flex>
 
