@@ -4,6 +4,7 @@ import { FilterControl } from './filters/filter-control';
 import { LayerControl } from './layers/layer-control';
 import { useModel } from "@/utils/context/model";
 import { ChangeEvent } from "react";
+import { ApplyActions } from './apply-actions';
 
 const LayersPanel = () => {
   const { model, toggleLayer, activeLayers } = useModel();
@@ -21,21 +22,23 @@ const LayersPanel = () => {
 };
 
 const ControlsPanel = () => {
-  const { model, filters, setFilters } = useModel();
+  const { model, displayFilters, setPendingFilters } = useModel();
 
-  if (!filters) return <div>Please wait</div>;
-  return <Box>
-    {model.filters.map(matchingFilter => {
+  if (!displayFilters) return <div>Please wait</div>;
+  return <Box position="relative" height="100%">
+    <Box>
+      {model.filters.map(matchingFilter => {
 
-      const setFilterOnChange = (e: unknown) =>{
-        if (matchingFilter.type === 'select') setFilters({ [matchingFilter.id]: (e as ChangeEvent<HTMLSelectElement>).target.value });
-        else if (matchingFilter.type === 'checkbox') setFilters({ [matchingFilter.id]: e as string[] });
-        else setFilters({ [matchingFilter.id]: (e as SliderValueChangeDetails).value });
-      };
-      const currentFilter = filters[matchingFilter.id];
-      return <FilterControl key={matchingFilter.id} config={matchingFilter} value={currentFilter} onChange={setFilterOnChange} />;
-    })}
-
+        const setFilterOnChange = (e: unknown) =>{
+          if (matchingFilter.type === 'select') setPendingFilters({ [matchingFilter.id]: (e as ChangeEvent<HTMLSelectElement>).target.value });
+          else if (matchingFilter.type === 'checkbox') setPendingFilters({ [matchingFilter.id]: e as string[] });
+          else setPendingFilters({ [matchingFilter.id]: (e as SliderValueChangeDetails).value });
+        };
+        const currentFilter = displayFilters[matchingFilter.id];
+        return <FilterControl key={matchingFilter.id} config={matchingFilter} value={currentFilter} onChange={setFilterOnChange} />;
+      })}
+    </Box>
+    <ApplyActions />
   </Box>;
 };
 

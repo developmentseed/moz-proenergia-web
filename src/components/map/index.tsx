@@ -65,7 +65,7 @@ const MainMap = ({ scenario, main }: MainMapProps) => {
         hoveredCluster={hovered}
       />
     </Map>
-    <SummaryPanel clusterId={selected} />
+    <SummaryPanel clusterId={selected} filters={filters}/>
   </Box>;
 };
 

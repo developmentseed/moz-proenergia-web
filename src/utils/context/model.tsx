@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, ReactNode, useMemo } from 'react';
+import { createContext, useContext, ReactNode, useMemo, useState } from 'react';
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger, type UseQueryStatesKeysMap, type SetValues } from 'nuqs';
 import { ModelMetadata, Filter, FilterType } from '@/app/types';
 
@@ -33,12 +33,28 @@ type ModelContextType = {
   model: ModelMetadata
   mainAttribute: string | null;
   setMainAttribute: (value: string | null) => void;
+  // Current URL state (for map display - NO PREVIEW)
   filters: Record<string, [number, number] | string[] | null>;
+
+  // Display values for UI controls (pending takes precedence)
+  displayFilters: Record<string, [number, number] | string[] | null>;
+  // Pending change handlers
+  setPendingFilters: (updates: Record<string, unknown>) => void;
+  // Apply action
+  applyPendingChanges: () => void;
+  hasPendingChanges: boolean;
+
   setFilters: SetValues<DynamicFilterParsers>;
   resetAllFilters: () => void;
+
   activeLayers: string[];
   setActiveLayers: (layers: string[]) => void;
   toggleLayer: (param: { [x: string]: boolean; }) => void;
+
+  summaryDataLoading: boolean;
+  summaryDataError: boolean;
+  setSummaryDataLoading: (loading: boolean) => void;
+  setSummaryDataError: (loading: boolean) => void;
 };
 
 const ModelContext = createContext<ModelContextType | null>(null);
@@ -72,6 +88,34 @@ export function ModelProvider({
     layers: parseAsArrayOf(parseAsString).withDefault([]),
   });
 
+  // Pending state for batching changes
+  const [pendingFilters, setPendingFilters] = useState<Record<string, unknown> | null>(null);
+  // const [pendingLayers, setPendingLayers] = useState<string[] | null>(null);
+
+  // Compute display values (pending takes precedence over URL state)
+  const displayFilters = useMemo(() =>
+    pendingFilters || filters,
+    [pendingFilters, filters]
+  );
+
+  // Detect if there are pending filter changes (layers apply instantly)
+  const hasPendingChanges = useMemo(() => {
+    return pendingFilters !== null;
+  }, [pendingFilters]);
+
+  // Pending change handlers
+  const setPendingFiltersWrapper = (updates: Record<string, unknown>) => {
+    setPendingFilters(prev => ({ ...(prev || filters), ...updates }));
+  };
+
+  // Apply pending filter changes (layers apply instantly)
+  const applyPendingChanges = () => {
+    if (pendingFilters) {
+      setFilters(pendingFilters);
+      setPendingFilters(null);
+    }
+  };
+
   // @ TODO: There is no "clear" - this needs to be resetting to be default status
   const resetAllFilters = () => {
     const resetState = Object.keys(filterParsers).reduce((acc, key) => {
@@ -95,18 +139,36 @@ export function ModelProvider({
     }
   };
 
+  // summary data
+    // Main attribute state (main visualization component - this won't be manipulated through UI)
+  const [summaryDataLoading, setSummaryDataLoading] = useState<boolean>(false);
+  const [summaryDataError, setSummaryDataError] = useState<boolean>(false);
+
   return (
     <ModelContext.Provider
       value={{
         model,
         mainAttribute: mainAttribute.main,
         setMainAttribute: (value) => setMainAttribute({ main: value }),
+        // URL state, map
         filters,
+        activeLayers: layerState.layers,
+        // Display values (for UI controls)
+        displayFilters,
+        // Pending change handlers
+        setPendingFilters: setPendingFiltersWrapper,
+        // Apply action
+        applyPendingChanges,
+        hasPendingChanges,
         setFilters,
         resetAllFilters,
-        activeLayers: layerState.layers,
         setActiveLayers: (layers) => setLayerState({ layers }),
         toggleLayer,
+        // summary data
+        summaryDataLoading,
+        summaryDataError,
+        setSummaryDataLoading,
+        setSummaryDataError,
       }}
     >
       {children}

@@ -2,6 +2,8 @@ import { RangeSlider, Select, CheckboxGroup } from "@/components/chakra";
 import { type Filter
 
  } from "@/app/types";
+import TextRange from "./text-range";
+
 type FilterControlProps = {
   config: Filter;
   value: unknown;
@@ -12,10 +14,9 @@ export function FilterControl({ config, value, onChange }: FilterControlProps) {
   switch (config.type) {
     case 'numeric':
       return (
-        <RangeSlider
+        <TextRange
           title={config.label}
           // description={config.description}
-          items={config.values}
           min={config.values[0]}
           max={config.values[1]}
           value={value as number[]}

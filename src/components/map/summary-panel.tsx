@@ -16,6 +16,10 @@ interface SummaryPanelProps {
   clusterId: string | null;
 }
 
+async function fetchFilteredData(filters): Promise<unknown> {
+  return { data: Math.random(), ...filters };
+}
+
 async function fetchClusterData(clusterId: string): Promise<ClusterData> {
   const randomData = parseInt(clusterId)%2 === 0? 'popup_400.json': 'popup_401.json';
 
@@ -26,16 +30,24 @@ async function fetchClusterData(clusterId: string): Promise<ClusterData> {
   return response.json();
 }
 
-const SummaryPanel = ({ clusterId }: SummaryPanelProps) => {
+const SummaryPanel = ({ clusterId, filters }: SummaryPanelProps) => {
 
-  const { data, isLoading, isError } = useQuery({
+  const { data: clusterRawData, isLoading: clusterIsLoading, isError: clusterIsError } = useQuery({
     queryKey: ['cluster', clusterId],
     queryFn: () => fetchClusterData(clusterId!),
     enabled: !!clusterId,
   });
 
-  if (!clusterId) return null;
-  const clusterData = data && data.length && data[0];
+  const { data: summaryData, isLoading: summaryIsLoading, isError: summaryIsError } = useQuery({
+    queryKey: ['filter', filters],
+    queryFn: () => fetchFilteredData(filters),
+    // enabled: !!clusterId,
+  });
+
+  const clusterData = clusterId && clusterRawData && clusterRawData.length && clusterRawData[0];
+  const dataToDisplay = clusterData || summaryData;
+  const isLoading = clusterIsLoading || summaryIsLoading;
+  const isError = clusterIsError || summaryIsError;
 
   return (
     <Box
@@ -68,11 +80,11 @@ const SummaryPanel = ({ clusterId }: SummaryPanelProps) => {
         </Alert.Root>
         )}
 
-      {!isLoading && !isError && clusterData && (
+      {!isLoading && !isError && dataToDisplay && (
       <Table.Root>
         <Table.Caption />
         <Table.Body>
-          {Object.entries(clusterData).map(([key, value]) => (
+          {Object.entries(dataToDisplay).map(([key, value]) => (
             <Table.Row key={key}>
               <Table.Cell > {key} </Table.Cell>
               <Table.Cell > {typeof value === 'number'
