@@ -1,6 +1,6 @@
 {
-  "id": "model-1",
-  "title": "Model 1",
+  "id": "model-2",
+  "title": "Model 2",
   "scenarios": [{
     "label": "Scenario 1",
     "id": "scenario-1",
@@ -40,10 +40,10 @@
     "options": [{"label": "SHS", "value":"SHS", "color": "#ff0000" }, {"label": "Mini Grid PV", "value":"MiniGrid_PV", "color": "#00ff00" }, {"label": "Existing Grid", "value":"ExistingGrid", "color": "#ff60ff" }, {"label": "Grid Extension", "value":"GridExtension", "color": "#ff6006" }]
   },
   "filters": [{
-    "id": "population",
+    "id": "population-1",
     "column": "PopStartYear",
-    "label": "Population Filter",
-    "description": "Some description",
+    "label": "Population Filtesr",
+    "description": "Some descriptiosn",
     "type": "numeric",
     "values": [0,500000]
   },
