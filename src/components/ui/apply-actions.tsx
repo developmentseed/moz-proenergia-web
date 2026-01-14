@@ -2,10 +2,12 @@
 
 import { Box, Button } from '@chakra-ui/react';
 import { useModel } from '@/utils/context/model';
+import { useIsFetching } from '@tanstack/react-query';
 
 export const ApplyActions = () => {
-  const { summaryDataLoading, hasPendingChanges, applyPendingChanges } = useModel();
+  const { hasPendingChanges, filters, applyPendingChanges } = useModel();
 
+  const isLoading = !!useIsFetching({ queryKey: ['filter', filters] });
   return (
     <Box
       width='100%'
@@ -14,7 +16,7 @@ export const ApplyActions = () => {
         colorScheme="blue"
         width="full"
         onClick={applyPendingChanges}
-        loading={summaryDataLoading}
+        loading={isLoading}
         loadingText={'Loading Summary data'}
         disabled={!hasPendingChanges}
       >

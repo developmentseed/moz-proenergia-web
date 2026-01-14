@@ -50,11 +50,6 @@ type ModelContextType = {
   activeLayers: string[];
   setActiveLayers: (layers: string[]) => void;
   toggleLayer: (param: { [x: string]: boolean; }) => void;
-
-  summaryDataLoading: boolean;
-  summaryDataError: boolean;
-  setSummaryDataLoading: (loading: boolean) => void;
-  setSummaryDataError: (loading: boolean) => void;
 };
 
 const ModelContext = createContext<ModelContextType | null>(null);
@@ -141,10 +136,6 @@ export function ModelProvider({
     }
   };
 
-  // summary data
-    // Main attribute state (main visualization component - this won't be manipulated through UI)
-  const [summaryDataLoading, setSummaryDataLoading] = useState<boolean>(false);
-  const [summaryDataError, setSummaryDataError] = useState<boolean>(false);
 
   return (
     <ModelContext.Provider
@@ -165,12 +156,7 @@ export function ModelProvider({
         setFilters,
         resetAllFilters,
         setActiveLayers: (layers) => setLayerState({ layers }),
-        toggleLayer,
-        // summary data
-        summaryDataLoading,
-        summaryDataError,
-        setSummaryDataLoading,
-        setSummaryDataError,
+        toggleLayer
       }}
     >
       {children}

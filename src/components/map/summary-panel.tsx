@@ -31,10 +31,9 @@ async function fetchClusterData(clusterId: string): Promise<ClusterData> {
 }
 
 const SummaryPanel = ({ clusterId, filters }: SummaryPanelProps) => {
-  const { setSummaryDataLoading, setSummaryDataError } = useModel();
 
   async function fetchFilteredData(filters: Record<string, [number, number] | string[] | null>): Promise<SummaryData> {
-     await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     return { data: Math.random(), ...filters };
   }
 
@@ -49,9 +48,6 @@ const SummaryPanel = ({ clusterId, filters }: SummaryPanelProps) => {
     queryFn: () => fetchFilteredData(filters),
     // enabled: !!clusterId,
   });
-  console.log(summaryIsLoading);
-  setSummaryDataLoading(summaryIsLoading);
-  setSummaryDataError(summaryIsError);
 
   const clusterData = clusterId && clusterRawData && clusterRawData.length && clusterRawData[0];
   const dataToDisplay = clusterData || summaryData;
