@@ -61,7 +61,7 @@ export const TextRange = ({
     // Validate and constrain the value
     if (isNaN(newMin)) {
       newMin = localValue[0];
-    } else if (newMin < min) {
+    } else if (newMin < min || newMin > max) {
       newMin = min;
     } else {
       newMin = Math.max(min, Math.min(newMin, localValue[1]));
@@ -79,7 +79,7 @@ export const TextRange = ({
     // Validate and constrain the value
     if (isNaN(newMax)) {
       newMax = localValue[1];
-    } else if (newMax > max) {
+    } else if (newMax > max || newMax > min) {
       newMax = max;
     } else {
       newMax = Math.min(max, Math.max(newMax, localValue[0]));
