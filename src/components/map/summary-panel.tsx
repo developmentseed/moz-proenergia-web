@@ -5,7 +5,6 @@ import {
   Text,
   Alert
 } from "@chakra-ui/react";
-import { useModel } from "@/utils/context/model";
 import { useQuery } from '@tanstack/react-query';
 
 interface ClusterData {
@@ -18,6 +17,7 @@ interface SummaryData {
 interface SummaryPanelProps {
   clusterId: string | null;
   filters: Record<string, [number, number] | string[] | null>;
+  resetCluster: () => void;
 }
 
 async function fetchClusterData(clusterId: string): Promise<ClusterData> {
@@ -30,10 +30,11 @@ async function fetchClusterData(clusterId: string): Promise<ClusterData> {
   return response.json();
 }
 
-const SummaryPanel = ({ clusterId, filters }: SummaryPanelProps) => {
+const SummaryPanel = ({ clusterId, filters, resetCluster }: SummaryPanelProps) => {
 
   async function fetchFilteredData(filters: Record<string, [number, number] | string[] | null>): Promise<SummaryData> {
     await new Promise(resolve => setTimeout(resolve, 1000));
+    resetCluster();
     return { data: Math.random(), ...filters };
   }
 

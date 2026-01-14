@@ -21,7 +21,7 @@ scenario: Scenario;
 
 const MainMap = ({ scenario, main }: MainMapProps) => {
     const [{ lat, lng, zoom }, setCoordinates] = useCoordinates();
-    const { selected, hovered, onHover, onClick } = useMouseEvent();
+    const { selected, setSelected, hovered, onHover, onClick } = useMouseEvent();
 
   // Attach pmtile protocol to MapLibre
   useEffect(() => {
@@ -64,7 +64,7 @@ const MainMap = ({ scenario, main }: MainMapProps) => {
         hoveredCluster={hovered}
       />
     </Map>
-    <SummaryPanel clusterId={selected} filters={filters}/>
+    <SummaryPanel clusterId={selected} resetCluster={() => { setSelected(null); }} filters={filters}/>
   </Box>;
 };
 

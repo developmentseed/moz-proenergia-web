@@ -5,6 +5,7 @@ import { type MapLayerMouseEvent } from 'react-map-gl/maplibre';
 interface UseMouseEventReturn {
   selected: string | null;
   hovered: string | null;
+  setSelected: (param: string| null) => void;
   onHover: (event: MapLayerMouseEvent) => void;
   onClick: (event: MapLayerMouseEvent) => void;
 }
@@ -33,6 +34,7 @@ export const useMouseEvent = (): UseMouseEventReturn => {
 
   return {
     selected,
+    setSelected,
     hovered,
     onHover,
     onClick,
