@@ -9,7 +9,7 @@ export interface MapItemUnit extends ItemUnit {
   color: string;
 }
 
-export enum FilterType { numeric = 'numeric', select = 'select', checkbox = 'checkbox'};
+export enum FilterType { numeric = 'numeric', select = 'select', checkbox = 'checkbox', admin='admin'};
 enum MainType {categorical = 'categorical', linear='linear'};
 
 interface BaseScenarioFilter {
@@ -26,13 +26,17 @@ interface CategoricalScenarioFilter extends BaseScenarioFilter {
   type: FilterType.select;
   options: ItemUnit[];
 }
-
 interface OptionScenarioFilter extends BaseScenarioFilter {
   type: FilterType.checkbox;
   options: ItemUnit[];
 }
 
-export type Filter = NumericScenarioFilter | CategoricalScenarioFilter | OptionScenarioFilter;
+interface AdminScenarioFilter extends BaseScenarioFilter {
+  type: FilterType.admin;
+  options: string[];
+}
+
+export type Filter = NumericScenarioFilter | CategoricalScenarioFilter | OptionScenarioFilter | AdminScenarioFilter;
 
 export type FilterEventValueType = number[] | string[] | string;
 
