@@ -9,8 +9,8 @@ export function Legend({ items }: LegendProps) {
   return (
     <Box
       position="absolute"
-      bottom={2}
-      left={2}
+      bottom={12}
+      right={4}
       bg="white"
       p={3}
       boxShadow="md"

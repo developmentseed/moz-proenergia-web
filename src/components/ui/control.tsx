@@ -57,7 +57,6 @@ const CollapsibleGroup = ({ collapsibleItem }: { collapsibleItem: ColGroup }) =>
           }
         };
         const currentFilter = displayFilters[matchingFilter.id];
-        // @ts-expect-error temp solution for now
         return <FilterControl key={matchingFilter.id} config={matchingFilter} value={currentFilter} onChange={setFilterOnChange} />;
         })
       }

@@ -59,7 +59,7 @@ const SummaryPanel = ({ clusterId, filters, resetCluster }: SummaryPanelProps) =
     <Box
       background='white'
       position='absolute'
-      bottom='10'
+      top='10'
       right='4'
       zIndex={100000}
       p={4}

@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { Map, ViewStateChangeEvent } from 'react-map-gl/maplibre';
+import { Map, ViewStateChangeEvent, NavigationControl } from 'react-map-gl/maplibre';
 import { Box } from '@chakra-ui/react';
 import * as pmtiles from 'pmtiles';
 import * as maplibregl from 'maplibre-gl';
@@ -42,7 +42,6 @@ const MainMap = ({ main }: MainMapProps) => {
   const scenario = model.scenarios.find(s => s.id === scenarioId)!;
 
   return <Box w='100%' h='100%' className="map-container" position="relative">
-    <Legend items={main.options} />
     <Map
       initialViewState={{
             longitude: lng,
@@ -64,7 +63,9 @@ const MainMap = ({ main }: MainMapProps) => {
         clusterId={selected}
         hoveredCluster={hovered}
       />
+      <NavigationControl position='bottom-left' />
     </Map>
+    <Legend items={main.options} />
     <SummaryPanel clusterId={selected} resetCluster={() => { setSelected(null); }} filters={filters}/>
   </Box>;
 };

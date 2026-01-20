@@ -22,7 +22,7 @@ const Explorer = ({ modelData }: { modelData: ModelMetadata }) => {
   return (
     <ModelProvider model={modelData}>
       <QueryClientProvider client={queryClient}>
-        <Flex width="full" height='full' position="relative">
+        <Flex id='container' width="full" height='full' position="relative">
           <MainPanel isOpen={isOpen} />
           {/* Toggle Button Tab */}
           <Box

@@ -44,17 +44,14 @@ export const Header = ({
   return (
     <Box
       as="header"
-      width="100vw"
+      width="full"
       bg="white"
       borderBottom="1px"
       borderColor="gray.200"
       px={6}
       py={4}
-      // position="sticky"
-      // top={0}
       zIndex={1000}
       boxShadow="sm"
-      height={16}
       >
       <Container>
         <Flex

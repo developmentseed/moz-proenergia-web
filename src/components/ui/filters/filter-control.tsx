@@ -4,7 +4,7 @@ import TextRange from "./text-range";
 
 type FilterControlProps = {
   config: Filter;
-  value: string[] | [number, number] | undefined;
+  value: string[] | [number, number] | undefined | null;
   onChange: (param:unknown) => void;
 };
 
@@ -41,7 +41,7 @@ export function FilterControl({ config, value, onChange }: FilterControlProps) {
           title={config.label}
           // description={config.description}
           items={items}
-          value={value}
+          value={value as (string[] | undefined)}
           onChange={onChange}
         />
       );
