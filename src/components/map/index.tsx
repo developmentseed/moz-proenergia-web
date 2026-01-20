@@ -15,11 +15,10 @@ import { ContextualLayer } from './contextual-layer';
 import { MainLayer } from './main-layer';
 
 interface MainMapProps {
-scenario: Scenario;
  main: Main;
 }
 
-const MainMap = ({ scenario, main }: MainMapProps) => {
+const MainMap = ({ main }: MainMapProps) => {
     const [{ lat, lng, zoom }, setCoordinates] = useCoordinates();
     const { selected, setSelected, hovered, onHover, onClick } = useMouseEvent();
 
@@ -32,13 +31,15 @@ const MainMap = ({ scenario, main }: MainMapProps) => {
     };
   },[]);
 
-  const { model, filters, activeLayers } = useModel();
+  const { model, scenarioId, filters, activeLayers } = useModel();
 
   const additionalLayers = model.layers.filter(l => activeLayers.includes(l.id));
 
   const mapFilter = useMemo(() => {
     return buildExpressionWithFilter(model.filters, filters);
   }, [filters, model.filters]);
+
+  const scenario = model.scenarios.find(s => s.id === scenarioId)!;
 
   return <Box w='100%' h='100%' className="map-container" position="relative">
     <Legend items={main.options} />

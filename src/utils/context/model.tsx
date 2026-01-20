@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, ReactNode, useMemo, useState } from 'react';
-import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger, type UseQueryStatesKeysMap, type SetValues } from 'nuqs';
+import { useQueryStates, useQueryState, parseAsArrayOf, parseAsString, parseAsInteger, type UseQueryStatesKeysMap, type SetValues } from 'nuqs';
 import { ModelMetadata, Filter, FilterType } from '@/app/types';
 
 const createFilterParsers = (filters: Filter[]) => {
@@ -12,9 +12,13 @@ const createFilterParsers = (filters: Filter[]) => {
         acc[filter.id] = parseAsArrayOf(parseAsInteger)
           .withDefault(filter.values as [number, number]);
         return acc;
-      // Option and Categorical value doens't have default
+      // Select has string value, empty string shows everything
       case FilterType.select:
-        acc[filter.id] = parseAsString;
+        acc[filter.id] = parseAsString.withDefault('');
+        return acc;
+      // Admin has string array value, empty array shows everything
+      case FilterType.admin:
+        acc[filter.id] = parseAsArrayOf(parseAsString).withDefault([]);
         return acc;
       case FilterType.checkbox:
         acc[filter.id] = parseAsArrayOf(parseAsString).withDefault(filter.options.map(o => o.value));
@@ -35,6 +39,10 @@ type ModelContextType = {
   setMainAttribute: (value: string | null) => void;
   // Current URL state (for map display - NO PREVIEW)
   filters: Record<string, [number, number] | string[] | null>;
+
+  // Scenario ID
+  scenarioId: string;
+  setScenarioId: (param:string) => void;
 
   // Display values for UI controls (pending takes precedence)
   displayFilters: Record<string, [number, number] | string[] | null>;
@@ -61,11 +69,15 @@ export function ModelProvider({
   model: ModelMetadata;
   children: ReactNode;
 }) {
-  // Create parsers from scenario
+  // Create parsers from model
   const filterParsers = useMemo(
     () => createFilterParsers(model.filters),
     [model.filters]
   );
+
+  const initialScenario = model.scenarios[0];
+  // Main attribute state (main visualization component - this won't be manipulated through UI)
+  const [scenarioId, setScenarioId] = useQueryState('scenario', parseAsString.withDefault(initialScenario.id));
 
   // Main attribute state (main visualization component - this won't be manipulated through UI)
   const [mainAttribute, setMainAttribute] = useQueryStates({
@@ -77,7 +89,6 @@ export function ModelProvider({
     history: 'replace',
     shallow: true
   });
-
   // Layer state
   const [layerState, setLayerState] = useQueryStates({
     layers: parseAsArrayOf(parseAsString).withDefault([]),
@@ -136,11 +147,13 @@ export function ModelProvider({
     }
   };
 
-
   return (
     <ModelContext.Provider
       value={{
         model,
+
+        scenarioId,
+        setScenarioId,
         mainAttribute: mainAttribute.main,
         setMainAttribute: (value) => setMainAttribute({ main: value }),
         // URL state, map

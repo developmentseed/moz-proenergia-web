@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+'use client';
+
+import { useState } from "react";
 import { Slider, type SliderValueChangeDetails } from "@chakra-ui/react";
 
 interface RangeSliderProps {

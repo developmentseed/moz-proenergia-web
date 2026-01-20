@@ -7,12 +7,13 @@ interface SelectProps {
   title: string;
   items: ItemUnit[];
   value: string;
+  multi?: boolean;
   onChange: ChangeEventHandler<HTMLSelectElement >
 }
 
-const Select = ({ title, items, value, onChange }: SelectProps) => {
+const Select = ({ title, items, value, multi, onChange }: SelectProps) => {
   return (
-    <Field.Root>
+    <Field.Root >
       <Field.Label>{title}</Field.Label>
       <NativeSelect.Root size="sm">
         <NativeSelect.Field

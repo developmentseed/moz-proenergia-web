@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { promises as fs } from 'fs';
-import { Flex, HStack, Box } from "@chakra-ui/react";
-import MainPanel from '@/components/ui/main-panel';
+import { Flex, Box } from "@chakra-ui/react";
+import Explorer from '@/components/ui/explorer';
 import { SideNav } from '@/components/layout/side-nav';
 import { ModelMetadata } from '@/app/types';
 
@@ -35,7 +35,8 @@ export default async function ModelPage({
       <SideNav models={models} currentSlug={slug} />
       <Box id='main-panel' width='full' height="100%">
         <Suspense>
-          <MainPanel modelData={metadata} />
+          {/* Control Panel and Map */}
+          <Explorer modelData={metadata} />
         </Suspense>
       </Box>
     </Flex>

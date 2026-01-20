@@ -65,7 +65,7 @@ const SummaryPanel = ({ clusterId, filters, resetCluster }: SummaryPanelProps) =
       p={4}
     >
       <Text fontSize='lg' fontWeight='bold' mb={3}>
-        Cluster {clusterId} Summary
+        {clusterId? `Cluster ${clusterId} Summary`: 'Analysis'}
       </Text>
 
       {isLoading && (
