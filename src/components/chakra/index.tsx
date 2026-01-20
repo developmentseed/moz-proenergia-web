@@ -7,3 +7,4 @@ export { RangeSlider } from './slider';
 export { RadioOptions } from './radio-options';
 export { Select } from './select';
 export { CheckboxGroupUI as CheckboxGroup } from './checkbox-group';
+export { ToggleTip } from './toggle-tip';
