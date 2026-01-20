@@ -1,12 +1,10 @@
-import { RangeSlider, Select, CheckboxGroup } from "@/components/chakra";
-import { type Filter
-
- } from "@/app/types";
+import { Combobox, Select, CheckboxGroup } from "@/components/chakra";
+import { type Filter } from "@/app/types";
 import TextRange from "./text-range";
 
 type FilterControlProps = {
   config: Filter;
-  value: unknown;
+  value: string[] | [number, number] | undefined;
   onChange: (param:unknown) => void;
 };
 
@@ -36,13 +34,14 @@ export function FilterControl({ config, value, onChange }: FilterControlProps) {
         />
       );
 
-    case 'select':
+    case 'admin':
+      const items = config.options.map(s => ({ label: s, value: s }));
       return (
-        <Select
+        <Combobox
           title={config.label}
           // description={config.description}
-          items={config.options}
-          value={value as string}
+          items={items}
+          value={value}
           onChange={onChange}
         />
       );
