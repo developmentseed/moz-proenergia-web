@@ -36,7 +36,11 @@ export const TextRange = ({
       max:max,
       step: step,
       width: "80px",
-      size: "sm" as const
+      size: "sm" as const,
+      textStyle: 'sliderLabel',
+      height: "24px",
+      borderRadius: 0,
+      p: 1
   };
 
   const handleSliderChange = (details: SliderValueChangeDetails) => {
@@ -105,7 +109,7 @@ export const TextRange = ({
 
   return (
     <Stack gap={2} width="full">
-      <Text fontWeight="medium" fontSize="sm">
+      <Text fontWeight="medium">
         {title}
       </Text>
 
@@ -145,10 +149,6 @@ export const TextRange = ({
         />
       </Flex>
 
-      <Flex justify="space-between" fontSize="xs" color="gray.500">
-        <Text>Min: {min}</Text>
-        <Text>Max: {max}</Text>
-      </Flex>
     </Stack>
   );
 };

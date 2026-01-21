@@ -1,7 +1,7 @@
 'use client';
 
 import { type ChangeEvent } from 'react';
-import { Box, Heading } from "@chakra-ui/react";
+import { Text, Box, Heading } from "@chakra-ui/react";
 import { Select } from '@/components/chakra';
 import { Control as ControlPanel } from './control';
 import { useModel } from "@/utils/context/model";
@@ -27,8 +27,9 @@ const MainPanel = ({ isOpen }: { isOpen: boolean }) => {
     transition={`width ${AnimationTime} ease`}
     width={isOpen ? ControlPanelWidth : 0}
             >
-    <Box width={ControlPanelWidth} height='full' overflowY='scroll'>
+    <Box width={ControlPanelWidth} height='full' overflowY='auto' boxShadow='md'>
       <Box mb={4} mt={2} p={4}>
+        <Text fontFamily='heading' textTransform='uppercase'>Model</Text>
         <Heading as={'h2'}> {model.title} </Heading>
         <Select title={'Scenario'} items={scenarioItems} value={scenarioId} onChange={onChange} />
       </Box>

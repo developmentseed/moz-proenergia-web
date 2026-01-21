@@ -1,6 +1,6 @@
 import { Tab } from "@/components/chakra";
 import { type SliderValueChangeDetails, Box, Collapsible } from "@chakra-ui/react";
-import { LuChevronUp } from "react-icons/lu";
+import { LuChevronUp, LuLayers, LuFilter } from "react-icons/lu";
 import { FilterControl } from './filters/filter-control';
 import { LayerControl } from './layers/layer-control';
 import { useModel } from "@/utils/context/model";
@@ -31,12 +31,12 @@ const CollapsibleGroup = ({ collapsibleItem }: { collapsibleItem: ColGroup }) =>
   const { displayFilters, setPendingFilters } = useModel();
   return <Collapsible.Root defaultOpen>
     <Collapsible.Trigger
-      paddingY="3"
       display="flex"
       gap="2"
       alignItems="center"
       justifyContent="space-between"
       width="100%"
+      textStyle="collapsibleGroupTitle"
     >
       {collapsibleItem.title}
       <Collapsible.Indicator
@@ -47,7 +47,7 @@ const CollapsibleGroup = ({ collapsibleItem }: { collapsibleItem: ColGroup }) =>
       </Collapsible.Indicator>
     </Collapsible.Trigger>
     <Collapsible.Content>
-      <Box>
+      <Box mt={1}>
         {collapsibleItem.items?.map(matchingFilter => {
         const setFilterOnChange = (e: unknown) =>{
           if (matchingFilter.type === 'select') setPendingFilters({ [matchingFilter.id]: (e as ChangeEvent<HTMLSelectElement>).target.value });
@@ -83,8 +83,9 @@ const ControlsPanel = () => {
 
   const noCollapsibleGroups = model.filters.filter(f=>f.type ==='numeric');
 
-  return <Box position="relative" height="100%" p={4}>
-    {collapsibleGroups.map(group => <CollapsibleGroup key={group.title} collapsibleItem={group} />)}
+  return <Box position="relative" p={4}>
+    {/* put collapsible groups first */}
+    {collapsibleGroups.map(group => <Box key={group.title} mb={6}><CollapsibleGroup collapsibleItem={group} /></Box>)}
 
     {/* numeric data doesn't need to be collapsible */}
     {noCollapsibleGroups.map(matchingFilter => {
@@ -92,8 +93,9 @@ const ControlsPanel = () => {
         setPendingFilters({ [matchingFilter.id]: (e as SliderValueChangeDetails).value });
       };
       const currentFilter = displayFilters[matchingFilter.id];
-      return <FilterControl key={matchingFilter.id} config={matchingFilter} value={currentFilter} onChange={setFilterOnChange} />;
+      return <Box key={matchingFilter.id} mb={6}><FilterControl config={matchingFilter} value={currentFilter} onChange={setFilterOnChange} /></Box>;
     })}
+
     {/* Button */}
     <ApplyActions />
   </Box>;
@@ -101,11 +103,11 @@ const ControlsPanel = () => {
 
 const tabItems = [{
   id: 'controls',
-  label: 'Controls',
+  label: <><LuFilter />Controls</>,
   Component: ControlsPanel
 }, {
   id: 'layers',
-  label: 'Layers',
+  label: <><LuLayers />Layers</>,
   Component: LayersPanel
 }];
 

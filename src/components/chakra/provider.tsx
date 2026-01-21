@@ -1,14 +1,96 @@
 "use client";
 
-import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
+import { ChakraProvider, createSystem, defineTextStyles, defaultConfig } from "@chakra-ui/react";
 import {
   ColorModeProvider,
   type ColorModeProviderProps,
 } from "./color-mode";
 
+// Text style sets
+
+export const textStyles = defineTextStyles({
+  subTitle: {
+    description: 'Small text that comes above the model title',
+    value: {
+
+    },
+  },
+  modelTitle: {
+    description: 'big text for model title, analysis title',
+    value: {}
+  },
+  collapsibleGroupTitle: {
+    description: "Title for collapsible area",
+    value: {
+      fontFamily: "var(--font-dm-sans)",
+      color: "#000",
+      fontSize: "1.125rem",
+      fontWeight: 600,
+      lineHeight: "1.75rem"
+    },
+  },
+  allCapLabel: {
+    description: "All Cap Labels for filters",
+    value: {
+      fontFamily: "var(--font-dm-mono)",
+      color: "#0A0A0C",
+      fontWeight: 300,
+      textTransform: "uppercase"
+    },
+  },
+  sliderLabel: {
+    description: "labe for text range sliders",
+    value: {
+    color: "#000",
+      fontFamily: "var(--font-dm-mono)",
+      fontSize: "0.875rem",
+      fontWeight: 400,
+      lineHeight: "1.25rem"
+    }
+  },
+  checkboxOption: {
+    description: "options for checkbox",
+    value: {
+      color: "#000",
+      fontFamily: "var(--font-dm-sans)",
+      fontSize: "0.75rem",
+      fontWeight: 500,
+      lineHeight: "1rem"
+    }
+  },
+  rangeValue: {
+    description: "text to display range slider value",
+    value: {
+      color: "#52525B",
+      fontFamily: "var(--font-dm-mono)",
+      fontSize: "0.75rem",
+      fontWeight: 400,
+      lineHeight: "1rem"
+    }
+  },
+  tableAttr: {
+
+  },
+  tableValue: {
+    
+  }
+});
+
+const system = createSystem(defaultConfig, {
+  theme: {
+    tokens: {
+      fonts: {
+        heading: { value: "var(--font-dm-mono)" },
+        body: { value: "var(--font-dm-sans)" },
+      },
+    },
+    textStyles
+  },
+});
+
 export function Provider(props: ColorModeProviderProps) {
   return (
-    <ChakraProvider value={defaultSystem}>
+    <ChakraProvider value={system}>
       {props.children}
       {/* <ColorModeProvider {...props} /> */}
     </ChakraProvider>

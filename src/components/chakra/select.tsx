@@ -14,7 +14,7 @@ interface SelectProps {
 const Select = ({ title, items, value, multi, onChange }: SelectProps) => {
   return (
     <Field.Root >
-      <Field.Label>{title}</Field.Label>
+      <Field.Label textStyle='allCapLabel'>{title}</Field.Label>
       <NativeSelect.Root size="sm">
         <NativeSelect.Field
           value={value}

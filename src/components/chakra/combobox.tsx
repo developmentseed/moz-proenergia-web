@@ -29,8 +29,9 @@ export const ChakraCombobox = ({ title, items, value, onChange }: ChakraCombobox
       onInputValueChange={(e) => filter(e.inputValue)}
       onValueChange={onChange}
       value={value}
+      mb={2}
     >
-      <Combobox.Label>{title}</Combobox.Label>
+      <Combobox.Label textStyle='allCapLabel'>{title}</Combobox.Label>
       <Combobox.Control>
         <Combobox.Input placeholder="Type to search" />
         <Combobox.IndicatorGroup>

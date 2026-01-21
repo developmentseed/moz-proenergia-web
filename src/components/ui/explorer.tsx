@@ -1,15 +1,14 @@
 'use client';
 
-import { type ChangeEvent, useState } from 'react';
-import { useQueryState, parseAsString } from 'nuqs';
+import { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ModelProvider } from '@/utils/context/model';
-import { Flex, Box, Heading, IconButton, Collapsible } from "@chakra-ui/react";
-import { Select } from '@/components/chakra';
-import { Control as ControlPanel } from './control';
+import { Flex, Box, IconButton } from "@chakra-ui/react";
 import { ModelMetadata } from '@/app/types';
 import MainMap from '@/components/map';
 import { HiChevronLeft, HiChevronRight } from 'react-icons/hi';
+import { LuPanelRightOpen, LuPanelLeftOpen } from "react-icons/lu";
+
 import MainPanel from './main-panel';
 
 const queryClient = new QueryClient();
@@ -36,12 +35,12 @@ const Explorer = ({ modelData }: { modelData: ModelMetadata }) => {
             <IconButton
               aria-label={isOpen ? "Collapse panel" : "Expand panel"}
               onClick={() => setIsOpen(!isOpen)}
+              variant="solid"
               size="sm"
-              bg="gray.200"
-              _hover={{ bg: "gray.300" }}
-              borderLeftRadius={0}
+              // _hover={{ bg: "gray.200" }}
+              borderRadius={0}
             >
-              {isOpen ? <HiChevronLeft /> : <HiChevronRight />}
+              {isOpen ? <LuPanelRightOpen /> : <LuPanelLeftOpen />}
             </IconButton>
           </Box>
 
