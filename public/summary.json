@@ -1,0 +1,58 @@
+[{
+  "type": "flat",
+  "label": "# of something",
+  "key": "Something",
+  "value": 40
+},
+{
+  "type": "group",
+  "label": "# of Settlements per PUE",
+  "value": [{
+    "key": "High",
+    "label": "High",
+    "value": 30
+  }, {
+    "key": "Low",
+    "label": "Low",
+    "value": 780
+  }, {
+    "key": "Medium",
+    "label": "Medium",
+    "value": 90
+  }, {
+    "key": "Very High",
+    "label": "Very High",
+    "value": 230
+  }]
+},
+
+{
+  "type": "group",
+  "label": "# of Settlements per PUE & Technology",
+  "value": [{
+    "key": "High1",
+    "label": "High and Technology 1",
+    "value": 300
+  }, {
+    "key": "High3",
+    "label": "High and Technology 3",
+    "value": 200
+  }, {
+    "key": "High8",
+    "label": "Medium and Technology 8",
+    "value": 800
+  }, {
+    "key": "Medium1",
+    "label": "Medium and Technology 1",
+    "value": 305
+  }, {
+    "key": "Medium3",
+    "label": "Medium and Technology 3",
+    "value": 21
+  }, {
+    "key": "Medium8",
+    "label": "Medium and Technology 8",
+    "value": 5
+  }]
+}]
+

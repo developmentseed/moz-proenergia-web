@@ -14,9 +14,27 @@ interface ClusterData {
   [key: string]: { [clusterId: string]: string | number };
 }
 
-interface SummaryData {
-  [key: string]: string | number ;
+interface SummaryItem {
+  key: string;
+  label: string;
+  value: number;
 }
+
+interface FlatRow {
+  type: 'flat';
+  label: string;
+  key: string;
+  value: number;
+}
+
+interface GroupRow {
+  type: 'group';
+  label: string;
+  value: SummaryItem[];
+}
+
+type SummaryRow = FlatRow | GroupRow;
+type SummaryData = SummaryRow[];
 interface SummaryPanelProps {
   clusterId: string | null;
   filters: Record<string, [number, number] | string[] | null>;
@@ -49,20 +67,25 @@ const PanelHeader = ({ title, subtitle, onClose }: PanelHeaderProps) => (
 );
 
 interface PanelBodyProps {
-  data: Record<string, string | number> | null;
+  data: SummaryData | null;
   isLoading: boolean;
   isError: boolean;
 }
 
-const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => (
-  <Box px={4} pb={4}>
-    {isLoading && (
+const formatValue = (value: number) =>
+  value.toLocaleString(undefined, { maximumFractionDigits: 3 });
+
+const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
+
+  return (
+    <Box p={4} maxHeight={300} overflowY='auto'>
+      {isLoading && (
       <Box display='flex' alignItems='center' justifyContent='center' py={8}>
         <Spinner size='xl' />
       </Box>
     )}
 
-    {isError && (
+      {isError && (
       <Alert.Root status="error">
         <Alert.Indicator />
         <Alert.Content>
@@ -74,45 +97,63 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => (
       </Alert.Root>
     )}
 
-    {!isLoading && !isError && data && (
+      {!isLoading && !isError && data && (
       <Table.Root>
-        <Table.Caption />
         <Table.Body>
-          {Object.entries(data).map(([key, value]) => (
-            <Table.Row key={key}>
-              <Table.Cell>{key}</Table.Cell>
-              <Table.Cell>
-                {typeof value === 'number'
-                  ? value.toLocaleString(undefined, { maximumFractionDigits: 3 })
-                  : value
-                }
-              </Table.Cell>
-            </Table.Row>
-          ))}
+          {data.map((row) => {
+            if (row.type === 'flat') {
+              return (
+                <Table.Row key={row.key}>
+                  <Table.Cell>{row.label}</Table.Cell>
+                  <Table.Cell>{formatValue(row.value)}</Table.Cell>
+                </Table.Row>
+              );
+            }
+
+            // Group type
+            return [
+              <Table.Row key={row.label}>
+                <Table.Cell colSpan={2} fontWeight='bold' bg='gray.100'>
+                  {row.label}
+                </Table.Cell>
+              </Table.Row>,
+              ...row.value.map((item) => (
+                <Table.Row key={item.key}>
+                  <Table.Cell pl={6}>{item.label}</Table.Cell>
+                  <Table.Cell>{formatValue(item.value)}</Table.Cell>
+                </Table.Row>
+              ))
+            ];
+          })}
         </Table.Body>
       </Table.Root>
     )}
-  </Box>
-);
+    </Box>
+);};
 
-async function fetchClusterData(clusterId: string): Promise<ClusterData> {
-  const randomData = parseInt(clusterId)%2 === 0? 'popup_400.json': 'popup_401.json';
+function transformClusterData(data: Record<string, string | number>): SummaryData {
+  return Object.entries(data).map(([key, value]) => ({
+    type: 'flat' as const,
+    key,
+    label: key,
+    value: typeof value === 'number' ? value : parseFloat(value) || 0,
+  }));
+}
+
+async function fetchClusterData(clusterId: string): Promise<SummaryData> {
+  const randomData = parseInt(clusterId) % 2 === 0 ? 'popup_400.json' : 'popup_401.json';
 
   const response = await fetch(`/${randomData}`);
   if (!response.ok) {
     throw new Error('Failed to fetch cluster data');
   }
-  return response.json();
+  const rawData = await response.json();
+  // The response is an array with one object, transform it to FlatRow format
+  return transformClusterData(rawData[0]);
 }
 
 const SummaryPanel = ({ clusterId, filters, resetCluster }: SummaryPanelProps) => {
   const [isOpen, setIsOpen] = useState(true);
-
-  async function fetchFilteredData(filters: Record<string, [number, number] | string[] | null>): Promise<SummaryData> {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    resetCluster();
-    return { data: Math.random(), ...filters };
-  }
 
   const { data: clusterRawData, isLoading: clusterIsLoading, isError: clusterIsError } = useQuery({
     queryKey: ['cluster', clusterId],
@@ -120,22 +161,32 @@ const SummaryPanel = ({ clusterId, filters, resetCluster }: SummaryPanelProps) =
     enabled: !!clusterId,
   });
 
+  async function fetchFilteredData(): Promise<SummaryData> {
+    const response = await fetch('/summary.json');
+    console.log(response);
+    if (!response.ok) {
+      throw new Error('Failed to fetch summary data');
+    }
+
+    return await response.json();
+  }
+
   const { data: summaryData, isLoading: summaryIsLoading, isError: summaryIsError } = useQuery({
     queryKey: ['filter', filters],
-    queryFn: () => fetchFilteredData(filters),
-    // enabled: !!clusterId,
+    queryFn: fetchFilteredData,
   });
 
-  const clusterData = clusterId && clusterRawData && clusterRawData.length && clusterRawData[0];
-  const dataToDisplay = clusterData || summaryData;
+  // const clusterData = clusterId && clusterRawData && clusterRawData.length && clusterRawData[0];
+  const dataToDisplay = clusterRawData || summaryData;
   const isLoading = clusterIsLoading || summaryIsLoading;
   const isError = clusterIsError || summaryIsError;
 
   useEffect(() => {
     if (!dataToDisplay) return;
+    if (isOpen) return;
     if(!isOpen) setIsOpen(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[dataToDisplay]);
-
 
   if (!isOpen) return null;
 
@@ -146,7 +197,7 @@ const SummaryPanel = ({ clusterId, filters, resetCluster }: SummaryPanelProps) =
       top='10'
       right='4'
       zIndex={100000}
-      // p={4}
+
     >
       <PanelHeader
         subtitle={'analysis'}
