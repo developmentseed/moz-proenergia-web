@@ -27,7 +27,7 @@ const MainPanel = ({ isOpen }: { isOpen: boolean }) => {
     transition={`width ${AnimationTime} ease`}
     width={isOpen ? ControlPanelWidth : 0}
             >
-    <Box width={ControlPanelWidth} height='full'>
+    <Box width={ControlPanelWidth} height='full' overflowY='scroll'>
       <Box mb={4} mt={2} p={4}>
         <Heading as={'h2'}> {model.title} </Heading>
         <Select title={'Scenario'} items={scenarioItems} value={scenarioId} onChange={onChange} />
