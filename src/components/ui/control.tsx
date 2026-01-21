@@ -1,5 +1,5 @@
 import { Tab } from "@/components/chakra";
-import { type SliderValueChangeDetails, Box, Collapsible } from "@chakra-ui/react";
+import { type SliderValueChangeDetails, Box, Collapsible, Text } from "@chakra-ui/react";
 import { LuChevronUp, LuLayers, LuFilter } from "react-icons/lu";
 import { FilterControl } from './filters/filter-control';
 import { LayerControl } from './layers/layer-control';
@@ -103,11 +103,11 @@ const ControlsPanel = () => {
 
 const tabItems = [{
   id: 'controls',
-  label: <><LuFilter />Controls</>,
+  label: <><LuFilter /><Text textStyle='subTitle'>Controls</Text></>,
   Component: ControlsPanel
 }, {
   id: 'layers',
-  label: <><LuLayers />Layers</>,
+  label: <><LuLayers /><Text textStyle='subTitle'>Layers</Text></>,
   Component: LayersPanel
 }];
 

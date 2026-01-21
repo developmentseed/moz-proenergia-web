@@ -12,12 +12,23 @@ export const textStyles = defineTextStyles({
   subTitle: {
     description: 'Small text that comes above the model title',
     value: {
-
-    },
+        color: "#52525B",
+        fontFamily: "var(--font-dm-mono)",
+        fontSize: "0.75rem",
+        fontWeight: 400,
+        letterSpacing: "1.2px",
+        textTransform: 'uppercase'
+    }
   },
   modelTitle: {
     description: 'big text for model title, analysis title',
-    value: {}
+    value: {
+      color: '#000',
+      fontFamily: "var(--font-dm-sans)",
+      fontSize: '1.5rem',
+      fontWeight: 900,
+      lineHeight: '2rem'
+    }
   },
   collapsibleGroupTitle: {
     description: "Title for collapsible area",
@@ -69,10 +80,24 @@ export const textStyles = defineTextStyles({
     }
   },
   tableAttr: {
-
+    description: "table attribution name",
+    value: {
+      color: '#000',
+      fontFamily:  "var(--font-dm-sans)",
+      fontSize: '0.75rem',
+      fontWeight: 600,
+      lineHeight: '0.85rem'
+    }
   },
   tableValue: {
-    
+    description: "table value",
+    value: {
+            color: '#52525b',
+      fontFamily:  "var(--font-dm-sans)",
+      fontSize: '0.75rem',
+      fontWeight: 400,
+      lineHeight: '0.85rem'
+    }
   }
 });
 

@@ -29,8 +29,8 @@ const MainPanel = ({ isOpen }: { isOpen: boolean }) => {
             >
     <Box width={ControlPanelWidth} height='full' overflowY='auto' boxShadow='md'>
       <Box mb={4} mt={2} p={4}>
-        <Text fontFamily='heading' textTransform='uppercase'>Model</Text>
-        <Heading as={'h2'}> {model.title} </Heading>
+        <Text textStyle='subTitle'>Model</Text>
+        <Heading as={'h2'} textStyle='modelTitle'> {model.title} </Heading>
         <Select title={'Scenario'} items={scenarioItems} value={scenarioId} onChange={onChange} />
       </Box>
       <ControlPanel />

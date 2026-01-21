@@ -7,8 +7,10 @@ import {
   Alert,
   IconButton
 } from "@chakra-ui/react";
+import { InfoTip } from '../chakra/toggle-tip';
 import { LuX } from "react-icons/lu";
 import { useQuery } from '@tanstack/react-query';
+import { controlZIndex, mapControlCommonStyleProps } from './control-constant';
 
 interface ClusterData {
   [key: string]: { [clusterId: string]: string | number };
@@ -67,7 +69,7 @@ const PanelHeader = ({ title, subtitle, onClose }: PanelHeaderProps) => (
 );
 
 interface PanelBodyProps {
-  data: SummaryData | null;
+  data: SummaryData | undefined;
   isLoading: boolean;
   isError: boolean;
 }
@@ -75,10 +77,13 @@ interface PanelBodyProps {
 const formatValue = (value: number) =>
   value.toLocaleString(undefined, { maximumFractionDigits: 3 });
 
+const tableCellStyleProps = {
+  py: 1, px: 2
+};
 const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
 
   return (
-    <Box p={4} maxHeight={300} overflowY='auto'>
+    <Box maxHeight={300} minWidth={350} overflowY='auto'>
       {isLoading && (
       <Box display='flex' alignItems='center' justifyContent='center' py={8}>
         <Spinner size='xl' />
@@ -104,8 +109,8 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
             if (row.type === 'flat') {
               return (
                 <Table.Row key={row.key}>
-                  <Table.Cell>{row.label}</Table.Cell>
-                  <Table.Cell>{formatValue(row.value)}</Table.Cell>
+                  <Table.Cell {...tableCellStyleProps}> <Text textStyle='tableAttr'> {row.label}<InfoTip content="description" /></Text> </Table.Cell>
+                  <Table.Cell {...tableCellStyleProps}><Text textStyle='tableValue'>{formatValue(row.value)}</Text></Table.Cell>
                 </Table.Row>
               );
             }
@@ -113,14 +118,15 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
             // Group type
             return [
               <Table.Row key={row.label}>
-                <Table.Cell colSpan={2} fontWeight='bold' bg='gray.100'>
-                  {row.label}
+                <Table.Cell px={2} py={2} colSpan={2} fontWeight='bold' bg='gray.100'>
+                  <Text textStyle='tableAttr'>{row.label}</Text>
                 </Table.Cell>
               </Table.Row>,
               ...row.value.map((item) => (
                 <Table.Row key={item.key}>
-                  <Table.Cell pl={6}>{item.label}</Table.Cell>
-                  <Table.Cell>{formatValue(item.value)}</Table.Cell>
+                  <Table.Cell {...tableCellStyleProps} pl={6}>
+                    <Text textStyle='tableAttr'> {item.label}<InfoTip content="description" /></Text></Table.Cell>
+                  <Table.Cell {...tableCellStyleProps}><Text textStyle='tableValue'>{formatValue(item.value)}</Text></Table.Cell>
                 </Table.Row>
               ))
             ];
@@ -163,11 +169,10 @@ const SummaryPanel = ({ clusterId, filters, resetCluster }: SummaryPanelProps) =
 
   async function fetchFilteredData(): Promise<SummaryData> {
     const response = await fetch('/summary.json');
-    console.log(response);
     if (!response.ok) {
       throw new Error('Failed to fetch summary data');
     }
-
+    resetCluster();
     return await response.json();
   }
 
@@ -192,12 +197,10 @@ const SummaryPanel = ({ clusterId, filters, resetCluster }: SummaryPanelProps) =
 
   return (
     <Box
-      background='white'
       position='absolute'
       top='10'
-      right='4'
-      zIndex={100000}
-
+      {...mapControlCommonStyleProps}
+      zIndex={controlZIndex}
     >
       <PanelHeader
         subtitle={'analysis'}

@@ -1,5 +1,6 @@
 import { Box, VStack, HStack, Text } from '@chakra-ui/react';
 import { type MapItemUnit } from '@/app/types';
+import { controlZIndex, mapControlCommonStyleProps } from './control-constant';
 
 interface LegendProps {
   items: MapItemUnit[];
@@ -10,15 +11,13 @@ export function Legend({ items }: LegendProps) {
     <Box
       position="absolute"
       bottom={12}
-      right={4}
-      bg="white"
-      p={3}
-      boxShadow="md"
-      zIndex={1000}
-      minW="200px"
+      p={2}
+      {...mapControlCommonStyleProps}
+      zIndex={controlZIndex}
+      minW="150px"
     >
       <VStack align="stretch" gap={2}>
-        <Text fontWeight="semibold" fontSize="sm" mb={1}>
+        <Text textStyle='tableAttr' mb={1}>
           Legend
         </Text>
         {items.map((item) => (
@@ -30,7 +29,7 @@ export function Legend({ items }: LegendProps) {
               borderRadius="sm"
               flexShrink={0}
             />
-            <Text fontSize="sm">{item.label}</Text>
+            <Text textStyle='tableValue'>{item.label}</Text>
           </HStack>
         ))}
       </VStack>

@@ -1,7 +1,7 @@
-import { type JSX, FunctionComponent } from 'react';
+import { JSX, FunctionComponent } from 'react';
 
 export type TabItem = {
   id: string;
-  label: JSX | string;
+  label: JSX.Element;
   Component: FunctionComponent;
 }
