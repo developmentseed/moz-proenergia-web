@@ -23,10 +23,11 @@ export function Legend({ items }: LegendProps) {
         {items.map((item) => (
           <HStack key={item.value} gap={2}>
             <Box
-              w="20px"
-              h="20px"
+              w="3"
+              h="3"
               bg={item.color}
-              borderRadius="sm"
+              borderRadius="100%"
+              border='1px solid black'
               flexShrink={0}
             />
             <Text textStyle='tableValue'>{item.label}</Text>

@@ -47,7 +47,7 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
   };
 
   return (
-    <Box p={4}>
+    <Box p={4} fontFamily={'body'}>
       <form onSubmit={handleSubmit}>
         <Stack gap={4}>
           <Text fontSize="sm" color="gray.600" mb={2}>
@@ -88,7 +88,7 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
             />
           </Field.Root>
 
-          <Flex justify="space-between" align="center">
+          {/* <Flex justify="space-between" align="center">
             <Link
               href="/forgot-password"
               fontSize="sm"
@@ -97,7 +97,7 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
             >
               Forgot password?
             </Link>
-          </Flex>
+          </Flex> */}
 
           <Button
             type="submit"
