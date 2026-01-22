@@ -1,12 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { ModelProvider } from '@/utils/context/model';
 import { Flex, Box, IconButton } from "@chakra-ui/react";
-import { ModelMetadata } from '@/app/types';
+import { ModelMetadata, Filter } from '@/app/types';
 import MainMap from '@/components/map';
-import { HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 import { LuPanelRightOpen, LuPanelLeftOpen } from "react-icons/lu";
 
 import MainPanel from './main-panel';
@@ -15,39 +14,114 @@ const queryClient = new QueryClient();
 const ControlPanelWidth = 350;
 const AnimationTime = '0.3s';
 
-const Explorer = ({ modelData }: { modelData: ModelMetadata }) => {
-    const [isOpen, setIsOpen] = useState(true);
+// Fetch metadata and merge options from separate files (for client-side refetch)
+async function fetchModelData(slug: string): Promise<ModelMetadata> {
+  const metadataPath = `/mock/${slug}/metadata`;
+  const filtersPath = `/mock/${slug}/filters`;
+
+  // Fetch main metadata
+  const metadataRes = await fetch(`${metadataPath}/data.json`);
+  if (!metadataRes.ok) throw new Error('Failed to fetch metadata');
+  const metadata: ModelMetadata = await metadataRes.json();
+
+  // Helper to fetch filter options/values file
+  const fetchFilterData = async (column: string) => {
+    try {
+      const res = await fetch(`${filtersPath}/${column}.json`);
+      if (!res.ok) return null;
+      return res.json();
+    } catch {
+      return null;
+    }
+  };
+
+  // Fetch main attribute options
+  if (metadata.main?.column) {
+    const mainOptions = await fetchFilterData(metadata.main.column);
+    if (mainOptions) metadata.main.options = mainOptions;
+  }
+
+  // Fetch all filter options/values in parallel
+  const filterDataPromises = (metadata.filters || []).map((filter: Filter) => {
+    if (filter.column) {
+      return fetchFilterData(filter.column);
+    }
+    return Promise.resolve(null);
+  });
+
+  const filterData = await Promise.all(filterDataPromises);
+
+  metadata.filters = metadata.filters.map((filter, index) => {
+    if (filterData[index]) {
+      const options = filterData[index];
+      return {
+        ...filter,
+        options
+      };
+    } else {
+      // @ TO DO: break?
+      return filter;
+    }
+  });
+
+  return metadata;
+}
+
+const ExplorerContent = ({ modelData }: { modelData: ModelMetadata }) => {
+  const [isOpen, setIsOpen] = useState(true);
+
+  // Use SSG data as initial, can refetch client-side when needed
+  const { data } = useQuery({
+    queryKey: ['modelData', modelData.id],
+    queryFn: () => fetchModelData(modelData.id),
+    // initialData: modelData, // Start with data fetched from static generation
+    staleTime: Infinity, // Don't auto-refetch, only refetch when manually triggered
+  });
+
+  const currentData = data ?? modelData;
 
   return (
-    <ModelProvider model={modelData}>
-      <QueryClientProvider client={queryClient}>
-        <Flex id='container' width="full" height='full' position="relative">
-          <MainPanel isOpen={isOpen} />
-          {/* Toggle Button Tab */}
-          <Box
-            position="absolute"
-            left={isOpen ? ControlPanelWidth : 0}
-            top="8"
-            transform="translateY(-50%)"
-            zIndex={1000}
-            transition={`left ${AnimationTime} ease`}
+    <ModelProvider model={currentData}>
+      <Flex id='container' width="full" height='full' position="relative">
+        <MainPanel isOpen={isOpen} />
+        {/* Toggle Button Tab */}
+        <Box
+          position="absolute"
+          left={isOpen ? ControlPanelWidth : 0}
+          top="8"
+          transform="translateY(-50%)"
+          zIndex={1000}
+          transition={`left ${AnimationTime} ease`}
+          border='1px solid'
+          borderColor='panelBorder'
+          borderLeft='none'
+        >
+          <IconButton
+            aria-label={isOpen ? "Collapse panel" : "Expand panel"}
+            onClick={() => setIsOpen(!isOpen)}
+            variant="solid"
+            size="sm"
+            bg='panelBg'
+            borderLeft='none'
+            borderRadius={0}
           >
-            <IconButton
-              aria-label={isOpen ? "Collapse panel" : "Expand panel"}
-              onClick={() => setIsOpen(!isOpen)}
-              variant="solid"
-              size="sm"
-              // _hover={{ bg: "gray.200" }}
-              borderRadius={0}
-            >
-              {isOpen ? <LuPanelRightOpen /> : <LuPanelLeftOpen />}
-            </IconButton>
-          </Box>
+            {isOpen ? <LuPanelRightOpen stroke='gray' /> : <LuPanelLeftOpen stroke='gray' />}
+          </IconButton>
+        </Box>
 
-          <Box transition={`width ${AnimationTime} ease`} height='full' width='full'><MainMap main={modelData.main} /></Box>
-        </Flex>
-      </QueryClientProvider>
+        <Box transition={`width ${AnimationTime} ease`} height='full' width='full'>
+          <MainMap main={currentData.main} />
+        </Box>
+      </Flex>
     </ModelProvider>
+  );
+};
+
+const Explorer = ({ modelData }: { modelData: ModelMetadata }) => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ExplorerContent modelData={modelData} />
+    </QueryClientProvider>
   );
 };
 

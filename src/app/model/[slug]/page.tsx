@@ -30,12 +30,12 @@ export default async function ModelPage({
   const metadataFile = await fs.readFile(process.cwd() + `/src/app/mock/${slug}/metadata/data.json`, 'utf8');
   const metadata = JSON.parse(metadataFile);
 
-  const basePath = process.cwd() + `/src/app/mock/${slug}/metadata`;
+  // const basePath = process.cwd() + `/src/app/mock/${slug}/metadata`;
 
   // Reading options value files: will need to be replaced by requests to backend
   const readOptionsFile = async (column: string) => {
     try {
-      const file = await fs.readFile(`${basePath}/${column}.json`, 'utf8');
+      const file = await fs.readFile(process.cwd() + `/src/app/mock/${slug}/filters/${column}.json`, 'utf8');
       return JSON.parse(file);
     } catch {
       return null;
@@ -56,10 +56,18 @@ export default async function ModelPage({
     return null;
   });
 
-  const filterOptions = await Promise.all(filterOptionsPromises);
-  metadata.filters?.forEach((filter: { options?: unknown }, index: number) => {
-    if (filterOptions[index]) {
-      filter.options = filterOptions[index];
+  const filterData = await Promise.all(filterOptionsPromises);
+
+  metadata.filters = metadata.filters.map((filter, index) => {
+    if (filterData[index]) {
+      const options = filterData[index];
+      return {
+        ...filter,
+        options
+      };
+    } else {
+      // @ TO DO: break?
+      return filter;
     }
   });
 
