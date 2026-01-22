@@ -28,7 +28,7 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
       height="100%"
       bg="navBg"
       borderRight="1px solid black"
-      borderColor="gray.200"
+      borderColor="panelBorder"
       top={16}
       zIndex={100}
     >
