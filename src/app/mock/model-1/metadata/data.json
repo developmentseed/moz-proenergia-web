@@ -36,30 +36,26 @@
     "label": "Main Attribute",
     "column": "Technology2030",
     "description": "Some description",
-    "type": "cateogorical",
-    "options": [{"label": "SHS", "value":"SHS", "color": "#ff0000" }, {"label": "Mini Grid PV", "value":"MiniGrid_PV", "color": "#00ff00" }, {"label": "Existing Grid", "value":"ExistingGrid", "color": "#ff60ff" }, {"label": "Grid Extension", "value":"GridExtension", "color": "#ff6006" }]
+    "type": "cateogorical"
   },
   "filters": [{
     "id": "admin-1-selector",
     "column": "Admin_1",
     "label": "Province",
     "description": "Some description",
-    "type": "admin",
-    "options": ["Gaza", "Tete", "Maputo", "Manica", "Inhambane", "Sofala", "Niassa", "Zambezia", "Nampula", "Cabo Delgado"]
+    "type": "admin"
   },{
     "id": "admin-2-selector",
     "column": "District",
     "label": "District",
     "description": "Some description",
-    "type": "admin",
-    "options": ["Chicualacuala", "M\u00e1goe", "Zumbu", "Mar\u00e1via", "Massingir", "Mapai", "Namaacha", "Moamba", "Cahora-Bassa", "Matutuine", "Magude", "Changara", "Chifunde", "Boane", "Mabalane", "Massangena", "Cidade da Matola", "Machaze", "Katembe", "Mossurize", "Kamubukwana", "Manhi\u00e7a", "Kampfumo", "Marracuene", "KaMaxakeni", "KaMavota", "Chokwe", "Manica", "Guija", "Sussundenga", "Marara", "Kanyaka", "Bilene", "Barue", "Chigubo", "Chi\u00fata", "Guro", "Vanduzi", "Chibuto", "Macanga", "Mabote", "Limpopo", "Moatize", "Macate", "Macossa", "Chimoio", "Cidade de Tete", "Chibabava", "Xai-Xai", "Gondola", "Chongoene", "Funhalouro", "Gorongosa", "Ang\u00f3nia", "Mandlakazi", "Tambara", "Buzi", "Nhamatanda", "Panda", "Machanga", "Tsangano", "Govuro", "D\u00f4a", "Zavala", "Maringue", "Chemba", "Inhassoro", "Massinga", "Vilankulo", "Inharrime", "Muanza", "Dondo", "Cheringoma", "Caia", "Lago", "Cidade da Beira", "Homoine", "Morrumbene", "Mutarara", "Lichinga", "Jangamo", "Chimbunila", "Sanga", "Cidade de Maxixe", "Morrumbala", "Ngauma", "Cidade de Inhambane", "Marromeu", "Milange", "Mopeia", "Mandimba", "Muembe", "Derre", "Majune", "Luabo", "Mecanhelas", "Molumbo", "Mavago", "Chinde", "Mocuba", "Lugela", "Cuamba", "Metarica", "Nicoadala", "Gurue", "Namarroi", "Inhassunge", "Malema", "Quelimane", "Namacurra", "Ma\u00faa", "Mecula", "Maganja da Costa", "Ile", "Marrupa", "Alto Molocue", "Mulevala", "Mocubela", "Nipepe", "Rib\u00e1u\u00e8", "Lalaua", "Gile", "Pebane", "Balama", "Murrupula", "Montepuez", "Namuno", "Mecuburi", "Mueda", "Rapale", "Mogovolas", "Moma", "Nampula", "Chiure", "Meconta", "Meluco", "Larde", "Muecate", "Erati", "Angoche", "Ancuabe", "Nacaroa", "Nangade", "Liupo", "Muidumbe", "Mogincual", "Monapo", "Macomia", "Mocimboa da Praia", "Quissanga", "Memba", "Palma", "Mossuril", "Nacala-A-Velha", "Metuge", "Mecufi", "Ilha de Mocambique", "Cidade de Pemba", "Ibo", "Nacala Porto"]
+    "type": "admin"
   },{
     "id": "admin-3-selector",
     "column": "Posto",
     "label": "Posto",
     "description": "Some description",
-    "type": "admin",
-    "options": ["Pafuri", "Eduardo Mondlane", "Mucumbura", "Chinthopo", "Mphende", "Zambue", "Zumbu", "Muze", "F\u00edngoe", "Malowera", "Mavodze", "Mapai", "Chiputo", "Namaacha", "Ressano Garcia", "Sabie", "Massingir", "Chintholo", "Chipera", "Catuane", "Changalane", "Moamba-Sede", "Mapulanguene", "Chioco", "Chitima", "N\u2019sadzu", "Boane-Sede", "Pessene", "Panjane", "Mahel", "Combomune", "Mavue", "Matola Rio", "Zulo", "Zitundo", "Infulene", "Save", "Bela Vista", "Catembe M'Sime", "Matola Cidade", "Machava", "Ntlhavene", "Nao Aplicavel", "Magude-Sede", "Machaila", "Chiurairue", "Maluana", "Mabalane", "Songo", "Marracuene", "Massangena", "Manhica-Sede", "Macarretane", "Chifunde", "Mwaladzi", "3 de Fevereiro", "Motaze", "Espungabera", "Chitobe", "Machipanda", "Xinavane", "Machubo", "Mubangoene", "Rotanda", "Marara", "Calanga", "Lionde", "Muoha", "Municipio de Manica", "Dacata", "Messica", "Mavonde", "Luenha", "Machangulo", "Ilha Josina Machel", "Cidade  de Chokwe", "Messano", "Choa", "Nhampassa", "Vila Cani\u00e7ado", "Chigubo-Sede", "Manje", "Nalazi", "Catandica", "Dombe", "Vila da Macia", "Chivonguene", "Macuane", "Mazivila", "Ndindiza", "Guro-Sede", "Mufa Boroma", "Vila da Praia de Bilene", "Incaia", "Xilembene", "Sussundenga-Sede", "Vanduzi", "Tchaimite", "Alto Changane", "Chidzolomondo", "Furancungo", "Zinave", "Zongoene-Sede", "Matsinho", "Moatize", "Chissano", "Zimane", "Zembe", "Nhamagua", "Nhamassonge", "Chicumbane", "Urbano N\u00b01", "N\u00e3o Aplicavel", "Mungari", "Goonda", "Macate-Sede", "Mandie", "Urbano N\u00b03", "Cidade de Chibuto", "Chibabava", "Nguawala", "Kazula", "Chilaulene", "Muxungue", "Urbano N\u00b02", "Godide", "Cafumpe", "Malehice", "Municipal-Sede", "Chongoene", "Gondola", "Patrice Lumumba", "Inhamissa", "Changanine", "Macossa-Sede", "Amatongas", "Praia", "Tome", "Mazucane", "Inchope", "Canda", "D\u00f3mue", "Mandlakazi-Sede", "Chalala", "Macuacua", "Mabote", "Nhacafula", "Z\u00f3bue", "Buzua", "Nguzene", "Buzi", "Nhamatanda", "Chidenguele", "Mawayela", "Chibondzane", "Kambulatsitsi", "Funhalouro", "Machanga", "Estaquinha", "Tsangano", "Gorongosa", "Tica", "Nhacolo", "Vunduzi", "Chueza", "Zandamela", "Canxixe", "Ntengo-Wa-Mbalame", "Subue", "Ul\u00f3ngue", "Maringue", "Chiramba", "Inhassoro", "Panda", "Chicomo", "Divinhe", "Nova Sofala", "Mapinhane", "Mucumbi", "Mulima", "Quissico", "Muanza", "Urrene", "Mafambisse", "Chemba", "Galinha", "D\u00f4a", "Nova Mambone", "Savane", "Cidade de Dondo", "Inhaminga", "Sena", "C\u00f3bue", "Inharrime-Sede", "Urbano 3", "Caia-Sede", "Lunho", "Pembe", "Urbano 1", "Urbano 2", "Urbano 5", "Meluluca", "Mocoduene", "Urbano 4", "Nhamayabwe", "Meponda", "Metangula", "Homoine-Sede", "Chiloane", "Murraca", "Massinga", "Maniamba", "Cumbana", "Inhamitanga", "Lione", "Vilankulo", "Chare", "Lussanhando", "Morrumbene", "Unango", "Inhangoma", "Lussimbesse", "Jangamo", "Chire", "Macaloge", "Massenger", "Sanjala", "Massangulo (Ngauma)", "Lulimile", "Chupanga", "Megaza", "Majaua", "Chimbunila", "Chiuaula", "Mopeia", "Mongue", "Bazaruto", "Morrumbala-Sede", "Lissiete", "Itepela", "Muembe", "Matchedje", "Milange-Sede", "Chiconono", "Marromeu", "Machindo", "Mitande", "Nairrubi", "Malingapansi", "Chimbadzo", "Insaca", "Corromana", "Guerissa", "Malanga", "Chiuta", "Campo", "Molumbo-Sede", "Samora Machel", "Mavago-Sede", "Chinde-Sede", "Namanjavira", "Muabanama", "Micaune", "Tacuane", "Mepica", "Namicundi", "Muaquia", "Nicoadala-Sede", "Etatara", "Cidade de Cuamba", "Lioma", "Msawize", "Regone", "Mucupia", "Lugela-sede", "Gonhane", "Cidade de Mocuba", "L\u00fario", "Munhamade", "Namarroi", "Cidade de Gurue", "Mutuali", "Namacurra-Sede", "Nacumua", "Ma\u00faa", "Maquival", "Macuse", "Matondovela", "Maiaca", "Mugeba", "Maganja da Costa-Sede", "Mepuagiua", "Ile", "Nante", "Marrupa-Sede", "Socone", "Nauela", "Chilulo", "Malema/Canhunha", "M'bauane", "Mecula-Sede", "Alto Molocue", "Mocubela", "Marrangira", "Nipepe-Sede", "Chiraco", "Iapala", "Nungo", "Bajone", "Meti", "Gile", "Alto Ligonha", "Pebane-Sede", "Lalaua-Sede", "Cunle", "Muluco", "Kwekwe", "Mulela (Mualama)", "Rib\u00e1u\u00e8", "Chinga", "Impire", "Mavala", "Murrupula", "Nairoto", "Papai", "Naburi", "Mecuburi-Sede", "Ncumpe", "Balama-Sede", "Negomano", "Namina", "Muite", "Nihessiue", "Mirate-Sede", "Namaita", "Machoca", "Namuno-Sede", "Mapupulo", "Ilute", "Mutivaze", "Chalaua", "Calipo", "Rapale", "Macone-Sede", "Meloco", "Nametil", "Cidade de Montepuez", "N'gapa", "Hucula", "Milhana", "Namanhumbir", "Natikire", "Anchilo", "Namogelia", "Corrane", "Muhala", "Muatala", "Urbano Central", "Meluco-Sede", "Mucuali", "Napipine", "Mucoluane", "Imala", "Namiroa", "Chapa", "Nanhupo Rio", "Namicopo", "Katapua", "Boila-Nametoria", "Mueda-Sede", "Meza", "Larde", "Muatua", "Muecate-Sede", "Aube", "7 De Abril", "Ocua", "Saua-Saua", "Namapa", "Chiure-Sede", "Ancuabe-Sede", "Ntamba", "Nangade-Sede", "Namaponda", "Nacaroa", "Alua", "Imbuho", "Liupo", "Metoro", "Miteda", "Meconta", "Quixaxe", "Netia", "Muambula", "Cidade De Angoche", "Quinga", "Muaguide", "Namialo", "Macomia-Sede", "Monapo-Sede", "Chiure Velho", "Diaca", "Chitunda", "Intete", "Bilibiza", "Chai", "Mazua", "Ituculo", "Mbau", "Pundanhar", "Naminge", "Mazeze", "Lunga", "Covo", "Chipene", "Mieze", "Metuge-Sede", "Mahate", "Mocimboa da Praia-Sede", "Lurio", "Mecufi-Sede", "Quionga", "Mossuril-Sede", "Barragem", "Memba", "Mucojo", "Quiterajo", "Palma", "Nacala-A-Velha", "Murrebue", "Quissanga", "Lumbo", "Matibane", "Ibo-Sede", "Olumbe", "Ilha de Mocambique", "Muanona", "Mutiva", "Quirimba"]
+    "type": "admin"
   },
   {
     "id": "population",
@@ -83,8 +79,7 @@
     "column": "ElecStart",
     "label": "Electrificastion Status",
     "description": "Some description",
-    "type": "checkbox",
-    "options": [{"label": "Unelectrified","value": "0"}, {"label": "Electrified","value":"1"}]
+    "type": "checkbox"
   }],
   "layers": [
     {

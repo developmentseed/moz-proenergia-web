@@ -30,6 +30,39 @@ export default async function ModelPage({
   const metadataFile = await fs.readFile(process.cwd() + `/src/app/mock/${slug}/metadata/data.json`, 'utf8');
   const metadata = JSON.parse(metadataFile);
 
+  const basePath = process.cwd() + `/src/app/mock/${slug}/metadata`;
+
+  // Reading options value files: will need to be replaced by requests to backend
+  const readOptionsFile = async (column: string) => {
+    try {
+      const file = await fs.readFile(`${basePath}/${column}.json`, 'utf8');
+      return JSON.parse(file);
+    } catch {
+      return null;
+    }
+  };
+
+  // Fetch main attribute options
+  if (metadata.main?.column) {
+    const mainOptions = await readOptionsFile(metadata.main.column);
+    if (mainOptions) metadata.main.options = mainOptions;
+  }
+
+  // Fetch all filter options in parallel
+  const filterOptionsPromises = (metadata.filters || []).map(async (filter: { column?: string }) => {
+    if (filter.column) {
+      return readOptionsFile(filter.column);
+    }
+    return null;
+  });
+
+  const filterOptions = await Promise.all(filterOptionsPromises);
+  metadata.filters?.forEach((filter: { options?: unknown }, index: number) => {
+    if (filterOptions[index]) {
+      filter.options = filterOptions[index];
+    }
+  });
+
   return (
     <Flex height="100%" width="100%">
       <SideNav models={models} currentSlug={slug} />
