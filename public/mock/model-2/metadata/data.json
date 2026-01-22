@@ -1,0 +1,127 @@
+{
+  "id": "model-2",
+  "title": "Model 2",
+  "scenarios": [{
+    "label": "Scenario 1",
+    "id": "scenario-1",
+    "description": "Description for Scenario 1",
+    "source": {
+      "type": "vector",
+      "minZoom": 4,
+      "maxZoom": 15,
+      "url": "pmtiles://https://mozsebar.s3.us-east-1.amazonaws.com/prototype/data/mozambique-test.pmtiles"
+    },
+    "layer": {
+      "source": "scenario-1",
+      "source-layer": "clusters",
+      "type": "fill"
+    }
+  },{
+    "label": "Scenario 2",
+    "id": "scenario-2",
+    "type": "vector",
+    "source": {
+      "type": "vector",
+      "minZoom": 4,
+      "maxZoom": 15,
+      "url": "pmtiles://https://mozsebar.s3.us-east-1.amazonaws.com/prototype/data/mozambique-test.pmtiles"
+    },
+    "layer": {
+      "source-layer": "clusters",
+      "type": "fill"
+    }
+  }],
+  "main": {
+    "id": "minimum-2027",
+    "label": "Main Attribute",
+    "column": "Technology2030",
+    "description": "Some description",
+    "type": "cateogorical",
+    "options": [{"label": "SHS", "value":"SHS", "color": "#ff0000" }, {"label": "Mini Grid PV", "value":"MiniGrid_PV", "color": "#00ff00" }, {"label": "Existing Grid", "value":"ExistingGrid", "color": "#ff60ff" }, {"label": "Grid Extension", "value":"GridExtension", "color": "#ff6006" }]
+  },
+  "filters": [{
+    "id": "population-1",
+    "column": "PopStartYear",
+    "label": "Population Filtesr",
+    "description": "Some descriptiosn",
+    "type": "numeric",
+    "values": [0,500000]
+  },
+  {
+    "id": "connections",
+    "column": "NewHHConnectionsTotal",
+    "label": "Connections",
+    "description": "Some description for Connection",
+    "type": "numeric",
+    "values": [0, 200 ]
+  },
+  {
+    "id": "elecstatus",
+    "column": "ElecStart",
+    "label": "Electrificastion Status",
+    "description": "Some description",
+    "type": "checkbox",
+    "options": [{"label": "Unelectrified","value": "0"}, {"label": "Electrified","value":"1"}]
+  }],
+  "layers": [
+    {
+    "id":"substations",
+    "label": "Substations",
+    "description": "description for additional layer 1",
+    "downlodLink": "",
+    "source": {
+      "id": "substations",
+      "type": "vector",
+      "minZoom": 4,
+      "maxZoom": 15,
+      "url": "pmtiles://https://mozsebar.s3.us-east-1.amazonaws.com/prototype/data/substation.pmtiles"
+    },
+    "layer": {
+      "source": "substations",
+      "source-layer": "data",
+      "type": "circle",
+      "paint": {
+        "circle-color":  "#377eb8"
+      }
+    }
+  }, 
+  {
+    "id":"transimission-network",
+    "label": "Transmission Network",
+    "description": "description for additional layer 2",
+    "downlodLink": "",
+    "source": {
+      "id": "transimission-network",
+      "type": "vector",
+      "minZoom": 4,
+      "maxZoom": 15,
+      "url": "pmtiles://https://mozsebar.s3.us-east-1.amazonaws.com/prototype/data/transmission-network.pmtiles"
+    },
+    "layer": {
+      "source": "transmission-network",
+      "source-layer": "data",
+      "type": "line",
+      "paint": {
+        "line-color":  "#b83777",
+        "line-width": 1
+      }
+    }
+  }, 
+  {
+    "id":"additional-layer-3",
+    "label": "Additional Layer 3",
+    "type": "polygon",
+    "description": "description for additional layer 3",
+    "downlodLink": "",
+    "source": {
+      "type": "vector",
+      "minZoom": 4,
+      "maxZoom": 15,
+      "url": ""
+    },
+    "layer": {
+      "source-layer": "clusters",
+      "type": "point"
+    }
+  }]
+}

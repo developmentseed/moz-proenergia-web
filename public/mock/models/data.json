@@ -1,0 +1,13 @@
+[{
+  "id": "model-1",
+  "name": "Model 1",
+  "description" : "Description for Model 1"
+}, {
+  "id": "model-2",
+  "name": "Model 2",
+  "description" : "Description for Model 2"
+}, {
+  "id": "model-3",
+  "name": "Model 3",
+  "description" : "Description for Model 3"
+}]
