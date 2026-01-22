@@ -28,7 +28,7 @@ const defaultNavigationItems: NavigationItem[] = [
 ];
 
 export const Header = ({
-  logoSrc = '/next.svg',
+  logoSrc = '/logo.svg',
   logoText = 'ProEnergia',
   navigationItems = defaultNavigationItems
 }: HeaderProps) => {
@@ -62,13 +62,13 @@ export const Header = ({
         >
           {/* Logo Section - Left */}
           <Flex align="center" gap={3}>
-            {/* <Image
+            <Image
               src={logoSrc}
               alt="Logo"
               width={40}
               height={40}
               style={{ objectFit: 'contain' }}
-            /> */}
+            />
             <Link href='/'>
               <Text
                 fontSize="xl"

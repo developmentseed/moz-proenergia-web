@@ -1,0 +1,16 @@
+[{
+  "model": "model-1",
+  "icon": "lightbulb.svg"
+},
+{
+  "model": "model-2",
+  "icon": "grid-3x3.svg"
+},
+{
+  "model": "model-3",
+  "icon": "cooking-pot.svg"
+},
+{
+  "model": "model-4",
+  "icon": "tractor.svg"
+}]
