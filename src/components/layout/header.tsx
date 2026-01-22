@@ -29,7 +29,7 @@ const defaultNavigationItems: NavigationItem[] = [
 ];
 
 export const Header = ({
-  logoSrc = '/logo.svg',
+  logoSrc = '/Logo.svg',
   logoText = 'Proenergia + IEP',
   navigationItems = defaultNavigationItems
 }: HeaderProps) => {
