@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Box, Container, Flex, HStack, Text, Link, Button, Dialog } from '@chakra-ui/react';
+import { usePathname } from 'next/navigation';
+import { Box, Container, Flex, HStack, Text, Link } from '@chakra-ui/react';
 import Modal from '../chakra/modal';
 import LoginForm from './login-form';
 import Image from 'next/image';
@@ -29,10 +30,18 @@ const defaultNavigationItems: NavigationItem[] = [
 
 export const Header = ({
   logoSrc = '/logo.svg',
-  logoText = 'ProEnergia',
+  logoText = 'Proenergia + IEP',
   navigationItems = defaultNavigationItems
 }: HeaderProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (href: string) => {
+    if (href === 'modal') return false;
+    // For /model/* paths, match any model page to Explorer
+    if (href.startsWith('/model/') && pathname.startsWith('/model/')) return true;
+    return pathname === href;
+  };
 
   const handleLinkClick = (href: string, e: React.MouseEvent) => {
     if (href === 'modal') {
@@ -45,13 +54,11 @@ export const Header = ({
     <Box
       as="header"
       width="full"
-      bg="white"
-      borderBottom="1px"
-      borderColor="gray.200"
+      bg="navBg"
+      borderBottom="1px solid black"
       px={6}
       py={4}
       zIndex={1000}
-      boxShadow="sm"
       >
       <Container>
         <Flex
@@ -65,15 +72,16 @@ export const Header = ({
             <Image
               src={logoSrc}
               alt="Logo"
-              width={40}
-              height={40}
+              width={30}
+              height={30}
               style={{ objectFit: 'contain' }}
             />
             <Link href='/'>
               <Text
-                fontSize="xl"
-                fontWeight="bold"
-                color="gray.800"
+                fontSize="1.25rem"
+                fontWeight="600"
+                fontFamily="body"
+                color="black"
             >
                 {logoText}
               </Text>
@@ -81,30 +89,26 @@ export const Header = ({
           </Flex>
 
           {/* Navigation Items - Right */}
-          <HStack>
+          <HStack fontFamily="body">
             {navigationItems.map((item) => {
               const isModal = item.href === 'modal';
-
               if (isModal) {
                 return (
                   <Modal key={item.href} item={item} modalTitle={'Log in'} modalContent={<LoginForm />} />
                 );
               }
 
+              const active = isActive(item.href);
               return (
                 <Box key={item.href} margin={2}>
                   <Link
                     href={item.href}
                     fontSize="md"
-                    fontWeight="medium"
-                    color="gray.700"
-                    _hover={{
-                    color: 'blue.600',
-                    textDecoration: 'none',
-                  }}
+                    fontWeight={active ? 'bold' : 'medium'}
+                    color={active ? 'black' : '#A1A1AA'}
                     transition="color 0.2s"
                     onClick={(e) => handleLinkClick(item.href, e)}
-                >
+                  >
                     {item.label}
                   </Link>
                 </Box>

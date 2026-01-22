@@ -111,8 +111,11 @@ const system = createSystem(defaultConfig, {
       colors: {
         navBg: { value: "#E4E4E7" },
         panelBg: { value: "#F4F4F5" },
+        panelBorder: { value: "#D4D4D8" },
         subtleBg: { value: '#FAFAFA' },
+        uiFg: { value: '#27272A' },
         uiPoint: { value: "#FEF08A" },
+        hover: { value: "#FEF08A" },
         mutedTxt: { value: "#52525b" },
         allCapTxt: { value: "#0A0A0C" }
       }

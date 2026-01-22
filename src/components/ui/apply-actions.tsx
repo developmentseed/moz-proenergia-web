@@ -19,6 +19,7 @@ export const ApplyActions = () => {
         loading={isLoading}
         loadingText={'Loading Summary data'}
         disabled={!hasPendingChanges}
+        fontFamily={'body'}
       >
         {hasPendingChanges? 'Apply Changes' : 'No pending change'}
       </Button>

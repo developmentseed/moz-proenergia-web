@@ -15,8 +15,8 @@ export function FilterControl({ config, value, onChange }: FilterControlProps) {
         <TextRange
           title={config.label}
           // description={config.description}
-          min={config.values[0]}
-          max={config.values[1]}
+          min={config.options[0]}
+          max={config.options[1]}
           value={value as number[]}
           onChange={onChange}
         />

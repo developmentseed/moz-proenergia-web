@@ -108,7 +108,7 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
           {data.map((row) => {
             if (row.type === 'flat') {
               return (
-                <Table.Row key={row.key}>
+                <Table.Row key={row.key} bg='panelBg'>
                   <Table.Cell {...tableCellStyleProps}> <Text textStyle='tableAttr'> {row.label}<InfoTip content="description" /></Text> </Table.Cell>
                   <Table.Cell {...tableCellStyleProps}><Text textStyle='tableValue'>{formatValue(row.value)}</Text></Table.Cell>
                 </Table.Row>
@@ -117,13 +117,13 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
 
             // Group type
             return [
-              <Table.Row key={row.label}>
-                <Table.Cell px={2} py={2} colSpan={2} fontWeight='bold' bg='gray.100'>
+              <Table.Row key={row.label} bg='gray.200'>
+                <Table.Cell px={2} py={2} colSpan={2} fontWeight='bold'>
                   <Text textStyle='tableAttr'>{row.label}</Text>
                 </Table.Cell>
               </Table.Row>,
               ...row.value.map((item) => (
-                <Table.Row key={item.key}>
+                <Table.Row key={item.key} bg='panelBg'>
                   <Table.Cell {...tableCellStyleProps} pl={6}>
                     <Text textStyle='tableAttr'> {item.label}<InfoTip content="description" /></Text></Table.Cell>
                   <Table.Cell {...tableCellStyleProps}><Text textStyle='tableValue'>{formatValue(item.value)}</Text></Table.Cell>
