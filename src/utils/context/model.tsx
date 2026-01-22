@@ -10,7 +10,7 @@ const createFilterParsers = (filters: Filter[]) => {
     switch (filter.type) {
       case FilterType.numeric:
         acc[filter.id] = parseAsArrayOf(parseAsInteger)
-          .withDefault(filter.values as [number, number]);
+          .withDefault(filter.options as [number, number]);
         return acc;
       // Select has string value, empty string shows everything
       case FilterType.select:

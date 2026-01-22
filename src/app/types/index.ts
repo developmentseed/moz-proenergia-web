@@ -20,7 +20,7 @@ interface BaseScenarioFilter {
 }
 interface NumericScenarioFilter extends BaseScenarioFilter {
   type: FilterType.numeric;
-  values: [number, number]
+  options: [number, number]
 }
 interface CategoricalScenarioFilter extends BaseScenarioFilter {
   type: FilterType.select;

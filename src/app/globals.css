@@ -27,5 +27,5 @@ body {
 
 main {
   /* this should be 72px, where is extra 8 px coming? */
-  height: calc(100vh - 72px); 
+  height: calc(100vh - 74px); 
 }

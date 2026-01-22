@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 import { Flex, Box } from "@chakra-ui/react";
 import Explorer from '@/components/ui/explorer';
 import { SideNav } from '@/components/layout/side-nav';
-import { ModelMetadata } from '@/app/types';
+import { Filter, ModelMetadata } from '@/app/types';
 
 // For dynamic route + ssg: fetch all the possible params
 export async function generateStaticParams() {
@@ -58,7 +58,7 @@ export default async function ModelPage({
 
   const filterData = await Promise.all(filterOptionsPromises);
 
-  metadata.filters = metadata.filters.map((filter, index) => {
+  metadata.filters = metadata.filters.map((filter: Filter, index: number) => {
     if (filterData[index]) {
       const options = filterData[index];
       return {
