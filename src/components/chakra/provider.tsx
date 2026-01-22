@@ -12,7 +12,7 @@ export const textStyles = defineTextStyles({
   subTitle: {
     description: 'Small text that comes above the model title',
     value: {
-        color: "#52525B",
+        color: "mutedTxt",
         fontFamily: "var(--font-dm-mono)",
         fontSize: "0.75rem",
         fontWeight: 400,
@@ -44,7 +44,7 @@ export const textStyles = defineTextStyles({
     description: "All Cap Labels for filters",
     value: {
       fontFamily: "var(--font-dm-mono)",
-      color: "#0A0A0C",
+      color: "allCapText",
       fontWeight: 300,
       textTransform: "uppercase"
     },
@@ -72,7 +72,7 @@ export const textStyles = defineTextStyles({
   rangeValue: {
     description: "text to display range slider value",
     value: {
-      color: "#52525B",
+      color: "mutedTxt",
       fontFamily: "var(--font-dm-mono)",
       fontSize: "0.75rem",
       fontWeight: 400,
@@ -92,7 +92,7 @@ export const textStyles = defineTextStyles({
   tableValue: {
     description: "table value",
     value: {
-            color: '#52525b',
+            color: 'mutedTxt',
       fontFamily:  "var(--font-dm-sans)",
       fontSize: '0.75rem',
       fontWeight: 400,
@@ -108,6 +108,14 @@ const system = createSystem(defaultConfig, {
         heading: { value: "var(--font-dm-mono)" },
         body: { value: "var(--font-dm-sans)" },
       },
+      colors: {
+        navBg: { value: "#E4E4E7" },
+        panelBg: { value: "#F4F4F5" },
+        subtleBg: { value: '#FAFAFA' },
+        uiPoint: { value: "#FEF08A" },
+        mutedTxt: { value: "#52525b" },
+        allCapTxt: { value: "#0A0A0C" }
+      }
     },
     textStyles
   },

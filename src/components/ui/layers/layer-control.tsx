@@ -1,5 +1,5 @@
-import { type CheckboxCheckedChangeDetails, Box, Switch, IconButton, Button } from "@chakra-ui/react";
-import { ToggleTip } from '@/components/chakra';
+import { type CheckboxCheckedChangeDetails, Text, Box, Switch, IconButton, Button } from "@chakra-ui/react";
+import { InfoTip } from "@/components/chakra/toggle-tip";
 import { LuInfo, LuDownload } from "react-icons/lu";
 import { type Layer } from "@/app/types";
 
@@ -17,12 +17,8 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" p="2" px='4'>
       <Box display="flex" alignItems="center" gap="1">
-        <span>{layer.label}</span>
-        <ToggleTip content="This is some additional information.">
-          <Button size="xs" variant="ghost">
-            <LuInfo />
-          </Button>
-        </ToggleTip>
+        <Text fontFamily="body">{layer.label}</Text>
+        <InfoTip content="This is some additional information." />
       </Box>
       <Box display="flex" alignItems="center" gap="2">
         <IconButton

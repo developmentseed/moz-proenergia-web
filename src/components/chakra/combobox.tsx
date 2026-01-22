@@ -30,6 +30,7 @@ export const ChakraCombobox = ({ title, items, value, onChange }: ChakraCombobox
       onValueChange={onChange}
       value={value}
       mb={2}
+      fontFamily="body"
     >
       <Combobox.Label textStyle='allCapLabel'>{title}</Combobox.Label>
       <Combobox.Control>
