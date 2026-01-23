@@ -39,12 +39,6 @@
     "type": "cateogorical"
   },
   "filters": [{
-    "id": "admin-1-selector",
-    "column": "Admin_1",
-    "label": "Province",
-    "description": "Some description",
-    "type": "admin"
-  },{
     "id": "admin-2-selector",
     "column": "District",
     "label": "District",
@@ -62,16 +56,14 @@
     "column": "PopStartYear",
     "label": "Population Filtesr",
     "description": "Some descriptiosn",
-    "type": "numeric",
-    "values": [0,5000000]
+    "type": "numeric"
   },
   {
     "id": "connections",
     "column": "NewHHConnectionsTotal",
     "label": "Connections",
     "description": "Some description for Connection",
-    "type": "numeric",
-    "values": [0, 200000 ]
+    "type": "numeric"
   },
 
   {
