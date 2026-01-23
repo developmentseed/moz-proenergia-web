@@ -37,7 +37,7 @@ export const TextRange = ({
       step: step,
       width: "80px",
       size: "sm" as const,
-      textStyle: 'sliderLabel',
+      textStyle: 'sliderTextLabel',
       height: "24px",
       borderRadius: 0,
       p: 1
@@ -109,7 +109,7 @@ export const TextRange = ({
 
   return (
     <Stack gap={2} width="full">
-      <Text fontWeight="medium">
+      <Text textStyle='sliderLabel'>
         {title}
       </Text>
 

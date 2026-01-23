@@ -15,7 +15,7 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
   };
 
   return (
-    <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" p="2" px='4'>
+    <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" py="0.5" px='4'>
       <Box display="flex" alignItems="center" gap="1">
         <Text fontFamily="body">{layer.label}</Text>
         <InfoTip content="This is some additional information." />
