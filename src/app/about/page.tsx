@@ -1,5 +1,6 @@
 import { type ReactNode } from "react";
-import { Container, Heading, Text, Box } from "@chakra-ui/react";
+import { Shell } from "@/components/layout/shell";
+import { Text, Heading } from "@chakra-ui/react";
 import AboutContent from './about.mdx';
 
 interface ChildrenType {
@@ -29,9 +30,7 @@ const overrideComponents = {
 };
 
 export default function Page() {
-  return <Container>
-    <Box mt={8} mb={8}>
-      <AboutContent components={overrideComponents} />
-    </Box>
-  </Container>;
+  return <Shell>
+    <AboutContent components={overrideComponents} />
+  </Shell>;
 }

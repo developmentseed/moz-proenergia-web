@@ -60,7 +60,7 @@ export const Header = ({
       px={6}
       py={4}
       >
-      <Container>
+      <Container maxWidth='5xl'>
         <Flex
           maxW="container.xl"
           mx="auto"
