@@ -36,6 +36,7 @@ export const Header = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const pathname = usePathname();
 
+  
   const isActive = (href: string) => {
     if (href === 'modal') return false;
     // For /model/* paths, match any model page to Explorer
@@ -58,7 +59,6 @@ export const Header = ({
       borderBottom="1px solid black"
       px={6}
       py={4}
-      zIndex={1000}
       >
       <Container>
         <Flex
@@ -76,15 +76,14 @@ export const Header = ({
               height={30}
               style={{ objectFit: 'contain' }}
             />
-            <Link href='/'>
-              <Text
-                fontSize="1.25rem"
-                fontWeight="600"
-                fontFamily="body"
-                color="black"
+            <Link
+              href='/'
+              fontSize="1.25rem"
+              fontWeight="600"
+              fontFamily="body"
+              color="black"
             >
-                {logoText}
-              </Text>
+              {logoText}
             </Link>
           </Flex>
 

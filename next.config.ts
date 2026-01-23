@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
-import createMDX from '@next/mdx'
+import createMDX from '@next/mdx';
 
 const nextConfig: NextConfig = {
   output: 'export',
+  pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   /* config options here */
   experimental: {
     optimizePackageImports: ["@chakra-ui/react"],
@@ -17,4 +18,3 @@ const withMDX = createMDX({
 });
 
 export default withMDX(nextConfig);
-
