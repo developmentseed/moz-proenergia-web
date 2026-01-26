@@ -42,36 +42,31 @@
     "id": "admin-2-selector",
     "column": "District",
     "label": "District",
-    "description": "Some description",
-    "type": "admin"
+    "description": "Some description"
   },{
     "id": "admin-3-selector",
     "column": "Posto",
     "label": "Posto",
-    "description": "Some description",
-    "type": "admin"
+    "description": "Some description"
   },
   {
     "id": "population",
     "column": "PopStartYear",
     "label": "Population Filtesr",
-    "description": "Some descriptiosn",
-    "type": "numeric"
+    "description": "Some descriptiosn"
   },
   {
     "id": "connections",
     "column": "NewHHConnectionsTotal",
     "label": "Connections",
-    "description": "Some description for Connection",
-    "type": "numeric"
+    "description": "Some description for Connection"
   },
 
   {
     "id": "elecstatus",
     "column": "ElecStart",
     "label": "Electrificastion Status",
-    "description": "Some description",
-    "type": "checkbox"
+    "description": "Some description"
   }],
   "layers": [
     {
