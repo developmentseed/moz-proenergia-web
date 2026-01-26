@@ -1,6 +1,9 @@
 import { Shell } from "@/components/layout/shell";
-import { Container, Heading, Text, Box } from "@chakra-ui/react";
 
-export default function Page ({}) {
-  return <Shell>Download page</Shell>;
+export default function Page() {
+  return (
+    <Shell breadcrumb={[{ label: "Downloads" }]}>
+      Download page
+    </Shell>
+  );
 }

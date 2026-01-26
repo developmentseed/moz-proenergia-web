@@ -1,7 +1,7 @@
 import { type ReactNode } from "react";
 import { Shell } from "@/components/layout/shell";
 import { Text, Heading } from "@chakra-ui/react";
-import AboutContent from './about.mdx';
+import AboutContent from "./about.mdx";
 
 interface ChildrenType {
   children: ReactNode
@@ -30,7 +30,9 @@ const overrideComponents = {
 };
 
 export default function Page() {
-  return <Shell>
-    <AboutContent components={overrideComponents} />
-  </Shell>;
+  return (
+    <Shell breadcrumb={[{ label: "About" }]}>
+      <AboutContent components={overrideComponents} />
+    </Shell>
+  );
 }
