@@ -1,6 +1,6 @@
-import { type CheckboxCheckedChangeDetails, Text, Box, Switch, IconButton, Button } from "@chakra-ui/react";
+import { type CheckboxCheckedChangeDetails, Text, Box, Switch } from "@chakra-ui/react";
 import { InfoTip } from "@/components/chakra/toggle-tip";
-import { LuInfo, LuDownload } from "react-icons/lu";
+import { DownloadButton } from "@/components/chakra/download-button";
 import { type Layer } from "@/app/types";
 
 interface LayerControlProps {
@@ -21,13 +21,9 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
         <InfoTip content="This is some additional information." />
       </Box>
       <Box display="flex" alignItems="center" gap="2">
-        <IconButton
-          aria-label="Download layer"
-          variant="ghost"
-          size="xs"
-        >
-          <LuDownload />
-        </IconButton>
+
+        <DownloadButton url={layer.downloadLink} label={`Download ${layer.label}`} />
+
         <Switch.Root value={layer.id} onCheckedChange={onCheckedChange} checked={selected}>
           <Switch.HiddenInput />
           <Switch.Control>
