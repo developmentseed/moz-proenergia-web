@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { Breadcrumb } from "@chakra-ui/react";
 
 export interface BreadcrumbItem {
@@ -19,14 +20,16 @@ export const BreadcrumbNav = ({ items }: BreadcrumbNavProps) => {
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           return (
-            <Breadcrumb.Item key={item.label}>
+            <Fragment key={item.label} >
               <Breadcrumb.Separator />
-              {isLast || !item.href ? (
-                <Breadcrumb.CurrentLink>{item.label}</Breadcrumb.CurrentLink>
+              <Breadcrumb.Item >
+                {isLast || !item.href ? (
+                  <Breadcrumb.CurrentLink>{item.label}</Breadcrumb.CurrentLink>
               ) : (
                 <Breadcrumb.Link href={item.href}>{item.label}</Breadcrumb.Link>
               )}
-            </Breadcrumb.Item>
+              </Breadcrumb.Item>
+            </Fragment>
           );
         })}
       </Breadcrumb.List>
