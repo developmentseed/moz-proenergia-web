@@ -72,7 +72,7 @@ export default async function ModelPage({
   });
 
   return (
-    <Flex height="100%" width="100%">
+    <Flex height="calc(100vh - 74px)" width="100%">
       <SideNav models={models} currentSlug={slug} />
       <Box id='main-panel' width='full' height="100%">
         <Suspense>
