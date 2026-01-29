@@ -21,7 +21,7 @@ interface HeaderProps {
 }
 
 const defaultNavigationItems: NavigationItem[] = [
-  { label: 'Explorer', href: '/model/model-1' },
+  { label: 'Explorer', href: '/model/1' },
   { label: 'Downloads', href: '/downloads' },
   { label: 'About', href: '/about' },
   { label: 'SDIDataPortal', href: 'https://developmentseed.org' },
@@ -36,7 +36,6 @@ export const Header = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const pathname = usePathname();
 
-  
   const isActive = (href: string) => {
     if (href === 'modal') return false;
     // For /model/* paths, match any model page to Explorer

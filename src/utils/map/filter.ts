@@ -1,5 +1,5 @@
 import { type FilterSpecification } from "maplibre-gl";
-import { type Filter} from "@/app/types";
+import { type Filter } from "@/app/types";
 
 export function buildExpressionWithFilter(filterRef: Filter[], filters: Record<string,unknown>): (FilterSpecification | null) {
 
