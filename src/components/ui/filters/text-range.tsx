@@ -17,12 +17,12 @@ export const TextRange = ({
   min,
   max,
   value,
-  onChange,
-  step = 1,
+  onChange
 }: TextRangeProps) => {
   const [localValue, setLocalValue] = useState<number[]>(value);
   const [minText, setMinText] = useState<number>(value[0] || min);
   const [maxText, setMaxText] = useState<number>(value[1] || max);
+  const step = Math.max(parseInt((max - min)/200) , 100);
 
   // Reset values when page navigates to new model
   useEffect(() => {
@@ -52,11 +52,15 @@ export const TextRange = ({
   };
 
   const handleMinTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMinText(parseFloat(e.target.value));
+    if (e.target.value==='') { setMinText(0); return;}
+    const newValue = parseFloat(e.target.value);
+    if (!isNaN(newValue)) setMinText(newValue);
   };
 
   const handleMaxTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMaxText(parseFloat(e.target.value));
+    if (e.target.value==='') { setMaxText(0); return;}
+    const newValue = parseFloat(e.target.value);
+    if (!isNaN(newValue)) setMaxText(newValue);
   };
 
   const handleMinTextBlur = () => {
