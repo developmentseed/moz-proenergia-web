@@ -22,7 +22,7 @@ export const TextRange = ({
   const [localValue, setLocalValue] = useState<number[]>(value);
   const [minText, setMinText] = useState<number>(value[0] || min);
   const [maxText, setMaxText] = useState<number>(value[1] || max);
-  const step = Math.max(parseInt((max - min)/200) , 100);
+  const step = 10;
 
   // Reset values when page navigates to new model
   useEffect(() => {

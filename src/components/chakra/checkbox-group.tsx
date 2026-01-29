@@ -1,7 +1,7 @@
 import { Checkbox, CheckboxGroup, Fieldset, For } from "@chakra-ui/react";
-
+import { ItemUnit } from "@/app/types";
 type CheckboxGroupUIProps = {
-  items: Array<{ value: string; label: string }>;
+  items: ItemUnit[];
   value?: string[];
   title: string;
   label: string;

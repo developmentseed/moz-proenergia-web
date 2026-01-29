@@ -1,13 +1,11 @@
 import Link from 'next/link';
-import { promises as fs } from 'fs';
 import { Shell } from '@/components/layout/shell';
 import { SimpleGrid } from "@chakra-ui/react";
 import { Card } from '@/components/chakra';
-import { type ModelGroupMetadata } from '@/app/types';
+import { fetchModels } from '@/utils/data-transformation';
 
 export default async function Home() {
-  const file = await fs.readFile(process.cwd() + '/src/app/mock/models/data.json', 'utf8');
-  const models = JSON.parse(file) as ModelGroupMetadata[];
+  const models = await fetchModels();
   return (
     <Shell>
       <SimpleGrid columns={3} padding={2} gap={2}>

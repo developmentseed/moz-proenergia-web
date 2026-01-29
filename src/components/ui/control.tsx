@@ -6,7 +6,7 @@ import { LayerControl } from './layers/layer-control';
 import { useModel } from "@/utils/context/model";
 import { ChangeEvent } from "react";
 import { ApplyActions } from './apply-actions';
-import { type Filter } from "@/app/types";
+import { FilterType, type Filter } from "@/app/types";
 
 interface ColGroup {
   title: string;
@@ -50,8 +50,8 @@ const CollapsibleGroup = ({ collapsibleItem }: { collapsibleItem: ColGroup }) =>
       <Box mt={1}>
         {collapsibleItem.items?.map(matchingFilter => {
         const setFilterOnChange = (e: unknown) =>{
-          if (matchingFilter.type === 'select') setPendingFilters({ [matchingFilter.id]: (e as ChangeEvent<HTMLSelectElement>).target.value });
-          else if (matchingFilter.type === 'checkbox') setPendingFilters({ [matchingFilter.id]: e as string[] });
+          if (matchingFilter.type === FilterType.admin) setPendingFilters({ [matchingFilter.id]: (e as ChangeEvent<HTMLSelectElement>).target.value });
+          else if (matchingFilter.type === FilterType.checkbox) setPendingFilters({ [matchingFilter.id]: e as string[] });
           else {
             setPendingFilters({ [matchingFilter.id]: (e as SliderValueChangeDetails).value });
           }
@@ -69,19 +69,18 @@ const ControlsPanel = () => {
   const { model, displayFilters, setPendingFilters } = useModel();
   if (!displayFilters) return <div>Please wait</div>;
 
-  const adminFilterExists = model.filters.filter(f => f.type ==='admin');
+  const adminFilterExists = model.filters.filter(f => f.type === FilterType.admin);
   const adminFilter = !!adminFilterExists.length? [{
     title: 'Area Selection',
-    items: model.filters.filter(f => f.type ==='admin')
+    items: model.filters.filter(f => f.type === FilterType.admin)
   }]: [];
 
-  const checkboxExists = model.filters.filter(f => f.type==='checkbox');
+  const checkboxExists = model.filters.filter(f => f.type===FilterType.checkbox);
   const checkboxFilters = !!checkboxExists.length? checkboxExists.map(item => ({ title: item.label, items: [item] })): [];
 
   // Group area selection related filter together here.
   const collapsibleGroups: ColGroup[] = [...adminFilter, ...checkboxFilters].filter(i => i);
-
-  const noCollapsibleGroups = model.filters.filter(f=>f.type ==='numeric');
+  const noCollapsibleGroups = model.filters.filter(f=>f.type === FilterType.numeric);
 
   return <Box position="relative" p={4}>
     {/* put collapsible groups first */}

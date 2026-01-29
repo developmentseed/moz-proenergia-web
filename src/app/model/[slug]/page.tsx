@@ -1,17 +1,19 @@
 import { Suspense } from 'react';
-import { promises as fs } from 'fs';
 import { Flex, Box } from "@chakra-ui/react";
 import Explorer from '@/components/ui/explorer';
 import { SideNav } from '@/components/layout/side-nav';
-import { Filter, ModelMetadata } from '@/app/types';
+import {
+  fetchModels,
+  fetchModelMetadata,
+  fetchVectors,
+  transformToModelMetadata,
+} from '@/utils/data-transformation';
 
-// For dynamic route + ssg: fetch all the possible params
+// ----- Page Component -----
 export async function generateStaticParams() {
-  const file = await fs.readFile(process.cwd() + '/src/app/mock/models/data.json', 'utf8');
-  const models = JSON.parse(file);
-
-  return models.map((model: ModelMetadata) => ({
-    slug: model.id
+  const res = await fetchModels();
+  return res.map((model) => ({
+    slug: String(model.id),
   }));
 }
 
@@ -22,54 +24,15 @@ export default async function ModelPage({
 }) {
   const { slug } = await params;
 
-  // Fetch models to populate sidenav
-  const modelsFile = await fs.readFile(process.cwd() + '/src/app/mock/models/data.json', 'utf8');
-  const models = JSON.parse(modelsFile);
+  // Fetch all data in parallel
+  const [models, apiModel, apiVectors] = await Promise.all([
+    fetchModels(),
+    fetchModelMetadata(slug),
+    fetchVectors(),
+  ]);
 
-  // Fetch current model metadata
-  const metadataFile = await fs.readFile(process.cwd() + `/src/app/mock/${slug}/metadata/data.json`, 'utf8');
-  const metadata = JSON.parse(metadataFile);
-
-  // const basePath = process.cwd() + `/src/app/mock/${slug}/metadata`;
-
-  // Reading options value files: will need to be replaced by requests to backend
-  const readOptionsFile = async (column: string) => {
-    try {
-      const file = await fs.readFile(process.cwd() + `/src/app/mock/${slug}/filters/${column}.json`, 'utf8');
-      return JSON.parse(file);
-    } catch {
-      return null;
-    }
-  };
-
-  // Fetch main attribute options
-  if (metadata.main?.column) {
-    const mainOptions = await readOptionsFile(metadata.main.column);
-    if (mainOptions) metadata.main.options = mainOptions;
-  }
-
-  // Fetch all filter options in parallel
-  const filterOptionsPromises = (metadata.filters || []).map(async (filter: { column?: string }) => {
-    if (filter.column) {
-      return readOptionsFile(filter.column);
-    }
-    return null;
-  });
-
-  const filterData = await Promise.all(filterOptionsPromises);
-
-  metadata.filters = metadata.filters.map((filter: Filter, index: number) => {
-    if (filterData[index]) {
-      const options = filterData[index];
-      return {
-        ...filter,
-        options
-      };
-    } else {
-      // @ TO DO: break?
-      return filter;
-    }
-  });
+  // Transform API response to expected format
+  const metadata = await transformToModelMetadata(apiModel, apiVectors);
 
   return (
     <Flex height="calc(100vh - 74px)" width="100%">

@@ -100,7 +100,7 @@ const ExplorerContent = ({ modelData }: { modelData: ModelMetadata }) => {
     staleTime: Infinity, // Don't auto-refetch, only refetch when manually triggered
   });
 
-  const currentData = data ?? modelData;
+  const currentData = modelData;
 
   return (
     <ModelProvider model={currentData}>

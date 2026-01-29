@@ -4,15 +4,10 @@ import { Box, VStack } from '@chakra-ui/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import modelConfig from '@/config/model.json';
-
-interface Model {
-  id: string;
-  name: string;
-  description?: string;
-}
+import { ModelGroupMetadata } from '@/app/types';
 
 interface SideNavProps {
-  models: Model[];
+  models: ModelGroupMetadata[];
   currentSlug: string;
 }
 
@@ -34,7 +29,7 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
     >
       <VStack gap={0} align="stretch">
         {models.map((model) => {
-          const isActive = model.id === currentSlug;
+          const isActive = String(model.id) === currentSlug;
           const iconPath = getIconPath(model.id);
 
           return (

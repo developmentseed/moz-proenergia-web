@@ -1,4 +1,4 @@
-import { type LayerProps, type SourceProps } from "react-map-gl/maplibre";
+import { type SourceProps } from "react-map-gl/maplibre";
 export interface ItemUnit {
   value: string;
   label: string;
@@ -6,11 +6,10 @@ export interface ItemUnit {
 }
 
 export interface MapItemUnit extends ItemUnit {
-  color: string;
+  color?: string;
 }
 
-export enum FilterType { numeric = 'numeric', select = 'select', checkbox = 'checkbox', admin='admin'};
-enum MainType {categorical = 'categorical', linear='linear'};
+export enum FilterType { numeric = 'numeric', checkbox = 'checkbox', admin='admin'};
 
 interface BaseScenarioFilter {
   id: string;
@@ -22,10 +21,6 @@ interface NumericScenarioFilter extends BaseScenarioFilter {
   type: FilterType.numeric;
   options: [number, number]
 }
-interface CategoricalScenarioFilter extends BaseScenarioFilter {
-  type: FilterType.select;
-  options: ItemUnit[];
-}
 interface OptionScenarioFilter extends BaseScenarioFilter {
   type: FilterType.checkbox;
   options: ItemUnit[];
@@ -36,9 +31,8 @@ interface AdminScenarioFilter extends BaseScenarioFilter {
   options: string[];
 }
 
-export type Filter = NumericScenarioFilter | CategoricalScenarioFilter | OptionScenarioFilter | AdminScenarioFilter;
-
-export type FilterEventValueType = number[] | string[] | string;
+export type Filter = NumericScenarioFilter | OptionScenarioFilter | AdminScenarioFilter;
+export type FilterOptionValues = [number, number] | string[] | ItemUnit[];
 
 export interface Scenario {
   id: string;
@@ -58,7 +52,6 @@ export interface Layer extends Scenario {
 }
 
 export interface Main extends BaseScenarioFilter {
-  type: MainType;
   options: MapItemUnit[];
 }
 

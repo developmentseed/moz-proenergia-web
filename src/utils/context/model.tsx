@@ -12,10 +12,6 @@ const createFilterParsers = (filters: Filter[]) => {
         acc[filter.id] = parseAsArrayOf(parseAsInteger)
           .withDefault(filter.options as [number, number]);
         return acc;
-      // Select has string value, empty string shows everything
-      case FilterType.select:
-        acc[filter.id] = parseAsString.withDefault('');
-        return acc;
       // Admin has string array value, empty array shows everything
       case FilterType.admin:
         acc[filter.id] = parseAsArrayOf(parseAsString).withDefault([]);

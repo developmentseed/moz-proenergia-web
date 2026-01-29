@@ -23,13 +23,6 @@ export function buildExpressionWithFilter(filterRef: Filter[], filters: Record<s
           const intValues = selectedValues.map(v => parseInt(v));
           conditions.push(["in", ["get", filterDef.column], ["literal", intValues]]);
           break;
-        case 'select':
-          const selectValue = filterValue as string;
-          // Skip if empty string (show everything)
-          if (selectValue && selectValue !== '') {
-            conditions.push(["==", ["get", filterDef.column], selectValue]);
-          }
-          break;
         case 'admin':
           const adminValues = filterValue as string[];
           // Skip if empty array (show everything)
