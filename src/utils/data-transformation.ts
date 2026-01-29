@@ -1,7 +1,8 @@
-import fs from 'fs';
-import { Filter, FilterOptionValues, FilterType, ModelMetadata, ModelGroupMetadata, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
+// import fs from 'fs';
+import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
 import mapConfig from '@/config/map.json';
 import colormap from '@/config/colormap';
+import { getFilterOptions } from '@/config/filters';
 
 const API_ENDPOINT = 'https://proenergia-staging.ds.io/api/v1/';
 const ADMIN_COLUMNS = ['Admin_1', 'District', 'Posto', 'Localidade'];
@@ -133,15 +134,11 @@ export async function fetchVectors(): Promise<ApiVectorsResponse> {
   return res.json();
 }
 
-export async function fetchFilterOptions(modelId: string, column: string): Promise<FilterOptionValues> {
-  // @TODO: use actual endpoint: /mock/${modelId}/filters/${column}.json
-  try {
-    const filePath = `${process.cwd()}/public/mock/${modelId}/filters/${column}.json`;
-    const file = await fs.promises.readFile(filePath, 'utf8');
-    return JSON.parse(file);
-  } catch {
-    throw Error('No matching filter found');
-  }
+// @TODO: Replace with actual API endpoint when ready
+export async function fetchFilterOptions(modelId: string, column: string): Promise<string[] | number[] | null> {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 100));
+  return getFilterOptions(modelId, column);
 }
 
 export function getColormap(column: string): Array<{ value: string; color: string }> | null {
@@ -174,7 +171,7 @@ export async function transformToModelMetadata(
     apiModel.filter_fields.map(async (f): Promise<Filter> => {
       const rawOptions = await fetchFilterOptions(modelId, f.column);
       const filterType = deriveFilterType(f.column, rawOptions);
-      const options = filterType === 'checkbox'? transformOptions(rawOptions): rawOptions;
+      const options = filterType === 'checkbox' ? transformOptions(rawOptions) : rawOptions;
       return {
         id: slugify(f.column),
         column: f.column,
@@ -225,4 +222,12 @@ export async function transformToModelMetadata(
     filters: filtersWithOptions,
     layers,
   };
+}
+
+export async function getModelData(slug: string) {
+  const [apiModel, apiVectors] = await Promise.all([
+    fetchModelMetadata(slug),
+    fetchVectors(),
+  ]);
+  return transformToModelMetadata(apiModel, apiVectors);
 }

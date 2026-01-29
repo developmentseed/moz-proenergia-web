@@ -139,12 +139,4 @@ const ExplorerContent = ({ modelData }: { modelData: ModelMetadata }) => {
   );
 };
 
-const Explorer = ({ modelData }: { modelData: ModelMetadata }) => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ExplorerContent modelData={modelData} />
-    </QueryClientProvider>
-  );
-};
-
-export default Explorer;
+export default ExplorerContent;

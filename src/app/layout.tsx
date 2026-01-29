@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Box } from "@chakra-ui/react";
 import { Provider } from "@/components/chakra/provider";
+import ReactQueryProvider from '@/utils/context/react-query';
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import Header from "@/components/layout/header";
 import { DM_Sans, DM_Mono } from "next/font/google";
@@ -34,15 +35,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${dmSans.variable} ${dmMono.variable}`} suppressHydrationWarning>
       <body>
-        <NuqsAdapter>
-          <Provider>
-            <Header />
-            <Box as='main' bg={"panelBg"}>
-              {children}
-            </Box>
-            {/* <footer> Footer</footer> */}
-          </Provider>
-        </NuqsAdapter>
+        <ReactQueryProvider>
+          <NuqsAdapter>
+            <Provider>
+              <Header />
+              <Box as='main' bg={"panelBg"}>
+                {children}
+              </Box>
+              {/* <footer> Footer</footer> */}
+            </Provider>
+          </NuqsAdapter>
+        </ReactQueryProvider>
       </body>
     </html>
   );
