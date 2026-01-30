@@ -21,7 +21,7 @@ export const CheckboxGroupUI = ({ items, value, title, label, onChange }: Checkb
             {(option) => (
               <Checkbox.Root key={option.value} value={option.value}>
                 <Checkbox.HiddenInput />
-                <Checkbox.Control width="0.75rem" height="0.75rem" />
+                <Checkbox.Control width={3} height={3} />
                 <Checkbox.Label textStyle='checkboxOption'>{option.label}</Checkbox.Label>
               </Checkbox.Root>
             )}

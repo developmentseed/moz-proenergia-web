@@ -2,10 +2,13 @@
 
 import { ItemUnit } from "@/app/types";
 import {
+  Checkbox,
   Combobox,
   Portal,
+  Tag,
+  Text,
   useFilter,
-  useListCollection,
+  useListCollection
 } from "@chakra-ui/react";
 
 interface ChakraComboboxProps {
@@ -29,12 +32,18 @@ export const ChakraCombobox = ({ title, items, value, onChange }: ChakraCombobox
       onInputValueChange={(e) => filter(e.inputValue)}
       onValueChange={onChange}
       value={value}
+      multiple
       mb={2}
       fontFamily="body"
     >
       <Combobox.Label textStyle='allCapLabel'>{title}</Combobox.Label>
       <Combobox.Control>
-        <Combobox.Input placeholder="Type to search" />
+        {value && value.length > 0 && (
+          <Tag.Root size="md" ml={1} position={'absolute'} top={1} p ={2} bg={"navBg"}>
+            <Tag.Label>{value.length} selected</Tag.Label>
+          </Tag.Root>
+        )}
+        <Combobox.Input placeholder={value?.length ? "" : "Type to search"} />
         <Combobox.IndicatorGroup>
           <Combobox.ClearTrigger />
           <Combobox.Trigger />
@@ -46,8 +55,11 @@ export const ChakraCombobox = ({ title, items, value, onChange }: ChakraCombobox
             <Combobox.Empty>No items found</Combobox.Empty>
             {collection.items.map((item) => (
               <Combobox.Item item={item} key={item.value}>
-                {item.label}
-                <Combobox.ItemIndicator />
+                <Checkbox.Root checked={value?.includes(item.value)} pointerEvents="none">
+                  <Checkbox.HiddenInput />
+                  <Checkbox.Control width={4} height={4} mr={1} />
+                </Checkbox.Root>
+                <Combobox.ItemText>{item.label}</Combobox.ItemText>
               </Combobox.Item>
             ))}
           </Combobox.Content>
