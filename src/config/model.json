@@ -3,14 +3,17 @@
   "icon": "lightbulb.svg"
 },
 {
-  "model": "model-2",
+  "model": 2,
   "icon": "grid-3x3.svg"
 },
 {
-  "model": "model-3",
-  "icon": "cooking-pot.svg"
+  "model": 3,
+  "icon": "landmark.svg"
 },
 {
-  "model": "model-4",
+  "model": 4,
   "icon": "tractor.svg"
+},{
+  "model": 5,
+  "icon": "cooking-pot.svg"
 }]
