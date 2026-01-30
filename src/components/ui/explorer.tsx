@@ -21,9 +21,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     queryFn: () => getModelData(modelId),
   });
 
-  const currentData = data;
-
-  if (!currentData) {
+  if (!data) {
     return (
       <Flex id='container' width="full" height='full' position="relative">
         <Skeleton width={ControlPanelWidth} height='full' />
@@ -35,7 +33,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   }
 
   return (
-    <ModelProvider model={currentData}>
+    <ModelProvider model={data}>
       <Flex id='container' width="full" height='full' position="relative">
         <MainPanel isOpen={isOpen} />
         {/* Toggle Button Tab */}
@@ -64,7 +62,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
         </Box>
 
         <Box transition={`width ${AnimationTime} ease`} height='full' width='full'>
-          <MainMap main={currentData.main} />
+          <MainMap main={data.main} />
         </Box>
       </Flex>
     </ModelProvider>

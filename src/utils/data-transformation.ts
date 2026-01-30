@@ -33,8 +33,14 @@ export interface ApiVectorResult {
   id: number;
   name: string;
   description: string;
+  source: string;
+  created: string;
+  updated: string;
+  created_by: string;
+  last_updated_by: string;
+  is_public: boolean;
+  is_approved: boolean;
   raw_file: string;
-  geometry_type?: 'point' | 'line' | 'polygon'; // TODO: Backend needs to provide this
 }
 
 export interface ApiVectorsResponse {
@@ -115,22 +121,47 @@ export function geometryTypeToLayerType(geometryType?: string): 'fill' | 'line' 
 }
 
 // ----- Data Fetching -----
+async function handleFetchError(res: Response, context: string): Promise<never> {
+  let errorMessage = `${context}: ${res.status} ${res.statusText}`;
+  console.error(errorMessage);
+  try {
+    const body = await res.json();
+    if (body.detail) {
+      errorMessage += ` - ${body.detail}`;
+    } else if (body.message) {
+      errorMessage += ` - ${body.message}`;
+    }
+  } catch {
+    // Response body isn't JSON, use status text only
+  }
+  throw new Error(errorMessage);
+}
+
 export async function fetchModels(): Promise<ModelGroupMetadata[]> {
-  const res = await fetch(`${API_ENDPOINT}model/`);
+  const url = `${API_ENDPOINT}model/`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    await handleFetchError(res, 'Failed to fetch models');
+  }
   const json = await res.json();
-  if (!res.ok) throw new Error('Failed to fetch models');
   return json.results;
 }
 
 export async function fetchModelMetadata(slug: string): Promise<ApiModelResponse> {
-  const res = await fetch(`${API_ENDPOINT}model/${slug}/`);
-  if (!res.ok) throw new Error('Failed to fetch model metadata');
+  const url = `${API_ENDPOINT}model/${slug}/`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    await handleFetchError(res, `Failed to fetch model metadata for "${slug}"`);
+  }
   return res.json();
 }
 
 export async function fetchVectors(): Promise<ApiVectorsResponse> {
-  const res = await fetch(`${API_ENDPOINT}vector/`);
-  if (!res.ok) throw new Error('Failed to fetch vectors');
+  const url = `${API_ENDPOINT}vector/`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    await handleFetchError(res, 'Failed to fetch vectors');
+  }
   return res.json();
 }
 
@@ -200,7 +231,7 @@ export async function transformToModelMetadata(
 
   // Transform layers from vectors
   const layers: Layer[] = apiVectors.results.map(v => {
-    const layerType = geometryTypeToLayerType(v.geometry_type);
+
     return {
       id: String(v.id),
       label: v.name,
@@ -209,7 +240,8 @@ export async function transformToModelMetadata(
       layer: {
         source: String(v.id),
         'source-layer': mapConfig.sourceLayerName,
-        type: layerType,
+        // @TODO: Remove this attribute
+        type: 'fill',
       },
     };
   });

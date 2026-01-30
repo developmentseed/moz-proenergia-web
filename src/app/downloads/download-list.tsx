@@ -1,40 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { SimpleGrid, Box, Spinner, Center } from "@chakra-ui/react";
 import { DownloadDataCard } from "@/components/chakra/card";
 import { Search } from "@/components/ui/search";
-
-interface VectorData {
-  id: number;
-  name: string;
-  description: string;
-  source: string;
-  created: string;
-  updated: string;
-  created_by: string;
-  last_updated_by: string;
-  is_public: boolean;
-  is_approved: boolean;
-  raw_file: string;
-}
+import { fetchVectors } from "@/utils/data-transformation";
 
 export const DownloadList = () => {
-  const [data, setData] = useState<VectorData[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    async function loadData() {
-      const res = await fetch("/mock/vector/data.json");
-      const json = await res.json();
-      setData(json);
-      setIsLoading(false);
-    }
-    loadData();
-  }, []);
+  const { data, isLoading } = useQuery({
+    queryKey: ['vector'],
+    queryFn: () => fetchVectors()
+  });
 
-  const filteredData = data.filter((item) =>
+  const filteredData = data?.results.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -57,7 +38,7 @@ export const DownloadList = () => {
         />
       </Box>
 
-      {filteredData.map((item) => (
+      {filteredData?.map((item) => (
         <DownloadDataCard
           key={item.id}
           title={item.name}
@@ -68,7 +49,7 @@ export const DownloadList = () => {
           highlight={searchQuery}
         />
       ))}
-      {filteredData.length === 0 && <Center py={10}> No data found</Center>}
+      {!filteredData || filteredData.length === 0 && <Center py={10}> No data found</Center>}
     </SimpleGrid>
   );
 };
