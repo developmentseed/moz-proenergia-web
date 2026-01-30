@@ -4,9 +4,9 @@ import { LuChevronUp, LuLayers, LuFilter } from "react-icons/lu";
 import { FilterControl } from './filters/filter-control';
 import { LayerControl } from './layers/layer-control';
 import { useModel } from "@/utils/context/model";
-import { ChangeEvent } from "react";
 import { ApplyActions } from './apply-actions';
-import { FilterType, type Filter } from "@/app/types";
+// FilterType as enum
+import { FilterType, type Filter, type ItemUnit } from "@/app/types";
 
 interface ColGroup {
   title: string;
@@ -50,7 +50,7 @@ const CollapsibleGroup = ({ collapsibleItem }: { collapsibleItem: ColGroup }) =>
       <Box mt={1}>
         {collapsibleItem.items?.map(matchingFilter => {
         const setFilterOnChange = (e: unknown) =>{
-          if (matchingFilter.type === FilterType.admin) setPendingFilters({ [matchingFilter.id]: (e as ChangeEvent<HTMLSelectElement>).target.value });
+          if (matchingFilter.type === FilterType.admin) setPendingFilters({ [matchingFilter.id]: (e as {items: ItemUnit[], value: string[]}).value });
           else if (matchingFilter.type === FilterType.checkbox) setPendingFilters({ [matchingFilter.id]: e as string[] });
           else {
             setPendingFilters({ [matchingFilter.id]: (e as SliderValueChangeDetails).value });
