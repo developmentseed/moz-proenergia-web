@@ -1,4 +1,4 @@
-// import fs from 'fs';
+import { LayerProps } from "react-map-gl/maplibre";
 import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
 import mapConfig from '@/config/map.json';
 import colormap from '@/config/colormap';
@@ -105,19 +105,35 @@ export function deriveSource(id: string, filePath: string) {
   return {
     id,
     type: 'vector' as const,
-    minzoom: mapConfig.minZom, // Note: typo in config file
+    minzoom: mapConfig.minZoom,
     maxzoom: mapConfig.maxZoom,
     url: `pmtiles://${pmtilesUrl}`,
   };
 }
 
-export function geometryTypeToLayerType(geometryType?: string): 'fill' | 'line' | 'circle' {
-  switch (geometryType) {
-    case 'point': return 'circle';
-    case 'line': return 'line';
-    case 'polygon':
-    default: return 'fill';
-  }
+export function deriveLayerStyles(sourceId: string): { circleLayer: LayerProps; lineLayer: LayerProps } {
+  return {
+    circleLayer: {
+      id:`${sourceId}-circle-layer`,
+      source: sourceId,
+      'source-layer': mapConfig.sourceLayerName,
+      type: 'circle',
+      //@TODO: style
+      "paint": {
+        "circle-color":  "#377eb8"
+      }
+    },
+    lineLayer: {
+      id:`${sourceId}-line-layer`,
+      source: sourceId,
+      'source-layer': mapConfig.sourceLayerName,
+      type: 'line',
+      //@TODO: style
+      "paint": {
+        "line-color":  "#377eb8"
+      }
+    },
+  };
 }
 
 // ----- Data Fetching -----
@@ -191,6 +207,7 @@ export async function transformToModelMetadata(
       label: s.name,
       source: deriveSource(String(s.id), s.model_file!),
       layer: {
+        id:`${s.id}-main`,
         source: String(s.id),
         'source-layer': mapConfig.sourceLayerName,
         type: 'fill' as const,
@@ -229,20 +246,15 @@ export async function transformToModelMetadata(
     options: transformOptions(mainOptions, mainColormap),
   };
 
-  // Transform layers from vectors
+  // Transform layers from vectors with both circle and line styles
   const layers: Layer[] = apiVectors.results.map(v => {
-
+    const sourceId = String(v.id);
     return {
-      id: String(v.id),
+      id: sourceId,
       label: v.name,
       description: v.description,
-      source: deriveSource(String(v.id), v.raw_file),
-      layer: {
-        source: String(v.id),
-        'source-layer': mapConfig.sourceLayerName,
-        // @TODO: Remove this attribute
-        type: 'fill',
-      },
+      source: deriveSource(sourceId, v.raw_file),
+      ...deriveLayerStyles(sourceId),
     };
   });
 

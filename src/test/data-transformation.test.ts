@@ -6,7 +6,7 @@ import {
   makeLabel,
   transformOptions,
   deriveSource,
-  geometryTypeToLayerType,
+  deriveLayerStyles,
   getColormap,
 } from '@/utils/data-transformation';
 
@@ -186,6 +186,16 @@ describe('data-transformation', () => {
       const result = deriveSource('my-custom-id', 'file.json');
       expect(result.id).toBe('my-custom-id');
     });
+  });
+
+  describe('deriveLayerStyles', () => {
+    it('should return both circle and line layer styles', () => {
+      const result = deriveLayerStyles('source-1');
+
+      expect(result.circleLayer).toBeDefined();
+      expect(result.lineLayer).toBeDefined();
+    });
+
   });
 
   describe('getColormap', () => {

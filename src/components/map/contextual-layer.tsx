@@ -9,7 +9,8 @@ export const ContextualLayer = ({ layers }:ContextualLayerProps) => {
   return <>
     {layers.map(layer => {
     return <Source key={layer.id} {...layer.source} >
-      <MapLayer id={layer.id} {...layer.layer} />
+      <MapLayer id={layer.id} {...layer.circleLayer} />
+      <MapLayer id={layer.id} {...layer.lineLayer} />
     </Source>;
   })}
   </>;

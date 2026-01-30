@@ -1,4 +1,4 @@
-import { type SourceProps } from "react-map-gl/maplibre";
+import { LayerProps, type SourceProps } from "react-map-gl/maplibre";
 export interface ItemUnit {
   value: string;
   label: string;
@@ -46,9 +46,15 @@ export interface Scenario {
   }
 }
 
-export interface Layer extends Scenario {
+export interface Layer {
+  id: string;
+  label: string;
+  description?: string;
+  source: SourceProps;
+  circleLayer: LayerProps;
+  lineLayer: LayerProps;
   downloadLink?: string;
-  color?: string; // only main one? or also contextural layer?
+  color?: string;
 }
 
 export interface Main extends BaseScenarioFilter {
