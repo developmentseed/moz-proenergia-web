@@ -13,12 +13,12 @@ import MainPanel from './main-panel';
 const ControlPanelWidth = 350;
 const AnimationTime = '0.3s';
 
-const ExplorerContent = () => {
+const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const [isOpen, setIsOpen] = useState(true);
 
   const { data } = useQuery({
-    queryKey: ['model', '1'],
-    queryFn: () => getModelData('1'),
+    queryKey: ['model', modelId],
+    queryFn: () => getModelData(modelId),
   });
 
   const currentData = data;
