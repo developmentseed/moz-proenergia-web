@@ -11,8 +11,9 @@ import {
   fetchModels,
   getModelData
 } from '@/utils/data-transformation';
+import { type ModelGroupMetadata } from '@/app/types';
 
-// ----- Page Component -----
+// Generate pages per miodel id
 export async function generateStaticParams() {
   const res = await fetchModels();
   return res.map((model) => ({
@@ -34,8 +35,12 @@ export default async function ModelPage({
     queryFn: () => getModelData(slug),
   });
 
-  // Fetch models for sidenav
-  const models = await fetchModels();
+  await queryClient.prefetchQuery({
+    queryKey: ['models'],
+    queryFn: fetchModels,
+  });
+
+  const models = queryClient.getQueryData<Awaited<ModelGroupMetadata[]>>(['models'])!;
 
   return (
     <Flex height="calc(100vh - 74px)" width="100%">
