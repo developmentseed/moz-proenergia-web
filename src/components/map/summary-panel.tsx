@@ -12,6 +12,8 @@ import { LuX } from "react-icons/lu";
 import { useQuery } from '@tanstack/react-query';
 import { controlZIndex, mapControlCommonStyleProps } from './control-constant';
 
+const API_ENDPOINT = 'https://proenergia-staging.ds.io/api/v1/';
+
 interface ClusterData {
   [key: string]: { [clusterId: string]: string | number };
 }
@@ -39,6 +41,7 @@ type SummaryRow = FlatRow | GroupRow;
 type SummaryData = SummaryRow[];
 interface SummaryPanelProps {
   clusterId: string | null;
+  scenarioId: string;
   filters: Record<string, [number, number] | string[] | null>;
   resetCluster: () => void;
 }
@@ -146,24 +149,21 @@ function transformClusterData(data: Record<string, string | number>): SummaryDat
   }));
 }
 
-async function fetchClusterData(clusterId: string): Promise<SummaryData> {
-  const randomData = parseInt(clusterId) % 2 === 0 ? 'popup_400.json' : 'popup_401.json';
-
-  const response = await fetch(`/${randomData}`);
+async function fetchClusterData(scenarioId: string, clusterId: string): Promise<SummaryData> {
+  const response = await fetch(`${API_ENDPOINT}scenario/${scenarioId}/feature/${clusterId}/`);
   if (!response.ok) {
     throw new Error('Failed to fetch cluster data');
   }
   const rawData = await response.json();
-  // The response is an array with one object, transform it to FlatRow format
-  return transformClusterData(rawData[0]);
+  return transformClusterData(rawData);
 }
 
-const SummaryPanel = ({ clusterId, filters, resetCluster }: SummaryPanelProps) => {
+const SummaryPanel = ({ clusterId, scenarioId, filters, resetCluster }: SummaryPanelProps) => {
   const [isOpen, setIsOpen] = useState(true);
 
   const { data: clusterRawData, isLoading: clusterIsLoading, isError: clusterIsError } = useQuery({
-    queryKey: ['cluster', clusterId],
-    queryFn: () => fetchClusterData(clusterId!),
+    queryKey: ['cluster', scenarioId, clusterId],
+    queryFn: () => fetchClusterData(scenarioId, clusterId!),
     enabled: !!clusterId,
   });
 

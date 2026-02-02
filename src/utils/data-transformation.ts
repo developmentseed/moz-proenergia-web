@@ -2,9 +2,9 @@ import { LayerProps } from "react-map-gl/maplibre";
 import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
 import mapConfig from '@/config/map.json';
 import colormap from '@/config/colormap';
-import { getFilterOptions } from '@/config/filters';
 
 const API_ENDPOINT = 'https://proenergia-staging.ds.io/api/v1/';
+const MEDIA_URL_PREFIX = 'https://proenergia-staging.ds.io/media/';
 const ADMIN_COLUMNS = ['Admin_1', 'District', 'Posto', 'Localidade'];
 
 // ----- API Response Types -----
@@ -107,7 +107,7 @@ export function deriveSource(id: string, filePath: string) {
     type: 'vector' as const,
     minzoom: mapConfig.minZoom,
     maxzoom: mapConfig.maxZoom,
-    url: `pmtiles://${pmtilesUrl}`,
+    url: `pmtiles://${MEDIA_URL_PREFIX}${pmtilesUrl}`,
   };
 }
 
@@ -181,11 +181,37 @@ export async function fetchVectors(): Promise<ApiVectorsResponse> {
   return res.json();
 }
 
-// @TODO: Replace with actual API endpoint when ready
-export async function fetchFilterOptions(modelId: string, column: string): Promise<string[] | number[] | null> {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 100));
-  return getFilterOptions(modelId, column);
+interface FilterOptionsResponseString {
+  key: string;
+  type: 'string';
+  count: number;
+  values: Record<string, number>;
+}
+
+interface FilterOptionsResponseNumeric {
+  key: string;
+  type: 'numeric';
+  count: number;
+  min: number;
+  max: number;
+  sum: number;
+}
+
+type FilterOptionsResponse = FilterOptionsResponseString | FilterOptionsResponseNumeric;
+
+export async function fetchFilterOptions(scenarioId: string | number, column: string): Promise<string[] | number[] | null> {
+  const url = `${API_ENDPOINT}scenario/${scenarioId}/summary/${column}/`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    console.warn(`Failed to fetch filter options for ${column}: ${res.status}`);
+    return null;
+  }
+  const data: FilterOptionsResponse = await res.json();
+
+  if (data.type === 'numeric') {
+    return [Math.floor(data.min), Math.ceil(data.max)];
+  }
+  return Object.keys(data.values);
 }
 
 export function getColormap(column: string): Array<{ value: string; color: string }> | null {
@@ -214,10 +240,16 @@ export async function transformToModelMetadata(
       },
     }));
 
+  // @TODO: use the first sceanrio id
+  const defaultScenarioId = 3; //scenarios[0]?.id;
+  if (!defaultScenarioId) {
+    throw new Error('Model has no scenarios with valid model files');
+  }
+
   // Transform filters with options fetched in parallel
   const filtersWithOptions = await Promise.all(
     apiModel.filter_fields.map(async (f): Promise<Filter> => {
-      const rawOptions = await fetchFilterOptions(modelId, f.column);
+      const rawOptions = await fetchFilterOptions(defaultScenarioId, f.column);
       const filterType = deriveFilterType(f.column, rawOptions);
       const options = filterType === 'checkbox' ? transformOptions(rawOptions) : rawOptions;
       return {
@@ -235,7 +267,7 @@ export async function transformToModelMetadata(
   const mainColumn = 'Technology2030';
 
   const mainField = filtersWithOptions.find(f => f.column === mainColumn);
-  const mainOptions = await fetchFilterOptions(modelId, mainColumn);
+  const mainOptions = await fetchFilterOptions(defaultScenarioId, mainColumn);
   const mainColormap = getColormap(mainColumn);
 
   const main: Main = {

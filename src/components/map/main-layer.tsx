@@ -32,13 +32,12 @@ export const MainLayer = ({
   clusterId,
   hoveredCluster,
 }: MainLayerProps) => {
-
   const mainLayer: LayerSpecification = useMemo(
     () => ({
-      id: main.id,
       ...scenario.layer,
+      id: main.id,
       paint: {
-        [getColorAttributeNamebyType(scenario.layer.type)]: [
+        [getColorAttributeNamebyType('fill')]: [
           'match',
           ['get', main.column],
           ...main.options.flatMap((val) => [val.value, val.color]),
@@ -49,13 +48,13 @@ export const MainLayer = ({
     }),
     [main.id, main.column, main.options, scenario.layer, mapFilter]
   );
-
+  
   const backgroundMainLayer: LayerSpecification = useMemo(
     () => ({
       id: main.id + 'bg',
       ...scenario.layer,
       paint: {
-        [getColorAttributeNamebyType(scenario.layer.type)]: '#CCCCCC',
+        [getColorAttributeNamebyType('fill')]: '#CCCCCC',
       },
     }),
     [main.id, scenario.layer]
@@ -63,8 +62,8 @@ export const MainLayer = ({
 
   const selectedClusterLayer: LayerSpecification = useMemo(
     () => ({
-      id: main.id + 'selected',
       ...scenario.layer,
+      id: main.id + 'selected',
       type: 'line',
       paint: {
         'line-color': '#533',
@@ -77,8 +76,8 @@ export const MainLayer = ({
 
   const hoveredClusterLayer: LayerSpecification = useMemo(
     () => ({
-      id: main.id + 'hovered',
       ...scenario.layer,
+      id: main.id + 'hovered',
       type: 'line',
       paint: {
         'line-color': '#979',
@@ -91,8 +90,8 @@ export const MainLayer = ({
 
   return (
     <Source id={scenario.id} {...scenario.source}>
-      <MapLayer {...backgroundMainLayer} />
       <MapLayer {...mainLayer} />
+      <MapLayer {...backgroundMainLayer} beforeId={main.id} />
       <MapLayer {...selectedClusterLayer} />
       <MapLayer {...hoveredClusterLayer} />
     </Source>

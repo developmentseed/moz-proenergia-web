@@ -1,5 +1,5 @@
 {
-  "minZom": 5,
-  "maxZoom": 15,
+  "minZoom": 5,
+  "maxZoom": 11,
   "sourceLayerName": "data"
 }

@@ -2,11 +2,17 @@ import { type FilterSpecification } from "maplibre-gl";
 import { type Filter } from "@/app/types";
 
 export function buildExpressionWithFilter(filterRef: Filter[], filters: Record<string,unknown>): (FilterSpecification | null) {
-
   const conditions: FilterSpecification[] = [];
   Object.entries(filters).forEach(([filterId, filterValue]) => {
       const filterDef = filterRef.find(filter => filter.id === filterId);
       if (!filterDef) return;
+
+      // @TODO: Skip ElecStart column  - this is enum but being passed as number
+      // Not sure why it won't work though but commenting out for now.
+      if (filterDef.column === 'ElecStart') {
+        return;
+      }
+
       switch (filterDef.type) {
         case 'numeric':
           const [min, max] = filterValue as [number, number];
@@ -19,9 +25,7 @@ export function buildExpressionWithFilter(filterRef: Filter[], filters: Record<s
           break;
         case 'checkbox':
           const selectedValues = filterValue as string[];
-          // @TODO: Convert any enum data to string
-          const intValues = selectedValues.map(v => parseInt(v));
-          conditions.push(["in", ["get", filterDef.column], ["literal", intValues]]);
+          conditions.push(["in", ["get", filterDef.column], ["literal", selectedValues]]);
           break;
         case 'admin':
           const adminValues = filterValue as string[];
@@ -31,6 +35,7 @@ export function buildExpressionWithFilter(filterRef: Filter[], filters: Record<s
           }
           break;
       }
+
     });
 
     // Return combined filter or null if no conditions found.

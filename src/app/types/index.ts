@@ -66,8 +66,8 @@ export interface ModelMetadata {
   title: string;
   scenarios: Scenario[];
   main: Main;
-  filters: Filter[],
-  layers: Layer[]
+  filters: Filter[];
+  layers: Layer[];
 }
 
 export interface ModelGroupMetadata {
