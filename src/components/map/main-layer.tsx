@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Source, Layer as MapLayer, useMap } from 'react-map-gl/maplibre';
 import {
   type LayerSpecification,
@@ -30,7 +30,6 @@ export const MainLayer = ({
   mapFilter,
   clusterId,
 }: MainLayerProps) => {
-
   const { current: map } = useMap();
   const [hoveredCluster, setHoveredCluster] = useState<string | null>(null);
 
@@ -60,12 +59,12 @@ export const MainLayer = ({
       ...scenario.layer,
       id: main.id,
       paint: {
-        [getColorAttributeNamebyType('fill')]: [
+        [getColorAttributeNamebyType('fill')]: main.options.length? [
           'match',
           ['get', main.column],
           ...main.options.flatMap((val) => [val.value, val.color]),
           '#CCCCCC',
-        ],
+        ] : '#66ff',
       },
       ...(mapFilter ? { filter: mapFilter } : {}),
     }),

@@ -162,7 +162,7 @@ export async function fetchModels(): Promise<ModelGroupMetadata[]> {
   }
   const json = await res.json();
   // @TODO just return first model until backend ingests all the data
-  return [json.results[0]];
+  return [json.results[0], json.results[2]];
 }
 
 export async function fetchModelMetadata(slug: string): Promise<ApiModelResponse> {
@@ -243,7 +243,7 @@ export async function transformToModelMetadata(
     }));
 
   // @TODO: use the first sceanrio id. Hardcoded 3 for now while summary endpoint is not stable.
-  const defaultScenarioId = 3; //scenarios[0]?.id;
+  const defaultScenarioId = scenarios[0]?.id;
   if (!defaultScenarioId) {
     throw new Error('Model has no scenarios with valid model files');
   }
@@ -266,7 +266,7 @@ export async function transformToModelMetadata(
   );
 
   // TODO: main_column should come from backend; using first non-admin filter as fallback
-  const mainColumn = 'Technology2030';
+  const mainColumn = apiModel.visualization_column;//'Technology2030';
 
   const mainField = filtersWithOptions.find(f => f.column === mainColumn);
   const mainOptions = await fetchFilterOptions(defaultScenarioId, mainColumn);
