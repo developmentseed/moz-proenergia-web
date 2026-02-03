@@ -112,7 +112,7 @@ export const MainLayer = ({
   );
 
   return (
-    <Source id={scenario.id} {...scenario.source}>
+    <Source key={scenario.id} id={scenario.id} {...scenario.source}>
       <MapLayer {...mainLayer} />
       <MapLayer {...backgroundMainLayer} beforeId={main.id} />
       <MapLayer {...selectedClusterLayer} />

@@ -228,10 +228,12 @@ const SummaryPanel = ({ clusterId, scenarioId, popupFields, filters, resetCluste
       "column": "Technology2030",
       "description": "Identified least-cost technology"
     }];
-  useEffect(() => {
-    resetCluster();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[filters]);
+  // @TODO: better logic whether to display summary vs. cluster
+  // This will wipe clusterId on landing if there is selected cluster id in url
+  // useEffect(() => {
+  //   resetCluster();
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // },[filters]);
 
   const { data: clusterRawData, isLoading: clusterIsLoading, isError: clusterIsError, isFetching: clusterIsFetching } = useQuery({
     queryKey: ['cluster', scenarioId, clusterId],

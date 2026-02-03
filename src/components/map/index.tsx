@@ -54,7 +54,7 @@ const MainMap = ({ main }: MainMapProps) => {
       style={{ width: '100%', height: '100%' }}
       onClick={onClick}
       onMoveEnd={(e:ViewStateChangeEvent) => { setCoordinates({ lng: e.viewState.longitude, lat: e.viewState.latitude , zoom: e.viewState.zoom });}}
-      mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+      mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
       interactiveLayerIds={[main.id]}
         >
       <ContextualLayer layers={additionalLayers} mainId={main.id} />
@@ -67,7 +67,7 @@ const MainMap = ({ main }: MainMapProps) => {
       <NavigationControl position='bottom-left' />
     </Map>
     <Legend items={main.options} />
-    <SummaryPanel clusterId={selected} scenarioId={scenarioId} popupFields={model.popupFields} summaryFields={model.summaryFields} resetCluster={resetCluster} filters={filters}/> 
+    <SummaryPanel clusterId={selected} scenarioId={scenarioId} popupFields={model.popupFields} summaryFields={model.summaryFields} resetCluster={resetCluster} filters={filters}/>
   </Box>;
 };
 
