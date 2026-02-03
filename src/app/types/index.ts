@@ -4,7 +4,11 @@ export interface ItemUnit {
   label: string;
   description?: string;
 }
-
+export interface Field {
+  column: string;
+  label: string;
+  description?: string;
+}
 export interface MapItemUnit extends ItemUnit {
   color?: string;
 }
@@ -68,6 +72,8 @@ export interface ModelMetadata {
   main: Main;
   filters: Filter[];
   layers: Layer[];
+  popupFields: Field[];
+  summaryFields: Field[];
 }
 
 export interface ModelGroupMetadata {

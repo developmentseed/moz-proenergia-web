@@ -45,5 +45,7 @@ export const mockModel: ModelMetadata = {
       options: ["Maputo", "Gaza", "Inhambane"],
     },
   ],
+  popupFields: [],
+  summaryFields: [],
   layers: [],
 };

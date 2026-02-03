@@ -11,6 +11,7 @@ import { InfoTip } from '../chakra/toggle-tip';
 import { LuX } from "react-icons/lu";
 import { useQuery } from '@tanstack/react-query';
 import { controlZIndex, mapControlCommonStyleProps } from './control-constant';
+import { type Field } from '@/app/types';
 
 const API_ENDPOINT = 'https://proenergia-staging.ds.io/api/v1/';
 
@@ -28,6 +29,7 @@ interface FlatRow {
   type: 'flat';
   label: string;
   key: string;
+  description?: string;
   value: number;
 }
 
@@ -42,6 +44,7 @@ type SummaryData = SummaryRow[];
 interface SummaryPanelProps {
   clusterId: string | null;
   scenarioId: string;
+  popupFields: Field[];
   filters: Record<string, [number, number] | string[] | null>;
   resetCluster: () => void;
 }
@@ -112,7 +115,7 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
             if (row.type === 'flat') {
               return (
                 <Table.Row key={row.key} bg='panelBg'>
-                  <Table.Cell {...tableCellStyleProps}> <Text textStyle='tableAttr'> {row.label}<InfoTip content="description" /></Text> </Table.Cell>
+                  <Table.Cell {...tableCellStyleProps}> <Text textStyle='tableAttr'> {row.label}{row.description && <InfoTip content={row.description} />}</Text> </Table.Cell>
                   <Table.Cell {...tableCellStyleProps}><Text textStyle='tableValue'>{formatValue(row.value)}</Text></Table.Cell>
                 </Table.Row>
               );
@@ -140,25 +143,32 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
     </Box>
 );};
 
-function transformClusterData(data: Record<string, string | number>): SummaryData {
-  return Object.entries(data).map(([key, value]) => ({
-    type: 'flat' as const,
-    key,
-    label: key,
-    value: typeof value === 'number' ? value : parseFloat(value) || 0,
-  }));
+function transformClusterData(
+  data: Record<string, string | number>,
+  popupFields: Field[]
+): SummaryData {
+  return popupFields
+    .filter(field => field.column in data)
+    .map(field => ({
+      type: 'flat' as const,
+      key: field.column,
+      label: field.label,
+      description: field.description,
+      value: typeof data[field.column] === 'number'
+        ? data[field.column] as number
+        : parseFloat(data[field.column] as string) || 0,
+    }));
 }
 
-async function fetchClusterData(scenarioId: string, clusterId: string): Promise<SummaryData> {
+async function fetchClusterData(scenarioId: string, clusterId: string): Promise<Record<string, string | number>> {
   const response = await fetch(`${API_ENDPOINT}scenario/${scenarioId}/feature/${clusterId}/`);
   if (!response.ok) {
     throw new Error('Failed to fetch cluster data');
   }
-  const rawData = await response.json();
-  return transformClusterData(rawData);
+  return response.json();
 }
 
-const SummaryPanel = ({ clusterId, scenarioId, filters, resetCluster }: SummaryPanelProps) => {
+const SummaryPanel = ({ clusterId, scenarioId, popupFields, filters, resetCluster }: SummaryPanelProps) => {
   const [isOpen, setIsOpen] = useState(true);
 
   const { data: clusterRawData, isLoading: clusterIsLoading, isError: clusterIsError } = useQuery({
@@ -166,6 +176,8 @@ const SummaryPanel = ({ clusterId, scenarioId, filters, resetCluster }: SummaryP
     queryFn: () => fetchClusterData(scenarioId, clusterId!),
     enabled: !!clusterId,
   });
+
+  const clusterData = clusterRawData ? transformClusterData(clusterRawData, popupFields) : undefined;
 
   async function fetchFilteredData(): Promise<SummaryData> {
     const response = await fetch('/summary.json');
@@ -181,8 +193,7 @@ const SummaryPanel = ({ clusterId, scenarioId, filters, resetCluster }: SummaryP
     queryFn: fetchFilteredData,
   });
 
-  // const clusterData = clusterId && clusterRawData && clusterRawData.length && clusterRawData[0];
-  const dataToDisplay = clusterRawData || summaryData;
+  const dataToDisplay = clusterData || summaryData;
   const isLoading = clusterIsLoading || summaryIsLoading;
   const isError = clusterIsError || summaryIsError;
 

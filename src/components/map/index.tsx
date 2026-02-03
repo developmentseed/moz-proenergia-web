@@ -66,7 +66,7 @@ const MainMap = ({ main }: MainMapProps) => {
       <NavigationControl position='bottom-left' />
     </Map>
     <Legend items={main.options} />
-    <SummaryPanel clusterId={selected} scenarioId={scenarioId} resetCluster={() => { setSelected(null); }} filters={filters}/>
+    <SummaryPanel clusterId={selected} scenarioId={scenarioId} popupFields={model.popupFields} resetCluster={() => { setSelected(null); }} filters={filters}/>
   </Box>;
 };
 

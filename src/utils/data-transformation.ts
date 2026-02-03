@@ -25,6 +25,7 @@ export interface ApiModelResponse {
   name: string;
   filter_fields: ApiFilterField[];
   popup_fields: ApiFilterField[];
+  summary_fields: ApiFilterField[];
   scenarios: ApiScenario[];
   main_column?: string; // TODO: Backend needs to provide this
 }
@@ -298,6 +299,8 @@ export async function transformToModelMetadata(
     main,
     filters: filtersWithOptions,
     layers,
+    popupFields: apiModel.popup_fields,
+    summaryFields: apiModel.summary_fields
   };
 }
 
