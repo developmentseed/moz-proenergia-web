@@ -1,3 +1,4 @@
+import { memo, useCallback } from "react";
 import { Tab } from "@/components/chakra";
 import { type SliderValueChangeDetails, Box, Collapsible, Text } from "@chakra-ui/react";
 import { LuChevronUp, LuLayers, LuFilter } from "react-icons/lu";
@@ -13,21 +14,46 @@ interface ColGroup {
   items: Filter[];
 }
 
+// Wrapper component to memoize onChange per filter
+const FilterControlWrapper = memo(function FilterControlWrapper({
+  filter,
+  value,
+  setPendingFilters
+}: {
+  filter: Filter;
+  value: string[] | [number, number] | undefined | null;
+  setPendingFilters: (updates: Record<string, unknown>) => void;
+}) {
+  const onChange = useCallback((e: unknown) => {
+    if (filter.type === FilterType.admin) {
+      setPendingFilters({ [filter.id]: (e as {items: ItemUnit[], value: string[]}).value });
+    } else if (filter.type === FilterType.checkbox) {
+      setPendingFilters({ [filter.id]: e as string[] });
+    } else {
+      setPendingFilters({ [filter.id]: (e as SliderValueChangeDetails).value });
+    }
+  }, [filter.id, filter.type, setPendingFilters]);
+
+  return <FilterControl config={filter} value={value} onChange={onChange} />;
+});
+
 const LayersPanel = () => {
   const { model, toggleLayer, activeLayers } = useModel();
-    if (!activeLayers) return <div>Please wait</div>;
-  const setLayerOnChange = (param: { [x: string]: boolean; }) =>{
+  if (!activeLayers) return <div>Please wait</div>;
+
+  const setLayerOnChange = useCallback((param: { [x: string]: boolean; }) => {
     toggleLayer(param);
-  };
+  }, [toggleLayer]);
+
   return <Box>
     {model.layers.map(layer => {
       const active = activeLayers.includes(layer.id);
-      return <LayerControl key={layer.id} layer={layer} onChange={setLayerOnChange} selected={active} />;})
-    }
+      return <LayerControl key={layer.id} layer={layer} onChange={setLayerOnChange} selected={active} />;
+    })}
   </Box>;
 };
 
-const CollapsibleGroup = ({ collapsibleItem }: { collapsibleItem: ColGroup }) => {
+const CollapsibleGroup = memo(function CollapsibleGroup({ collapsibleItem }: { collapsibleItem: ColGroup }) {
   const { displayFilters, setPendingFilters } = useModel();
   return <Collapsible.Root defaultOpen>
     <Collapsible.Trigger
@@ -48,22 +74,18 @@ const CollapsibleGroup = ({ collapsibleItem }: { collapsibleItem: ColGroup }) =>
     </Collapsible.Trigger>
     <Collapsible.Content>
       <Box mt={1}>
-        {collapsibleItem.items?.map(matchingFilter => {
-        const setFilterOnChange = (e: unknown) =>{
-          if (matchingFilter.type === FilterType.admin) setPendingFilters({ [matchingFilter.id]: (e as {items: ItemUnit[], value: string[]}).value });
-          else if (matchingFilter.type === FilterType.checkbox) setPendingFilters({ [matchingFilter.id]: e as string[] });
-          else {
-            setPendingFilters({ [matchingFilter.id]: (e as SliderValueChangeDetails).value });
-          }
-        };
-        const currentFilter = displayFilters[matchingFilter.id];
-        return <FilterControl key={matchingFilter.id} config={matchingFilter} value={currentFilter} onChange={setFilterOnChange} />;
-        })
-      }
+        {collapsibleItem.items?.map(matchingFilter => (
+          <FilterControlWrapper
+            key={matchingFilter.id}
+            filter={matchingFilter}
+            value={displayFilters[matchingFilter.id]}
+            setPendingFilters={setPendingFilters}
+          />
+        ))}
       </Box>
     </Collapsible.Content>
   </Collapsible.Root>;
-};
+});
 
 const ControlsPanel = () => {
   const { model, displayFilters, setPendingFilters } = useModel();
@@ -87,13 +109,15 @@ const ControlsPanel = () => {
     {collapsibleGroups.map(group => <Box key={group.title} mb={6}><CollapsibleGroup collapsibleItem={group} /></Box>)}
 
     {/* numeric data doesn't need to be collapsible */}
-    {noCollapsibleGroups.map(matchingFilter => {
-      const setFilterOnChange = (e: unknown) => {
-        setPendingFilters({ [matchingFilter.id]: (e as SliderValueChangeDetails).value });
-      };
-      const currentFilter = displayFilters[matchingFilter.id];
-      return <Box key={matchingFilter.id} mb={6}><FilterControl config={matchingFilter} value={currentFilter} onChange={setFilterOnChange} /></Box>;
-    })}
+    {noCollapsibleGroups.map(matchingFilter => (
+      <Box key={matchingFilter.id} mb={6}>
+        <FilterControlWrapper
+          filter={matchingFilter}
+          value={displayFilters[matchingFilter.id]}
+          setPendingFilters={setPendingFilters}
+        />
+      </Box>
+    ))}
 
     {/* Button */}
     <ApplyActions />
