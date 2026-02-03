@@ -1,4 +1,5 @@
-import { Combobox, Select, CheckboxGroup } from "@/components/chakra";
+import { memo } from "react";
+import { Combobox, CheckboxGroup } from "@/components/chakra";
 import { type Filter } from "@/app/types";
 import TextRange from "./text-range";
 
@@ -8,7 +9,7 @@ type FilterControlProps = {
   onChange: (param:unknown) => void;
 };
 
-export function FilterControl({ config, value, onChange }: FilterControlProps) {
+export const FilterControl = memo(function FilterControl({ config, value, onChange }: FilterControlProps) {
   switch (config.type) {
     case 'numeric':
       return (
@@ -49,4 +50,4 @@ export function FilterControl({ config, value, onChange }: FilterControlProps) {
     default:
       return null;
   }
-}
+});
