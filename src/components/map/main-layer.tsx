@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { Source, Layer as MapLayer, type LayerProps } from 'react-map-gl/maplibre';
+import { useMemo, useState, useEffect, useCallback } from 'react';
+import { Source, Layer as MapLayer, useMap } from 'react-map-gl/maplibre';
 import {
   type LayerSpecification,
   type FilterSpecification
@@ -22,7 +22,6 @@ interface MainLayerProps {
   main: Main;
   mapFilter?: FilterSpecification | null;
   clusterId: string | null;
-  hoveredCluster: string | null;
 }
 
 export const MainLayer = ({
@@ -30,8 +29,32 @@ export const MainLayer = ({
   main,
   mapFilter,
   clusterId,
-  hoveredCluster,
 }: MainLayerProps) => {
+
+  const { current: map } = useMap();
+  const [hoveredCluster, setHoveredCluster] = useState<string | null>(null);
+
+  // Handle hover events directly on the map - so we can avoid re-render of the whole map related components
+  useEffect(() => {
+    if (!map) return;
+
+    const handleMouseMove = (e: maplibregl.MapLayerMouseEvent) => {
+      const feature = e.features?.[0];
+      setHoveredCluster(feature?.properties?.id ?? null);
+    };
+
+    const handleMouseLeave = () => {
+      setHoveredCluster(null);
+    };
+
+    map.on('mousemove', main.id, handleMouseMove);
+    map.on('mouseleave', main.id, handleMouseLeave);
+
+    return () => {
+      map.off('mousemove', main.id, handleMouseMove);
+      map.off('mouseleave', main.id, handleMouseLeave);
+    };
+  }, [map, main.id]);
   const mainLayer: LayerSpecification = useMemo(
     () => ({
       ...scenario.layer,

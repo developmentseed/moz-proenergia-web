@@ -1,27 +1,15 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useQueryState, parseAsString } from 'nuqs';
 import { type MapLayerMouseEvent } from 'react-map-gl/maplibre';
 
 interface UseMouseEventReturn {
   selected: string | null;
-  hovered: string | null;
   setSelected: (param: string| null) => void;
-  onHover: (event: MapLayerMouseEvent) => void;
   onClick: (event: MapLayerMouseEvent) => void;
 }
 
 export const useMouseEvent = (): UseMouseEventReturn => {
   const [selected, setSelected] = useQueryState('cluster', parseAsString);
-  const [hovered, setHovered] = useState<string | null>(null);
-
-  const onHover = useCallback((event: MapLayerMouseEvent) => {
-    const cluster = event.features && event.features[0];
-    if (cluster) {
-      setHovered(cluster.properties?.id ?? null);
-    } else {
-      setHovered(null);
-    }
-  }, [setHovered]);
 
   const onClick = useCallback((event: MapLayerMouseEvent) => {
     const cluster = event.features && event.features[0];
@@ -35,8 +23,6 @@ export const useMouseEvent = (): UseMouseEventReturn => {
   return {
     selected,
     setSelected,
-    hovered,
-    onHover,
     onClick,
   };
 };

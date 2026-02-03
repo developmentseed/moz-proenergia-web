@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import {
   Box,
   Table,
@@ -9,15 +9,12 @@ import {
 } from "@chakra-ui/react";
 import { InfoTip } from '../chakra/toggle-tip';
 import { LuX } from "react-icons/lu";
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueries } from '@tanstack/react-query';
 import { controlZIndex, mapControlCommonStyleProps } from './control-constant';
 import { type Field } from '@/app/types';
+import cluster from 'cluster';
 
 const API_ENDPOINT = 'https://proenergia-staging.ds.io/api/v1/';
-
-interface ClusterData {
-  [key: string]: { [clusterId: string]: string | number };
-}
 
 interface SummaryItem {
   key: string;
@@ -40,14 +37,34 @@ interface GroupRow {
 }
 
 type SummaryRow = FlatRow | GroupRow;
+
 type SummaryData = SummaryRow[];
 interface SummaryPanelProps {
   clusterId: string | null;
   scenarioId: string;
   popupFields: Field[];
+  summaryFields: Field[];
   filters: Record<string, [number, number] | string[] | null>;
   resetCluster: () => void;
 }
+
+interface FieldSummaryNumeric {
+  key: string;
+  type: 'numeric';
+  count: number;
+  min: number;
+  max: number;
+  sum: number;
+}
+
+interface FieldSummaryString {
+  key: string;
+  type: 'string';
+  count: number;
+  values: Record<string, number>;
+}
+
+type FieldSummary = FieldSummaryNumeric | FieldSummaryString;
 
 interface PanelHeaderProps {
   subtitle: string;
@@ -168,34 +185,84 @@ async function fetchClusterData(scenarioId: string, clusterId: string): Promise<
   return response.json();
 }
 
+async function fetchFieldSummary(scenarioId: string, column: string): Promise<FieldSummary> {
+  const response = await fetch(`${API_ENDPOINT}scenario/${scenarioId}/summary/${column}/`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch summary for ${column}`);
+  }
+  return response.json();
+}
+
+function transformFieldSummary(result: FieldSummary, field: Field): SummaryRow {
+  if (result.type === 'numeric') {
+    return {
+      type: 'flat' as const,
+      key: field.column,
+      label: `${field.label} (Total)`,
+      description: field.description,
+      value: result.sum,
+    };
+  }
+  // String type - show value distribution
+  return {
+    type: 'group' as const,
+    label: field.label,
+    value: Object.entries(result.values).map(([key, count]) => ({
+      key,
+      label: key,
+      value: count,
+    })),
+  };
+}
+
 const SummaryPanel = ({ clusterId, scenarioId, popupFields, filters, resetCluster }: SummaryPanelProps) => {
   const [isOpen, setIsOpen] = useState(true);
+  // @TODO: subbing summary fields until endpoint is ready
+  const summaryFields = [{
+      "label": "New Connections",
+      "column": "NewHHConnectionsTotal",
+      "description": "New connections (HH) required until 2030"
+    },
+    {
+      "label": "Least-cost tech",
+      "column": "Technology2030",
+      "description": "Identified least-cost technology"
+    }];
+  useEffect(() => {
+    resetCluster();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[filters]);
 
-  const { data: clusterRawData, isLoading: clusterIsLoading, isError: clusterIsError } = useQuery({
+  const { data: clusterRawData, isLoading: clusterIsLoading, isError: clusterIsError, isFetching: clusterIsFetching } = useQuery({
     queryKey: ['cluster', scenarioId, clusterId],
     queryFn: () => fetchClusterData(scenarioId, clusterId!),
     enabled: !!clusterId,
   });
 
-  const clusterData = clusterRawData ? transformClusterData(clusterRawData, popupFields) : undefined;
+  // Only show cluster data when not actively fetching (prevents stale data flash)
+  const clusterData = clusterRawData && !clusterIsFetching
+    ? transformClusterData(clusterRawData, popupFields)
+    : undefined;
 
-  async function fetchFilteredData(): Promise<SummaryData> {
-    const response = await fetch('/summary.json');
-    if (!response.ok) {
-      throw new Error('Failed to fetch summary data');
-    }
-    resetCluster();
-    return await response.json();
-  }
-
-  const { data: summaryData, isLoading: summaryIsLoading, isError: summaryIsError } = useQuery({
-    queryKey: ['filter', filters],
-    queryFn: fetchFilteredData,
+  const summaryQueries = useQueries({
+    queries: summaryFields.map(field => ({
+      // @TODO: reflect filters
+      queryKey: ['summary', scenarioId, field.column],
+      queryFn: () => fetchFieldSummary(scenarioId, field.column),
+    })),
   });
 
-  const dataToDisplay = clusterData || summaryData;
-  const isLoading = clusterIsLoading || summaryIsLoading;
-  const isError = clusterIsError || summaryIsError;
+  const summaryIsLoading = summaryQueries.some(q => q.isLoading);
+  const summaryIsError = summaryQueries.some(q => q.isError);
+  const summaryData: SummaryData | undefined = summaryQueries.every(q => q.data)
+    ? summaryQueries.map((q, i) => transformFieldSummary(q.data!, summaryFields[i]))
+    : undefined;
+
+  // Views are mutually exclusive - cluster view never falls through to summary
+  const showingCluster = !!clusterId;
+  const dataToDisplay = showingCluster ? clusterData: summaryData;
+  const isLoading = showingCluster ? (clusterIsLoading || clusterIsFetching) : summaryIsLoading;
+  const isError = showingCluster ? clusterIsError : summaryIsError;
 
   useEffect(() => {
     if (!dataToDisplay) return;
@@ -227,4 +294,4 @@ const SummaryPanel = ({ clusterId, scenarioId, popupFields, filters, resetCluste
   );
 };
 
-export default SummaryPanel;
+export default memo(SummaryPanel);

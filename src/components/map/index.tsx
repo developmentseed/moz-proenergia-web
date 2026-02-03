@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import { Map, ViewStateChangeEvent, NavigationControl } from 'react-map-gl/maplibre';
 import { Box } from '@chakra-ui/react';
 import * as pmtiles from 'pmtiles';
@@ -20,7 +20,7 @@ interface MainMapProps {
 
 const MainMap = ({ main }: MainMapProps) => {
     const [{ lat, lng, zoom }, setCoordinates] = useCoordinates();
-    const { selected, setSelected, hovered, onHover, onClick } = useMouseEvent();
+    const { selected, setSelected, onClick } = useMouseEvent();
 
   // Attach pmtile protocol to MapLibre
   useEffect(() => {
@@ -41,6 +41,9 @@ const MainMap = ({ main }: MainMapProps) => {
 
   const scenario = model.scenarios.find(s => s.id === scenarioId)!;
 
+  const resetCluster = useCallback(() => {
+    setSelected(null);
+  }, [setSelected]);
   return <Box w='100%' h='100%' className="map-container" position="relative">
     <Map
       initialViewState={{
@@ -50,7 +53,6 @@ const MainMap = ({ main }: MainMapProps) => {
           }}
       style={{ width: '100%', height: '100%' }}
       onClick={onClick}
-      onMouseMove={onHover}
       onMoveEnd={(e:ViewStateChangeEvent) => { setCoordinates({ lng: e.viewState.longitude, lat: e.viewState.latitude , zoom: e.viewState.zoom });}}
       mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
       interactiveLayerIds={[main.id]}
@@ -61,12 +63,11 @@ const MainMap = ({ main }: MainMapProps) => {
         main={main}
         mapFilter={mapFilter}
         clusterId={selected}
-        hoveredCluster={hovered}
       />
       <NavigationControl position='bottom-left' />
     </Map>
     <Legend items={main.options} />
-    <SummaryPanel clusterId={selected} scenarioId={scenarioId} popupFields={model.popupFields} resetCluster={() => { setSelected(null); }} filters={filters}/>
+    <SummaryPanel clusterId={selected} scenarioId={scenarioId} popupFields={model.popupFields} summaryFields={model.summaryFields} resetCluster={resetCluster} filters={filters}/> 
   </Box>;
 };
 
