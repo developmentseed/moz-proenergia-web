@@ -48,7 +48,7 @@ export const MainLayer = ({
     }),
     [main.id, main.column, main.options, scenario.layer, mapFilter]
   );
-  
+
   const backgroundMainLayer: LayerSpecification = useMemo(
     () => ({
       id: main.id + 'bg',

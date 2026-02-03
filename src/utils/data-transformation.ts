@@ -92,14 +92,11 @@ export function transformOptions(
     : null;
 
   return options.map(opt => {
-    // if (typeof opt === 'string') {
       return {
         value: String(opt),
         label: makeLabel(String(opt)),
-        color: colorLookup?.get(opt) ?? null,
+        color: colorLookup?.get(opt) ?? undefined
       };
-    // }
-    // return opt;
   });
 }
 
@@ -163,7 +160,8 @@ export async function fetchModels(): Promise<ModelGroupMetadata[]> {
     await handleFetchError(res, 'Failed to fetch models');
   }
   const json = await res.json();
-  return json.results;
+  // @TODO just return first model until backend ingests all the data
+  return [json.results[0]];
 }
 
 export async function fetchModelMetadata(slug: string): Promise<ApiModelResponse> {

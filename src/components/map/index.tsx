@@ -55,7 +55,7 @@ const MainMap = ({ main }: MainMapProps) => {
       mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
       interactiveLayerIds={[main.id]}
         >
-      <ContextualLayer layers={additionalLayers} />
+      <ContextualLayer layers={additionalLayers} mainId={main.id} />
       <MainLayer
         scenario={scenario}
         main={main}
