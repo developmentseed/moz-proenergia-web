@@ -177,16 +177,16 @@ function transformClusterData(
     }));
 }
 
-async function fetchClusterData(scenarioId: string, clusterId: string): Promise<Record<string, string | number>> {
-  const response = await fetch(`${API_ENDPOINT}scenario/${scenarioId}/feature/${clusterId}/`);
+async function fetchClusterData(scenarioId: string, clusterId: string, signal: AbortSignal): Promise<Record<string, string | number>> {
+  const response = await fetch(`${API_ENDPOINT}scenario/${scenarioId}/feature/${clusterId}/`, { signal });
   if (!response.ok) {
     throw new Error('Failed to fetch cluster data');
   }
   return response.json();
 }
 
-async function fetchFieldSummary(scenarioId: string, column: string): Promise<FieldSummary> {
-  const response = await fetch(`${API_ENDPOINT}scenario/${scenarioId}/summary/${column}/`);
+async function fetchFieldSummary(scenarioId: string, column: string, signal: AbortSignal): Promise<FieldSummary> {
+  const response = await fetch(`${API_ENDPOINT}scenario/${scenarioId}/summary/${column}/`, { signal });
   if (!response.ok) {
     throw new Error(`Failed to fetch summary for ${column}`);
   }
@@ -237,7 +237,7 @@ const SummaryPanel = ({ clusterId, scenarioId, popupFields, filters, resetCluste
 
   const { data: clusterRawData, isLoading: clusterIsLoading, isError: clusterIsError, isFetching: clusterIsFetching } = useQuery({
     queryKey: ['cluster', scenarioId, clusterId],
-    queryFn: () => fetchClusterData(scenarioId, clusterId!),
+    queryFn: ({ signal }) => fetchClusterData(scenarioId, clusterId!, signal),
     enabled: !!clusterId,
   });
 
@@ -250,7 +250,7 @@ const SummaryPanel = ({ clusterId, scenarioId, popupFields, filters, resetCluste
     queries: summaryFields.map(field => ({
       // @TODO: reflect filters
       queryKey: ['summary', scenarioId, field.column],
-      queryFn: () => fetchFieldSummary(scenarioId, field.column),
+      queryFn: ({ signal }) => fetchFieldSummary(scenarioId, field.column, signal),
     })),
   });
 
