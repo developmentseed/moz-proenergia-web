@@ -12,8 +12,7 @@ import { LuX } from "react-icons/lu";
 import { useQuery, useQueries } from '@tanstack/react-query';
 import { controlZIndex, mapControlCommonStyleProps } from './control-constant';
 import { type Field } from '@/app/types';
-import cluster from 'cluster';
-
+import { formatNumber } from '@/utils/numer';
 const API_ENDPOINT = 'https://proenergia-staging.ds.io/api/v1/';
 
 interface SummaryItem {
@@ -97,8 +96,11 @@ interface PanelBodyProps {
   isError: boolean;
 }
 
-const formatValue = (value: number) =>
-  value.toLocaleString(undefined, { maximumFractionDigits: 3 });
+const formatValue = (value: string | number) => {
+  //@ts-expect-error @TODO
+  if (!isNaN(value)) return formatNumber(value as number);
+  else return value;
+};
 
 const tableCellStyleProps = {
   py: 1, px: 2
@@ -165,15 +167,13 @@ function transformClusterData(
   popupFields: Field[]
 ): SummaryData {
   return popupFields
-    .filter(field => field.column in data)
+    // .filter(field => field.column in data)
     .map(field => ({
       type: 'flat' as const,
       key: field.column,
       label: field.label,
       description: field.description,
-      value: typeof data[field.column] === 'number'
-        ? data[field.column] as number
-        : parseFloat(data[field.column] as string) || 0,
+      value: data[field.column]
     }));
 }
 
