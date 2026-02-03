@@ -215,19 +215,19 @@ function transformFieldSummary(result: FieldSummary, field: Field): SummaryRow {
   };
 }
 
-const SummaryPanel = ({ clusterId, scenarioId, popupFields, filters, resetCluster }: SummaryPanelProps) => {
+const SummaryPanel = ({ clusterId, scenarioId, summaryFields, popupFields, filters, resetCluster }: SummaryPanelProps) => {
   const [isOpen, setIsOpen] = useState(true);
   // @TODO: subbing summary fields until endpoint is ready
-  const summaryFields = [{
-      "label": "New Connections",
-      "column": "NewHHConnectionsTotal",
-      "description": "New connections (HH) required until 2030"
-    },
-    {
-      "label": "Least-cost tech",
-      "column": "Technology2030",
-      "description": "Identified least-cost technology"
-    }];
+  // const summaryFields = [{
+  //     "label": "New Connections",
+  //     "column": "NewHHConnectionsTotal",
+  //     "description": "New connections (HH) required until 2030"
+  //   },
+  //   {
+  //     "label": "Least-cost tech",
+  //     "column": "Technology2030",
+  //     "description": "Identified least-cost technology"
+  //   }];
   // @TODO: better logic whether to display summary vs. cluster
   // This will wipe clusterId on landing if there is selected cluster id in url
   // useEffect(() => {
