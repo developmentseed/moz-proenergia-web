@@ -7,12 +7,6 @@ export function buildExpressionWithFilter(filterRef: Filter[], filters: Record<s
       const filterDef = filterRef.find(filter => filter.id === filterId);
       if (!filterDef) return;
 
-      // @TODO: Skip ElecStart column  - this is enum but being passed as number
-      // Not sure why it won't work though but commenting out for now.
-      if (filterDef.column === 'ElecStart') {
-        return;
-      }
-
       switch (filterDef.type) {
         case 'numeric':
           const [min, max] = filterValue as [number, number];

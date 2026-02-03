@@ -63,6 +63,9 @@ export function deriveFilterType(column: string, options: unknown): FilterType.n
     return FilterType.admin;
   }
   if (Array.isArray(options) && options.length > 0 && options.every(v => typeof v === 'number')) {
+    // @TODO: Boolean value should be fixed from original data
+    if (options.every(v => [0, 1].includes(v))) return FilterType.checkbox;
+
     return FilterType.numeric;
   }
   return FilterType.checkbox;
@@ -89,14 +92,14 @@ export function transformOptions(
     : null;
 
   return options.map(opt => {
-    if (typeof opt === 'string') {
+    // if (typeof opt === 'string') {
       return {
-        value: opt,
-        label: makeLabel(opt),
+        value: String(opt),
+        label: makeLabel(String(opt)),
         color: colorLookup?.get(opt) ?? null,
       };
-    }
-    return opt;
+    // }
+    // return opt;
   });
 }
 
@@ -240,7 +243,7 @@ export async function transformToModelMetadata(
       },
     }));
 
-  // @TODO: use the first sceanrio id
+  // @TODO: use the first sceanrio id. Hardcoded 3 for now while summary endpoint is not stable.
   const defaultScenarioId = 3; //scenarios[0]?.id;
   if (!defaultScenarioId) {
     throw new Error('Model has no scenarios with valid model files');
