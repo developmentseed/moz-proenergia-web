@@ -10,7 +10,6 @@ export function useCoordinates() {
     lng: parseAsFloat.withDefault(COORDS[1]),
     zoom: parseAsFloat.withDefault(ZOOM),
   }, {
-      shallow: false,
-      limitUrlUpdates: throttle(1000)
+      limitUrlUpdates: throttle(500)
   });
 }
