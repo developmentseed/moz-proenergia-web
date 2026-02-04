@@ -27,6 +27,7 @@ export interface ApiModelResponse {
   popup_fields: ApiFilterField[];
   summary_fields: ApiFilterField[];
   scenarios: ApiScenario[];
+  visualization_column: string;
   main_column?: string; // TODO: Backend needs to provide this
 }
 

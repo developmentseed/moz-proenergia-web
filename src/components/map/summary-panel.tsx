@@ -7,6 +7,7 @@ import {
   Alert,
   IconButton
 } from "@chakra-ui/react";
+import axios from 'axios';
 import { InfoTip } from '../chakra/toggle-tip';
 import { LuX } from "react-icons/lu";
 import { useQuery, useQueries } from '@tanstack/react-query';
@@ -18,7 +19,7 @@ const API_ENDPOINT = 'https://proenergia-staging.ds.io/api/v1/';
 interface SummaryItem {
   key: string;
   label: string;
-  value: number;
+  value: number | string;
 }
 
 interface FlatRow {
@@ -26,7 +27,7 @@ interface FlatRow {
   label: string;
   key: string;
   description?: string;
-  value: number;
+  value: number | string;
 }
 
 interface GroupRow {
@@ -167,7 +168,7 @@ function transformClusterData(
   popupFields: Field[]
 ): SummaryData {
   return popupFields
-    // .filter(field => field.column in data)
+    .filter(field => field.column in data)
     .map(field => ({
       type: 'flat' as const,
       key: field.column,
@@ -177,20 +178,28 @@ function transformClusterData(
     }));
 }
 
-async function fetchClusterData(scenarioId: string, clusterId: string, signal: AbortSignal): Promise<Record<string, string | number>> {
-  const response = await fetch(`${API_ENDPOINT}scenario/${scenarioId}/feature/${clusterId}/`, { signal });
-  if (!response.ok) {
+async function fetchClusterData(scenarioId: string, clusterId: string, popupFields:Field[], signal: AbortSignal): Promise<SummaryData> {
+  try {
+    const { data } = await axios.get(`${API_ENDPOINT}scenario/${scenarioId}/feature/${clusterId}/`,
+      { timeout: 3000,
+        signal,
+        transformResponse: (data) => transformClusterData(JSON.parse(data), popupFields)
+      });
+    return data;
+  } catch(e) {
+    console.error(e);
     throw new Error('Failed to fetch cluster data');
   }
-  return response.json();
 }
 
 async function fetchFieldSummary(scenarioId: string, column: string, signal: AbortSignal): Promise<FieldSummary> {
-  const response = await fetch(`${API_ENDPOINT}scenario/${scenarioId}/summary/${column}/`, { signal });
-  if (!response.ok) {
-    throw new Error(`Failed to fetch summary for ${column}`);
+  try {
+    const { data } = await axios.get(`${API_ENDPOINT}scenario/${scenarioId}/summary/${column}/`, { timeout: 3000, signal });
+    return data;
+  } catch(e) {
+    console.error(e);
+    throw new Error('Failed to fetch summary data');
   }
-  return response.json();
 }
 
 function transformFieldSummary(result: FieldSummary, field: Field): SummaryRow {
@@ -235,16 +244,16 @@ const SummaryPanel = ({ clusterId, scenarioId, summaryFields, popupFields, filte
   // // eslint-disable-next-line react-hooks/exhaustive-deps
   // },[filters]);
 
-  const { data: clusterRawData, isLoading: clusterIsLoading, isError: clusterIsError, isFetching: clusterIsFetching } = useQuery({
+  const { data: clusterData, isLoading: clusterIsLoading, isError: clusterIsError, isFetching: clusterIsFetching } = useQuery({
     queryKey: ['cluster', scenarioId, clusterId],
-    queryFn: ({ signal }) => fetchClusterData(scenarioId, clusterId!, signal),
+    queryFn: ({ signal }) => fetchClusterData(scenarioId, clusterId!, popupFields, signal),
     enabled: !!clusterId,
   });
 
   // Only show cluster data when not actively fetching (prevents stale data flash)
-  const clusterData = clusterRawData && !clusterIsFetching
-    ? transformClusterData(clusterRawData, popupFields)
-    : undefined;
+  // const clusterData = clusterRawData && !clusterIsFetching
+  //   ? transformClusterData(clusterRawData, popupFields)
+  //   : undefined;
 
   const summaryQueries = useQueries({
     queries: summaryFields.map(field => ({
