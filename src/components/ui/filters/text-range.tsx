@@ -22,6 +22,7 @@ export const TextRange = ({
   const [localValue, setLocalValue] = useState<number[]>(value);
   const [minText, setMinText] = useState<number>(value[0] || min);
   const [maxText, setMaxText] = useState<number>(value[1] || max);
+  //@TODO: better logic
   const step = (max - min > 100)? 10 :1;
 
   // Reset values when page navigates to new model
@@ -137,6 +138,7 @@ export const TextRange = ({
 
       <Flex gap={3} align="center" justify="space-between">
         <Input
+          id={`${title}-min-text`}
           value={formatNumber(minText)}
           onChange={handleMinTextChange}
           onBlur={handleMinTextBlur}
@@ -145,6 +147,7 @@ export const TextRange = ({
         />
 
         <Input
+          id={`${title}-max-text`}
           value={formatNumber(maxText)}
           onChange={handleMaxTextChange}
           onBlur={handleMaxTextBlur}
