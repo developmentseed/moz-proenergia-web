@@ -1,10 +1,8 @@
 import { LayerProps } from "react-map-gl/maplibre";
 import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
+import { api, MEDIA_URL_PREFIX } from '@/utils/api';
 import mapConfig from '@/config/map.json';
 import colormap from '@/config/colormap';
-
-const API_ENDPOINT = 'https://proenergia-staging.ds.io/api/v1/';
-const MEDIA_URL_PREFIX = 'https://proenergia-staging.ds.io/media/';
 const ADMIN_COLUMNS = ['Admin_1', 'District', 'Posto', 'Localidade'];
 
 // ----- API Response Types -----
@@ -138,50 +136,35 @@ export function deriveLayerStyles(sourceId: string): { circleLayer: LayerProps; 
   };
 }
 
-// ----- Data Fetching -----
-async function handleFetchError(res: Response, context: string): Promise<never> {
-  let errorMessage = `${context}: ${res.status} ${res.statusText}`;
-  console.error(errorMessage);
-  try {
-    const body = await res.json();
-    if (body.detail) {
-      errorMessage += ` - ${body.detail}`;
-    } else if (body.message) {
-      errorMessage += ` - ${body.message}`;
-    }
-  } catch {
-    // Response body isn't JSON, use status text only
-  }
-  throw new Error(errorMessage);
-}
-
 export async function fetchModels(): Promise<ModelGroupMetadata[]> {
-  const url = `${API_ENDPOINT}model/`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    await handleFetchError(res, 'Failed to fetch models');
+  try {
+    const { data } = await api.get('model/');
+    // @TODO return models as it is. Returning lcoe and mini grids until data getting ingested.
+    return [data.results[0], data.results[2]];
+  } catch(e) {
+    console.error(e);
+    throw new Error('failed to fetch models');
   }
-  const json = await res.json();
-  // @TODO just return first model until backend ingests all the data
-  return [json.results[0], json.results[2]];
 }
 
 export async function fetchModelMetadata(slug: string): Promise<ApiModelResponse> {
-  const url = `${API_ENDPOINT}model/${slug}/`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    await handleFetchError(res, `Failed to fetch model metadata for "${slug}"`);
+  try {
+    const { data } = await api.get(`model/${slug}/`);
+    return data;
+  } catch(e) {
+    console.error(e);
+    throw new Error('failed to fetch model metadata for model ID: ' + slug);
   }
-  return res.json();
 }
 
-export async function fetchVectors(): Promise<ApiVectorsResponse> {
-  const url = `${API_ENDPOINT}vector/`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    await handleFetchError(res, 'Failed to fetch vectors');
+export async function fetchVectors(): Promise<ApiVectorResult[]> {
+  try {
+    const { data } = await api.get('vector/');
+    return data.results;
+  } catch(e) {
+    console.error(e);
+    throw new Error('Failed to fetch vectors');
   }
-  return res.json();
 }
 
 interface FilterOptionsResponseString {
@@ -200,21 +183,21 @@ interface FilterOptionsResponseNumeric {
   sum: number;
 }
 
-type FilterOptionsResponse = FilterOptionsResponseString | FilterOptionsResponseNumeric;
-
 export async function fetchFilterOptions(scenarioId: string | number, column: string): Promise<string[] | number[] | null> {
-  const url = `${API_ENDPOINT}scenario/${scenarioId}/summary/${column}/`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    console.warn(`Failed to fetch filter options for ${column}: ${res.status}`);
-    return null;
+  try {
+    const { data, status } = await api.get(`scenario/${scenarioId}/summary/${column}/`);
+    if (status !== 200) {
+      console.warn(`fetchFilterOptions: ${column} returned status ${status}, using fallback`);
+      return [];
+    }
+    if (data.type === 'numeric') {
+      return [Math.floor(data.min), Math.ceil(data.max)];
+    }
+    return Object.keys(data.values);
+  } catch(e) {
+    console.warn(`fetchFilterOptions: ${column} failed, using fallback`, e);
+    return [];
   }
-  const data: FilterOptionsResponse = await res.json();
-
-  if (data.type === 'numeric') {
-    return [Math.floor(data.min), Math.ceil(data.max)];
-  }
-  return Object.keys(data.values);
 }
 
 export function getColormap(column: string): Array<{ value: string; color: string }> | null {
@@ -224,7 +207,7 @@ export function getColormap(column: string): Array<{ value: string; color: strin
 // ----- Transformation -----
 export async function transformToModelMetadata(
   apiModel: ApiModelResponse,
-  apiVectors: ApiVectorsResponse
+  apiVectors: ApiVectorResult[]
 ): Promise<ModelMetadata> {
   const modelId = String(apiModel.id);
 
@@ -256,7 +239,7 @@ export async function transformToModelMetadata(
       const filterType = deriveFilterType(f.column, rawOptions);
       const options = filterType === 'checkbox' ? transformOptions(rawOptions) : rawOptions;
       return {
-        id: slugify(f.column),
+        id: f.column,
         column: f.column,
         label: f.label,
         description: f.description,
@@ -270,11 +253,12 @@ export async function transformToModelMetadata(
   const mainColumn = apiModel.visualization_column;//'Technology2030';
 
   const mainField = filtersWithOptions.find(f => f.column === mainColumn);
-  const mainOptions = await fetchFilterOptions(defaultScenarioId, mainColumn);
+  // Return empty options if there is no visualization column defined.
+  const mainOptions =(!mainField)? await fetchFilterOptions(defaultScenarioId, mainColumn): [];
   const mainColormap = getColormap(mainColumn);
 
   const main: Main = {
-    id: slugify(mainColumn),
+    id: slugify(mainColumn) + 'main-ids',
     column: mainColumn,
     label: mainField?.label || mainColumn,
     description: mainField?.description,
@@ -282,7 +266,7 @@ export async function transformToModelMetadata(
   };
 
   // Transform layers from vectors with both circle and line styles
-  const layers: Layer[] = apiVectors.results.map(v => {
+  const layers: Layer[] = apiVectors.map(v => {
     const sourceId = String(v.id);
     return {
       id: sourceId,
@@ -311,4 +295,10 @@ export async function getModelData(slug: string) {
     fetchVectors(),
   ]);
   return transformToModelMetadata(apiModel, apiVectors);
+}
+
+// @TODO: this will need to be filtered by scenario id
+export async function getVectorData() {
+  const apiVectors = await fetchVectors();
+  return apiVectors;
 }

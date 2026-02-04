@@ -15,7 +15,7 @@ export const DownloadList = () => {
     queryFn: () => fetchVectors()
   });
 
-  const filteredData = data?.results.filter((item) =>
+  const filteredData = data?.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.description.toLowerCase().includes(searchQuery.toLowerCase())
   );

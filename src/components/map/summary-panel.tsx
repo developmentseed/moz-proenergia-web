@@ -7,14 +7,13 @@ import {
   Alert,
   IconButton
 } from "@chakra-ui/react";
-import axios from 'axios';
+import { api } from '@/utils/api';
 import { InfoTip } from '../chakra/toggle-tip';
 import { LuX } from "react-icons/lu";
 import { useQuery, useQueries } from '@tanstack/react-query';
 import { controlZIndex, mapControlCommonStyleProps } from './control-constant';
 import { type Field } from '@/app/types';
 import { formatNumber } from '@/utils/numer';
-const API_ENDPOINT = 'https://proenergia-staging.ds.io/api/v1/';
 
 interface SummaryItem {
   key: string;
@@ -180,11 +179,10 @@ function transformClusterData(
 
 async function fetchClusterData(scenarioId: string, clusterId: string, popupFields:Field[], signal: AbortSignal): Promise<SummaryData> {
   try {
-    const { data } = await axios.get(`${API_ENDPOINT}scenario/${scenarioId}/feature/${clusterId}/`,
-      { timeout: 3000,
-        signal,
-        transformResponse: (data) => transformClusterData(JSON.parse(data), popupFields)
-      });
+    const { data } = await api.get(`scenario/${scenarioId}/feature/${clusterId}/`, {
+      signal,
+      transformResponse: (data) => transformClusterData(JSON.parse(data), popupFields)
+    });
     return data;
   } catch(e) {
     console.error(e);
@@ -192,9 +190,33 @@ async function fetchClusterData(scenarioId: string, clusterId: string, popupFiel
   }
 }
 
-async function fetchFieldSummary(scenarioId: string, column: string, signal: AbortSignal): Promise<FieldSummary> {
+function buildFilterQueryString(filters: Record<string, [number, number] | string[] | null>): string {
+  const queryParts: string[] = [];
+  for (const [column, value] of Object.entries(filters)) {
+    if (value === null) continue;
+    if (Array.isArray(value) && value.length === 2 && typeof value[0] === 'number' && typeof value[1] === 'number') {
+      // Numeric filter: [min, max]
+      queryParts.push(`${column}__min=${value[0]}`);
+      queryParts.push(`${column}__max=${value[1]}`);
+    } else if (Array.isArray(value) && value.length > 0) {
+      // String array filter: join with semicolon when length is > 1
+      if (value.length === 1) queryParts.push(`${column}=${value}`);
+      else queryParts.push(`${column}__in=${value.join(';')}`);
+    }
+  }
+
+  return queryParts.length > 0 ? `?q=${queryParts.join(',')}` : '';
+}
+
+async function fetchFieldSummary(
+  scenarioId: string,
+  column: string,
+  filters: Record<string, [number, number] | string[] | null>,
+  signal: AbortSignal
+): Promise<FieldSummary> {
   try {
-    const { data } = await axios.get(`${API_ENDPOINT}scenario/${scenarioId}/summary/${column}/`, { timeout: 3000, signal });
+    const queryString = buildFilterQueryString(filters);
+    const { data } = await api.get(`scenario/${scenarioId}/summary/${column}/${queryString}`, { signal });
     return data;
   } catch(e) {
     console.error(e);
@@ -257,9 +279,8 @@ const SummaryPanel = ({ clusterId, scenarioId, summaryFields, popupFields, filte
 
   const summaryQueries = useQueries({
     queries: summaryFields.map(field => ({
-      // @TODO: reflect filters
-      queryKey: ['summary', scenarioId, field.column],
-      queryFn: ({ signal }) => fetchFieldSummary(scenarioId, field.column, signal),
+      queryKey: ['summary', scenarioId, field.column, filters],
+      queryFn: ({ signal }) => fetchFieldSummary(scenarioId, field.column, filters, signal),
     })),
   });
 
