@@ -2,7 +2,6 @@ import { LayerProps } from "react-map-gl/maplibre";
 import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
 import { api, MEDIA_URL_PREFIX } from '@/utils/api';
 import mapConfig from '@/config/map.json';
-import colormap from '@/config/colormap';
 const ADMIN_COLUMNS = ['Admin_1', 'District', 'Posto', 'Localidade'];
 
 // ----- API Response Types -----
@@ -17,7 +16,10 @@ export interface ApiScenario {
   name: string;
   model_file: string | null;
 }
-
+export interface ColorCoding {
+  color: string;
+  value: string;
+}
 export interface ApiModelResponse {
   id: number;
   name: string;
@@ -25,8 +27,8 @@ export interface ApiModelResponse {
   popup_fields: ApiFilterField[];
   summary_fields: ApiFilterField[];
   scenarios: ApiScenario[];
-  visualization_column: string;
-  main_column?: string; // TODO: Backend needs to provide this
+  visualization_column: string; // for main column
+  color_coding: ColorCoding[]
 }
 
 export interface ApiVectorResult {
@@ -140,7 +142,7 @@ export async function fetchModels(): Promise<ModelGroupMetadata[]> {
   try {
     const { data } = await api.get('model/');
     // @TODO return models as it is. Returning lcoe and mini grids until data getting ingested.
-    return [data.results[0], data.results[2]];
+    return [data.results[2]];
   } catch(e) {
     console.error(e);
     throw new Error('failed to fetch models');
@@ -200,18 +202,10 @@ export async function fetchFilterOptions(scenarioId: string | number, column: st
   }
 }
 
-export function getColormap(column: string): Array<{ value: string; color: string }> | null {
-  return colormap[column as keyof typeof colormap] ?? null;
-}
-
-// ----- Transformation -----
-export async function transformToModelMetadata(
-  apiModel: ApiModelResponse,
-  apiVectors: ApiVectorResult[]
-): Promise<ModelMetadata> {
+// Transform model metadata - give source definition to scenario
+export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetadata, 'filters' | 'layers'> & { filterFields: ApiFilterField[]; colorCoding: ColorCoding[] } {
   const modelId = String(apiModel.id);
 
-  // Transform scenarios
   const scenarios: Scenario[] = apiModel.scenarios
     .filter(s => s.model_file !== null)
     .map(s => ({
@@ -219,54 +213,39 @@ export async function transformToModelMetadata(
       label: s.name,
       source: deriveSource(String(s.id), s.model_file!),
       layer: {
-        id:`${s.id}-main`,
+        id: `${s.id}-main`,
         source: String(s.id),
         'source-layer': mapConfig.sourceLayerName,
         type: 'fill' as const,
       },
     }));
 
-  // @TODO: use the first sceanrio id. Hardcoded 3 for now while summary endpoint is not stable.
-  const defaultScenarioId = scenarios[0]?.id;
-  if (!defaultScenarioId) {
-    throw new Error('Model has no scenarios with valid model files');
-  }
-
-  // Transform filters with options fetched in parallel
-  const filtersWithOptions = await Promise.all(
-    apiModel.filter_fields.map(async (f): Promise<Filter> => {
-      const rawOptions = await fetchFilterOptions(defaultScenarioId, f.column);
-      const filterType = deriveFilterType(f.column, rawOptions);
-      const options = filterType === 'checkbox' ? transformOptions(rawOptions) : rawOptions;
-      return {
-        id: f.column,
-        column: f.column,
-        label: f.label,
-        description: f.description,
-        type: filterType,
-        options: options
-      } as Filter;
-    })
-  );
-
-  // TODO: main_column should come from backend; using first non-admin filter as fallback
-  const mainColumn = apiModel.visualization_column;//'Technology2030';
-
-  const mainField = filtersWithOptions.find(f => f.column === mainColumn);
-  // Return empty options if there is no visualization column defined.
-  const mainOptions =(!mainField)? await fetchFilterOptions(defaultScenarioId, mainColumn): [];
-  const mainColormap = getColormap(mainColumn);
+  const mainColumn = apiModel.visualization_column;
+  const mainField = apiModel.filter_fields.find(f => f.column === mainColumn);
 
   const main: Main = {
     id: slugify(mainColumn) + 'main-ids',
     column: mainColumn,
     label: mainField?.label || mainColumn,
     description: mainField?.description,
-    options: transformOptions(mainOptions, mainColormap),
+    options: [], // Options fetched separately
   };
 
-  // Transform layers from vectors with both circle and line styles
-  const layers: Layer[] = apiVectors.map(v => {
+  return {
+    id: modelId,
+    title: apiModel.name,
+    scenarios,
+    main,
+    popupFields: apiModel.popup_fields,
+    summaryFields: apiModel.summary_fields,
+    filterFields: apiModel.filter_fields,
+    colorCoding: apiModel.color_coding ?? [],
+  };
+}
+
+// Transform vectors to layers
+export function transformVectorsToLayers(apiVectors: ApiVectorResult[]): Layer[] {
+  return apiVectors.map(v => {
     const sourceId = String(v.id);
     return {
       id: sourceId,
@@ -276,25 +255,47 @@ export async function transformToModelMetadata(
       ...deriveLayerStyles(sourceId),
     };
   });
-
-  return {
-    id: modelId,
-    title: apiModel.name,
-    scenarios,
-    main,
-    filters: filtersWithOptions,
-    layers,
-    popupFields: apiModel.popup_fields,
-    summaryFields: apiModel.summary_fields
-  };
 }
 
-export async function getModelData(slug: string) {
-  const [apiModel, apiVectors] = await Promise.all([
-    fetchModelMetadata(slug),
-    fetchVectors(),
-  ]);
-  return transformToModelMetadata(apiModel, apiVectors);
+// Transform filter options response to Filter
+export function transformFilterField(
+  field: ApiFilterField,
+  rawOptions: string[] | number[] | null
+): Filter {
+  const filterType = deriveFilterType(field.column, rawOptions);
+  const options = filterType === 'checkbox' ? transformOptions(rawOptions) : rawOptions;
+  return {
+    id: slugify(field.column),
+    column: field.column,
+    label: field.label,
+    description: field.description,
+    type: filterType,
+    options: options
+  } as Filter;
+}
+
+// Transform main options using color_coding from backend
+export function transformMainOptions(
+  rawOptions: string[] | number[] | null,
+  colorCoding: ColorCoding[]
+): MapItemUnit[] {
+  if (!Array.isArray(rawOptions)) return [];
+
+  // Find default color (value: "any")
+  const defaultColor = colorCoding.find(c => c.value === 'any')?.color;
+
+  // Build color lookup map
+  const colorLookup = new Map(
+    colorCoding
+      .filter(c => c.value && c.value !== 'any' && c.color)
+      .map(c => [c.value, c.color])
+  );
+
+  return rawOptions.map(opt => ({
+    value: String(opt),
+    label: makeLabel(String(opt)),
+    color: colorLookup.get(String(opt)) ?? defaultColor,
+  }));
 }
 
 // @TODO: this will need to be filtered by scenario id

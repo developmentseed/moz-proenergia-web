@@ -1,13 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueries } from '@tanstack/react-query';
 import { ModelProvider } from '@/utils/context/model';
 import { Flex, Box, IconButton, Skeleton } from '@chakra-ui/react';
 import MainMap from '@/components/map';
 import { LuPanelRightOpen, LuPanelLeftOpen } from 'react-icons/lu';
-import { getModelData } from '@/utils/data-transformation';
+import {
+  fetchModelMetadata,
+  fetchVectors,
+  fetchFilterOptions,
+  transformModelCore,
+  transformVectorsToLayers,
+  transformFilterField,
+  transformMainOptions,
+} from '@/utils/data-transformation';
+import { type ModelMetadata } from '@/app/types';
 import MainPanel from './main-panel';
 
 const ControlPanelWidth = 350;
@@ -16,12 +25,68 @@ const AnimationTime = '0.3s';
 const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const [isOpen, setIsOpen] = useState(true);
 
-  const { data } = useQuery({
-    queryKey: ['model', modelId],
-    queryFn: () => getModelData(modelId),
+  // Query 1: Model metadata
+  const { data: modelCore } = useQuery({
+    queryKey: ['modelMetadata', modelId],
+    queryFn: async () => {
+      const apiModel = await fetchModelMetadata(modelId);
+      return transformModelCore(apiModel);
+    },
   });
 
-  if (!data) {
+  // Query 2: Contextual layers
+  const { data: layers } = useQuery({
+    queryKey: ['vectors'],
+    queryFn: async () => {
+      const apiVectors = await fetchVectors();
+      return transformVectorsToLayers(apiVectors);
+    },
+  });
+
+  const defaultScenarioId = modelCore?.scenarios[0]?.id;
+  // Query 3+: Filter options (cached per scenario + column)
+  const filterQueries = useQueries({
+    queries: (modelCore?.filterFields ?? []).map(field => ({
+      queryKey: ['filterOptions', defaultScenarioId, field.column],
+      queryFn: () => fetchFilterOptions(defaultScenarioId!, field.column),
+      enabled: !!defaultScenarioId,
+    })),
+  });
+
+  // Combine all data into ModelMetadata
+  const modelData = useMemo<ModelMetadata | undefined>(() => {
+    if (!modelCore || !layers) return undefined;
+
+    const allFiltersLoaded = filterQueries.every(q => q.data !== undefined);
+    if (!allFiltersLoaded) return undefined;
+
+    const filters = modelCore.filterFields.map((field, i) =>
+      transformFilterField(field, filterQueries[i].data ?? null)
+    );
+
+    // Find. main option among filters (filters always have main, other wise, options are empty for main)
+    const mainFilter = filters.find(f => f.column === modelCore.main.column);
+    const rawMainOptions = mainFilter
+      ? (mainFilter.options as string[] | number[] | null)
+      : [];
+    const resolvedMainOptions = transformMainOptions(rawMainOptions, modelCore.colorCoding);
+
+    return {
+      id: modelCore.id,
+      title: modelCore.title,
+      scenarios: modelCore.scenarios,
+      main: {
+        ...modelCore.main,
+        options: resolvedMainOptions,
+      },
+      filters,
+      layers,
+      popupFields: modelCore.popupFields,
+      summaryFields: modelCore.summaryFields,
+    };
+  }, [modelCore, layers, filterQueries]);
+
+  if (!modelData) {
     return (
       <Flex id='container' width="full" height='full' position="relative">
         <Skeleton width={ControlPanelWidth} height='full' />
@@ -33,7 +98,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   }
 
   return (
-    <ModelProvider model={data}>
+    <ModelProvider model={modelData}>
       <Flex id='container' width="full" height='full' position="relative">
         <MainPanel isOpen={isOpen} />
         {/* Toggle Button Tab */}
@@ -62,7 +127,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
         </Box>
 
         <Box transition={`width ${AnimationTime} ease`} height='full' width='full'>
-          <MainMap main={data.main} />
+          <MainMap main={modelData.main} />
         </Box>
       </Flex>
     </ModelProvider>
