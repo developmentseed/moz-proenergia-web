@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
   typescript: {
     // ignoreBuildErrors: true,
   },
+  outputFileTracingRoot: 'pnpm-lock.yaml'
 };
 
 const withMDX = createMDX({
