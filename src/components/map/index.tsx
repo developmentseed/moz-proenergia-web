@@ -32,7 +32,6 @@ const MainMap = ({ main }: MainMapProps) => {
   },[]);
 
   const { model, scenarioId, filters, activeLayers } = useModel();
-
   const additionalLayers = model.layers.filter(l => activeLayers.includes(l.id));
 
   const mapFilter = useMemo(() => {
@@ -44,6 +43,7 @@ const MainMap = ({ main }: MainMapProps) => {
   const resetCluster = useCallback(() => {
     setSelected(null);
   }, [setSelected]);
+
   return <Box w='100%' h='100%' className="map-container" position="relative">
     <Map
       initialViewState={{
@@ -55,7 +55,7 @@ const MainMap = ({ main }: MainMapProps) => {
       onClick={onClick}
       onMoveEnd={(e:ViewStateChangeEvent) => { setCoordinates({ lng: e.viewState.longitude, lat: e.viewState.latitude , zoom: e.viewState.zoom });}}
       mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
-      interactiveLayerIds={[main.id]}
+      interactiveLayerIds={[main.id, main.id + 'bg']}
         >
       <ContextualLayer layers={additionalLayers} mainId={main.id} />
       <MainLayer
@@ -67,7 +67,7 @@ const MainMap = ({ main }: MainMapProps) => {
       <NavigationControl position='bottom-left' />
     </Map>
     <Legend items={main.options} />
-    <SummaryPanel clusterId={selected} scenarioId={scenarioId} popupFields={model.popupFields} summaryFields={model.summaryFields} resetCluster={resetCluster} filters={filters}/>
+    <SummaryPanel clusterId={selected} scenarioId={scenarioId} popupFields={model.popupFields} summaryFields={model.summaryFields} filters={filters} filterDefs={model.filters} resetCluster={resetCluster} />
   </Box>;
 };
 
