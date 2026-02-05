@@ -71,7 +71,6 @@ export interface ModelMetadata {
   scenarios: Scenario[];
   main: Main;
   filters: Filter[];
-  layers: Layer[];
   popupFields: Field[];
   summaryFields: Field[];
 }

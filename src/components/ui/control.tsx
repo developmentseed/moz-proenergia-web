@@ -5,6 +5,7 @@ import { LuChevronUp, LuLayers, LuFilter } from "react-icons/lu";
 import { FilterControl } from './filters/filter-control';
 import { LayerControl } from './layers/layer-control';
 import { useModel } from "@/utils/context/model";
+import { useContextualLayers } from "@/utils/context/contextual-layers";
 import { ApplyActions } from './apply-actions';
 // FilterType as enum
 import { FilterType, type Filter, type ItemUnit } from "@/app/types";
@@ -38,7 +39,7 @@ const FilterControlWrapper = memo(function FilterControlWrapper({
 });
 
 const LayersPanel = () => {
-  const { model, toggleLayer, activeLayers } = useModel();
+  const { layers, toggleLayer, activeLayers } = useContextualLayers();
   if (!activeLayers) return <div>Please wait</div>;
 
   const setLayerOnChange = useCallback((param: { [x: string]: boolean; }) => {
@@ -46,7 +47,7 @@ const LayersPanel = () => {
   }, [toggleLayer]);
 
   return <Box>
-    {model.layers.map(layer => {
+    {layers.map(layer => {
       const active = activeLayers.includes(layer.id);
       return <LayerControl key={layer.id} layer={layer} onChange={setLayerOnChange} selected={active} />;
     })}

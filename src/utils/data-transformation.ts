@@ -122,7 +122,8 @@ export function deriveLayerStyles(sourceId: string): { circleLayer: LayerProps; 
       type: 'circle',
       //@TODO: style
       "paint": {
-        "circle-color":  "#377eb8"
+        "circle-color":  "#377eb8",
+        "circle-radius": 2
       }
     },
     lineLayer: {

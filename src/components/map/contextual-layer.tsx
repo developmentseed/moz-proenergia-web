@@ -1,14 +1,15 @@
 import { Source, Layer as MapLayer } from 'react-map-gl/maplibre';
-import { type Layer } from '@/app/types';
+import { useContextualLayers } from "@/utils/context/contextual-layers";
 
 interface ContextualLayerProps {
-  layers: Layer[];
   mainId: string;
 }
 
-export const ContextualLayer = ({ layers, mainId }:ContextualLayerProps) => {
+export const ContextualLayer = ({ mainId }:ContextualLayerProps) => {
+    const { layers, activeLayers } = useContextualLayers();
+    const contextualLayers = layers.filter(l => activeLayers.includes(l.id));
   return <>
-    {layers.map(layer => {
+    {contextualLayers.map(layer => {
     return <Source key={layer.id} {...layer.source} >
       <MapLayer id={layer.id} {...layer.circleLayer} beforeId={mainId} />
       <MapLayer id={layer.id} {...layer.lineLayer} beforeId={mainId} />

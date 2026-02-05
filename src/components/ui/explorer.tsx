@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 
 import { useQuery, useQueries } from '@tanstack/react-query';
 import { ModelProvider } from '@/utils/context/model';
+import { ContextualLayersProvider } from '@/utils/context/contextual-layers';
 import { Flex, Box, IconButton, Skeleton } from '@chakra-ui/react';
 import MainMap from '@/components/map';
 import { LuPanelRightOpen, LuPanelLeftOpen } from 'react-icons/lu';
@@ -34,7 +35,8 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     },
   });
 
-  // Query 2: Contextual layers
+  // contextual layers : separate context
+  // @TODO: reflect user authentication
   const { data: layers } = useQuery({
     queryKey: ['vectors'],
     queryFn: async () => {
@@ -44,7 +46,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   });
 
   const defaultScenarioId = modelCore?.scenarios[0]?.id;
-  // Query 3+: Filter options (cached per scenario + column)
+  // Filter options (cached per scenario + column)
   const filterQueries = useQueries({
     queries: (modelCore?.filterFields ?? []).map(field => ({
       queryKey: ['filterOptions', defaultScenarioId, field.column],
@@ -53,9 +55,9 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     })),
   });
 
-  // Combine all data into ModelMetadata
+  // Combine filter options to main model
   const modelData = useMemo<ModelMetadata | undefined>(() => {
-    if (!modelCore || !layers) return undefined;
+    if (!modelCore) return undefined;
 
     const allFiltersLoaded = filterQueries.every(q => q.data !== undefined);
     if (!allFiltersLoaded) return undefined;
@@ -80,13 +82,12 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
         options: resolvedMainOptions,
       },
       filters,
-      layers,
       popupFields: modelCore.popupFields,
       summaryFields: modelCore.summaryFields,
     };
-  }, [modelCore, layers, filterQueries]);
+  }, [modelCore, filterQueries]);
 
-  if (!modelData) {
+  if (!modelData || !layers) {
     return (
       <Flex id='container' width="full" height='full' position="relative">
         <Skeleton width={ControlPanelWidth} height='full' />
@@ -98,39 +99,41 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   }
 
   return (
-    <ModelProvider model={modelData}>
-      <Flex id='container' width="full" height='full' position="relative">
-        <MainPanel isOpen={isOpen} />
-        {/* Toggle Button Tab */}
-        <Box
-          position="absolute"
-          left={isOpen ? ControlPanelWidth : 0}
-          top="8"
-          transform="translateY(-50%)"
-          zIndex={1000}
-          transition={`left ${AnimationTime} ease`}
-          border='1px solid'
-          borderColor='panelBorder'
-          borderLeft='none'
-        >
-          <IconButton
-            aria-label={isOpen ? 'Collapse panel' : 'Expand panel'}
-            onClick={() => setIsOpen(!isOpen)}
-            variant="solid"
-            size="sm"
-            bg='panelBg'
+    <ContextualLayersProvider layers={layers}>
+      <ModelProvider model={modelData}>
+        <Flex id='container' width="full" height='full' position="relative">
+          <MainPanel isOpen={isOpen} />
+          {/* Toggle Button Tab */}
+          <Box
+            position="absolute"
+            left={isOpen ? ControlPanelWidth : 0}
+            top="8"
+            transform="translateY(-50%)"
+            zIndex={1000}
+            transition={`left ${AnimationTime} ease`}
+            border='1px solid'
+            borderColor='panelBorder'
             borderLeft='none'
-            borderRadius={0}
           >
-            {isOpen ? <LuPanelRightOpen stroke='gray' /> : <LuPanelLeftOpen stroke='gray' />}
-          </IconButton>
-        </Box>
+            <IconButton
+              aria-label={isOpen ? 'Collapse panel' : 'Expand panel'}
+              onClick={() => setIsOpen(!isOpen)}
+              variant="solid"
+              size="sm"
+              bg='panelBg'
+              borderLeft='none'
+              borderRadius={0}
+            >
+              {isOpen ? <LuPanelRightOpen stroke='gray' /> : <LuPanelLeftOpen stroke='gray' />}
+            </IconButton>
+          </Box>
 
-        <Box transition={`width ${AnimationTime} ease`} height='full' width='full'>
-          <MainMap main={modelData.main} />
-        </Box>
-      </Flex>
-    </ModelProvider>
+          <Box transition={`width ${AnimationTime} ease`} height='full' width='full'>
+            <MainMap main={modelData.main} />
+          </Box>
+        </Flex>
+      </ModelProvider>
+    </ContextualLayersProvider>
   );
 };
 

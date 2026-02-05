@@ -50,10 +50,6 @@ type ModelContextType = {
 
   setFilters: SetValues<DynamicFilterParsers>;
   resetAllFilters: () => void;
-
-  activeLayers: string[];
-  setActiveLayers: (layers: string[]) => void;
-  toggleLayer: (param: { [x: string]: boolean; }) => void;
 };
 
 const ModelContext = createContext<ModelContextType | null>(null);
@@ -84,10 +80,6 @@ export function ModelProvider({
   const [filters, setFilters] = useQueryStates<DynamicFilterParsers>(filterParsers, {
     history: 'replace',
     shallow: true
-  });
-  // Layer state
-  const [layerState, setLayerState] = useQueryStates({
-    layers: parseAsArrayOf(parseAsString).withDefault([]),
   });
 
   // Pending state for batching changes
@@ -129,20 +121,6 @@ export function ModelProvider({
     setPendingFilters(null);
   };
 
-  const toggleLayer = (layer: { [x: string]: boolean; }) => {
-    const [layerId, displayValue] = Object.entries(layer)[0];
-    if (displayValue) {
-      setLayerState({
-        layers: [...layerState.layers, layerId]
-      });
-
-    } else {
-      setLayerState({
-        layers: layerState.layers.filter(id => id !== layerId)
-      });
-    }
-  };
-
   return (
     <ModelContext.Provider
       value={{
@@ -154,7 +132,6 @@ export function ModelProvider({
         setMainAttribute: (value) => setMainAttribute({ main: value }),
         // URL state, map
         filters,
-        activeLayers: layerState.layers,
         // Display values (for UI controls)
         displayFilters,
         // Pending change handlers
@@ -164,8 +141,6 @@ export function ModelProvider({
         hasPendingChanges,
         setFilters,
         resetAllFilters,
-        setActiveLayers: (layers) => setLayerState({ layers }),
-        toggleLayer
       }}
     >
       {children}

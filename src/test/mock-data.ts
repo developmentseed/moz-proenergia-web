@@ -47,5 +47,4 @@ export const mockModel: ModelMetadata = {
   ],
   popupFields: [],
   summaryFields: [],
-  layers: [],
 };

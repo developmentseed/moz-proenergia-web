@@ -7,7 +7,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { useModel } from "@/utils/context/model";
 import { useCoordinates } from './hooks/use-coordinates';
 import { useMouseEvent } from './hooks/use-mouse-event';
-import { type Scenario, type Main } from '@/app/types';
+import { type Main } from '@/app/types';
 import { buildExpressionWithFilter } from '@/utils/map/filter';
 import SummaryPanel from './summary-panel';
 import { Legend } from './legend';
@@ -31,8 +31,7 @@ const MainMap = ({ main }: MainMapProps) => {
     };
   },[]);
 
-  const { model, scenarioId, filters, activeLayers } = useModel();
-  const additionalLayers = model.layers.filter(l => activeLayers.includes(l.id));
+  const { model, scenarioId, filters } = useModel();
 
   const mapFilter = useMemo(() => {
     return buildExpressionWithFilter(model.filters, filters);
@@ -57,7 +56,7 @@ const MainMap = ({ main }: MainMapProps) => {
       mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
       interactiveLayerIds={[main.id, main.id + 'bg']}
         >
-      <ContextualLayer layers={additionalLayers} mainId={main.id} />
+      <ContextualLayer mainId={main.id} />
       <MainLayer
         scenario={scenario}
         main={main}
