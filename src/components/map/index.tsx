@@ -54,7 +54,7 @@ const MainMap = ({ main }: MainMapProps) => {
           }}
       style={{ width: '100%', height: '100%' }}
       onClick={onClick}
-      onMoveEnd={(e:ViewStateChangeEvent) => { setCoordinates({ lng: e.viewState.longitude, lat: e.viewState.latitude , zoom: e.viewState.zoom });}}
+      onMoveEnd={(e:ViewStateChangeEvent) => { setCoordinates({ lng: e.viewState.longitude.toFixed(5), lat: e.viewState.latitude.toFixed(5) , zoom: e.viewState.zoom.toFixed(5) });}}
       mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
       interactiveLayerIds={[main.id, main.id + 'bg']}
         >
