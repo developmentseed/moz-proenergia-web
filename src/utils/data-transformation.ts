@@ -1,6 +1,6 @@
 import { LayerProps } from "react-map-gl/maplibre";
 import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
-import { api, MEDIA_URL_PREFIX } from '@/utils/api';
+import { api, MEDIA_URL_PREFIX, DEFAULT_COL } from '@/utils/api';
 import mapConfig from '@/config/map.json';
 const ADMIN_COLUMNS = ['Admin_1', 'District', 'Posto', 'Localidade'];
 
@@ -27,7 +27,7 @@ export interface ApiModelResponse {
   popup_fields: ApiFilterField[];
   summary_fields: ApiFilterField[];
   scenarios: ApiScenario[];
-  visualization_column: string; // for main column
+  visualization_column: string | null; // for main column
   color_coding: ColorCoding[]
 }
 
@@ -222,8 +222,8 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
         type: 'fill' as const,
       },
     }));
-
-  const mainColumn = apiModel.visualization_column;
+  // whwen visuaslization column is empty or null
+  const mainColumn = (!apiModel.visualization_column || apiModel.visualization_column === '')? DEFAULT_COL: apiModel.visualization_column;
   const mainField = apiModel.filter_fields.find(f => f.column === mainColumn);
 
   const main: Main = {
@@ -285,12 +285,19 @@ export function transformMainOptions(
   if (!Array.isArray(rawOptions)) return [];
 
   // Find default color (value: "any")
-  const defaultColor = colorCoding.find(c => c.value === 'any')?.color;
-
+  const defaultColor = colorCoding.find(c => c.value === DEFAULT_COL)?.color;
+  // When options are missing (ex. no column to visualize)
+  if (rawOptions.length === 0) {
+    return [{
+      value: DEFAULT_COL,
+      label: DEFAULT_COL,
+      color: defaultColor,
+    }];
+  }
   // Build color lookup map
   const colorLookup = new Map(
     colorCoding
-      .filter(c => c.value && c.value !== 'any' && c.color)
+      .filter(c => c.value && c.color)
       .map(c => [c.value, c.color])
   );
 

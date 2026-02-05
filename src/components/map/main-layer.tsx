@@ -4,6 +4,7 @@ import {
   type LayerSpecification,
   type FilterSpecification
 } from 'maplibre-gl';
+import { DEFAULT_COL } from '@/utils/api';
 import { type Scenario, type Main } from '@/app/types';
 
 function getColorAttributeNamebyType(type: string) {
@@ -61,7 +62,7 @@ export const MainLayer = ({
       paint: {
         [getColorAttributeNamebyType('fill')]: main.options.length? [
           'match',
-          ['get', main.column],
+          main.column === DEFAULT_COL ? ['literal', DEFAULT_COL] : ['get', main.column],
           ...main.options.flatMap((val) => [val.value, val.color]),
           '#CCCCCC',
         ] : '#66ff',
