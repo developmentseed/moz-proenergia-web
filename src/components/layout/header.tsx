@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Box, Container, Flex, HStack, Text, Link } from '@chakra-ui/react';
+import NextLink from "next/link";
 import Modal from '../chakra/modal';
 import LoginForm from './login-form';
 import Image from 'next/image';
@@ -76,13 +77,15 @@ export const Header = ({
               style={{ objectFit: 'contain' }}
             />
             <Link
-              href='/'
               fontSize="1.25rem"
               fontWeight="600"
               fontFamily="body"
               color="black"
+              asChild
             >
-              {logoText}
+              <NextLink href='/'>
+                {logoText}
+              </NextLink>
             </Link>
           </Flex>
 
@@ -100,14 +103,15 @@ export const Header = ({
               return (
                 <Box key={item.href} margin={2}>
                   <Link
-                    href={item.href}
                     fontSize="md"
                     fontWeight={active ? 'bold' : 'medium'}
                     color={active ? 'black' : '#A1A1AA'}
                     transition="color 0.2s"
                     onClick={(e) => handleLinkClick(item.href, e)}
-                  >
+                    asChild
+                  ><NextLink href={item.href}>
                     {item.label}
+                  </NextLink>
                   </Link>
                 </Box>
               );
