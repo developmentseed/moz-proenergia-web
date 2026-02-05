@@ -113,8 +113,6 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
             id="container"
             width="full"
             height="full"
-            maxH="calc(100vh - 3.5rem)"
-            overflow="hidden"
             position="relative"
           >
             <MainPanel isOpen={isOpen} />

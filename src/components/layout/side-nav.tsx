@@ -19,7 +19,7 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
 
   return (
     <Box
-      height="100%"
+      height="full"
       bg="navBg"
       borderRight="1px solid"
       borderColor="panelBorder"

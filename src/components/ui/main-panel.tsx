@@ -1,45 +1,56 @@
-'use client';
+"use client";
 
-import { type ChangeEvent } from 'react';
+import { type ChangeEvent } from "react";
 import { Text, Box, Heading } from "@chakra-ui/react";
-import { Select } from '@/components/chakra';
-import { Control as ControlPanel } from './control';
+import { Select } from "@/components/chakra";
+import { Control as ControlPanel } from "./control";
 import { useModel } from "@/utils/context/model";
 
 const ControlPanelWidth = 350;
-const AnimationTime = '0.3s';
+const AnimationTime = "0.3s";
 
 const MainPanel = ({ isOpen }: { isOpen: boolean }) => {
   const { model, scenarioId, setScenarioId } = useModel();
 
-  const onChange = (e:ChangeEvent<HTMLSelectElement >) => {
+  const onChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setScenarioId(e.target.value);
   };
-  const scenarioItems = model.scenarios.map(s => ({
+  const scenarioItems = model.scenarios.map((s) => ({
     value: s.id,
     label: s.label,
-    description: s.description
+    description: s.description,
   }));
 
-  return ( <Box
-    position="relative"
-    bg="panelBg"
-    height='full'
-    borderRightWidth={isOpen ? '1px' : 0}
-    borderRightStyle={'solid'}
-    borderRightColor='panelBorder'
-    transition={`width ${AnimationTime} ease`}
-    width={isOpen ? ControlPanelWidth : 0}
-            >
-    <Box width={ControlPanelWidth} height='full' overflowY='auto'>
-      <Box p={4}>
-        <Text textStyle='subTitle'>Model</Text>
-        <Heading as={'h2'} textStyle='modelTitle'> {model.title} </Heading>
-        <Select title={'Scenario'} items={scenarioItems} value={scenarioId} onChange={onChange} />
+  return (
+    <Box
+      position="relative"
+      bg="panelBg"
+      borderRightWidth={isOpen ? "1px" : 0}
+      borderRightStyle={"solid"}
+      borderRightColor="panelBorder"
+      transition={`width ${AnimationTime} ease`}
+      width={isOpen ? ControlPanelWidth : 0}
+      display="flex"
+      flexDirection="column"
+    >
+      <Box width={ControlPanelWidth}>
+        <Box p={4}>
+          <Text textStyle="subTitle">Model</Text>
+          <Heading as={"h2"} textStyle="modelTitle">
+            {" "}
+            {model.title}{" "}
+          </Heading>
+          <Select
+            title={"Scenario"}
+            items={scenarioItems}
+            value={scenarioId}
+            onChange={onChange}
+          />
+        </Box>
+        <ControlPanel />
       </Box>
-      <ControlPanel />
     </Box>
-  </Box>);
+  );
 };
 
 export default MainPanel;

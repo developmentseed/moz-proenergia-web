@@ -153,31 +153,31 @@ const ControlsPanel = () => {
   );
 
   return (
-    <Box position="relative" p={4} height="full" maxHeight="100%" overflowY="auto">
-      {/* put collapsible groups first */}
-      {collapsibleGroups.map((group) => (
-        <Box key={group.title} mb={4}>
-          <CollapsibleGroup collapsibleItem={group} />
-        </Box>
-      ))}
+    <Box
+      display="flex"
+      flexDirection="column"
+      p={4}
+    >
+      <Box overflowY="auto">
+        {/* put collapsible groups first */}
+        {collapsibleGroups.map((group) => (
+          <Box key={group.title} mb={4}>
+            <CollapsibleGroup collapsibleItem={group} />
+          </Box>
+        ))}
 
-      {/* numeric data doesn't need to be collapsible */}
-      {noCollapsibleGroups.map((matchingFilter) => (
-        <Box key={matchingFilter.id} mb={2}>
-          <FilterControlWrapper
-            filter={matchingFilter}
-            value={displayFilters[matchingFilter.id]}
-            setPendingFilters={setPendingFilters}
-          />
-        </Box>
-      ))}
-      <Box
-        position="sticky"
-        bottom={0}
-        left={0}
-        width="full"
-        bg="panelBg"
-      >
+        {/* numeric data doesn't need to be collapsible */}
+        {noCollapsibleGroups.map((matchingFilter) => (
+          <Box key={matchingFilter.id} mb={2}>
+            <FilterControlWrapper
+              filter={matchingFilter}
+              value={displayFilters[matchingFilter.id]}
+              setPendingFilters={setPendingFilters}
+            />
+          </Box>
+        ))}
+      </Box>
+      <Box position="sticky" bottom={0} width="full" py={4} my={-4} bg="panelBg" >
         <ApplyActions />
       </Box>
     </Box>

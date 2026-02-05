@@ -1,4 +1,4 @@
-import { Tabs, Center } from "@chakra-ui/react";
+import { Tabs } from "@chakra-ui/react";
 import { type TabItem } from '@/app/types/ui';
 
 interface TabProps {
