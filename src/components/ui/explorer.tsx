@@ -18,7 +18,7 @@ import {
   transformFilterField,
   transformMainOptions,
 } from '@/utils/data-transformation';
-import { type ModelMetadata } from '@/app/types';
+import { MapItemUnit, type ModelMetadata } from '@/app/types';
 import MainPanel from './main-panel';
 
 const ControlPanelWidth = 350;
@@ -71,7 +71,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     // Find. main option among filters (filters always have main, other wise, options are empty for main)
     const mainFilter = filters.find(f => f.column === modelCore.main.column);
     const rawMainOptions = mainFilter
-      ? (mainFilter.options as string[] | number[] | null)
+      ? (mainFilter.options as MapItemUnit[] | null)
       : [];
     const resolvedMainOptions = transformMainOptions(rawMainOptions, modelCore.colorCoding);
 
@@ -89,9 +89,6 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     };
   }, [modelCore, filterQueries]);
 
-  console.log(modelData);
-  console.log(layers);
-  console.log(!modelData || !layers);
   if (!modelData || !layers) {
     return (
       <Flex id='container' width="full" height='full' position="relative">

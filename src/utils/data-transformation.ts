@@ -279,7 +279,7 @@ export function transformFilterField(
 
 // Transform main options using color_coding from backend
 export function transformMainOptions(
-  rawOptions: string[] | number[] | null,
+  rawOptions: MapItemUnit[] | null,
   colorCoding: ColorCoding[]
 ): MapItemUnit[] {
   if (!Array.isArray(rawOptions)) return [];
@@ -295,9 +295,9 @@ export function transformMainOptions(
   );
 
   return rawOptions.map(opt => ({
-    value: String(opt),
-    label: makeLabel(String(opt)),
-    color: colorLookup.get(String(opt)) ?? defaultColor,
+    value: String(opt.value),
+    label: opt.label,
+    color: colorLookup.get(String(opt.value)) ?? defaultColor,
   }));
 }
 
