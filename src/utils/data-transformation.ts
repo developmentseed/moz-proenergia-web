@@ -143,7 +143,7 @@ export async function fetchModels(): Promise<ModelGroupMetadata[]> {
   try {
     const { data } = await api.get('model/');
     // @TODO return models as it is. Returning lcoe and mini grids until data getting ingested.
-    return [data.results[0], data.results[2]];
+    return data.results;
   } catch(e) {
     console.error(e);
     throw new Error('failed to fetch models');
