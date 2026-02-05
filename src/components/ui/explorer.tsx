@@ -28,13 +28,16 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const [isOpen, setIsOpen] = useState(true);
 
   // Query 1: Model metadata
-  const { data: modelCore } = useQuery({
-    queryKey: ["modelMetadata", modelId],
+  const {  data: modelCore, status, error, fetchStatus } = useQuery({
+    queryKey: ['modelMetadata', modelId],
     queryFn: async () => {
       const apiModel = await fetchModelMetadata(modelId);
       return transformModelCore(apiModel);
     },
   });
+
+  console.log('modelId:', modelId);
+  console.log('query status:', status, 'fetchStatus:', fetchStatus, 'error:', error);
 
   // contextual layers : separate context
   // @TODO: reflect user authentication
@@ -53,7 +56,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
       // Filters don't change per scenario, so just using default scenario here
       queryKey: ["filterOptions", modelCore?.id, field.column],
       queryFn: () => fetchFilterOptions(defaultScenarioId!, field.column),
-      enabled: !!defaultScenarioId,
+      enabled: !!modelCore?.id,
     })),
   });
 
@@ -91,8 +94,6 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
       summaryFields: modelCore.summaryFields,
     };
   }, [modelCore, filterQueries]);
-  console.log("modelData", modelData);
-  console.log("layers", layers);
   if (!modelData || !layers) {
     return (
       <Flex id="container" width="full" height="full" position="relative">

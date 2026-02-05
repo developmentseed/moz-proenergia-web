@@ -26,12 +26,15 @@ interface FlatRow {
   label: string;
   key: string;
   description?: string;
+  unit?: string;
   value: number | string;
 }
 
 interface GroupRow {
   type: "group";
   label: string;
+  description?:string;
+  unit?: string;
   value: SummaryItem[];
 }
 
@@ -158,34 +161,25 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
                 );
               }
 
-              // Group type
-              return [
-                <Table.Row key={row.label} bg="gray.200">
-                  <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
-                    <Text textStyle="tableAttr">{row.label}</Text>
-                  </Table.Cell>
-                </Table.Row>,
-                ...row.value.map((item) => (
-                  <Table.Row key={item.key} bg="panelBg">
-                    <Table.Cell {...tableCellStyleProps} pl={6}>
-                      <Text textStyle="tableAttr">
-                        {" "}
-                        {item.label}
-                        <InfoTip content="description" />
-                      </Text>
-                    </Table.Cell>
-                    <Table.Cell {...tableCellStyleProps}>
-                      <Text textStyle="tableValue">
-                        {formatValue(item.value)}
-                      </Text>
-                    </Table.Cell>
-                  </Table.Row>
-                )),
-              ];
-            })}
-          </Table.Body>
-        </Table.Root>
-      )}
+            // Group type
+            return [
+              <Table.Row key={row.label} bg='gray.200'>
+                <Table.Cell px={2} py={2} colSpan={2} fontWeight='bold'>
+                  <Text textStyle='tableAttr'> {row.label}<InfoTip content={row.description} /></Text>
+                </Table.Cell>
+              </Table.Row>,
+              ...row.value.map((item) => (
+                <Table.Row key={item.key} bg='panelBg'>
+                  <Table.Cell {...tableCellStyleProps} pl={6}>
+                    <Text textStyle='tableAttr' pt={1} pb={1}> {item.label}</Text></Table.Cell>
+                  <Table.Cell {...tableCellStyleProps}><Text textStyle='tableValue'>{formatValue(item.value)}</Text></Table.Cell>
+                </Table.Row>
+              ))
+            ];
+          })}
+        </Table.Body>
+      </Table.Root>
+    )}
     </Box>
   );
 };
@@ -289,12 +283,15 @@ function transformFieldSummary(result: FieldSummary, field: Field): SummaryRow {
       label: `${field.label} (Total)`,
       description: field.description,
       value: result.sum,
+      unit: field.unit
     };
   }
   // String type - show value distribution
   return {
     type: "group" as const,
     label: field.label,
+    description: field.description,
+    unit: field.unit,
     value: Object.entries(result.values).map(([key, count]) => ({
       key,
       label: key,

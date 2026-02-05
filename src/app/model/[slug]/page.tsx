@@ -34,54 +34,55 @@ export default async function ModelPage({
   const queryClient = new QueryClient();
 
   // Prefetch in parallel: models list, model metadata, vectors
-  await Promise.all([
-    queryClient.prefetchQuery({
-      queryKey: ['models'],
-      queryFn: fetchModels,
-    }),
+  // await Promise.all([
+    // queryClient.prefetchQuery({
+    //   queryKey: ['models'],
+    //   queryFn: fetchModels,
+    // });
+    const models = await fetchModels();
 
-    queryClient.prefetchQuery({
-      queryKey: ['modelMetadata', slug],
-      queryFn: async () => {
-        const apiModel = await fetchModelMetadata(slug);
-        return transformModelCore(apiModel);
-      },
-    }),
-    queryClient.prefetchQuery({
-      queryKey: ['vectors'],
-      queryFn: async () => {
-        const apiVectors = await fetchVectors();
-        return transformVectorsToLayers(apiVectors);
-      },
-    }),
-  ]);
+  //   queryClient.prefetchQuery({
+  //     queryKey: ['modelMetadata', slug],
+  //     queryFn: async () => {
+  //       const apiModel = await fetchModelMetadata(slug);
+  //       return transformModelCore(apiModel);
+  //     },
+  //   }),
+  //   queryClient.prefetchQuery({
+  //     queryKey: ['vectors'],
+  //     queryFn: async () => {
+  //       const apiVectors = await fetchVectors();
+  //       return transformVectorsToLayers(apiVectors);
+  //     },
+  //   }),
+  // ]);
 
   // Get model core to fetch filter options
-  const modelCore = queryClient.getQueryData<ReturnType<typeof transformModelCore>>(['modelMetadata', slug]);
-  const defaultScenarioId = modelCore?.scenarios[0]?.id;
+  // const modelCore = queryClient.getQueryData<ReturnType<typeof transformModelCore>>(['modelMetadata', slug]);
+  // const defaultScenarioId = modelCore?.scenarios[0]?.id;
 
   // Prefetch filter options in parallel
-  if (modelCore && defaultScenarioId) {
-    await Promise.all(
-      modelCore.filterFields.map(field =>
-        queryClient.prefetchQuery({
-          queryKey: ['filterOptions', modelCore?.id, field.column],
-          queryFn: () => fetchFilterOptions(defaultScenarioId, field.column),
-        })
-      )
-    );
-  }
+  // if (modelCore && defaultScenarioId) {
+  //   await Promise.all(
+  //     modelCore.filterFields.map(field =>
+  //       queryClient.prefetchQuery({
+  //         queryKey: ['filterOptions', modelCore?.id, field.column],
+  //         queryFn: () => fetchFilterOptions(defaultScenarioId, field.column),
+  //       })
+  //     )
+  //   );
+  // }
 
-  const models = queryClient.getQueryData<ModelGroupMetadata[]>(['models'])!;
+  // const models = queryClient.getQueryData<ModelGroupMetadata[]>(['models'])!;
 
   return (
     <Flex height="calc(100vh - 3.5rem)" width="100%">
       <Suspense>
         <SideNav models={models} currentSlug={slug} />
         <Box id='main-panel' width='full' height="100%">
-          <HydrationBoundary state={dehydrate(queryClient)}>
-            <Explorer modelId={slug} />
-          </HydrationBoundary>
+          {/* <HydrationBoundary state={dehydrate(queryClient)}> */}
+          <Explorer modelId={slug} />
+          {/* </HydrationBoundary> */}
         </Box>
       </Suspense>
     </Flex>
