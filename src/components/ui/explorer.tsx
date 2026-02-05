@@ -28,17 +28,13 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const [isOpen, setIsOpen] = useState(true);
 
   // Query 1: Model metadata
-  const {  data: modelCore, status, error, fetchStatus } = useQuery({
+  const { data: modelCore } = useQuery({
     queryKey: ['modelMetadata', modelId],
     queryFn: async () => {
       const apiModel = await fetchModelMetadata(modelId);
       return transformModelCore(apiModel);
     },
   });
-
-  console.log('modelId:', modelId);
-  console.log('query status:', status, 'fetchStatus:', fetchStatus, 'error:', error);
-
   // contextual layers : separate context
   // @TODO: reflect user authentication
   const { data: layers } = useQuery({
