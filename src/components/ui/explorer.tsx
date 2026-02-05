@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { ModelProvider } from "@/utils/context/model";
 import { ContextualLayersProvider } from "@/utils/context/contextual-layers";
 import { FiltersProvider } from "@/utils/context/filters";
-import { Flex, Box, IconButton, Skeleton } from "@chakra-ui/react";
+import { Flex, Box, IconButton, Center, Skeleton, Text } from "@chakra-ui/react";
+import NextLink from "next/link";
 import MainMap from "@/components/map";
 import { LuPanelRightOpen, LuPanelLeftOpen } from "react-icons/lu";
 import {
@@ -28,17 +28,13 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const [isOpen, setIsOpen] = useState(true);
 
   // Query 1: Model metadata
-  const {  data: modelCore, status, error, fetchStatus } = useQuery({
+  const { data: modelCore } = useQuery({
     queryKey: ['modelMetadata', modelId],
     queryFn: async () => {
       const apiModel = await fetchModelMetadata(modelId);
       return transformModelCore(apiModel);
     },
   });
-
-  console.log('modelId:', modelId);
-  console.log('query status:', status, 'fetchStatus:', fetchStatus, 'error:', error);
-
   // contextual layers : separate context
   // @TODO: reflect user authentication
   const { data: layers } = useQuery({
@@ -50,13 +46,14 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   });
 
   const defaultScenarioId = modelCore?.scenarios[0]?.id;
+
   // Filter options (cached per scenario + column)
   const filterQueries = useQueries({
     queries: (modelCore?.filterFields ?? []).map((field) => ({
       // Filters don't change per scenario, so just using default scenario here
       queryKey: ["filterOptions", modelCore?.id, field.column],
       queryFn: () => fetchFilterOptions(defaultScenarioId!, field.column),
-      enabled: !!modelCore?.id,
+      enabled: !!modelCore?.id && !!defaultScenarioId,
     })),
   });
 
@@ -94,6 +91,16 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
       summaryFields: modelCore.summaryFields,
     };
   }, [modelCore, filterQueries]);
+
+  // @TODO: A very hacky way of telling users that the data doesn't have related scenarios
+  // Assuming /vectors endpoints succeeded
+  if (modelCore && !defaultScenarioId && layers) {
+    return <Box h="full" w="full" display={'flex'} justifyContent={'center'} alignItems='center' flexDirection={'column'}>
+      <Box>This data doesnt look like it is ready. Make sure there are scenarios related to this model.
+      </Box>
+      <Box><NextLink href='/'> Going back to home</NextLink></Box></Box>;
+  };
+  // @TODO: detach layers
   if (!modelData || !layers) {
     return (
       <Flex id="container" width="full" height="full" position="relative">
