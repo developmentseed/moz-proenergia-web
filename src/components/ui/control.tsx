@@ -90,7 +90,6 @@ const CollapsibleGroup = memo(function CollapsibleGroup({ collapsibleItem }: { c
 });
 
 const ControlsPanel = () => {
-  console.log('controls panel');
   const { model } = useModel();
   const { displayFilters, setPendingFilters } = useFilters();
   if (!displayFilters) return <div>Please wait</div>;
