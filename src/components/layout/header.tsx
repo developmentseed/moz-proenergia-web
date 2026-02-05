@@ -2,14 +2,8 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import {
-  Box,
-  Flex,
-  HStack,
-  Text,
-  Link,
-  Heading,
-} from "@chakra-ui/react";
+import { Box, Heading, Flex, HStack, Text, Link } from "@chakra-ui/react";
+import NextLink from "next/link";
 import Modal from "../chakra/modal";
 import LoginForm from "./login-form";
 import Image from "next/image";
@@ -67,14 +61,10 @@ export const Header = ({
       pr={6}
       py={2}
     >
-      <Flex
-        mx="auto"
-        justify="space-between"
-        align="center"
-      >
+      <Flex mx="auto" justify="space-between" align="center">
         {/* Logo Section - Left */}
         <Flex align="center" gap={3}>
-          <Link href="/">
+          <NextLink href="/">
             <Image
               src={logoSrc}
               alt="Logo"
@@ -92,13 +82,15 @@ export const Header = ({
               color="fg.muted"
             >
               Mozambique <br />
-              <Text as="span" color="fg" fontWeight="900">Proenergia+ IEP</Text>
+              <Text as="span" color="fg" fontWeight="900">
+                Proenergia+ IEP
+              </Text>
             </Heading>
-          </Link>
+          </NextLink>
         </Flex>
 
         {/* Navigation Items - Right */}
-        <HStack fontFamily="body" gap="6">
+        <HStack fontFamily="body" gap={6}>
           {navigationItems.map((item) => {
             const isModal = item.href === "modal";
             if (isModal) {
@@ -116,14 +108,14 @@ export const Header = ({
             return (
               <Box key={item.href}>
                 <Link
-                  href={item.href}
                   fontSize="sm"
                   fontWeight={active ? "bold" : "medium"}
                   color={active ? "fg" : "#A1A1AA"}
                   transition="color 0.2s"
                   onClick={(e) => handleLinkClick(item.href, e)}
+                  asChild
                 >
-                  {item.label}
+                  <NextLink href={item.href}>{item.label}</NextLink>
                 </Link>
               </Box>
             );
