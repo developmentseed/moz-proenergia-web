@@ -86,7 +86,7 @@ const PanelHeader = ({ title, subtitle }: PanelHeaderProps) => (
     borderBottom='1px solid'
     borderColor='panelBorder'
   >
-    <Box>
+    <Box textAlign="left">
       <Text textStyle='subTitle'>{subtitle}</Text>
       <Text textStyle='modelTitle'>{title}</Text>
     </Box>
@@ -144,7 +144,7 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
               return (
                 <Table.Row key={row.key} bg='panelBg'>
                   <Table.Cell {...tableCellStyleProps}> <Text textStyle='tableAttr'> {row.label}{row.description && <InfoTip content={row.description} />}</Text> </Table.Cell>
-                  <Table.Cell {...tableCellStyleProps}><Text textStyle='tableValue'>{formatValue(row.value)}</Text></Table.Cell>
+                  <Table.Cell {...tableCellStyleProps}><Text textStyle='tableValue'>{formatValue(row.value)} {row.unit}</Text></Table.Cell>
                 </Table.Row>
               );
             }
@@ -160,7 +160,7 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
                 <Table.Row key={item.key} bg='panelBg'>
                   <Table.Cell {...tableCellStyleProps} pl={6}>
                     <Text textStyle='tableAttr' pt={1} pb={1}> {item.label}</Text></Table.Cell>
-                  <Table.Cell {...tableCellStyleProps}><Text textStyle='tableValue'>{formatValue(item.value)}</Text></Table.Cell>
+                  <Table.Cell {...tableCellStyleProps}><Text textStyle='tableValue'>{formatValue(item.value)} {row.unit}</Text></Table.Cell>
                 </Table.Row>
               ))
             ];
@@ -296,7 +296,7 @@ const SummaryPanel = ({ clusterId, scenarioId, summaryFields, popupFields, filte
   const isLoading = showingCluster ? (clusterIsLoading || clusterIsFetching) : summaryIsLoading;
   const isError = showingCluster ? clusterIsError : summaryIsError;
 
-  const title = clusterId ? `Cluster - ${clusterId}` : 'Summary';
+  const title = showingCluster ? `Cluster - ${clusterId}` : 'Summary';
 
   return (
     <Box
