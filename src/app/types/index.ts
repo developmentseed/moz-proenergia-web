@@ -8,6 +8,7 @@ export interface Field {
   column: string;
   label: string;
   description?: string;
+  unit?: string;
 }
 export interface MapItemUnit extends ItemUnit {
   color?: string;
