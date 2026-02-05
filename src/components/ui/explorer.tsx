@@ -50,7 +50,8 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   // Filter options (cached per scenario + column)
   const filterQueries = useQueries({
     queries: (modelCore?.filterFields ?? []).map(field => ({
-      queryKey: ['filterOptions', defaultScenarioId, field.column],
+      // Filters don't change per scenario, so just using default scenario here
+      queryKey: ['filterOptions', modelCore?.id, field.column],
       queryFn: () => fetchFilterOptions(defaultScenarioId!, field.column),
       enabled: !!defaultScenarioId,
     })),
@@ -88,6 +89,9 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     };
   }, [modelCore, filterQueries]);
 
+  console.log(modelData);
+  console.log(layers);
+  console.log(!modelData || !layers);
   if (!modelData || !layers) {
     return (
       <Flex id='container' width="full" height='full' position="relative">

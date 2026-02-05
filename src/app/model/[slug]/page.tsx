@@ -65,7 +65,7 @@ export default async function ModelPage({
     await Promise.all(
       modelCore.filterFields.map(field =>
         queryClient.prefetchQuery({
-          queryKey: ['filterOptions', defaultScenarioId, field.column],
+          queryKey: ['filterOptions', modelCore?.id, field.column],
           queryFn: () => fetchFilterOptions(defaultScenarioId, field.column),
         })
       )
