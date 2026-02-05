@@ -5,6 +5,7 @@ import * as pmtiles from 'pmtiles';
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useModel } from "@/utils/context/model";
+import { useFilters } from "@/utils/context/filters";
 import { useCoordinates } from './hooks/use-coordinates';
 import { useMouseEvent } from './hooks/use-mouse-event';
 import { type Main } from '@/app/types';
@@ -31,7 +32,8 @@ const MainMap = ({ main }: MainMapProps) => {
     };
   },[]);
 
-  const { model, scenarioId, filters } = useModel();
+  const { model, scenarioId } = useModel();
+  const { filters } = useFilters();
 
   const mapFilter = useMemo(() => {
     return buildExpressionWithFilter(model.filters, filters);

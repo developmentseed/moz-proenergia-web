@@ -6,6 +6,7 @@ import { FilterControl } from './filters/filter-control';
 import { LayerControl } from './layers/layer-control';
 import { useModel } from "@/utils/context/model";
 import { useContextualLayers } from "@/utils/context/contextual-layers";
+import { useFilters } from "@/utils/context/filters";
 import { ApplyActions } from './apply-actions';
 // FilterType as enum
 import { FilterType, type Filter, type ItemUnit } from "@/app/types";
@@ -55,7 +56,7 @@ const LayersPanel = () => {
 };
 
 const CollapsibleGroup = memo(function CollapsibleGroup({ collapsibleItem }: { collapsibleItem: ColGroup }) {
-  const { displayFilters, setPendingFilters } = useModel();
+  const { displayFilters, setPendingFilters } = useFilters();
   return <Collapsible.Root defaultOpen>
     <Collapsible.Trigger
       display="flex"
@@ -89,7 +90,9 @@ const CollapsibleGroup = memo(function CollapsibleGroup({ collapsibleItem }: { c
 });
 
 const ControlsPanel = () => {
-  const { model, displayFilters, setPendingFilters } = useModel();
+  console.log('controls panel');
+  const { model } = useModel();
+  const { displayFilters, setPendingFilters } = useFilters();
   if (!displayFilters) return <div>Please wait</div>;
 
   const adminFilterExists = model.filters.filter(f => f.type === FilterType.admin);

@@ -1,11 +1,11 @@
 'use client';
 
 import { Box, Button } from '@chakra-ui/react';
-import { useModel } from '@/utils/context/model';
+import { useFilters } from '@/utils/context/filters';
 import { useIsFetching } from '@tanstack/react-query';
 
 export const ApplyActions = () => {
-  const { hasPendingChanges, filters, applyPendingChanges } = useModel();
+  const { hasPendingChanges, filters, applyPendingChanges } = useFilters();
 
   const isLoading = !!useIsFetching({ queryKey: ['filter', filters] });
   return (

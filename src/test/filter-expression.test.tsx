@@ -4,24 +4,34 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 
 import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import { ModelProvider, useModel } from "@/utils/context/model";
+import { FiltersProvider, useFilters } from "@/utils/context/filters";
 import { buildExpressionWithFilter } from "@/utils/map/filter";
 import { mockModel } from "./mock-data";
+
+// Hook that combines useModel and useFilters for testing
+const useModelWithFilters = () => {
+  const model = useModel();
+  const filters = useFilters();
+  return { ...model, ...filters };
+};
 
 // Wrapper for renderHook
 const createWrapper = () => {
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
       <NuqsTestingAdapter>
-        <ModelProvider model={mockModel}>{children}</ModelProvider>
+        <FiltersProvider filterDefs={mockModel.filters}>
+          <ModelProvider model={mockModel}>{children}</ModelProvider>
+        </FiltersProvider>
       </NuqsTestingAdapter>
     );
   };
 };
 
 describe("Filter to Expression End-to-End", () => {
-  describe("useModel hook with default filters", () => {
+  describe("useFilters hook with default filters", () => {
     it("should initialize filters with default values", () => {
-      const { result } = renderHook(() => useModel(), { wrapper: createWrapper() });
+      const { result } = renderHook(() => useModelWithFilters(), { wrapper: createWrapper() });
 
       // Numeric filter defaults to full range
       expect(result.current.filters.population).toEqual([0, 1000]);
@@ -34,7 +44,7 @@ describe("Filter to Expression End-to-End", () => {
     });
 
     it("should build correct initial expression from filters", () => {
-      const { result } = renderHook(() => useModel(), { wrapper: createWrapper() });
+      const { result } = renderHook(() => useModelWithFilters(), { wrapper: createWrapper() });
 
       const expression = buildExpressionWithFilter(
         result.current.model.filters,
@@ -51,7 +61,7 @@ describe("Filter to Expression End-to-End", () => {
 
   describe("Filter state updates and expression changes", () => {
     it("should update pending filters and build correct expression after apply", async () => {
-      const { result } = renderHook(() => useModel(), { wrapper: createWrapper() });
+      const { result } = renderHook(() => useModelWithFilters(), { wrapper: createWrapper() });
 
       // Update pending filters
       act(() => {
@@ -86,7 +96,7 @@ describe("Filter to Expression End-to-End", () => {
     });
 
     it("should add admin condition when province is set", async () => {
-      const { result } = renderHook(() => useModel(), { wrapper: createWrapper() });
+      const { result } = renderHook(() => useModelWithFilters(), { wrapper: createWrapper() });
 
       act(() => {
         result.current.setPendingFilters({ province: ["Maputo"] });
@@ -114,7 +124,7 @@ describe("Filter to Expression End-to-End", () => {
     });
 
     it("should update numeric filter range and build correct expression", async () => {
-      const { result } = renderHook(() => useModel(), { wrapper: createWrapper() });
+      const { result } = renderHook(() => useModelWithFilters(), { wrapper: createWrapper() });
 
       act(() => {
         result.current.setPendingFilters({ population: [100, 500] });
@@ -141,7 +151,7 @@ describe("Filter to Expression End-to-End", () => {
     });
 
     it("should combine multiple filter changes correctly", async () => {
-      const { result } = renderHook(() => useModel(), { wrapper: createWrapper() });
+      const { result } = renderHook(() => useModelWithFilters(), { wrapper: createWrapper() });
 
       act(() => {
         result.current.setPendingFilters({
@@ -177,7 +187,7 @@ describe("Filter to Expression End-to-End", () => {
 
   describe("Reset filters", () => {
     it("should reset all filters to defaults", async () => {
-      const { result } = renderHook(() => useModel(), { wrapper: createWrapper() });
+      const { result } = renderHook(() => useModelWithFilters(), { wrapper: createWrapper() });
 
       // First, change some filters
       act(() => {

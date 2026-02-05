@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { useQuery, useQueries } from '@tanstack/react-query';
 import { ModelProvider } from '@/utils/context/model';
 import { ContextualLayersProvider } from '@/utils/context/contextual-layers';
+import { FiltersProvider } from '@/utils/context/filters';
 import { Flex, Box, IconButton, Skeleton } from '@chakra-ui/react';
 import MainMap from '@/components/map';
 import { LuPanelRightOpen, LuPanelLeftOpen } from 'react-icons/lu';
@@ -100,39 +101,41 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
 
   return (
     <ContextualLayersProvider layers={layers}>
-      <ModelProvider model={modelData}>
-        <Flex id='container' width="full" height='full' position="relative">
-          <MainPanel isOpen={isOpen} />
-          {/* Toggle Button Tab */}
-          <Box
-            position="absolute"
-            left={isOpen ? ControlPanelWidth : 0}
-            top="8"
-            transform="translateY(-50%)"
-            zIndex={1000}
-            transition={`left ${AnimationTime} ease`}
-            border='1px solid'
-            borderColor='panelBorder'
-            borderLeft='none'
-          >
-            <IconButton
-              aria-label={isOpen ? 'Collapse panel' : 'Expand panel'}
-              onClick={() => setIsOpen(!isOpen)}
-              variant="solid"
-              size="sm"
-              bg='panelBg'
+      <FiltersProvider filterDefs={modelData.filters}>
+        <ModelProvider model={modelData}>
+          <Flex id='container' width="full" height='full' position="relative">
+            <MainPanel isOpen={isOpen} />
+            {/* Toggle Button Tab */}
+            <Box
+              position="absolute"
+              left={isOpen ? ControlPanelWidth : 0}
+              top="8"
+              transform="translateY(-50%)"
+              zIndex={1000}
+              transition={`left ${AnimationTime} ease`}
+              border='1px solid'
+              borderColor='panelBorder'
               borderLeft='none'
-              borderRadius={0}
             >
-              {isOpen ? <LuPanelRightOpen stroke='gray' /> : <LuPanelLeftOpen stroke='gray' />}
-            </IconButton>
-          </Box>
+              <IconButton
+                aria-label={isOpen ? 'Collapse panel' : 'Expand panel'}
+                onClick={() => setIsOpen(!isOpen)}
+                variant="solid"
+                size="sm"
+                bg='panelBg'
+                borderLeft='none'
+                borderRadius={0}
+              >
+                {isOpen ? <LuPanelRightOpen stroke='gray' /> : <LuPanelLeftOpen stroke='gray' />}
+              </IconButton>
+            </Box>
 
-          <Box transition={`width ${AnimationTime} ease`} height='full' width='full'>
-            <MainMap main={modelData.main} />
-          </Box>
-        </Flex>
-      </ModelProvider>
+            <Box transition={`width ${AnimationTime} ease`} height='full' width='full'>
+              <MainMap main={modelData.main} />
+            </Box>
+          </Flex>
+        </ModelProvider>
+      </FiltersProvider>
     </ContextualLayersProvider>
   );
 };
