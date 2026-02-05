@@ -63,8 +63,8 @@ export const Header = ({
     >
       <Flex mx="auto" justify="space-between" align="center">
         {/* Logo Section - Left */}
-        <Flex align="center" gap={3}>
-          <NextLink href="/">
+        <NextLink href="/">
+          <Flex align="center" gap={3}>
             <Image
               src={logoSrc}
               alt="Logo"
@@ -86,8 +86,8 @@ export const Header = ({
                 Proenergia+ IEP
               </Text>
             </Heading>
-          </NextLink>
-        </Flex>
+          </Flex>
+        </NextLink>
 
         {/* Navigation Items - Right */}
         <HStack fontFamily="body" gap={6}>
