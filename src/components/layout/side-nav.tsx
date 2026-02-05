@@ -19,15 +19,13 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
 
   return (
     <Box
-      width={16}
       height="100%"
       bg="navBg"
-      borderRight="1px solid black"
+      borderRight="1px solid"
       borderColor="panelBorder"
-      top={16}
       zIndex={100}
     >
-      <VStack gap={0} align="stretch">
+      <VStack p={2} gap={2} align="center">
         {models.map((model) => {
           const isActive = String(model.id) === currentSlug;
           const iconPath = getIconPath(model.id);
@@ -39,14 +37,13 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
               style={{ textDecoration: 'none' }}
             >
               <Box
-                m={2}
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
-                border="1px solid black"
+                rounded="sm"
                 width={12}
                 height={12}
-                bg={isActive ? 'uiPoint' : 'transparent'}
+                bg={isActive ? "yellow.muted" : "transparent"}
                 cursor="pointer"
                 transition="all 0.2s"
                 _hover={{
@@ -57,8 +54,8 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
                   <Image
                     src={iconPath}
                     alt={model.name}
-                    width={24}
-                    height={24}
+                    width={20}
+                    height={20}
                   />
                 ) : (
                   model.name

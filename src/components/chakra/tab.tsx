@@ -10,7 +10,7 @@ const Tab = ({ items }: TabProps) => {
     <Tabs.Root
       defaultValue={items[0].id}
       fitted
-      // variant={'plain'}
+      variant="line"
     >
       <Tabs.List>
         {items.map(item => <Tabs.Trigger

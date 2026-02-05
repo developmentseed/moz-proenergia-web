@@ -25,14 +25,14 @@ const MainPanel = ({ isOpen }: { isOpen: boolean }) => {
     position="relative"
     bg="panelBg"
     height='full'
-    borderRightWidth={'1px'}
+    borderRightWidth={isOpen ? '1px' : 0}
     borderRightStyle={'solid'}
     borderRightColor='panelBorder'
     transition={`width ${AnimationTime} ease`}
     width={isOpen ? ControlPanelWidth : 0}
             >
     <Box width={ControlPanelWidth} height='full' overflowY='auto'>
-      <Box mb={4} mt={2} p={4}>
+      <Box p={4}>
         <Text textStyle='subTitle'>Model</Text>
         <Heading as={'h2'} textStyle='modelTitle'> {model.title} </Heading>
         <Select title={'Scenario'} items={scenarioItems} value={scenarioId} onChange={onChange} />

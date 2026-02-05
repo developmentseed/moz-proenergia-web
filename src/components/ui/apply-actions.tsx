@@ -11,17 +11,22 @@ export const ApplyActions = () => {
   return (
     <Box
       width='100%'
+      display="flex"
+      gap="4"
     >
+      <Button flex="1" disabled>
+        Reset
+      </Button>
       <Button
-        colorScheme="blue"
-        width="full"
+        flex="1"
+        colorPalette="yellow"
         onClick={applyPendingChanges}
         loading={isLoading}
         loadingText={'Loading Summary data'}
         disabled={!hasPendingChanges}
         fontFamily={'body'}
       >
-        {hasPendingChanges? 'Apply Changes' : 'No pending change'}
+        Apply
       </Button>
     </Box>
   );
