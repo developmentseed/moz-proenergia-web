@@ -83,8 +83,7 @@ const PanelHeader = ({ title, subtitle }: PanelHeaderProps) => (
     width="100%"
     px={4}
     py={2}
-    borderBottom="1px solid"
-    borderColor="panelBorder"
+    _open={{ borderBottom: "1px solid", borderColor: "panelBorder" }}
   >
     <Text textStyle="subTitle">{subtitle}</Text>
     <Text textStyle="modelTitle">{title}</Text>
@@ -114,11 +113,11 @@ const formatValue = (value: string | number) => {
 
 const tableCellStyleProps = {
   py: 1,
-  px: 2,
+  px: 4,
 };
 const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
   return (
-    <Box maxHeight={300} width="100%" overflowY="auto">
+    <Box maxHeight={400} width="100%" overflowY="auto" pb={4}>
       {isLoading && (
         <Box display="flex" alignItems="center" justifyContent="center" py={8}>
           <Spinner size="xl" />
@@ -136,7 +135,7 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
       )}
 
       {!isLoading && !isError && data && (
-        <Table.Root>
+        <Table.Root size="sm">
           <Table.Body>
             {data.map((row) => {
               if (row.type === "flat") {
@@ -144,16 +143,15 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
                   <Table.Row key={row.key} bg="panelBg">
                     <Table.Cell {...tableCellStyleProps}>
                       {" "}
-                      <Text textStyle="tableAttr">
-                        {" "}
-                        {row.label}
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <Text textStyle="tableAttr">{row.label}</Text>
                         {row.description && (
                           <InfoTip content={row.description} />
                         )}
-                      </Text>{" "}
+                      </Box>
                     </Table.Cell>
                     <Table.Cell {...tableCellStyleProps}>
-                      <Text textStyle="tableValue">
+                      <Text textStyle="tableValue" textAlign="right">
                         {formatValue(row.value)} {row.unit}
                       </Text>
                     </Table.Cell>
@@ -165,11 +163,10 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
               return [
                 <Table.Row key={row.label} bg="gray.200">
                   <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
-                    <Text textStyle="tableAttr">
-                      {" "}
-                      {row.label}
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Text textStyle="tableAttr"> {row.label}</Text>
                       <InfoTip content={row.description} />
-                    </Text>
+                    </Box>
                   </Table.Cell>
                 </Table.Row>,
                 ...row.value.map((item) => (
@@ -181,7 +178,7 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
                       </Text>
                     </Table.Cell>
                     <Table.Cell {...tableCellStyleProps}>
-                      <Text textStyle="tableValue">
+                      <Text textStyle="tableValue" textAlign="right">
                         {formatValue(item.value)} {row.unit}
                       </Text>
                     </Table.Cell>
@@ -370,8 +367,8 @@ const SummaryPanel = ({
   return (
     <Box
       position="absolute"
-      top="10"
-      minWidth={350}
+      top="4"
+      minWidth={"350px"}
       {...mapControlCommonStyleProps}
       zIndex={controlZIndex}
     >

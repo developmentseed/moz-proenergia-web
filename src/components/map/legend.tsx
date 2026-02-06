@@ -10,7 +10,7 @@ export function Legend({ items }: LegendProps) {
   return (
     <Box
       position="absolute"
-      bottom={12}
+      bottom={10}
       p={2}
       {...mapControlCommonStyleProps}
       zIndex={controlZIndex}

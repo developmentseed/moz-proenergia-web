@@ -140,7 +140,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
                 onClick={() => setIsOpen(!isOpen)}
                 variant="solid"
                 size="sm"
-                bg={isOpen ? "panelBg" : "navBg"}
+                bg="panelBg"
                 borderLeft="none"
                 borderRadius={0}
               >

@@ -9,7 +9,7 @@ export const textStyles = defineTextStyles({
         fontFamily: "mono",
         fontSize: "xs",
         fontWeight: 400,
-        letterSpacing: "1.2px",
+        letterSpacing: "0.8px",
         textTransform: 'uppercase'
     }
   },
@@ -38,6 +38,8 @@ export const textStyles = defineTextStyles({
       fontFamily: "mono",
       color: "fg.muted",
       fontWeight: 300,
+      fontSize: "xs",
+      letterSpacing: "0.8px",
       textTransform: "uppercase"
     },
   },

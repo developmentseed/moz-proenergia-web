@@ -30,10 +30,13 @@ const MainPanel = ({ isOpen }: { isOpen: boolean }) => {
       borderRightColor="panelBorder"
       transition={`width ${AnimationTime} ease`}
       width={isOpen ? ControlPanelWidth : 0}
-      display="flex"
-      flexDirection="column"
     >
-      <Box width={ControlPanelWidth}>
+      <Box
+        width={ControlPanelWidth}
+        display="flex"
+        flexDirection="column"
+        height="100%"
+      >
         <Box p={4}>
           <Text textStyle="subTitle">Model</Text>
           <Heading as={"h2"} textStyle="modelTitle">

@@ -6,7 +6,7 @@ import {
   Collapsible,
   Text,
 } from "@chakra-ui/react";
-import { LuChevronUp, LuLayers, LuFilter, LuSettings2 } from "react-icons/lu";
+import { LuChevronUp, LuLayers, LuSettings2 } from "react-icons/lu";
 import { FilterControl } from "./filters/filter-control";
 import { LayerControl } from "./layers/layer-control";
 import { useModel } from "@/utils/context/model";
@@ -153,12 +153,13 @@ const ControlsPanel = () => {
   );
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      p={4}
-    >
-      <Box overflowY="auto">
+    <Box p={4} pr={2} h="full">
+      <Box
+        overflowY="auto"
+        h="calc(100% - 3.5rem - 1px)"
+        scrollbarGutter="stable"
+        scrollbarWidth="thin"
+      >
         {/* put collapsible groups first */}
         {collapsibleGroups.map((group) => (
           <Box key={group.title} mb={4}>
@@ -177,7 +178,7 @@ const ControlsPanel = () => {
           </Box>
         ))}
       </Box>
-      <Box position="sticky" bottom={0} width="full" py={4} my={-4} bg="panelBg" >
+      <Box my={4} pr={2}>
         <ApplyActions />
       </Box>
     </Box>

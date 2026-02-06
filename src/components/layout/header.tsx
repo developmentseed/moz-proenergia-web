@@ -24,7 +24,7 @@ const defaultNavigationItems: NavigationItem[] = [
   { label: "Explorer", href: "/model/1" },
   { label: "Downloads", href: "/downloads" },
   { label: "About", href: "/about" },
-  { label: "SDIDataPortal", href: "https://developmentseed.org" },
+  { label: "SDIDataPortal", href: "https://proenergia-staging.ds.io/admin/" },
   { label: "Login", href: "modal" },
 ];
 
