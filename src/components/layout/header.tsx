@@ -21,10 +21,10 @@ interface HeaderProps {
 }
 
 const defaultNavigationItems: NavigationItem[] = [
-  { label: "Explorer", href: "/model/1" },
+  { label: "Explorer", href: "/models" },
   { label: "Downloads", href: "/downloads" },
   { label: "About", href: "/about" },
-  { label: "SDIDataPortal", href: "https://proenergia-staging.ds.io/admin/" },
+  { label: "SDI Admin", href: "https://proenergia-staging.ds.io/admin/" },
   { label: "Login", href: "modal" },
 ];
 
@@ -38,9 +38,9 @@ export const Header = ({
   const isActive = (href: string) => {
     if (href === "modal") return false;
     // For /model/* paths, match any model page to Explorer
-    if (href.startsWith("/model/") && pathname.startsWith("/model/"))
+    if (href.startsWith("/models") && pathname.startsWith("/model/"))
       return true;
-    return pathname === href;
+    return pathname === href + "/";
   };
 
   const handleLinkClick = (href: string, e: React.MouseEvent) => {
@@ -110,10 +110,11 @@ export const Header = ({
                 <Link
                   fontSize="sm"
                   fontWeight={active ? "bold" : "medium"}
-                  color={active ? "fg" : "#A1A1AA"}
+                  color={active ? "fg" : "fg.muted"}
                   transition="color 0.2s"
                   onClick={(e) => handleLinkClick(item.href, e)}
                   asChild
+                  _hover={{ textDecoration: "none", outline: "none"}}
                 >
                   <NextLink href={item.href}>{item.label}</NextLink>
                 </Link>

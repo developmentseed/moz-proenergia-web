@@ -16,6 +16,7 @@ const Modal = ({ item, modalTitle, modalContent }: ModalProps) => {
         variant="plain"
         fontSize="sm"
         fontWeight="medium"
+        color="fg.muted"
       >
         {item.label}
       </Button>
