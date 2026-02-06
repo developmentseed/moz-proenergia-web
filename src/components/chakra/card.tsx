@@ -12,7 +12,10 @@ const HighlightText = ({
     return <>{text}</>;
   }
 
-  const regex = new RegExp(`(${highlight.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+  const regex = new RegExp(
+    `(${highlight.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+    "gi",
+  );
   const parts = text.split(regex);
 
   return (
@@ -24,22 +27,32 @@ const HighlightText = ({
           </Box>
         ) : (
           part
-        )
+        ),
       )}
     </>
   );
 };
 
-export const ModelCard = ({ title, description }: { title: string, description: string}) => {
-  return <Card.Root size="md" borderRadius={0}>
-    <Card.Header>
-      <Heading size="md"> {title} </Heading>
-    </Card.Header>
-    <Card.Body color="fg.muted">
-      {description}
-    </Card.Body>
-  </Card.Root>;
-
+export const ModelCard = ({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) => {
+  return (
+    <Card.Root
+      size="md"
+      height="full"
+      bg="bg.muted"
+      _hover={{ bg: "yellow.subtle" }}
+    >
+      <Card.Header>
+        <Heading size="md"> {title} </Heading>
+      </Card.Header>
+      <Card.Body color="fg.muted">{description}</Card.Body>
+    </Card.Root>
+  );
 };
 
 export const DownloadDataCard = ({
@@ -77,10 +90,17 @@ export const DownloadDataCard = ({
         </p>
       </Card.Body>
       <Card.Footer>
-        <a href={downloadUrl} download >
-          <Box fontFamily='heading' display='flex' alignItems='center' textDecoration={"underline"}>
+        <a href={downloadUrl} download>
+          <Box
+            fontFamily="heading"
+            display="flex"
+            alignItems="center"
+            textDecoration={"underline"}
+          >
             Download
-            <Box pl={2}><LuDownload /></Box>
+            <Box pl={2}>
+              <LuDownload />
+            </Box>
           </Box>
         </a>
       </Card.Footer>

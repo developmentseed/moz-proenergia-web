@@ -16,7 +16,7 @@ export default function ModelCards() {
   });
 
   return (
-    <SimpleGrid columns={3} padding={2} gap={2}>
+    <SimpleGrid columns={3} py={6} gap={6}>
       {models?.map(e =>
         <Link key={e.id} href ={`/model/${e.id}`}>
           <Card title={e.name} description = {e.description} />

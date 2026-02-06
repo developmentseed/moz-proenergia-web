@@ -5,7 +5,12 @@ import { useQuery, useQueries } from "@tanstack/react-query";
 import { ModelProvider } from "@/utils/context/model";
 import { ContextualLayersProvider } from "@/utils/context/contextual-layers";
 import { FiltersProvider } from "@/utils/context/filters";
-import { Flex, Box, IconButton, Center, Skeleton, Text } from "@chakra-ui/react";
+import {
+  Flex,
+  Box,
+  IconButton,
+  Skeleton,
+} from "@chakra-ui/react";
 import NextLink from "next/link";
 import MainMap from "@/components/map";
 import { LuPanelRightOpen, LuPanelLeftOpen } from "react-icons/lu";
@@ -29,7 +34,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
 
   // Query 1: Model metadata
   const { data: modelCore } = useQuery({
-    queryKey: ['modelMetadata', modelId],
+    queryKey: ["modelMetadata", modelId],
     queryFn: async () => {
       const apiModel = await fetchModelMetadata(modelId);
       return transformModelCore(apiModel);
@@ -95,11 +100,25 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   // @TODO: A very hacky way of telling users that the data doesn't have related scenarios
   // Assuming /vectors endpoints succeeded
   if (modelCore && !defaultScenarioId && layers) {
-    return <Box h="full" w="full" display={'flex'} justifyContent={'center'} alignItems='center' flexDirection={'column'}>
-      <Box>This data doesnt look like it is ready. Make sure there are scenarios related to this model.
+    return (
+      <Box
+        h="full"
+        w="full"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        flexDirection="column"
+      >
+        <Box>
+          This data doesnt look like it is ready. Make sure there are scenarios
+          related to this model.
+        </Box>
+        <Box mt={4} textDecoration="underline">
+          <NextLink href="/models">Return to models</NextLink>
+        </Box>
       </Box>
-      <Box><NextLink href='/'> Going back to home</NextLink></Box></Box>;
-  };
+    );
+  }
   // @TODO: detach layers
   if (!modelData || !layers) {
     return (
@@ -116,12 +135,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     <ContextualLayersProvider layers={layers}>
       <FiltersProvider filterDefs={modelData.filters}>
         <ModelProvider model={modelData}>
-          <Flex
-            id="container"
-            width="full"
-            height="full"
-            position="relative"
-          >
+          <Flex id="container" width="full" height="full" position="relative">
             <MainPanel isOpen={isOpen} />
             {/* Toggle Button Tab */}
             <Box
