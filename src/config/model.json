@@ -4,15 +4,15 @@
 },
 {
   "model": 2,
-  "icon": "grid-3x3.svg"
+  "icon": "tractor.svg"
 },
 {
   "model": 3,
-  "icon": "landmark.svg"
+  "icon": "grid-3x3.svg"
 },
 {
   "model": 4,
-  "icon": "tractor.svg"
+  "icon": "landmark.svg"
 },{
   "model": 5,
   "icon": "cooking-pot.svg"

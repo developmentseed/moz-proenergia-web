@@ -14,10 +14,8 @@ const Modal = ({ item, modalTitle, modalContent }: ModalProps) => {
       <Button
         padding={0}
         variant="plain"
-        fontSize="md"
+        fontSize="sm"
         fontWeight="medium"
-        color="gray.700"
-        _hover={{ color: 'blue.600', }}
       >
         {item.label}
       </Button>

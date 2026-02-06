@@ -6,58 +6,58 @@ export const textStyles = defineTextStyles({
     description: 'Small text that comes above the model title',
     value: {
         color: "fg.muted",
-        fontFamily: "var(--font-dm-mono)",
-        fontSize: "0.75rem",
+        fontFamily: "mono",
+        fontSize: "xs",
         fontWeight: 400,
-        letterSpacing: "1.2px",
+        letterSpacing: "0.8px",
         textTransform: 'uppercase'
     }
   },
   modelTitle: {
     description: 'big text for model title, analysis title',
     value: {
-      color: 'text.fg',
-      fontFamily: "var(--font-dm-sans)",
-      fontSize: '1.5rem',
-      fontWeight: 900,
+      color: 'fg',
+      fontFamily: "body",
+      fontSize: "xl",
+      fontWeight: 600,
       lineHeight: '2rem'
     }
   },
   collapsibleGroupTitle: {
     description: "Title for collapsible area",
     value: {
-      fontFamily: "var(--font-dm-sans)",
-      color: "text.fg",
-      fontSize: "1.125rem",
+      fontFamily: "body",
+      color: "fg",
+      fontSize: "sm",
       fontWeight: 600,
-      lineHeight: "1.75rem"
     },
   },
   allCapLabel: {
     description: "All Cap Labels for filters",
     value: {
-      fontFamily: "var(--font-dm-mono)",
-      color: "gray.fg",
+      fontFamily: "mono",
+      color: "fg.muted",
       fontWeight: 300,
+      fontSize: "xs",
+      letterSpacing: "0.8px",
       textTransform: "uppercase"
     },
   },
   sliderLabel: {
-    description: "labe for text range sliders",
+    description: "label for text range sliders",
     value: {
-      color: "text.fg",
-      fontFamily: "var(--font-dm-sans)",
-      fontSize: "0.875rem",
+      color: "fg",
+      fontFamily: "body",
+      fontSize: "sm",
       fontWeight: 600,
-      lineHeight: "1.25rem"
     }
   },
   sliderTextLabel: {
-    description: "labe for text input in text range sliders",
+    description: "label for text input in text range sliders",
     value: {
-    color: "text.fg",
-      fontFamily: "var(--font-dm-mono)",
-      fontSize: "0.875rem",
+    color: "fg",
+      fontFamily: "mono",
+      fontSize: "xs",
       fontWeight: 400,
       lineHeight: "1.25rem"
     }
@@ -65,8 +65,8 @@ export const textStyles = defineTextStyles({
   checkboxOption: {
     description: "options for checkbox",
     value: {
-      color: "text.fg",
-      fontFamily: "var(--font-dm-sans)",
+      color: "fg",
+      fontFamily: "body",
       fontSize: "0.75rem",
       fontWeight: 500,
       lineHeight: "1rem"
@@ -76,8 +76,8 @@ export const textStyles = defineTextStyles({
     description: "text to display range slider value",
     value: {
       color: "fg.muted",
-      fontFamily: "var(--font-dm-mono)",
-      fontSize: "0.75rem",
+      fontFamily: "mono",
+      fontSize: "xs",
       fontWeight: 400,
       lineHeight: "1rem"
     }
@@ -85,9 +85,9 @@ export const textStyles = defineTextStyles({
   tableAttr: {
     description: "table attribution name",
     value: {
-      color: 'text.fg',
-      fontFamily:  "var(--font-dm-sans)",
-      fontSize: '0.75rem',
+      color: 'fg',
+      fontFamily:  "body",
+      fontSize: "xs",
       fontWeight: 600,
       lineHeight: '0.85rem'
     }
@@ -96,8 +96,8 @@ export const textStyles = defineTextStyles({
     description: "table value",
     value: {
       color: 'fg.muted',
-      fontFamily:  "var(--font-dm-sans)",
-      fontSize: '0.75rem',
+      fontFamily:  "body",
+      fontSize: "xs",
       fontWeight: 400,
       lineHeight: '0.85rem'
     }
@@ -108,14 +108,14 @@ export const system = createSystem(defaultConfig, {
   theme: {
     tokens: {
       fonts: {
-        heading: { value: "var(--font-dm-mono)" },
+        heading: { value: "var(--font-dm-sans)" },
         body: { value: "var(--font-dm-sans)" },
+        mono: { value: "var(--font-dm-mono)" },
       },
       colors: {
-        navBg: { value: "{colors.bg.emphasized}" },
-        panelBg: { value: "{colors.bg.muted}" },
+        navBg: { value: "{colors.bg.subtle}" },
+        panelBg: { value: "{colors.bg}" },
         panelBorder: { value: "{colors.border.emphasized}" },
-        uiPoint: { value: "{colors.yellow.muted}" },
       }
     },
     textStyles

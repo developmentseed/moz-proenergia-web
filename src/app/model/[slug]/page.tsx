@@ -76,7 +76,7 @@ export default async function ModelPage({
   // const models = queryClient.getQueryData<ModelGroupMetadata[]>(['models'])!;
 
   return (
-    <Flex height="calc(100vh - 74px)" width="100%">
+    <Flex h="calc(100vh - 3.5rem - 1px)" maxH="calc(100vh - 3.5rem - 1px)" overflow="hidden" width="100%">
       <Suspense>
         <SideNav models={models} currentSlug={slug} />
         <Box id='main-panel' width='full' height="100%">
