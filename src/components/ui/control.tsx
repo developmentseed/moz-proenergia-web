@@ -153,7 +153,7 @@ const ControlsPanel = () => {
   );
 
   return (
-    <Box p={4} pr={2} h="full">
+    <Box p={4}h="full">
       <Box
         overflowY="auto"
         h="calc(100% - 3.5rem - 1px)"
@@ -178,7 +178,7 @@ const ControlsPanel = () => {
           </Box>
         ))}
       </Box>
-      <Box my={4} pr={2}>
+      <Box my={4}>
         <ApplyActions />
       </Box>
     </Box>
