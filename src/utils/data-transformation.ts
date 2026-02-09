@@ -110,7 +110,7 @@ export function deriveSource(id: string, filePath: string) {
     id,
     type: 'vector' as const,
     minzoom: mapConfig.minZoom,
-    maxzoom: mapConfig.maxZoom,
+    // maxzoom: mapConfig.maxZoom,
     url: `pmtiles://${MEDIA_URL_PREFIX}${pmtilesUrl}`,
   };
 }
