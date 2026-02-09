@@ -1,4 +1,5 @@
 import { LayerProps } from "react-map-gl/maplibre";
+import { interpolateWarm } from 'd3-scale-chromatic';
 import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
 import { api, MEDIA_URL_PREFIX, DEFAULT_COL } from '@/utils/api';
 import mapConfig from '@/config/map.json';
@@ -43,6 +44,7 @@ export interface ApiVectorResult {
   is_public: boolean;
   is_approved: boolean;
   raw_file: string;
+  color?: string;
 }
 
 export interface ApiVectorsResponse {
@@ -113,7 +115,7 @@ export function deriveSource(id: string, filePath: string) {
   };
 }
 
-export function deriveLayerStyles(sourceId: string): { circleLayer: LayerProps; lineLayer: LayerProps, polygonLayer:LayerProps } {
+export function deriveLayerStyles(sourceId: string, color: string): { circleLayer: LayerProps; lineLayer: LayerProps, polygonLayer:LayerProps } {
   return {
     circleLayer: {
       id:`${sourceId}-circle-layer`,
@@ -122,10 +124,10 @@ export function deriveLayerStyles(sourceId: string): { circleLayer: LayerProps; 
       type: 'circle',
       //@TODO: style
       "paint": {
-        "circle-color":  "#377eb8",
+        "circle-color": color,
         "circle-radius": 2
       },
-                filter: ["==", ["geometry-type"], "Point"],
+      filter: ["==", ["geometry-type"], "Point"],
     },
     lineLayer: {
       id:`${sourceId}-line-layer`,
@@ -134,7 +136,7 @@ export function deriveLayerStyles(sourceId: string): { circleLayer: LayerProps; 
       type: 'line',
       //@TODO: style
       "paint": {
-        "line-color":  "#377eb8"
+        "line-color":  color
       },
       filter: ["==", ["geometry-type"], "LineString"],
     },
@@ -145,7 +147,7 @@ export function deriveLayerStyles(sourceId: string): { circleLayer: LayerProps; 
       type: 'fill',
       //@TODO: style
       "paint": {
-        "fill-color":  "#377eb8"
+        "fill-color": color
       },
       filter: ["==", ["geometry-type"], "Polygon"]
     },
@@ -176,7 +178,12 @@ export async function fetchModelMetadata(slug: string): Promise<ApiModelResponse
 export async function fetchVectors(): Promise<ApiVectorResult[]> {
   try {
     const { data } = await api.get('vector/');
-    return data.results;
+    const results: ApiVectorResult[] = data.results;
+    return results.map((v, idx) => ({
+      ...v,
+      // @TODO would this come from endpoint at some point?
+      color: interpolateWarm(idx / results.length),
+    }));
   } catch(e) {
     console.error(e);
     throw new Error('Failed to fetch vectors');
@@ -267,8 +274,8 @@ export function transformVectorsToLayers(apiVectors: ApiVectorResult[]): Layer[]
       id: sourceId,
       label: v.name,
       description: v.description,
-      source: deriveSource(sourceId, v.raw_file),
-      ...deriveLayerStyles(sourceId),
+      filePath: v.raw_file,
+      color: v.color,
     };
   });
 }

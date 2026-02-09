@@ -1,5 +1,6 @@
 import { Source, Layer as MapLayer } from 'react-map-gl/maplibre';
 import { useContextualLayers } from "@/utils/context/contextual-layers";
+import { deriveSource, deriveLayerStyles } from "@/utils/data-transformation";
 
 interface ContextualLayerProps {
   mainId: string;
@@ -10,10 +11,12 @@ export const ContextualLayer = ({ mainId }:ContextualLayerProps) => {
     const contextualLayers = layers.filter(l => activeLayers.includes(l.id));
   return <>
     {contextualLayers.map(layer => {
-    return <Source key={layer.id} {...layer.source} >
-      <MapLayer id={layer.id} {...layer.circleLayer} beforeId={mainId} />
-      <MapLayer id={layer.id} {...layer.lineLayer} beforeId={mainId} />
-      <MapLayer id={layer.id} {...layer.polygonLayer} beforeId={mainId} />
+    const source = deriveSource(layer.id, layer.filePath);
+    const { circleLayer, lineLayer, polygonLayer } = deriveLayerStyles(layer.id, layer.color!);
+    return <Source key={layer.id} {...source} >
+      <MapLayer {...circleLayer} beforeId={mainId} />
+      <MapLayer {...lineLayer} beforeId={mainId} />
+      <MapLayer {...polygonLayer} beforeId={mainId} />
     </Source>;
   })}
   </>;

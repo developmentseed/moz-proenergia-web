@@ -1,4 +1,4 @@
-import { LayerProps, type SourceProps } from "react-map-gl/maplibre";
+import type { SourceProps } from "react-map-gl/maplibre";
 export interface ItemUnit {
   value: string;
   label: string;
@@ -55,10 +55,7 @@ export interface Layer {
   id: string;
   label: string;
   description?: string;
-  source: SourceProps;
-  circleLayer: LayerProps;
-  lineLayer: LayerProps;
-  polygonLayer: LayerProps;
+  filePath: string;
   downloadLink?: string;
   color?: string;
 }
