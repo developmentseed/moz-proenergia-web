@@ -50,7 +50,8 @@ const MainMap = ({ main }: MainMapProps) => {
       initialViewState={{
             longitude: lng,
             latitude: lat,
-            zoom: zoom
+            zoom: zoom,
+            padding: { top: 20, bottom: 20, left: 20, right: 20 },
           }}
       style={{ width: '100%', height: '100%' }}
       onClick={onClick}
