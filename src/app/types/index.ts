@@ -58,6 +58,7 @@ export interface Layer {
   source: SourceProps;
   circleLayer: LayerProps;
   lineLayer: LayerProps;
+  polygonLayer: LayerProps;
   downloadLink?: string;
   color?: string;
 }

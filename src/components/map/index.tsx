@@ -44,7 +44,7 @@ const MainMap = ({ main }: MainMapProps) => {
   const resetCluster = useCallback(() => {
     setSelected(null);
   }, [setSelected]);
-
+  console.log(main);
   return <Box w='100%' h='100%' className="map-container" position="relative">
     <Map
       initialViewState={{
@@ -56,7 +56,7 @@ const MainMap = ({ main }: MainMapProps) => {
       onClick={onClick}
       onMoveEnd={(e:ViewStateChangeEvent) => { setCoordinates({ lng: e.viewState.longitude, lat: e.viewState.latitude , zoom: e.viewState.zoom });}}
       mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
-      interactiveLayerIds={[main.id, main.id + 'bg']}
+      interactiveLayerIds={[main.id]}
         >
       <ContextualLayer mainId={main.id} />
       <MainLayer

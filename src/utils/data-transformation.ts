@@ -113,7 +113,7 @@ export function deriveSource(id: string, filePath: string) {
   };
 }
 
-export function deriveLayerStyles(sourceId: string): { circleLayer: LayerProps; lineLayer: LayerProps } {
+export function deriveLayerStyles(sourceId: string): { circleLayer: LayerProps; lineLayer: LayerProps, polygonLayer:LayerProps } {
   return {
     circleLayer: {
       id:`${sourceId}-circle-layer`,
@@ -124,7 +124,8 @@ export function deriveLayerStyles(sourceId: string): { circleLayer: LayerProps; 
       "paint": {
         "circle-color":  "#377eb8",
         "circle-radius": 2
-      }
+      },
+                filter: ["==", ["geometry-type"], "Point"],
     },
     lineLayer: {
       id:`${sourceId}-line-layer`,
@@ -134,7 +135,19 @@ export function deriveLayerStyles(sourceId: string): { circleLayer: LayerProps; 
       //@TODO: style
       "paint": {
         "line-color":  "#377eb8"
-      }
+      },
+      filter: ["==", ["geometry-type"], "LineString"],
+    },
+    polygonLayer: {
+      id:`${sourceId}-polygon-layer`,
+      source: sourceId,
+      'source-layer': mapConfig.sourceLayerName,
+      type: 'fill',
+      //@TODO: style
+      "paint": {
+        "fill-color":  "#377eb8"
+      },
+      filter: ["==", ["geometry-type"], "Polygon"]
     },
   };
 }
@@ -249,7 +262,7 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
 // Transform vectors to layers
 export function transformVectorsToLayers(apiVectors: ApiVectorResult[]): Layer[] {
   return apiVectors.map(v => {
-    const sourceId = String(v.id);
+    const sourceId = String(v.id) + 'vector-source';
     return {
       id: sourceId,
       label: v.name,
