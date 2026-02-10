@@ -175,10 +175,14 @@ export async function fetchModelMetadata(slug: string): Promise<ApiModelResponse
   }
 }
 
-export async function fetchVectors(modelId?: string): Promise<ApiVectorResult[]> {
+export async function fetchVectors(modelId?: string, token?: string): Promise<ApiVectorResult[]> {
   try {
     const endpoint = modelId? `vector/?model=${modelId}`: 'vector/';
-    const { data } = await api.get(endpoint);
+    const { data } = await api.get(endpoint, {
+        ...(token && {
+        headers: { 'Authorization': `Token ${token}` }
+      })
+    });
     const results: ApiVectorResult[] = data.results;
 
     return results.map((v, idx) => ({

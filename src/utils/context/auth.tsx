@@ -2,7 +2,6 @@
 
 import { createContext, PropsWithChildren, useContext, useState } from "react";
 import { api } from '@/utils/api';
-import axios from 'axios';
 const TOKEN_KEY = "token";
 
 export interface LoginResponse {
