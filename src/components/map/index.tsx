@@ -44,13 +44,14 @@ const MainMap = ({ main }: MainMapProps) => {
   const resetCluster = useCallback(() => {
     setSelected(null);
   }, [setSelected]);
-  console.log(main);
+  
   return <Box w='100%' h='100%' className="map-container" position="relative">
     <Map
       initialViewState={{
             longitude: lng,
             latitude: lat,
-            zoom: zoom
+            zoom: zoom,
+            padding: { top: 20, bottom: 20, left: 20, right: 20 },
           }}
       style={{ width: '100%', height: '100%' }}
       onClick={onClick}
