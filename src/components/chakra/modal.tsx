@@ -5,11 +5,13 @@ import { type NavigationItem } from '../layout/header';
 type ModalProps = {
   item: NavigationItem;
   modalTitle: string;
+  isOpen: boolean;
   modalContent?: ReactNode
 }
 
-const Modal = ({ item, modalTitle, modalContent }: ModalProps) => {
-  return <Dialog.Root>
+const Modal = ({ item, modalTitle, isOpen, setIsModalOpen, modalContent }: ModalProps) => {
+
+  return <Dialog.Root open={isOpen} onOpenChange={(e) => setIsModalOpen(e.open)}>
     <Dialog.Trigger asChild>
       <Button
         padding={0}

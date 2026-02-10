@@ -4,6 +4,7 @@ import { Provider } from "@/components/chakra/provider";
 import ReactQueryProvider from "@/utils/context/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import Header from "@/components/layout/header";
+import { AuthProvider } from "@/utils/context/auth";
 import { DM_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -42,11 +43,13 @@ export default function RootLayout({
         <ReactQueryProvider>
           <NuqsAdapter>
             <Provider>
-              <Header />
-              <Box as="main" bg="bg">
-                {children}
-              </Box>
-              {/* <footer> Footer</footer> */}
+              <AuthProvider>
+                <Header />
+                <Box as="main" bg="bg">
+                  {children}
+                </Box>
+                {/* <footer> Footer</footer> */}
+              </AuthProvider>
             </Provider>
           </NuqsAdapter>
         </ReactQueryProvider>

@@ -6,6 +6,7 @@ import { Box, Heading, Flex, HStack, Text, Link } from "@chakra-ui/react";
 import NextLink from "next/link";
 import Modal from "../chakra/modal";
 import LoginForm from "./login-form";
+import { useAuth } from "@/utils/context/auth";
 import Image from "next/image";
 
 export interface NavigationItem {
@@ -34,6 +35,7 @@ export const Header = ({
 }: HeaderProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const pathname = usePathname();
+  const { login, isAuthenticated } = useAuth();
 
   const isActive = (href: string) => {
     if (href === "modal") return false;
@@ -46,8 +48,11 @@ export const Header = ({
   const handleLinkClick = (href: string, e: React.MouseEvent) => {
     if (href === "modal") {
       e.preventDefault();
-      setIsModalOpen(true);
+      // setIsModalOpen(true);
     }
+  };
+  const onModalClose = () => {
+      setIsModalOpen(false);
   };
 
   return (
@@ -97,9 +102,11 @@ export const Header = ({
               return (
                 <Modal
                   key={item.href}
+                  isOpen={isModalOpen}
                   item={item}
                   modalTitle={"Log in"}
-                  modalContent={<LoginForm />}
+                  setIsModalOpen={setIsModalOpen}
+                  modalContent={<LoginForm onSubmit={login} onClose={onModalClose} />}
                 />
               );
             }
