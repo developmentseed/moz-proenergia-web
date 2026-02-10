@@ -1,50 +1,66 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Stack,
   Input,
   Button,
   Text,
-  Link,
-  Flex,
   Field,
 } from '@chakra-ui/react';
+import { LoginResponse } from '@/utils/context/auth';
 
 interface LoginModalProps {
-  onSubmit?: (email: string, password: string) => void | Promise<void>;
+  onSubmit?: (username: string, password: string) => void | Promise<LoginResponse>;
   onClose?: () => void;
 }
 
 export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    if (!success) return;
+    const timer = setTimeout(() => {
+      onClose?.();
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [success, onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!email || !password) {
+    if (!username || !password) {
       setError('Please fill in all fields');
       return;
     }
-
     setIsLoading(true);
-
     try {
       if (onSubmit) {
-        await onSubmit(email, password);
+        await onSubmit(username, password);
       }
-      onClose?.();
+      setSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (success) {
+    return (
+      <Box p={4} fontFamily={'body'} textAlign="center">
+        <Box bg="green.50" color="green.700" p={4} borderRadius="md">
+          <Text fontWeight="bold" fontSize="md">Login successful!</Text>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box p={4} fontFamily={'body'}>
@@ -69,10 +85,10 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
           <Field.Root>
             <Field.Label>Email</Field.Label>
             <Input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
             />
           </Field.Root>

@@ -14,6 +14,7 @@ import {
 import NextLink from "next/link";
 import MainMap from "@/components/map";
 import { LuPanelRightOpen, LuPanelLeftOpen } from "react-icons/lu";
+import { useAuth } from "@/utils/context/auth";
 import {
   fetchModelMetadata,
   fetchVectors,
@@ -31,6 +32,7 @@ const AnimationTime = "0.3s";
 
 const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const [isOpen, setIsOpen] = useState(true);
+  const { token } = useAuth();
 
   // Query 1: Model metadata
   const { data: modelCore } = useQuery({
@@ -43,9 +45,9 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   // contextual layers : separate context
   // @TODO: reflect user authentication
   const { data: layers } = useQuery({
-    queryKey: ["vectors"],
+    queryKey: ["vectors", token],
     queryFn: async () => {
-      const apiVectors = await fetchVectors();
+      const apiVectors = await fetchVectors({ modelId, token });
       return transformVectorsToLayers(apiVectors);
     },
   });

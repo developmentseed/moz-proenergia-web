@@ -9,17 +9,17 @@ import { fetchVectors } from "@/utils/data-transformation";
 
 export default async function Page() {
 
-  const queryClient = new QueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: ['vector'],
-    queryFn: () => fetchVectors()
-  });
+  // const queryClient = new QueryClient();
+  // await queryClient.prefetchQuery({
+  //   queryKey: ['vector'],
+  //   queryFn: () => fetchVectors()
+  // });
 
   return (
     <Shell breadcrumb={[{ label: "Downloads" }]}>
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <DownloadList />
-      </HydrationBoundary>
+      {/* <HydrationBoundary state={dehydrate(queryClient)}> */}
+      <DownloadList />
+      {/* </HydrationBoundary> */}
     </Shell>
   );
 }
