@@ -175,10 +175,12 @@ export async function fetchModelMetadata(slug: string): Promise<ApiModelResponse
   }
 }
 
-export async function fetchVectors(): Promise<ApiVectorResult[]> {
+export async function fetchVectors(modelId?: string): Promise<ApiVectorResult[]> {
   try {
-    const { data } = await api.get('vector/');
+    const endpoint = modelId? `vector/?model=${modelId}`: 'vector/';
+    const { data } = await api.get(endpoint);
     const results: ApiVectorResult[] = data.results;
+
     return results.map((v, idx) => ({
       ...v,
       // @TODO would this come from endpoint at some point?

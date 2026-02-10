@@ -45,7 +45,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const { data: layers } = useQuery({
     queryKey: ["vectors"],
     queryFn: async () => {
-      const apiVectors = await fetchVectors();
+      const apiVectors = await fetchVectors(modelId);
       return transformVectorsToLayers(apiVectors);
     },
   });

@@ -44,7 +44,7 @@ const MainMap = ({ main }: MainMapProps) => {
   const resetCluster = useCallback(() => {
     setSelected(null);
   }, [setSelected]);
-  console.log(main);
+  
   return <Box w='100%' h='100%' className="map-container" position="relative">
     <Map
       initialViewState={{
