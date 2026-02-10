@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { ModelProvider } from "@/utils/context/model";
 import { ContextualLayersProvider } from "@/utils/context/contextual-layers";
@@ -33,6 +33,13 @@ const AnimationTime = "0.3s";
 const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const [isOpen, setIsOpen] = useState(true);
   const { token } = useAuth();
+
+  // Clear nuqs query params from the URL when leaving the explorer page
+  useEffect(() => {
+    return () => {
+      window.history.replaceState(null, '', window.location.pathname);
+    };
+  }, []);
 
   // Query 1: Model metadata
   const { data: modelCore } = useQuery({

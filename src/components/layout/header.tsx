@@ -51,7 +51,6 @@ export const Header = ({
   const handleLinkClick = (href: string, e: React.MouseEvent) => {
     if (href === "modal") {
       e.preventDefault();
-      // setIsModalOpen(true);
     }
   };
   const onModalClose = () => {
