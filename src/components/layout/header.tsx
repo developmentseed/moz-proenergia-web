@@ -7,6 +7,7 @@ import NextLink from "next/link";
 import Modal from "../chakra/modal";
 import LoginForm from "./login-form";
 import { useAuth } from "@/utils/context/auth";
+import LogoutButton from "../ui/logout-button";
 import Image from "next/image";
 
 export interface NavigationItem {
@@ -36,6 +37,8 @@ export const Header = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const pathname = usePathname();
   const { login, isAuthenticated } = useAuth();
+  // To show successful logout message
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const isActive = (href: string) => {
     if (href === "modal") return false;
@@ -99,6 +102,15 @@ export const Header = ({
           {navigationItems.map((item) => {
             const isModal = item.href === "modal";
             if (isModal) {
+              if ((isAuthenticated || loggingOut) && !isModalOpen) {
+                return (
+                  <LogoutButton
+                    key={item.href}
+                    onLogoutStart={() => setLoggingOut(true)}
+                    onLogoutEnd={() => setLoggingOut(false)}
+                  />
+                );
+              }
               return (
                 <Modal
                   key={item.href}
@@ -121,7 +133,7 @@ export const Header = ({
                   transition="color 0.2s"
                   onClick={(e) => handleLinkClick(item.href, e)}
                   asChild
-                  _hover={{ textDecoration: "none", outline: "none"}}
+                  _hover={{ textDecoration: "none", outline: "none" }}
                 >
                   <NextLink href={item.href}>{item.label}</NextLink>
                 </Link>

@@ -45,9 +45,9 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   // contextual layers : separate context
   // @TODO: reflect user authentication
   const { data: layers } = useQuery({
-    queryKey: ["vectors"],
+    queryKey: ["vectors", token],
     queryFn: async () => {
-      const apiVectors = await fetchVectors(modelId, token);
+      const apiVectors = await fetchVectors({ modelId, token });
       return transformVectorsToLayers(apiVectors);
     },
   });

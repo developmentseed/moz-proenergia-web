@@ -6,6 +6,7 @@ type ModalProps = {
   item: NavigationItem;
   modalTitle: string;
   isOpen: boolean;
+  setIsModalOpen: (open:boolean)=> void;
   modalContent?: ReactNode
 }
 
