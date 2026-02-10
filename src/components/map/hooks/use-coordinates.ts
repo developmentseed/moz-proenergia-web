@@ -1,8 +1,8 @@
 'use client';
 import { useQueryStates, parseAsFloat, throttle } from 'nuqs';
 
-const COORDS = [-18.841,35.57];
-const ZOOM = 5.5;
+const COORDS = [-18.76304, 36.78403];
+const ZOOM = 4.97;
 
 export function useCoordinates() {
   return useQueryStates({
