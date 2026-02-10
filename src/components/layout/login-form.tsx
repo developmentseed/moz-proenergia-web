@@ -83,7 +83,7 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
           )}
 
           <Field.Root>
-            <Field.Label>Email</Field.Label>
+            <Field.Label>Username</Field.Label>
             <Input
               type="text"
               placeholder="Enter your username"
