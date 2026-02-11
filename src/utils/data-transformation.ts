@@ -2,6 +2,7 @@ import { LayerProps } from "react-map-gl/maplibre";
 import { interpolateWarm } from 'd3-scale-chromatic';
 import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
 import { api, MEDIA_URL_PREFIX, DEFAULT_COL } from '@/utils/api';
+import { sortFilterOptions } from '@/config/filters';
 import mapConfig from '@/config/map.json';
 const ADMIN_COLUMNS = ['Admin_1', 'District', 'Posto', 'Localidade'];
 
@@ -225,7 +226,7 @@ export async function fetchFilterOptions(scenarioId: string | number, column: st
     if (data.type === 'numeric') {
       return [Math.floor(data.min), Math.ceil(data.max)];
     }
-    return Object.keys(data.values);
+    return sortFilterOptions(Object.keys(data.values));
   } catch(e) {
     console.warn(`fetchFilterOptions: ${column} failed, using fallback`, e);
     return [];
