@@ -1,5 +1,6 @@
-import { Box, VStack, HStack, Text } from '@chakra-ui/react';
+import { Box, VStack, HStack, Text, Separator } from '@chakra-ui/react';
 import { type MapItemUnit } from '@/app/types';
+import { useContextualLayers } from '@/utils/context/contextual-layers';
 import { controlZIndex, mapControlCommonStyleProps } from './control-constant';
 
 interface LegendProps {
@@ -7,6 +8,8 @@ interface LegendProps {
 }
 
 export function Legend({ items }: LegendProps) {
+  const { layers, activeLayers } = useContextualLayers();
+  const contextualLayers = layers.filter(l => activeLayers.includes(l.id));
   return (
     <Box
       position="absolute"
@@ -33,6 +36,24 @@ export function Legend({ items }: LegendProps) {
             <Text textStyle='tableValue'>{item.label}</Text>
           </HStack>
         ))}
+        {contextualLayers.length > 0 && (
+          <>
+            <Separator />
+            {contextualLayers.map((layer) => (
+              <HStack key={layer.id} gap={2}>
+                <Box
+                  w="3"
+                  h="3"
+                  bg={layer.color}
+                  borderRadius="100%"
+                  border='1px solid black'
+                  flexShrink={0}
+                />
+                <Text textStyle='tableValue'>{layer.label}</Text>
+              </HStack>
+            ))}
+          </>
+        )}
       </VStack>
     </Box>
   );
