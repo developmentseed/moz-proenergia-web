@@ -10,7 +10,7 @@ import { fetchVectors } from "@/utils/data-transformation";
 
 export const DownloadList = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { token } = useAuth();
+  const { token, isAuthenticated } = useAuth();
 
   const { data, isLoading } = useQuery({
     queryKey: ['vector', token],
@@ -21,6 +21,13 @@ export const DownloadList = () => {
     item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  if (!isAuthenticated) {
+        return (
+          <Center py={10}>
+            <Text>Access not allowed</Text>
+          </Center>
+    );
+  }
 
   if (isLoading) {
     return (
