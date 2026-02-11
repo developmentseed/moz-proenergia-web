@@ -4,6 +4,7 @@ import {
   type SliderValueChangeDetails,
   Box,
   Collapsible,
+  ScrollArea,
   Text,
 } from "@chakra-ui/react";
 import { LuChevronUp, LuLayers, LuSettings2 } from "react-icons/lu";
@@ -153,32 +154,34 @@ const ControlsPanel = () => {
   );
 
   return (
-    <Box p={4}h="full">
-      <Box
-        overflowY="auto"
-        h="calc(100% - 3.5rem - 1px)"
-        scrollbarGutter="stable"
-        scrollbarWidth="thin"
-      >
-        {/* put collapsible groups first */}
-        {collapsibleGroups.map((group) => (
-          <Box key={group.title} mb={4}>
-            <CollapsibleGroup collapsibleItem={group} />
-          </Box>
-        ))}
+    // To give space for scrollable area
+    <Box p={4} pr={0} h="full">
+      <ScrollArea.Root h="calc(100% - 3.5rem - 1px)">
+        <ScrollArea.Viewport>
+          <ScrollArea.Content spaceY="4" pr={4}>
+            {/* put collapsible groups first */}
+            {collapsibleGroups.map((group) => (
+              <Box key={group.title}>
+                <CollapsibleGroup collapsibleItem={group} />
+              </Box>
+            ))}
 
-        {/* numeric data doesn't need to be collapsible */}
-        {noCollapsibleGroups.map((matchingFilter) => (
-          <Box key={matchingFilter.id} mb={2}>
-            <FilterControlWrapper
-              filter={matchingFilter}
-              value={displayFilters[matchingFilter.id]}
-              setPendingFilters={setPendingFilters}
-            />
-          </Box>
-        ))}
-      </Box>
-      <Box my={4}>
+            {/* numeric data doesn't need to be collapsible */}
+            {noCollapsibleGroups.map((matchingFilter) => (
+              <Box key={matchingFilter.id}>
+                <FilterControlWrapper
+                  filter={matchingFilter}
+                  value={displayFilters[matchingFilter.id]}
+                  setPendingFilters={setPendingFilters}
+                />
+              </Box>
+            ))}
+          </ScrollArea.Content>
+        </ScrollArea.Viewport>
+        <ScrollArea.Scrollbar orientation="vertical" />
+        <ScrollArea.Corner bg="bg" />
+      </ScrollArea.Root>
+      <Box my={4} pr={4}>
         <ApplyActions />
       </Box>
     </Box>
