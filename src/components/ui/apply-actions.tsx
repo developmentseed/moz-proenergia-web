@@ -5,7 +5,7 @@ import { useFilters } from '@/utils/context/filters';
 import { useIsFetching } from '@tanstack/react-query';
 
 export const ApplyActions = () => {
-  const { hasPendingChanges, filters, applyPendingChanges } = useFilters();
+  const { hasPendingChanges, filters, resetAllFilters, applyPendingChanges } = useFilters();
 
   const isLoading = !!useIsFetching({ queryKey: ['filter', filters] });
   return (
@@ -14,7 +14,10 @@ export const ApplyActions = () => {
       display="flex"
       gap="4"
     >
-      <Button flex="1" disabled>
+      <Button
+        flex="1"
+        onClick={resetAllFilters}
+        >
         Reset
       </Button>
       <Button
