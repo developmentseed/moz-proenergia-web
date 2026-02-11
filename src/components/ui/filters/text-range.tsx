@@ -54,19 +54,20 @@ export const TextRange = ({
 
   const handleMinTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value==='') { setMinText(0); return;}
-    const newValue = parseFloat(e.target.value);
+    const noCommaValue = e.target.value.replace(',','');
+    const newValue = parseInt(noCommaValue);
     if (!isNaN(newValue)) setMinText(newValue);
   };
 
   const handleMaxTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value==='') { setMaxText(0); return;}
-    const newValue = parseFloat(e.target.value);
+    const noCommaValue = e.target.value.replace(',','');
+    const newValue = parseInt(noCommaValue);
     if (!isNaN(newValue)) setMaxText(newValue);
   };
 
   const handleMinTextBlur = () => {
     let newMin = minText;
-
     // Validate and constrain the value
     if (isNaN(newMin)) {
       newMin = localValue[0];
@@ -88,7 +89,7 @@ export const TextRange = ({
     // Validate and constrain the value
     if (isNaN(newMax)) {
       newMax = localValue[1];
-    } else if (newMax > max || newMax > min) {
+    } else if (newMax > max || newMax < min) {
       newMax = max;
     } else {
       newMax = Math.min(max, Math.max(newMax, localValue[0]));

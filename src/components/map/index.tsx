@@ -4,6 +4,7 @@ import { Box } from '@chakra-ui/react';
 import * as pmtiles from 'pmtiles';
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import mapConfig from '@/config/map.json';
 import { useModel } from "@/utils/context/model";
 import { useFilters } from "@/utils/context/filters";
 import { useCoordinates } from './hooks/use-coordinates';
@@ -44,15 +45,16 @@ const MainMap = ({ main }: MainMapProps) => {
   const resetCluster = useCallback(() => {
     setSelected(null);
   }, [setSelected]);
-  
+
   return <Box w='100%' h='100%' className="map-container" position="relative">
     <Map
       initialViewState={{
-            longitude: lng,
-            latitude: lat,
-            zoom: zoom,
-            padding: { top: 20, bottom: 20, left: 20, right: 20 },
-          }}
+        longitude: lng,
+        latitude: lat,
+        zoom: zoom,
+        padding: { top: 20, bottom: 20, left: 20, right: 20 },
+      }}
+      minZoom={mapConfig.minZoom}
       style={{ width: '100%', height: '100%' }}
       onClick={onClick}
       onMoveEnd={(e:ViewStateChangeEvent) => { setCoordinates({ lng: e.viewState.longitude, lat: e.viewState.latitude , zoom: e.viewState.zoom });}}
