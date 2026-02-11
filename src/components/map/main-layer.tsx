@@ -131,7 +131,7 @@ export const MainLayer = ({
           '',
         ] : '',
         'icon-overlap': 'cooperative',
-        'icon-size': 0.05,
+        'icon-size': ["interpolate", ["linear"], ["zoom"], mapConfig.minZoom, 0.02, mapConfig.polygonMinZoom, 0.03],
       },
       ...(mapFilter ? { filter: mapFilter } : {}),
     }),
