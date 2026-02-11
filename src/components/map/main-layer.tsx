@@ -2,7 +2,8 @@ import { useMemo, useState, useEffect } from 'react';
 import { Source, Layer as MapLayer, useMap } from 'react-map-gl/maplibre';
 import {
   type LayerSpecification,
-  type FilterSpecification
+  type FilterSpecification,
+  type ExpressionSpecification,
 } from 'maplibre-gl';
 import mapConfig from '@/config/map.json';
 import { DEFAULT_COL } from '@/utils/api';
@@ -72,7 +73,7 @@ export const MainLayer = ({
 
     for (const { imageId, color } of symbolImageIds) {
       if (map.hasImage(imageId)) continue;
-      const svgText = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50" fill="${color}" /></svg>`;
+      const svgText = `<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="5" fill="${color}" /></svg>`;
       const src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText);
       const image = new Image();
       image.onload = () => {
@@ -115,13 +116,14 @@ export const MainLayer = ({
     [main.id, main.column, main.options, scenario.layer, mapFilter]
   );
 
-  const symbollayer: LayerSpecification = useMemo(
+  const symbolMainLayer:LayerSpecification = useMemo(
     () => ({
-      ...scenario.layer,
+      source: scenario.layer.source,
+      "source-layer": scenario.layer['source-layer'],
       id: main.id + '-symbol',
-      type: 'symbol',
-      minZoom: mapConfig.minZoom,
-      maxZoom: mapConfig.polygonMinZoom,
+      type: 'symbol' as const,
+      minzoom: mapConfig.minZoom,
+      maxzoom: mapConfig.polygonMinZoom,
       layout: {
         'symbol-placement': 'point',
         'icon-image': symbolImageIds.length ? [
@@ -129,7 +131,7 @@ export const MainLayer = ({
           main.column === DEFAULT_COL ? ['literal', DEFAULT_COL] : ['get', main.column],
           ...symbolImageIds.flatMap(({ value, imageId }) => [value, imageId]),
           '',
-        ] : '',
+        ] as ExpressionSpecification : '',
         'icon-overlap': 'cooperative',
         'icon-size': ["interpolate", ["linear"], ["zoom"], mapConfig.minZoom, 0.02, mapConfig.polygonMinZoom, 0.03],
       },
@@ -180,7 +182,7 @@ export const MainLayer = ({
     <Source key={scenario.id} id={scenario.id} {...scenario.source}>
       <MapLayer {...mainLayer} />
       <MapLayer {...backgroundMainLayer} beforeId={main.id} />
-      <MapLayer {...symbollayer} />
+      <MapLayer {...symbolMainLayer} />
       <MapLayer {...selectedClusterLayer} />
       <MapLayer {...hoveredClusterLayer} />
     </Source>
