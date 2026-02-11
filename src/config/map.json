@@ -1,5 +1,6 @@
 {
   "minZoom": 5,
+  "polygonMinZoom": 7,
   "maxZoom": 11,
   "sourceLayerName": "data"
 }

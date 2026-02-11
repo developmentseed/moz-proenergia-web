@@ -4,6 +4,7 @@ import {
   type LayerSpecification,
   type FilterSpecification
 } from 'maplibre-gl';
+import mapConfig from '@/config/map.json';
 import { DEFAULT_COL } from '@/utils/api';
 import { type Scenario, type Main } from '@/app/types';
 
@@ -55,10 +56,52 @@ export const MainLayer = ({
       map.off('mouseleave', main.id, handleMouseLeave);
     };
   }, [map, main.id]);
+  const symbolImageIds = useMemo(
+    () => main.options.map((opt) => ({
+      value: opt.value,
+      imageId: `${main.id}-symbol-${opt.value}`,
+      color: opt.color || '#CCCCCC',
+    })),
+    [main.id, main.options]
+  );
+
+  useEffect(() => {
+    if (!map || symbolImageIds.length === 0) return;
+
+    const addedIds: string[] = [];
+
+    for (const { imageId, color } of symbolImageIds) {
+      if (map.hasImage(imageId)) continue;
+      const svgText = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50" fill="${color}" /></svg>`;
+      const src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText);
+      const image = new Image();
+      image.onload = () => {
+        if (!map.hasImage(imageId)) {
+          map.addImage(imageId, image);
+          addedIds.push(imageId);
+        }
+      };
+      image.src = src;
+    }
+
+    return () => {
+      try {
+        for (const id of addedIds) {
+          if (map.hasImage(id)) {
+            map.removeImage(id);
+          }
+        }
+      } catch {
+        // Map already removed
+      }
+    };
+  }, [map, symbolImageIds]);
+
   const mainLayer: LayerSpecification = useMemo(
     () => ({
       ...scenario.layer,
       id: main.id,
+      minzoom: mapConfig.polygonMinZoom,
       paint: {
         [getColorAttributeNamebyType('fill')]: main.options.length? [
           'match',
@@ -72,6 +115,28 @@ export const MainLayer = ({
     [main.id, main.column, main.options, scenario.layer, mapFilter]
   );
 
+  const symbollayer: LayerSpecification = useMemo(
+    () => ({
+      ...scenario.layer,
+      id: main.id + '-symbol',
+      type: 'symbol',
+      minZoom: mapConfig.minZoom,
+      maxZoom: mapConfig.polygonMinZoom,
+      layout: {
+        'symbol-placement': 'point',
+        'icon-image': symbolImageIds.length ? [
+          'match',
+          main.column === DEFAULT_COL ? ['literal', DEFAULT_COL] : ['get', main.column],
+          ...symbolImageIds.flatMap(({ value, imageId }) => [value, imageId]),
+          '',
+        ] : '',
+        'icon-overlap': 'cooperative',
+        'icon-size': ["interpolate", ["linear"], ["zoom"], mapConfig.minZoom, 0.02, mapConfig.polygonMinZoom, 0.03],
+      },
+      ...(mapFilter ? { filter: mapFilter } : {}),
+    }),
+    [main.id, main.column, scenario.layer, symbolImageIds, mapFilter]
+  );
   const backgroundMainLayer: LayerSpecification = useMemo(
     () => ({
       id: main.id + 'bg',
@@ -115,6 +180,7 @@ export const MainLayer = ({
     <Source key={scenario.id} id={scenario.id} {...scenario.source}>
       <MapLayer {...mainLayer} />
       <MapLayer {...backgroundMainLayer} beforeId={main.id} />
+      <MapLayer {...symbollayer} />
       <MapLayer {...selectedClusterLayer} />
       <MapLayer {...hoveredClusterLayer} />
     </Source>
