@@ -36,7 +36,7 @@ export const Header = ({
 }: HeaderProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const pathname = usePathname();
-  const { login, isAuthenticated } = useAuth();
+  const { login } = useAuth();
   // To show successful logout message
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -101,7 +101,7 @@ export const Header = ({
           {navigationItems.map((item) => {
             const isModal = item.href === "modal";
             if (isModal) {
-              if ((isAuthenticated || loggingOut) && !isModalOpen) {
+              if ((loggingOut) && !isModalOpen) {
                 return (
                   <LogoutButton
                     key={item.href}
@@ -121,9 +121,6 @@ export const Header = ({
                 />
               );
             }
-
-            if (item.href === "/downloads" && !isAuthenticated) return null;
-
             const active = isActive(item.href);
             return (
               <Box key={item.href}>
