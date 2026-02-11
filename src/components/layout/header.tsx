@@ -24,8 +24,8 @@ interface HeaderProps {
 
 const defaultNavigationItems: NavigationItem[] = [
   { label: "Explorer", href: "/models" },
-  { label: "Downloads", href: "/downloads" },
   { label: "About", href: "/about" },
+  { label: "Downloads", href: "/downloads" },
   { label: "SDI Admin", href: "https://proenergia-staging.ds.io/admin/" },
   { label: "Login", href: "modal" },
 ];
@@ -121,6 +121,8 @@ export const Header = ({
                 />
               );
             }
+
+            if (item.href === "/downloads" && !isAuthenticated) return null;
 
             const active = isActive(item.href);
             return (
