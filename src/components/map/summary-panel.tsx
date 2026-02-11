@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import {
   Box,
   Table,
@@ -10,7 +10,7 @@ import {
 import { api } from "@/utils/api";
 import { InfoTip } from "../chakra/toggle-tip";
 import { LuChevronUp } from "react-icons/lu";
-import { useQuery, useQueries } from "@tanstack/react-query";
+import { useQuery, useQueries, useQueryClient } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter } from "@/app/types";
 import { formatNumber } from "@/utils/numer";
@@ -285,6 +285,15 @@ async function fetchFieldSummary(
 }
 
 function transformFieldSummary(result: FieldSummary, field: Field): SummaryRow {
+  console.log(result);
+  if (result.count === 0) return {
+      type: "flat" as const,
+      key: field.column,
+      label: `${field.label} (Total)`,
+      description: field.description,
+      value: 0,
+      unit: field.unit,
+  };
   if (result.type === "numeric") {
     return {
       type: "flat" as const,
@@ -330,6 +339,8 @@ const SummaryPanel = ({
     enabled: !!clusterId,
   });
 
+  const queryClient = useQueryClient();
+
   const summaryQueries = useQueries({
     queries: summaryFields.map((field) => ({
       queryKey: ["summary", scenarioId, field.column, filters],
@@ -344,15 +355,29 @@ const SummaryPanel = ({
     })),
   });
 
+  const noMatchingData = summaryQueries.some(
+    (q) => q.data && q.data.count === 0,
+  );
+
+  useEffect(() => {
+    if (!noMatchingData) return;
+    // Cancel remaining queries when any result has count === 0
+    for (const field of summaryFields) {
+      queryClient.cancelQueries({
+        queryKey: ["summary", scenarioId, field.column, filters],
+      });
+    }
+  }, [noMatchingData, scenarioId, summaryFields, filters, queryClient]);
+
   const summaryIsLoading = summaryQueries.some((q) => q.isLoading);
-  const summaryIsError = summaryQueries.some((q) => q.isError);
-  const summaryData: SummaryData | undefined = summaryQueries.every(
-    (q) => q.data,
-  )
-    ? summaryQueries.map((q, i) =>
-        transformFieldSummary(q.data!, summaryFields[i]),
-      )
-    : undefined;
+  const summaryIsError = !noMatchingData && summaryQueries.some((q) => q.isError);
+  const summaryData: SummaryData | undefined = noMatchingData
+    ? undefined
+    : summaryQueries.every((q) => q.data)
+      ? summaryQueries.map((q, i) =>
+          transformFieldSummary(q.data!, summaryFields[i]),
+        )
+      : undefined;
 
   // Views are mutually exclusive - cluster view never falls through to summary
   const showingCluster = !!clusterId;
@@ -375,11 +400,19 @@ const SummaryPanel = ({
       <Collapsible.Root defaultOpen>
         <PanelHeader subtitle="analysis" title={title} />
         <Collapsible.Content>
-          <PanelBody
-            data={dataToDisplay}
-            isLoading={isLoading}
-            isError={isError}
-          />
+          {!showingCluster && noMatchingData ? (
+            <Box px={4} py={8} textAlign="center">
+              <Text textStyle="tableAttr" color="fg.muted">
+                No matching data for the current filters.
+              </Text>
+            </Box>
+          ) : (
+            <PanelBody
+              data={dataToDisplay}
+              isLoading={isLoading}
+              isError={isError}
+            />
+          )}
         </Collapsible.Content>
       </Collapsible.Root>
     </Box>
