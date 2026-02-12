@@ -21,7 +21,8 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
         <InfoTip content="This is some additional information." />
       </Box>
       <Box display="flex" alignItems="center" gap="2">
-
+        {/* TODO: properly render download button  */}
+        <DownloadButton url={layer.downloadLink || ""} label={`Download ${layer.label}`} />
         <Switch.Root value={layer.id} onCheckedChange={onCheckedChange} checked={selected}>
           <Switch.HiddenInput />
           <Switch.Control>
