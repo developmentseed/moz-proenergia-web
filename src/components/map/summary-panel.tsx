@@ -13,7 +13,7 @@ import { LuChevronUp } from "react-icons/lu";
 import { useQuery, useQueries, useQueryClient } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter } from "@/app/types";
-import { formatNumber } from "@/utils/numer";
+import { formatDisplayNumber } from "@/utils/numer";
 
 interface SummaryItem {
   key: string;
@@ -105,9 +105,9 @@ interface PanelBodyProps {
   isError: boolean;
 }
 
-const formatValue = (value: string | number) => {
+const formatValue = (value: string | number, column?: string) => {
   //@ts-expect-error @TODO
-  if (!isNaN(value)) return formatNumber(value as number);
+  if (!isNaN(value)) return formatDisplayNumber(value as number, column);
   else return value;
 };
 
@@ -152,7 +152,7 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
                     </Table.Cell>
                     <Table.Cell {...tableCellStyleProps}>
                       <Text textStyle="tableValue" textAlign="right">
-                        {formatValue(row.value)} {row.unit}
+                        {formatValue(row.value, row.key)} {row.unit}
                       </Text>
                     </Table.Cell>
                   </Table.Row>
@@ -179,7 +179,7 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
                     </Table.Cell>
                     <Table.Cell {...tableCellStyleProps}>
                       <Text textStyle="tableValue" textAlign="right">
-                        {formatValue(item.value)} {row.unit}
+                        {formatValue(item.value, item.key)} {row.unit}
                       </Text>
                     </Table.Cell>
                   </Table.Row>
