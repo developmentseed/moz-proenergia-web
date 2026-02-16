@@ -5,6 +5,7 @@ import { Card } from '@/components/chakra';
 import {
   useQuery
 } from '@tanstack/react-query';
+import { slugify } from '@/utils/data-transformation';
 import { fetchModels } from '@/utils/data-transformation';
 import { SimpleGrid } from '@chakra-ui/react';
 
@@ -18,7 +19,7 @@ export default function ModelCards() {
   return (
     <SimpleGrid columns={3} py={6} gap={6}>
       {models?.map(e =>
-        <Link key={e.id} href ={`/model/${e.id}`}>
+        <Link key={e.id} href ={`/model/${slugify(e.name)}`}>
           <Card title={e.name} description = {e.description} />
         </Link>
         )}

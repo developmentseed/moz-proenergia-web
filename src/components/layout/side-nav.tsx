@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import modelConfig from '@/config/model.json';
 import { ModelGroupMetadata } from '@/app/types';
+import { slugify } from '@/utils/data-transformation';
 
 interface SideNavProps {
   models: ModelGroupMetadata[];
@@ -27,13 +28,14 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
     >
       <VStack p={2} gap={2} align="center">
         {models.map((model) => {
-          const isActive = String(model.id) === currentSlug;
+          const modelSlug = slugify(model.name);
+          const isActive = modelSlug === currentSlug;
           const iconPath = getIconPath(model.id);
 
           return (
             <Link
               key={model.id}
-              href={`/model/${model.id}`}
+              href={`/model/${modelSlug}`}
               title={model.name}
               style={{ textDecoration: 'none' }}
             >

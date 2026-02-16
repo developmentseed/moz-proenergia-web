@@ -9,6 +9,7 @@ import Explorer from '@/components/ui/explorer';
 import { SideNav } from '@/components/layout/side-nav';
 import {
   fetchModels,
+  slugify,
   fetchModelMetadata,
   fetchVectors,
   transformModelCore,
@@ -20,7 +21,7 @@ import { type ModelGroupMetadata } from '@/app/types';
 export async function generateStaticParams() {
   const res = await fetchModels();
   return res.map((model) => ({
-    slug: String(model.id),
+    slug: slugify(model.name),
   }));
 }
 
@@ -39,6 +40,11 @@ export default async function ModelPage({
     //   queryFn: fetchModels,
     // });
     const models = await fetchModels();
+    const model = models.find((m) => slugify(m.name) === slug);
+
+    if (!model) {
+      throw new Error(`Model not found for slug: ${slug}`);
+    }
 
   //   queryClient.prefetchQuery({
   //     queryKey: ['modelMetadata', slug],
@@ -80,7 +86,7 @@ export default async function ModelPage({
         <SideNav models={models} currentSlug={slug} />
         <Box id='main-panel' width='full' height="100%">
           {/* <HydrationBoundary state={dehydrate(queryClient)}> */}
-          <Explorer modelId={slug} />
+          <Explorer modelId={model.id} />
           {/* </HydrationBoundary> */}
         </Box>
       </Suspense>
