@@ -408,7 +408,7 @@ const SummaryPanel = ({
   // Separate request per grouped field
   const groupedQueries = useQueries({
     queries: groupedFields.map((field) => ({
-      queryKey: ["summaries", scenarioId, field.columns, field.group_by, filters],
+      queryKey: ["summaries", scenarioId, field.label, field.columns, filters],
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         fetchGroupedSummary(scenarioId, field, filters, filterDefs, signal),
       enabled: summaryEnabled,
@@ -433,16 +433,17 @@ const SummaryPanel = ({
       Object.values(q.data!.summaries).every((s) => s.count === 0),
     );
 
-  // Recombine results in original summaryFields order
+  // Combine results: batch fields first, then grouped fields
   const summaryData: SummaryData | undefined = (() => {
     if (!batchReady || !groupedReady) return undefined;
-    let groupedIdx = 0;
-    return summaryFields.map((field) => {
-      if (field.group_by) {
-        return transformFieldSummary(groupedQueries[groupedIdx++].data!, field);
-      }
-      return transformFieldSummary(batchQuery.data!, field);
-    });
+    return [
+      ...batchFields.map((field) =>
+        transformFieldSummary(batchQuery.data!, field)
+      ),
+      ...groupedFields.map((field, idx) =>
+        transformFieldSummary(groupedQueries[idx].data!, field)
+      ),
+    ];
   })();
 
   // Views are mutually exclusive - cluster view never falls through to summary
