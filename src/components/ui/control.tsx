@@ -89,7 +89,8 @@ const CollapsibleGroup = memo(function CollapsibleGroup({
   collapsibleItem: ColGroup;
 }) {
   const { displayFilters, setPendingFilters, getFilterPendingStatus } = useFilters();
-  const groupHasPending = collapsibleItem.items.some((f) => getFilterPendingStatus(f.id));
+  const pendingCount = collapsibleItem.items.filter((f) => getFilterPendingStatus(f.id)).length;
+  console.log(collapsibleItem.items.filter((f) => getFilterPendingStatus(f.id)));
   return (
     <Collapsible.Root>
       <Collapsible.Trigger
@@ -100,7 +101,7 @@ const CollapsibleGroup = memo(function CollapsibleGroup({
         width="100%"
         textStyle="collapsibleGroupTitle"
       >
-        <FilterLabel title={collapsibleItem.title} hasPending={groupHasPending} textStyle="collapsibleGroupTitle" />
+        <FilterLabel title={collapsibleItem.title} hasPending={pendingCount > 0} pendingCount={pendingCount} textStyle="collapsibleGroupTitle" />
         <Collapsible.Indicator
           transition="transform 0.2s"
           _open={{ transform: "rotate(180deg)" }}
