@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useMemo, useState, useEffect } from "react";
 import {
   Box,
   Table,
@@ -10,7 +10,7 @@ import {
 import { api } from "@/utils/api";
 import { InfoTip } from "../chakra/toggle-tip";
 import { LuChevronUp } from "react-icons/lu";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter } from "@/app/types";
 import { formatDisplayNumber } from "@/utils/numer";
@@ -160,7 +160,7 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
                     <Table.Cell {...tableCellStyleProps}>
                       {" "}
                       <Box display="flex" alignItems="center" gap={1}>
-                        <Text textStyle="tableAttr">{row.label}</Text>
+                        <Text textStyle="tableAttr">{row.label} { row.unit && `(${row.unit})`} </Text>
                         {row.description && (
                           <InfoTip content={row.description} />
                         )}
@@ -168,7 +168,7 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
                     </Table.Cell>
                     <Table.Cell {...tableCellStyleProps}>
                       <Text textStyle="tableValue" textAlign="right">
-                        {formatValue(row.value, row.key)} {row.unit}
+                        {formatValue(row.value, row.key)}
                       </Text>
                     </Table.Cell>
                   </Table.Row>
@@ -191,11 +191,13 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
                       <Text textStyle="tableAttr" pt={1} pb={1}>
                         {" "}
                         {item.label}
+                        {" "}
+                        {row.unit && `(${row.unit})`}
                       </Text>
                     </Table.Cell>
                     <Table.Cell {...tableCellStyleProps}>
                       <Text textStyle="tableValue" textAlign="right">
-                        {formatValue(item.value, item.key)} {row.unit}
+                        {formatValue(item.value, item.key)}
                       </Text>
                     </Table.Cell>
                   </Table.Row>
@@ -246,21 +248,20 @@ async function fetchClusterData(
   }
 }
 
-async function fetchSummaries(
+async function fetchBatchSummaries(
   scenarioId: string,
-  summaryFields: Field[],
+  fields: Field[],
   filters: Record<string, [number, number] | string[] | null>,
   filterDefs: Filter[],
   signal: AbortSignal,
 ): Promise<BatchSummariesResponse> {
   try {
-    const fields = summaryFields.flatMap((f) => f.columns).join(",");
-    const q = buildFilterQueryParam(filters, filterDefs);
-    const groupBy = summaryFields.find((f) => f.group_by)?.group_by;
+    const fieldNames = fields.flatMap((f) => f.columns).join(",");
+    const params: Record<string, string> = { fields: fieldNames };
 
-    const params: Record<string, string> = { fields };
-    if (q) params.q = q;
-    if (groupBy) params.group_by = groupBy;
+    // @TODO: enable filter
+    // const q = buildFilterQueryParam(filters, filterDefs);
+    // if (q) params.q = q;
 
     const { data } = await api.get(
       `scenario/${scenarioId}/summaries/`,
@@ -273,72 +274,88 @@ async function fetchSummaries(
   }
 }
 
-function transformBatchSummaries(
+async function fetchGroupedSummary(
+  scenarioId: string,
+  field: Field,
+  filters: Record<string, [number, number] | string[] | null>,
+  filterDefs: Filter[],
+  signal: AbortSignal,
+): Promise<BatchSummariesResponse> {
+  try {
+    const fields = field.columns.join(",");
+
+    const params: Record<string, string> = { fields };
+        // @TODO: enable filter
+    // const q = buildFilterQueryParam(filters, filterDefs);
+    // if (q) params.q = q;
+    if (field.group_by) params.group_by = field.group_by;
+    if (field.method) params.method = field.method;
+
+    const { data } = await api.get(
+      `scenario/${scenarioId}/summaries/`,
+      { signal, params },
+    );
+    return data;
+  } catch (e) {
+    console.error(e);
+    throw new Error("Failed to fetch summary data");
+  }
+}
+
+function transformFieldSummary(
   response: BatchSummariesResponse,
-  summaryFields: Field[],
-): SummaryData {
-  const rows: SummaryData = [];
+  field: Field,
+): SummaryRow {
+  const column = field.columns[0];
+  const summary = response.summaries[column];
 
-  for (const field of summaryFields) {
-    // For multi-column fields, use the first column to look up the summary
-    const column = field.columns[0];
-    const summary = response.summaries[column];
-
-    if (!summary || summary.count === 0) {
-      rows.push({
-        type: "flat",
-        key: column,
-        label: `${field.label} (Total)`,
-        description: field.description,
-        value: 0,
-        unit: field.unit,
-      });
-      continue;
-    }
-
-    if (summary.type === "numeric") {
-      if (summary.grouped) {
-        // Numeric with grouped data → GroupRow showing per-group sums
-        rows.push({
-          type: "group",
-          label: field.label,
-          description: field.description,
-          unit: field.unit,
-          value: Object.entries(summary.grouped).map(([key, stats]) => ({
-            key,
-            label: key,
-            value: stats.sum,
-          })),
-        });
-      } else {
-        // Numeric without grouped data → FlatRow with total sum
-        rows.push({
-          type: "flat",
-          key: column,
-          label: `${field.label} (Total)`,
-          description: field.description,
-          value: summary.sum,
-          unit: field.unit,
-        });
-      }
-      continue;
-    }
-
-    // String type → GroupRow with value distribution
-    rows.push({
-      type: "group",
-      label: field.label,
+  if (!summary || summary.count === 0) {
+    return {
+      type: "flat",
+      key: column,
+      label: `${field.label} (Total)`,
       description: field.description,
+      value: 0,
       unit: field.unit,
-      value: Object.entries(summary.values).map(([key, count]) => ({
-        key,
-        label: key,
-        value: count,
-      })),
-    });
+    };
   }
 
-  return rows;
+  if (summary.type === "numeric") {
+    if (summary.grouped) {
+      return {
+        type: "group",
+        label: field.label,
+        description: field.description,
+        unit: field.unit,
+        value: Object.entries(summary.grouped).map(([key, stats]) => ({
+          key,
+          label: key,
+          value: stats.sum,
+        })),
+      };
+    }
+    return {
+      type: "flat",
+      key: column,
+      label: `${field.label} (Total)`,
+      description: field.description,
+      value: summary.sum,
+      unit: field.unit,
+    };
+  }
+
+  // String type → GroupRow with value distribution
+  return {
+    type: "group",
+    label: field.label,
+    description: field.description,
+    unit: field.unit,
+    value: Object.entries(summary.values).map(([key, count]) => ({
+      key,
+      label: key,
+      value: count,
+    })),
+  };
 }
 
 const SummaryPanel = ({
@@ -362,23 +379,71 @@ const SummaryPanel = ({
     enabled: !!clusterId,
   });
 
-  const {
-    data: summariesResponse,
-    isLoading: summaryIsLoading,
-    isError: summaryIsError,
-  } = useQuery({
-    queryKey: ["summaries", scenarioId, filters],
+  // Defer summary fetches so map tiles get network priority
+  const [summaryEnabled, setSummaryEnabled] = useState(false);
+  useEffect(() => {
+    const id = requestIdleCallback(() => setSummaryEnabled(true));
+    return () => cancelIdleCallback(id);
+  }, []);
+
+  // Split fields: batch those without group_by, separate those with group_by
+  const { batchFields, groupedFields } = useMemo(() => {
+    const batch: Field[] = [];
+    const grouped: Field[] = [];
+    for (const f of summaryFields) {
+      if (f.group_by) grouped.push(f);
+      else batch.push(f);
+    }
+    return { batchFields: batch, groupedFields: grouped };
+  }, [summaryFields]);
+
+  // Single request for all non-grouped fields
+  const batchQuery = useQuery({
+    queryKey: ["summaries", scenarioId, "batch", batchFields.map((f) => f.columns), filters],
     queryFn: ({ signal }) =>
-      fetchSummaries(scenarioId, summaryFields, filters, filterDefs, signal),
+      fetchBatchSummaries(scenarioId, batchFields, filters, filterDefs, signal),
+    enabled: summaryEnabled && batchFields.length > 0,
   });
 
-  const noMatchingData = summariesResponse
-    ? Object.values(summariesResponse.summaries).every((s) => s.count === 0)
-    : false;
+  // Separate request per grouped field
+  const groupedQueries = useQueries({
+    queries: groupedFields.map((field) => ({
+      queryKey: ["summaries", scenarioId, field.columns, field.group_by, filters],
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        fetchGroupedSummary(scenarioId, field, filters, filterDefs, signal),
+      enabled: summaryEnabled,
+    })),
+  });
 
-  const summaryData: SummaryData | undefined = summariesResponse
-    ? transformBatchSummaries(summariesResponse, summaryFields)
-    : undefined;
+  const batchReady = batchFields.length === 0 || !!batchQuery.data;
+  const groupedReady = groupedQueries.every((q) => q.data);
+
+  const summaryIsLoading =
+    (batchFields.length > 0 && batchQuery.isLoading) ||
+    groupedQueries.some((q) => q.isLoading);
+  const summaryIsError =
+    batchQuery.isError || groupedQueries.some((q) => q.isError);
+
+  const noMatchingData =
+    batchReady &&
+    groupedReady &&
+    (batchFields.length === 0 ||
+      Object.values(batchQuery.data!.summaries).every((s) => s.count === 0)) &&
+    groupedQueries.every((q) =>
+      Object.values(q.data!.summaries).every((s) => s.count === 0),
+    );
+
+  // Recombine results in original summaryFields order
+  const summaryData: SummaryData | undefined = (() => {
+    if (!batchReady || !groupedReady) return undefined;
+    let groupedIdx = 0;
+    return summaryFields.map((field) => {
+      if (field.group_by) {
+        return transformFieldSummary(groupedQueries[groupedIdx++].data!, field);
+      }
+      return transformFieldSummary(batchQuery.data!, field);
+    });
+  })();
 
   // Views are mutually exclusive - cluster view never falls through to summary
   const showingCluster = !!clusterId;
