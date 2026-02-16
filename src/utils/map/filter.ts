@@ -1,5 +1,6 @@
-import { type FilterSpecification } from "maplibre-gl";
-import { type Filter } from "@/app/types";
+import { type FilterSpecification, type ExpressionSpecification } from "maplibre-gl";
+import { type Filter, type Main } from "@/app/types";
+import { DEFAULT_COL } from "@/utils/api";
 
 export function buildExpressionWithFilter(filterRef: Filter[], filters: Record<string,unknown>): (FilterSpecification | null) {
   const conditions: FilterSpecification[] = [];
@@ -34,4 +35,15 @@ export function buildExpressionWithFilter(filterRef: Filter[], filters: Record<s
 
     // Return combined filter or null if no conditions found.
     return conditions.length > 0 ? ["all", ...conditions] as FilterSpecification : null;
+}
+
+// For cases where visualization doesn't have any options, returns DEFAULT value (pue)
+export function buildMatchExpression(main: Main, fallback: string): ExpressionSpecification | string {
+  if (!main.options.length) return fallback;
+  return [
+    'match',
+    main.column === DEFAULT_COL ? ['literal', DEFAULT_COL] : ['get', main.column],
+    ...main.options.flatMap((val) => [val.value, val.color]),
+    '#CCCCCC',
+  ] as ExpressionSpecification;
 }

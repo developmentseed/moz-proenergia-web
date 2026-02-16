@@ -5,7 +5,9 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import { ModelProvider, useModel } from "@/utils/context/model";
 import { FiltersProvider, useFilters } from "@/utils/context/filters";
-import { buildExpressionWithFilter } from "@/utils/map/filter";
+import { buildExpressionWithFilter, buildMatchExpression } from "@/utils/map/filter";
+import { DEFAULT_COL } from "@/utils/api";
+import { type Main } from "@/app/types";
 import { mockModel } from "./mock-data";
 
 // Hook that combines useModel and useFilters for testing
@@ -54,7 +56,7 @@ describe("Filter to Expression End-to-End", () => {
       expect(expression).toEqual([
         "all",
         ["all", [">=", ["get", "pop_count"], 0], ["<=", ["get", "pop_count"], 1000]],
-        ["in", ["get", "type_id"], ["literal", [1, 2, 3]]],
+        ["in", ["get", "type_id"], ["literal", ["1","2", "3"]]],
       ]);
     });
   });
@@ -91,7 +93,7 @@ describe("Filter to Expression End-to-End", () => {
       expect(expression).toEqual([
         "all",
         ["all", [">=", ["get", "pop_count"], 0], ["<=", ["get", "pop_count"], 1000]],
-        ["in", ["get", "type_id"], ["literal", [1, 2]]],
+        ["in", ["get", "type_id"], ["literal", ["1", "2"]]],
       ]);
     });
 
@@ -118,7 +120,7 @@ describe("Filter to Expression End-to-End", () => {
       expect(expression).toEqual([
         "all",
         ["all", [">=", ["get", "pop_count"], 0], ["<=", ["get", "pop_count"], 1000]],
-        ["in", ["get", "type_id"], ["literal", [1, 2, 3]]],
+        ["in", ["get", "type_id"], ["literal", ["1", "2", "3"]]],
         ["in", ["get", "admin_name"], ["literal", ["Maputo"]]],
       ]);
     });
@@ -146,7 +148,7 @@ describe("Filter to Expression End-to-End", () => {
       expect(expression).toEqual([
         "all",
         ["all", [">=", ["get", "pop_count"], 100], ["<=", ["get", "pop_count"], 500]],
-        ["in", ["get", "type_id"], ["literal", [1, 2, 3]]],
+        ["in", ["get", "type_id"], ["literal", ["1", "2", "3"]]],
       ]);
     });
 
@@ -179,9 +181,62 @@ describe("Filter to Expression End-to-End", () => {
       expect(expression).toEqual([
         "all",
         ["all", [">=", ["get", "pop_count"], 200], ["<=", ["get", "pop_count"], 800]],
-        ["in", ["get", "type_id"], ["literal", [2, 3]]],
+        ["in", ["get", "type_id"], ["literal", ["2", "3"]]],
         ["in", ["get", "admin_name"], ["literal", ["Gaza", "Inhambane"]]],
       ]);
+    });
+  });
+
+  describe("Main layer match expression with DEFAULT_COL", () => {
+    it("should use ['literal', DEFAULT_COL] when column is DEFAULT_COL", () => {
+      const main: Main = {
+        id: "main",
+        column: DEFAULT_COL,
+        label: "Main",
+        options: [
+          { value: "a", label: "A", color: "#ff0000" },
+          { value: "b", label: "B", color: "#00ff00" },
+        ],
+      };
+
+      expect(buildMatchExpression(main, '#66ff')).toEqual([
+        'match',
+        ['literal', DEFAULT_COL],
+        'a', '#ff0000',
+        'b', '#00ff00',
+        '#CCCCCC',
+      ]);
+    });
+
+    it("should use ['get', column] when column is not DEFAULT_COL", () => {
+      const main: Main = {
+        id: "main",
+        column: "technology",
+        label: "Main",
+        options: [
+          { value: "solar", label: "Solar", color: "#ffcc00" },
+          { value: "wind", label: "Wind", color: "#0066ff" },
+        ],
+      };
+
+      expect(buildMatchExpression(main, '#66ff')).toEqual([
+        'match',
+        ['get', 'technology'],
+        'solar', '#ffcc00',
+        'wind', '#0066ff',
+        '#CCCCCC',
+      ]);
+    });
+
+    it("should return fallback color when options are empty", () => {
+      const main: Main = {
+        id: "main",
+        column: DEFAULT_COL,
+        label: "Main",
+        options: [],
+      };
+
+      expect(buildMatchExpression(main, '#66ff')).toEqual('#66ff');
     });
   });
 

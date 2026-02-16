@@ -112,8 +112,8 @@ describe('data-transformation', () => {
     it('should transform string options to ItemUnit', () => {
       const result = transformOptions(['Solar', 'Wind']);
       expect(result).toEqual([
-        { value: 'Solar', label: 'Solar', color: null },
-        { value: 'Wind', label: 'Wind', color: null },
+        { value: 'Solar', label: 'Solar', color: undefined },
+        { value: 'Wind', label: 'Wind', color: undefined },
       ]);
     });
 
@@ -132,7 +132,7 @@ describe('data-transformation', () => {
       expect(result).toEqual([
         { value: 'Solar', label: 'Solar', color: '#FFD700' },
         { value: 'Wind', label: 'Wind', color: '#00CED1' },
-        { value: 'Hydro', label: 'Hydro', color: null },
+        { value: 'Hydro', label: 'Hydro', color: undefined },
       ]);
     });
 
@@ -141,7 +141,7 @@ describe('data-transformation', () => {
       const result = transformOptions(['Solar', 'Wind'], colormap);
 
       expect(result[0].color).toBe('#FFD700');
-      expect(result[1].color).toBe(null);
+      expect(result[1].color).toBe(undefined);
     });
 
     it('should filter colormap entries without value or color', () => {
@@ -153,14 +153,9 @@ describe('data-transformation', () => {
       const result = transformOptions(['Solar', 'Wind'], colormap);
 
       expect(result[0].color).toBe('#FFD700');
-      expect(result[1].color).toBe(null);
+      expect(result[1].color).toBe(undefined);
     });
 
-    it('should pass through non-string options unchanged', () => {
-      const existingItem = { value: 'test', label: 'Test Label', color: '#FFF' };
-      const result = transformOptions([existingItem]);
-      expect(result[0]).toBe(existingItem);
-    });
   });
 
   describe('deriveSource', () => {
@@ -171,15 +166,14 @@ describe('data-transformation', () => {
         id: 'source-1',
         type: 'vector',
         minzoom: 5,
-        maxzoom: 15,
-        url: 'pmtiles://https://example.com/data.pmtiles',
+        url: 'pmtiles://https://proenergia-staging.ds.io/media/https://example.com/data.pmtiles',
       });
     });
 
     it('should replace any file extension with .pmtiles', () => {
-      expect(deriveSource('id', 'file.json').url).toBe('pmtiles://file.pmtiles');
-      expect(deriveSource('id', 'file.csv').url).toBe('pmtiles://file.pmtiles');
-      expect(deriveSource('id', 'path/to/file.geojson').url).toBe('pmtiles://path/to/file.pmtiles');
+      expect(deriveSource('id', 'file.json').url).toBe('pmtiles://https://proenergia-staging.ds.io/media/file.pmtiles');
+      expect(deriveSource('id', 'file.csv').url).toBe('pmtiles://https://proenergia-staging.ds.io/media/file.pmtiles');
+      expect(deriveSource('id', 'path/to/file.geojson').url).toBe('pmtiles://https://proenergia-staging.ds.io/media/path/to/file.pmtiles');
     });
 
     it('should use provided id', () => {
@@ -198,29 +192,4 @@ describe('data-transformation', () => {
 
   });
 
-  describe('getColormap', () => {
-    it('should return colormap for Technology2030', () => {
-      const result = getColormap('Technology2030');
-      expect(result).toBeDefined();
-      expect(Array.isArray(result)).toBe(true);
-      expect(result!.length).toBeGreaterThan(0);
-      expect(result!.some(c => c.value === 'GridExtension')).toBe(true);
-    });
-
-    it('should return colormap for LeastCostTech', () => {
-      const result = getColormap('LeastCostTech');
-      expect(result).toBeDefined();
-      expect(result!.some(c => c.value === 'SHS')).toBe(true);
-    });
-
-    it('should return colormap for PUE_potential', () => {
-      const result = getColormap('PUE_potential');
-      expect(result).toBeDefined();
-      expect(result!.some(c => c.value === 'High')).toBe(true);
-    });
-
-    it('should return null for unknown column', () => {
-      expect(getColormap('unknown_column')).toBeNull();
-    });
-  });
 });

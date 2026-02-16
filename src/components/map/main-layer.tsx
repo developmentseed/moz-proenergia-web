@@ -7,6 +7,7 @@ import {
 } from 'maplibre-gl';
 import mapConfig from '@/config/map.json';
 import { DEFAULT_COL } from '@/utils/api';
+import { buildMatchExpression } from '@/utils/map/filter';
 import { type Scenario, type Main } from '@/app/types';
 
 function getColorAttributeNamebyType(type: string) {
@@ -104,12 +105,7 @@ export const MainLayer = ({
       id: main.id,
       minzoom: mapConfig.polygonMinZoom,
       paint: {
-        [getColorAttributeNamebyType('fill')]: main.options.length? [
-          'match',
-          main.column === DEFAULT_COL ? ['literal', DEFAULT_COL] : ['get', main.column],
-          ...main.options.flatMap((val) => [val.value, val.color]),
-          '#CCCCCC',
-        ] : '#66ff',
+        [getColorAttributeNamebyType('fill')]: buildMatchExpression(main, '#66ff'),
       },
       ...(mapFilter ? { filter: mapFilter } : {}),
     }),
