@@ -14,7 +14,6 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
   const onCheckedChange = (details: CheckboxCheckedChangeDetails) => {
     onChange({ [layer.id]: details.checked as boolean });
   };
-  console.log(layer);
 
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" py="0.5" px='4'>
