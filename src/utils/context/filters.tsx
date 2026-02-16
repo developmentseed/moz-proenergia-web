@@ -67,9 +67,15 @@ export function FiltersProvider({
   // Pending state for batching changes
   const [pendingFilters, setPendingFiltersState] = useState<Record<string, unknown> | null>(null);
 
+  // Sort-stable stringify for order-insensitive array comparison
+  const stableStringify = useCallback((val: unknown) => {
+    if (Array.isArray(val)) return JSON.stringify([...val].sort());
+    return JSON.stringify(val);
+  }, []);
+
   // Compute display values (pending takes precedence over URL state)
   const displayFilters = useMemo(() =>
-    pendingFilters || filters,
+    pendingFilters ? { ...filters, ...pendingFilters } : filters,
     [pendingFilters, filters]
   );
 
@@ -81,13 +87,23 @@ export function FiltersProvider({
   // Check if a specific filter has pending changes
   const getFilterPendingStatus = useCallback((filterId: string): boolean => {
     if (!pendingFilters) return false;
-    return JSON.stringify(pendingFilters[filterId]) !== JSON.stringify(filters[filterId]);
-  }, [pendingFilters, filters]);
+    return filterId in pendingFilters;
+  }, [pendingFilters]);
 
-  // Pending change handlers
+  // Pending change handlers — only stores keys that differ from applied state
   const setPendingFilters = useCallback((updates: Record<string, unknown>) => {
-    setPendingFiltersState(prev => ({ ...(prev || filters), ...updates }));
-  }, [filters]);
+    setPendingFiltersState(prev => {
+      const next = { ...(prev || {}), ...updates };
+      // Only keep keys that actually differ from applied state
+      const changed = Object.entries(next).reduce((acc, [key, val]) => {
+        if (stableStringify(val) !== stableStringify(filters[key])) {
+          acc[key] = val;
+        }
+        return acc;
+      }, {} as Record<string, unknown>);
+      return Object.keys(changed).length > 0 ? changed : null;
+    });
+  }, [filters, stableStringify]);
 
   // Apply pending filter changes
   const applyPendingChanges = useCallback(() => {
