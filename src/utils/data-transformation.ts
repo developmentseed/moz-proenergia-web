@@ -22,12 +22,21 @@ export interface ColorCoding {
   color: string;
   value: string;
 }
+export interface ApiSummaryField {
+  columns: string[];
+  label: string;
+  description?: string;
+  group_by?: string;
+  method?: string;
+  unit?: string;
+}
+
 export interface ApiModelResponse {
   id: number;
   name: string;
   filter_fields: ApiFilterField[];
   popup_fields: ApiFilterField[];
-  summary_fields: ApiFilterField[];
+  summary_fields: ApiSummaryField[];
   scenarios: ApiScenario[];
   visualization_column: string | null; // for main column
   color_coding: ColorCoding[]
@@ -200,36 +209,35 @@ export async function fetchVectors({ modelId, token }: { modelId?: string, token
   }
 }
 
-interface FilterOptionsResponseString {
-  key: string;
-  type: 'string';
-  count: number;
-  values: Record<string, number>;
-}
-
-interface FilterOptionsResponseNumeric {
-  key: string;
-  type: 'numeric';
-  count: number;
-  min: number;
-  max: number;
-  sum: number;
-}
-
-export async function fetchFilterOptions(scenarioId: string | number, column: string): Promise<string[] | number[] | null> {
+export async function fetchAllFilterOptions(
+  scenarioId: string | number,
+  columns: string[],
+): Promise<Record<string, string[] | number[] | null>> {
   try {
-    const { data, status } = await api.get(`scenario/${scenarioId}/summary/${column}/`);
+    const fields = columns.join(',');
+    const { data, status } = await api.get(
+      `scenario/${scenarioId}/summaries/`,
+      { params: { fields } },
+    );
     if (status !== 200) {
-      console.warn(`fetchFilterOptions: ${column} returned status ${status}, using fallback`);
-      return [];
+      console.warn(`fetchAllFilterOptions: returned status ${status}, using fallback`);
+      return Object.fromEntries(columns.map(c => [c, []]));
     }
-    if (data.type === 'numeric') {
-      return [Math.floor(data.min), Math.ceil(data.max)];
+    const result: Record<string, string[] | number[] | null> = {};
+    for (const column of columns) {
+      const summary = data.summaries?.[column];
+      if (!summary) {
+        result[column] = [];
+      } else if (summary.type === 'numeric') {
+        result[column] = [Math.floor(summary.min), Math.ceil(summary.max)];
+      } else {
+        result[column] = sortFilterOptions(Object.keys(summary.values));
+      }
     }
-    return sortFilterOptions(Object.keys(data.values));
+    return result;
   } catch(e) {
-    console.warn(`fetchFilterOptions: ${column} failed, using fallback`, e);
-    return [];
+    console.warn(`fetchAllFilterOptions failed, using fallback`, e);
+    return Object.fromEntries(columns.map(c => [c, []]));
   }
 }
 
@@ -269,7 +277,11 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
     title: apiModel.name,
     scenarios,
     main,
-    popupFields: apiModel.popup_fields,
+    popupFields: apiModel.popup_fields.map(f => ({
+      columns: [f.column],
+      label: f.label,
+      description: f.description,
+    })),
     summaryFields: apiModel.summary_fields,
     filterFields: apiModel.filter_fields,
     colorCoding: apiModel.color_coding ?? [],

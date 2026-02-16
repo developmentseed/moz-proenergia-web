@@ -5,9 +5,11 @@ export interface ItemUnit {
   description?: string;
 }
 export interface Field {
-  column: string;
+  columns: string[];
   label: string;
   description?: string;
+  group_by?: string;
+  method?: string;
   unit?: string;
 }
 export interface MapItemUnit extends ItemUnit {

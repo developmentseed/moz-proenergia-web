@@ -1,4 +1,4 @@
-import { memo, useEffect } from "react";
+import { memo } from "react";
 import {
   Box,
   Table,
@@ -10,11 +10,11 @@ import {
 import { api } from "@/utils/api";
 import { InfoTip } from "../chakra/toggle-tip";
 import { LuChevronUp } from "react-icons/lu";
-import { useQuery, useQueries, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter } from "@/app/types";
 import { formatDisplayNumber } from "@/utils/numer";
-
+import { buildFilterQueryParam } from "@/utils/query-string-builder";
 interface SummaryItem {
   key: string;
   label: string;
@@ -51,23 +51,39 @@ interface SummaryPanelProps {
   resetCluster: () => void;
 }
 
-interface FieldSummaryNumeric {
-  key: string;
-  type: "numeric";
+// ----- Batch Summaries API types -----
+
+interface NumericGroupStats {
   count: number;
   min: number;
   max: number;
   sum: number;
 }
 
-interface FieldSummaryString {
-  key: string;
+interface BatchSummaryNumeric {
+  type: "numeric";
+  count: number;
+  min: number;
+  max: number;
+  sum: number;
+  grouped?: Record<string, NumericGroupStats>;
+}
+
+interface BatchSummaryString {
   type: "string";
   count: number;
   values: Record<string, number>;
+  grouped?: Record<string, { count: number; values: Record<string, number> }>;
 }
 
-type FieldSummary = FieldSummaryNumeric | FieldSummaryString;
+type BatchFieldSummary = BatchSummaryNumeric | BatchSummaryString;
+
+interface BatchSummariesResponse {
+  scenario_id: number;
+  filters_applied: string;
+  summaries: Record<string, BatchFieldSummary>;
+  group_by?: string;
+}
 
 interface PanelHeaderProps {
   subtitle: string;
@@ -164,8 +180,8 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
                 <Table.Row key={row.label} bg="gray.200">
                   <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
                     <Box display="flex" alignItems="center" gap={1}>
-                      <Text textStyle="tableAttr"> {row.label}</Text>
-                      <InfoTip content={row.description} />
+                      {/* group type should have description as label */}
+                      <Text textStyle="tableAttr"> {row.description || row.label}</Text>
                     </Box>
                   </Table.Cell>
                 </Table.Row>,
@@ -198,13 +214,13 @@ function transformClusterData(
   popupFields: Field[],
 ): SummaryData {
   return popupFields
-    .filter((field) => field.column in data)
+    .filter((field) => field.columns[0] in data)
     .map((field) => ({
       type: "flat" as const,
-      key: field.column,
+      key: field.columns[0],
       label: field.label,
       description: field.description,
-      value: data[field.column],
+      value: data[field.columns[0]],
     }));
 }
 
@@ -230,52 +246,25 @@ async function fetchClusterData(
   }
 }
 
-function buildFilterQueryString(
-  filters: Record<string, [number, number] | string[] | null>,
-  filterDefs: Filter[],
-): string {
-  const queryParts: string[] = [];
-
-  // Build ID to column lookup
-  const idToColumn = new Map(filterDefs.map((f) => [f.id, f.column]));
-
-  for (const [filterId, value] of Object.entries(filters)) {
-    if (value === null) continue;
-
-    // Map filter ID to column name
-    const column = idToColumn.get(filterId) ?? filterId;
-
-    if (
-      Array.isArray(value) &&
-      value.length === 2 &&
-      typeof value[0] === "number" &&
-      typeof value[1] === "number"
-    ) {
-      // Numeric filter: [min, max]
-      queryParts.push(`${column}__min=${value[0]}`);
-      queryParts.push(`${column}__max=${value[1]}`);
-    } else if (Array.isArray(value) && value.length > 0) {
-      // String array filter: join with semicolon when length is > 1
-      if (value.length === 1) queryParts.push(`${column}=${value}`);
-      else queryParts.push(`${column}__in=${value.join(";")}`);
-    }
-  }
-
-  return queryParts.length > 0 ? `?q=${queryParts.join(",")}` : "";
-}
-
-async function fetchFieldSummary(
+async function fetchSummaries(
   scenarioId: string,
-  column: string,
+  summaryFields: Field[],
   filters: Record<string, [number, number] | string[] | null>,
   filterDefs: Filter[],
   signal: AbortSignal,
-): Promise<FieldSummary> {
+): Promise<BatchSummariesResponse> {
   try {
-    const queryString = buildFilterQueryString(filters, filterDefs);
+    const fields = summaryFields.flatMap((f) => f.columns).join(",");
+    const q = buildFilterQueryParam(filters, filterDefs);
+    const groupBy = summaryFields.find((f) => f.group_by)?.group_by;
+
+    const params: Record<string, string> = { fields };
+    if (q) params.q = q;
+    if (groupBy) params.group_by = groupBy;
+
     const { data } = await api.get(
-      `scenario/${scenarioId}/summary/${column}/${queryString}`,
-      { signal },
+      `scenario/${scenarioId}/summaries/`,
+      { signal, params },
     );
     return data;
   } catch (e) {
@@ -284,38 +273,72 @@ async function fetchFieldSummary(
   }
 }
 
-function transformFieldSummary(result: FieldSummary, field: Field): SummaryRow {
-  console.log(result);
-  if (result.count === 0) return {
-      type: "flat" as const,
-      key: field.column,
-      label: `${field.label} (Total)`,
+function transformBatchSummaries(
+  response: BatchSummariesResponse,
+  summaryFields: Field[],
+): SummaryData {
+  const rows: SummaryData = [];
+
+  for (const field of summaryFields) {
+    // For multi-column fields, use the first column to look up the summary
+    const column = field.columns[0];
+    const summary = response.summaries[column];
+
+    if (!summary || summary.count === 0) {
+      rows.push({
+        type: "flat",
+        key: column,
+        label: `${field.label} (Total)`,
+        description: field.description,
+        value: 0,
+        unit: field.unit,
+      });
+      continue;
+    }
+
+    if (summary.type === "numeric") {
+      if (summary.grouped) {
+        // Numeric with grouped data → GroupRow showing per-group sums
+        rows.push({
+          type: "group",
+          label: field.label,
+          description: field.description,
+          unit: field.unit,
+          value: Object.entries(summary.grouped).map(([key, stats]) => ({
+            key,
+            label: key,
+            value: stats.sum,
+          })),
+        });
+      } else {
+        // Numeric without grouped data → FlatRow with total sum
+        rows.push({
+          type: "flat",
+          key: column,
+          label: `${field.label} (Total)`,
+          description: field.description,
+          value: summary.sum,
+          unit: field.unit,
+        });
+      }
+      continue;
+    }
+
+    // String type → GroupRow with value distribution
+    rows.push({
+      type: "group",
+      label: field.label,
       description: field.description,
-      value: 0,
       unit: field.unit,
-  };
-  if (result.type === "numeric") {
-    return {
-      type: "flat" as const,
-      key: field.column,
-      label: `${field.label} (Total)`,
-      description: field.description,
-      value: result.sum,
-      unit: field.unit,
-    };
+      value: Object.entries(summary.values).map(([key, count]) => ({
+        key,
+        label: key,
+        value: count,
+      })),
+    });
   }
-  // String type - show value distribution
-  return {
-    type: "group" as const,
-    label: field.label,
-    description: field.description,
-    unit: field.unit,
-    value: Object.entries(result.values).map(([key, count]) => ({
-      key,
-      label: key,
-      value: count,
-    })),
-  };
+
+  return rows;
 }
 
 const SummaryPanel = ({
@@ -339,45 +362,23 @@ const SummaryPanel = ({
     enabled: !!clusterId,
   });
 
-  const queryClient = useQueryClient();
-
-  const summaryQueries = useQueries({
-    queries: summaryFields.map((field) => ({
-      queryKey: ["summary", scenarioId, field.column, filters],
-      queryFn: ({ signal }) =>
-        fetchFieldSummary(
-          scenarioId,
-          field.column,
-          filters,
-          filterDefs,
-          signal,
-        ),
-    })),
+  const {
+    data: summariesResponse,
+    isLoading: summaryIsLoading,
+    isError: summaryIsError,
+  } = useQuery({
+    queryKey: ["summaries", scenarioId, filters],
+    queryFn: ({ signal }) =>
+      fetchSummaries(scenarioId, summaryFields, filters, filterDefs, signal),
   });
 
-  const noMatchingData = summaryQueries.some(
-    (q) => q.data && q.data.count === 0,
-  );
+  const noMatchingData = summariesResponse
+    ? Object.values(summariesResponse.summaries).every((s) => s.count === 0)
+    : false;
 
-  useEffect(() => {
-    if (!noMatchingData) return;
-    // Cancel remaining queries when any result has count === 0
-    for (const field of summaryFields) {
-      queryClient.cancelQueries({
-        queryKey: ["summary", scenarioId, field.column, filters],
-      });
-    }
-  }, [noMatchingData, scenarioId, summaryFields, filters, queryClient]);
-
-  const summaryIsLoading = summaryQueries.some((q) => q.isLoading);
-  const summaryIsError = !noMatchingData && summaryQueries.some((q) => q.isError);
-  const summaryData: SummaryData | undefined = noMatchingData
-    ? undefined
-    : summaryQueries.every((q) => q.data)
-      ? summaryQueries.map((q, i) =>
-          transformFieldSummary(q.data!, summaryFields[i]),
-        )
-      : undefined;
+  const summaryData: SummaryData | undefined = summariesResponse
+    ? transformBatchSummaries(summariesResponse, summaryFields)
+    : undefined;
 
   // Views are mutually exclusive - cluster view never falls through to summary
   const showingCluster = !!clusterId;

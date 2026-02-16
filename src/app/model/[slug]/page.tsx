@@ -11,7 +11,6 @@ import {
   fetchModels,
   fetchModelMetadata,
   fetchVectors,
-  fetchFilterOptions,
   transformModelCore,
   transformVectorsToLayers,
 } from '@/utils/data-transformation';

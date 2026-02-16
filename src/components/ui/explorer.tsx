@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useQuery, useQueries } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ModelProvider } from "@/utils/context/model";
 import { ContextualLayersProvider } from "@/utils/context/contextual-layers";
 import { FiltersProvider } from "@/utils/context/filters";
@@ -18,7 +18,7 @@ import { useAuth } from "@/utils/context/auth";
 import {
   fetchModelMetadata,
   fetchVectors,
-  fetchFilterOptions,
+  fetchAllFilterOptions,
   transformModelCore,
   transformVectorsToLayers,
   transformFilterField,
@@ -61,25 +61,24 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
 
   const defaultScenarioId = modelCore?.scenarios[0]?.id;
 
-  // Filter options (cached per scenario + column)
-  const filterQueries = useQueries({
-    queries: (modelCore?.filterFields ?? []).map((field) => ({
-      // Filters don't change per scenario, so just using default scenario here
-      queryKey: ["filterOptions", modelCore?.id, field.column],
-      queryFn: () => fetchFilterOptions(defaultScenarioId!, field.column),
-      enabled: !!modelCore?.id && !!defaultScenarioId,
-    })),
+  // Filter options (single batch fetch, cached per scenario)
+  const filterColumns = useMemo(
+    () => (modelCore?.filterFields ?? []).map((f) => f.column),
+    [modelCore?.filterFields],
+  );
+
+  const { data: allFilterOptions } = useQuery({
+    queryKey: ["filterOptions", modelCore?.id, filterColumns],
+    queryFn: () => fetchAllFilterOptions(defaultScenarioId!, filterColumns),
+    enabled: !!modelCore?.id && !!defaultScenarioId && filterColumns.length > 0,
   });
 
   // Combine filter options to main model
   const modelData = useMemo<ModelMetadata | undefined>(() => {
-    if (!modelCore) return undefined;
+    if (!modelCore || !allFilterOptions) return undefined;
 
-    const allFiltersLoaded = filterQueries.every((q) => q.data !== undefined);
-    if (!allFiltersLoaded) return undefined;
-
-    const filters = modelCore.filterFields.map((field, i) =>
-      transformFilterField(field, filterQueries[i].data ?? null),
+    const filters = modelCore.filterFields.map((field) =>
+      transformFilterField(field, allFilterOptions[field.column] ?? null),
     );
 
     // Find. main option among filters (filters always have main, other wise, options are empty for main)
@@ -104,7 +103,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
       popupFields: modelCore.popupFields,
       summaryFields: modelCore.summaryFields,
     };
-  }, [modelCore, filterQueries]);
+  }, [modelCore, allFilterOptions]);
 
   // @TODO: A very hacky way of telling users that the data doesn't have related scenarios
   // Assuming /vectors endpoints succeeded
