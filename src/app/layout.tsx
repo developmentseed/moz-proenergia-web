@@ -3,14 +3,15 @@ import { Box } from "@chakra-ui/react";
 import { Provider } from "@/components/chakra/provider";
 import ReactQueryProvider from "@/utils/context/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { WEBSITE_DESC, WEBSITE_TITLE } from "@/config/website";
 import Header from "@/components/layout/header";
 import { AuthProvider } from "@/utils/context/auth";
 import { DM_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Proenergia + IEP",
-  description: "Proenergia",
+  title: WEBSITE_TITLE,
+  description: WEBSITE_DESC,
   icons: {
     icon: ["/Logo.svg"],
     apple: ["/Logo.svg"],
