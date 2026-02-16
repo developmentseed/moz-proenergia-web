@@ -6,15 +6,17 @@ import TextRange from "./text-range";
 type FilterControlProps = {
   config: Filter;
   value: string[] | [number, number] | undefined | null;
+  hasPending?: boolean;
   onChange: (param:unknown) => void;
 };
 
-export const FilterControl = memo(function FilterControl({ config, value, onChange }: FilterControlProps) {
+export const FilterControl = memo(function FilterControl({ config, value, hasPending, onChange }: FilterControlProps) {
   switch (config.type) {
     case 'numeric':
       return (
         <TextRange
           title={config.label}
+          hasPending={hasPending}
           // description={config.description}
           min={config.options[0]}
           max={config.options[1]}

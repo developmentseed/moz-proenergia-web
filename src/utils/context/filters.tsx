@@ -38,6 +38,7 @@ type FiltersContextType = {
   // Apply action
   applyPendingChanges: () => void;
   hasPendingChanges: boolean;
+  getFilterPendingStatus: (filterId: string) => boolean;
   setFilters: SetValues<DynamicFilterParsers>;
   resetAllFilters: () => void;
 };
@@ -77,6 +78,12 @@ export function FiltersProvider({
     return pendingFilters !== null;
   }, [pendingFilters]);
 
+  // Check if a specific filter has pending changes
+  const getFilterPendingStatus = useCallback((filterId: string): boolean => {
+    if (!pendingFilters) return false;
+    return JSON.stringify(pendingFilters[filterId]) !== JSON.stringify(filters[filterId]);
+  }, [pendingFilters, filters]);
+
   // Pending change handlers
   const setPendingFilters = useCallback((updates: Record<string, unknown>) => {
     setPendingFiltersState(prev => ({ ...(prev || filters), ...updates }));
@@ -106,9 +113,10 @@ export function FiltersProvider({
     setPendingFilters,
     applyPendingChanges,
     hasPendingChanges,
+    getFilterPendingStatus,
     setFilters,
     resetAllFilters,
-  }), [filters, displayFilters, setPendingFilters, applyPendingChanges, hasPendingChanges, setFilters, resetAllFilters]);
+  }), [filters, displayFilters, setPendingFilters, applyPendingChanges, hasPendingChanges, getFilterPendingStatus, setFilters, resetAllFilters]);
 
   return (
     <FiltersContext.Provider value={value}>

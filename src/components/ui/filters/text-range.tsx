@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Box, Stack, Input, Flex, Text, Slider } from '@chakra-ui/react';
+import { Box, Stack, Input, Flex, Slider } from '@chakra-ui/react';
 import { type SliderValueChangeDetails } from '@chakra-ui/react';
 import { formatNumber } from '@/utils/numer';
+import { FilterLabel } from './filter-label';
 
 interface TextRangeProps {
   title: string;
   min: number;
   max: number;
   value: number[];
+  hasPending?: boolean;
   onChange: (details: SliderValueChangeDetails) => void;
   step?: number;
 }
@@ -17,6 +19,7 @@ export const TextRange = ({
   min,
   max,
   value,
+  hasPending,
   onChange
 }: TextRangeProps) => {
   const [localValue, setLocalValue] = useState<number[]>(value);
@@ -115,9 +118,7 @@ export const TextRange = ({
 
   return (
     <Stack gap={2} width="full">
-      <Text textStyle='sliderLabel'>
-        {title}
-      </Text>
+      <FilterLabel title={title} hasPending={hasPending} />
 
       <Box width="full">
         <Slider.Root

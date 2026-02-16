@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { LuChevronUp, LuLayers, LuSettings2 } from "react-icons/lu";
 import { FilterControl } from "./filters/filter-control";
+import { FilterLabel } from "./filters/filter-label";
 import { LayerControl } from "./layers/layer-control";
 import { useModel } from "@/utils/context/model";
 import { useContextualLayers } from "@/utils/context/contextual-layers";
@@ -26,10 +27,12 @@ interface ColGroup {
 const FilterControlWrapper = memo(function FilterControlWrapper({
   filter,
   value,
+  hasPending,
   setPendingFilters,
 }: {
   filter: Filter;
   value: string[] | [number, number] | undefined | null;
+  hasPending?: boolean;
   setPendingFilters: (updates: Record<string, unknown>) => void;
 }) {
   const onChange = useCallback(
@@ -49,7 +52,7 @@ const FilterControlWrapper = memo(function FilterControlWrapper({
     [filter.id, filter.type, setPendingFilters],
   );
 
-  return <FilterControl config={filter} value={value} onChange={onChange} />;
+  return <FilterControl config={filter} value={value} hasPending={hasPending} onChange={onChange} />;
 });
 
 const LayersPanel = () => {
@@ -85,7 +88,8 @@ const CollapsibleGroup = memo(function CollapsibleGroup({
 }: {
   collapsibleItem: ColGroup;
 }) {
-  const { displayFilters, setPendingFilters } = useFilters();
+  const { displayFilters, setPendingFilters, getFilterPendingStatus } = useFilters();
+  const groupHasPending = collapsibleItem.items.some((f) => getFilterPendingStatus(f.id));
   return (
     <Collapsible.Root>
       <Collapsible.Trigger
@@ -96,7 +100,7 @@ const CollapsibleGroup = memo(function CollapsibleGroup({
         width="100%"
         textStyle="collapsibleGroupTitle"
       >
-        {collapsibleItem.title}
+        <FilterLabel title={collapsibleItem.title} hasPending={groupHasPending} textStyle="collapsibleGroupTitle" />
         <Collapsible.Indicator
           transition="transform 0.2s"
           _open={{ transform: "rotate(180deg)" }}
@@ -122,7 +126,7 @@ const CollapsibleGroup = memo(function CollapsibleGroup({
 
 const ControlsPanel = () => {
   const { model } = useModel();
-  const { displayFilters, setPendingFilters } = useFilters();
+  const { displayFilters, setPendingFilters, getFilterPendingStatus } = useFilters();
   if (!displayFilters) return <div>Please wait</div>;
 
   const adminFilterExists = model.filters.filter(
@@ -172,6 +176,7 @@ const ControlsPanel = () => {
                 <FilterControlWrapper
                   filter={matchingFilter}
                   value={displayFilters[matchingFilter.id]}
+                  hasPending={getFilterPendingStatus(matchingFilter.id)}
                   setPendingFilters={setPendingFilters}
                 />
               </Box>

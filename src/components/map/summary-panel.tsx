@@ -453,7 +453,7 @@ const SummaryPanel = ({
     : summaryIsLoading;
   const isError = showingCluster ? clusterIsError : summaryIsError;
 
-  const title = showingCluster ? `Cluster - ${clusterId}` : "Summary";
+  const title = showingCluster ? `Cluster - ${clusterId}` : "Summary *Filter disabled temporarily*";
 
   return (
     <Box
