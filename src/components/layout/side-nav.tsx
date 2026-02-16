@@ -34,6 +34,7 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
             <Link
               key={model.id}
               href={`/model/${model.id}`}
+              title={model.name}
               style={{ textDecoration: 'none' }}
             >
               <Box
