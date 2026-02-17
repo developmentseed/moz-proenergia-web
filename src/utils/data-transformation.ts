@@ -1,6 +1,6 @@
 import { LayerProps } from "react-map-gl/maplibre";
 import { interpolateWarm } from 'd3-scale-chromatic';
-import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
+import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, Field, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
 import { api, MEDIA_URL_PREFIX, DEFAULT_COL } from '@/utils/api';
 import { sortFilterOptions } from '@/config/filters';
 import mapConfig from '@/config/map.json';
@@ -22,21 +22,13 @@ export interface ColorCoding {
   color: string;
   value: string;
 }
-export interface ApiSummaryField {
-  columns: string[];
-  label: string;
-  description?: string;
-  group_by?: string;
-  method?: string;
-  unit?: string;
-}
 
 export interface ApiModelResponse {
   id: number;
   name: string;
   filter_fields: ApiFilterField[];
   popup_fields: ApiFilterField[];
-  summary_fields: ApiSummaryField[];
+  summary_fields: Field[];
   scenarios: ApiScenario[];
   visualization_column: string | null; // for main column
   color_coding: ColorCoding[]
@@ -242,7 +234,7 @@ export async function fetchAllFilterOptions(
 }
 
 // Replace 'id' in summary field columns with the main visualization column
-export function replaceSummaryIdColumn(fields: ApiSummaryField[], mainColumn: string): ApiSummaryField[] {
+export function replaceSummaryIdColumn(fields: Field[], mainColumn: string): Field[] {
   return fields.map(f => {
     const idField = f.columns.includes('id');
     if (idField) {

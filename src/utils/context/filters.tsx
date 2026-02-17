@@ -33,6 +33,8 @@ type FiltersContextType = {
   filters: Record<string, [number, number] | string[] | null>;
   // Display values for UI controls (pending takes precedence)
   displayFilters: Record<string, [number, number] | string[] | null>;
+  // Changed filter values to apply to summary queries
+  updatedFilters: Record<string, [number, number] | string[] | null>;
   // Pending change handlers
   setPendingFilters: (updates: Record<string, unknown>) => void;
   // Apply action

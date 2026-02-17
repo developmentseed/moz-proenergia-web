@@ -14,38 +14,12 @@ import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter } from "@/app/types";
 import { formatDisplayNumber } from "@/utils/numer";
 import { buildFilterQueryParam } from "@/utils/query-string-builder";
-interface SummaryItem {
-  key: string;
-  label: string;
-  value: number | string;
-}
-
-interface FlatRow {
-  type: "flat";
-  label: string;
-  key: string;
-  description?: string;
-  unit?: string;
-  value: number | string;
-}
-
-interface GroupRow {
-  type: "group";
-  label: string;
-  description?: string;
-  unit?: string;
-  value: SummaryItem[];
-}
-
-interface ErrorRow {
-  type: "error";
-  label: string;
-  key: string;
-}
-
-type SummaryRow = FlatRow | GroupRow | ErrorRow;
-
-type SummaryData = SummaryRow[];
+import {
+  type BatchSummariesResponse,
+  type SummaryData,
+  type SummaryRow,
+  transformFieldSummary,
+} from "@/utils/summary";
 interface SummaryPanelProps {
   clusterId: string | null;
   scenarioId: string;
@@ -56,39 +30,6 @@ interface SummaryPanelProps {
   resetCluster: () => void;
 }
 
-interface NumericGroupStats {
-  count: number;
-  min: number;
-  max: number;
-  sum: number;
-}
-
-interface BatchSummaryNumeric {
-  type: "numeric";
-  count: number;
-  min: number;
-  max: number;
-  sum: number;
-  grouped?: Record<string, NumericGroupStats>;
-}
-
-interface BatchSummaryString {
-  type: "string";
-  count: number;
-  values: Record<string, number>;
-  grouped?: Record<string, { count: number; values: Record<string, number> }>;
-}
-
-type BatchFieldSummary = BatchSummaryNumeric | BatchSummaryString;
-
-interface BatchSummariesResponse {
-  scenario_id: number;
-  filters_applied: string;
-  summaries: Record<string, BatchFieldSummary>;
-  group_by?: string;
-}
-
-const DEFAULT_METHOD = 'sum';
 
 interface PanelHeaderProps {
   subtitle: string;
@@ -295,85 +236,6 @@ async function fetchFieldSummary(
   }
 }
 
-function transformFieldSummary(
-  response: BatchSummariesResponse,
-  field: Field,
-): SummaryRow {
-  const methodName = field.method || 'sum';
-
-  // Multi-column → always GroupRow, one sub-row per column
-  if (field.columns.length > 1) {
-    const items: SummaryItem[] = field.columns.map((col) => {
-      const summary = response.summaries[col];
-      if (!summary || summary.count === 0) {
-        return { key: col, label: col, value: 0 };
-      }
-      const value = summary.type === "numeric"
-        ? (summary[methodName] || summary[DEFAULT_METHOD])
-        : summary.count;
-      return { key: col, label: col, value };
-    });
-    return {
-      type: "group",
-      label: field.label,
-      description: field.description,
-      unit: field.unit,
-      value: items,
-    };
-  }
-
-  // Single column
-  const column = field.columns[0];
-  const summary = response.summaries[column];
-
-  if (!summary || summary.count === 0) {
-    return {
-      type: "flat",
-      key: column,
-      label: `${field.label} (Total)`,
-      description: field.description,
-      value: 0,
-      unit: field.unit,
-    };
-  }
-
-  if (summary.type === "numeric") {
-    if (summary.grouped) {
-      return {
-        type: "group",
-        label: field.label,
-        description: field.description,
-        unit: field.unit,
-        value: Object.entries(summary.grouped).map(([key, stats]) => ({
-          key,
-          label: key,
-          value: stats[methodName] || stats[DEFAULT_METHOD],
-        })),
-      };
-    }
-    return {
-      type: "flat",
-      key: column,
-      label: `${field.label} (Total)`,
-      description: field.description,
-      value: summary[methodName] || summary[DEFAULT_METHOD],
-      unit: field.unit,
-    };
-  }
-
-  // String type → GroupRow with value distribution
-  return {
-    type: "group",
-    label: field.label,
-    description: field.description,
-    unit: field.unit,
-    value: Object.entries(summary.values).map(([key, count]) => ({
-      key,
-      label: key,
-      value: count,
-    })),
-  };
-}
 
 const SummaryPanel = ({
   clusterId,
