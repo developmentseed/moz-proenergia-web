@@ -6,6 +6,7 @@ import Image from 'next/image';
 import modelConfig from '@/config/model.json';
 import { ModelGroupMetadata } from '@/app/types';
 import { slugify } from '@/utils/data-transformation';
+import { Tooltip } from '../ui/tooltip';
 
 interface SideNavProps {
   models: ModelGroupMetadata[];
@@ -39,31 +40,33 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
               title={model.name}
               style={{ textDecoration: 'none' }}
             >
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                rounded="sm"
-                width={12}
-                height={12}
-                bg={isActive ? "yellow.muted" : "transparent"}
-                cursor="pointer"
-                transition="all 0.2s"
-                _hover={{
-                  bg: isActive ? 'blue.600' : 'gray.200',
-                }}
-              >
-                {iconPath ? (
-                  <Image
-                    src={iconPath}
-                    alt={model.name}
-                    width={20}
-                    height={20}
-                  />
-                ) : (
-                  model.name
-                )}
-              </Box>
+              <Tooltip content={model.name}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  rounded="sm"
+                  width={12}
+                  height={12}
+                  bg={isActive ? "yellow.muted" : "transparent"}
+                  cursor="pointer"
+                  transition="all 0.2s"
+                  _hover={{
+                    bg: isActive ? 'blue.600' : 'gray.200',
+                  }}
+                >
+                  {iconPath ? (
+                    <Image
+                      src={iconPath}
+                      alt={model.name}
+                      width={20}
+                      height={20}
+                    />
+                  ) : (
+                    model.name
+                  )}
+                </Box>
+              </Tooltip>
             </Link>
           );
         })}
