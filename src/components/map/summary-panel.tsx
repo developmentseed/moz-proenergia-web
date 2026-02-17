@@ -285,7 +285,7 @@ async function fetchGroupedSummary(
     const fields = field.columns.join(",");
 
     const params: Record<string, string> = { fields };
-        // @TODO: enable filter
+    // @TODO: enable filter
     // const q = buildFilterQueryParam(filters, filterDefs);
     // if (q) params.q = q;
     if (field.group_by) params.group_by = field.group_by;
@@ -376,6 +376,7 @@ const SummaryPanel = ({
     queryKey: ["cluster", scenarioId, clusterId],
     queryFn: ({ signal }) =>
       fetchClusterData(scenarioId, clusterId!, popupFields, signal),
+    retry: false,
     enabled: !!clusterId,
   });
 
@@ -402,6 +403,7 @@ const SummaryPanel = ({
     queryKey: ["summaries", scenarioId, "batch", batchFields.map((f) => f.columns), filters],
     queryFn: ({ signal }) =>
       fetchBatchSummaries(scenarioId, batchFields, filters, filterDefs, signal),
+    retry: false,
     enabled: summaryEnabled && batchFields.length > 0,
   });
 
@@ -411,6 +413,7 @@ const SummaryPanel = ({
       queryKey: ["summaries", scenarioId, field.label, field.columns, filters],
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         fetchGroupedSummary(scenarioId, field, filters, filterDefs, signal),
+      retry: false,
       enabled: summaryEnabled,
     })),
   });
@@ -433,17 +436,20 @@ const SummaryPanel = ({
       Object.values(q.data!.summaries).every((s) => s.count === 0),
     );
 
-  // Combine results: batch fields first, then grouped fields
+  // Recombine results in original order, then sort flat rows before group rows
   const summaryData: SummaryData | undefined = (() => {
     if (!batchReady || !groupedReady) return undefined;
-    return [
-      ...batchFields.map((field) =>
-        transformFieldSummary(batchQuery.data!, field)
-      ),
-      ...groupedFields.map((field, idx) =>
-        transformFieldSummary(groupedQueries[idx].data!, field)
-      ),
-    ];
+    let groupedIdx = 0;
+    const rows = summaryFields.map((field) => {
+      if (field.group_by) {
+        return transformFieldSummary(groupedQueries[groupedIdx++].data!, field);
+      }
+      return transformFieldSummary(batchQuery.data!, field);
+    });
+    return rows.sort((a, b) => {
+      if (a.type === b.type) return 0;
+      return a.type === 'flat' ? -1 : 1;
+    });
   })();
 
   // Views are mutually exclusive - cluster view never falls through to summary

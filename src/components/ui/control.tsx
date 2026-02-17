@@ -90,7 +90,6 @@ const CollapsibleGroup = memo(function CollapsibleGroup({
 }) {
   const { displayFilters, setPendingFilters, getFilterPendingStatus } = useFilters();
   const pendingCount = collapsibleItem.items.filter((f) => getFilterPendingStatus(f.id)).length;
-  console.log(collapsibleItem.items.filter((f) => getFilterPendingStatus(f.id)));
   return (
     <Collapsible.Root>
       <Collapsible.Trigger
