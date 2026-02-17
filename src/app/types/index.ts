@@ -9,7 +9,7 @@ export interface Field {
   label: string;
   description?: string;
   group_by?: string;
-  method?: string;
+  method?: 'count' | 'min' | 'max' | 'average';
   unit?: string;
 }
 export interface MapItemUnit extends ItemUnit {

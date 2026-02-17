@@ -259,7 +259,7 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
 
   const scenarios: Scenario[] = apiModel.scenarios
     // @TODO: Filtering LCOE model until performance improvement
-    .filter(s => s.id !== 1)
+    // .filter(s => s.id !== 1)
     .filter(s => s.model_file !== null)
     .map(s => ({
       id: String(s.id),
