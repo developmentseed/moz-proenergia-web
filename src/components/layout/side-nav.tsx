@@ -15,7 +15,7 @@ interface SideNavProps {
 export const SideNav = ({ models, currentSlug }: SideNavProps) => {
   const getIconPath = (modelId: string) => {
     const config = modelConfig.find((c) => String(c.model) === String(modelId));
-    return config ? `/model-icon/${config.icon}` : null;
+    return config ? `/model-icon/${config.icon}` : `/model-icon/default.svg`;
   };
 
   return (
