@@ -34,11 +34,11 @@ const MainMap = ({ main }: MainMapProps) => {
   },[]);
 
   const { model, scenarioId } = useModel();
-  const { filters } = useFilters();
+  const { updatedFilters } = useFilters();
 
   const mapFilter = useMemo(() => {
-    return buildExpressionWithFilter(model.filters, filters);
-  }, [filters, model.filters]);
+    return buildExpressionWithFilter(model.filters, updatedFilters);
+  }, [updatedFilters, model.filters]);
 
   const scenario = model.scenarios.find(s => s.id === scenarioId)!;
 
@@ -71,7 +71,7 @@ const MainMap = ({ main }: MainMapProps) => {
       <NavigationControl position='bottom-left' />
     </Map>
     <Legend items={main.options} />
-    <SummaryPanel clusterId={selected} scenarioId={scenarioId} popupFields={model.popupFields} summaryFields={model.summaryFields} filters={filters} filterDefs={model.filters} resetCluster={resetCluster} />
+    <SummaryPanel clusterId={selected} scenarioId={scenarioId} popupFields={model.popupFields} summaryFields={model.summaryFields} filters={updatedFilters} filterDefs={model.filters} resetCluster={resetCluster} />
   </Box>;
 };
 
