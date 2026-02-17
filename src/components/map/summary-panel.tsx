@@ -13,7 +13,7 @@ import { LuChevronUp } from "react-icons/lu";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter } from "@/app/types";
-import { formatDisplayNumber } from "@/utils/numer";
+import { formatDisplayNumber } from "@/utils/number";
 import { buildFilterQueryParam } from "@/utils/query-string-builder";
 interface SummaryItem {
   key: string;
@@ -133,7 +133,7 @@ const tableCellStyleProps = {
 };
 const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
   return (
-    <Box maxHeight={400} width="100%" overflowY="auto" pb={4}>
+    <Box maxHeight={400} width="100%" overflowY="auto" py={4}>
       {isLoading && (
         <Box display="flex" alignItems="center" justifyContent="center" py={8}>
           <Spinner size="xl" />
@@ -145,7 +145,7 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
           <Alert.Indicator />
           <Alert.Content>
             <Alert.Title>Failed to load the data</Alert.Title>
-            <Alert.Description>Please try it again later.</Alert.Description>
+            <Alert.Description>Please try again later.</Alert.Description>
           </Alert.Content>
         </Alert.Root>
       )}
@@ -160,14 +160,19 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
                     <Table.Cell {...tableCellStyleProps}>
                       {" "}
                       <Box display="flex" alignItems="center" gap={1}>
-                        <Text textStyle="tableAttr">{row.label} { row.unit && `(${row.unit})`} </Text>
+                        <Text textStyle="tableAttr">
+                          {row.label}{" "}
+                          <Text as="span" fontWeight="normal">
+                            {row.unit && `(${row.unit})`}{" "}
+                          </Text>
+                        </Text>
                         {row.description && (
                           <InfoTip content={row.description} />
                         )}
                       </Box>
                     </Table.Cell>
                     <Table.Cell {...tableCellStyleProps}>
-                      <Text textStyle="tableValue" textAlign="right">
+                      <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
                         {formatValue(row.value, row.key)}
                       </Text>
                     </Table.Cell>
@@ -181,7 +186,14 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
                   <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
                     <Box display="flex" alignItems="center" gap={1}>
                       {/* group type should have description as label */}
-                      <Text textStyle="tableAttr"> {row.description || row.label}</Text>
+                      <Text textStyle="tableAttr">
+                        {" "}
+                        {row.description || row.label}
+                        <Text as="span" fontWeight="normal">
+                          {" "}
+                          {row.unit && `(${row.unit})`}
+                        </Text>
+                      </Text>
                     </Box>
                   </Table.Cell>
                 </Table.Row>,
@@ -191,12 +203,10 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
                       <Text textStyle="tableAttr" pt={1} pb={1}>
                         {" "}
                         {item.label}
-                        {" "}
-                        {row.unit && `(${row.unit})`}
                       </Text>
                     </Table.Cell>
                     <Table.Cell {...tableCellStyleProps}>
-                      <Text textStyle="tableValue" textAlign="right">
+                      <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
                         {formatValue(item.value, item.key)}
                       </Text>
                     </Table.Cell>
@@ -263,10 +273,10 @@ async function fetchBatchSummaries(
     // const q = buildFilterQueryParam(filters, filterDefs);
     // if (q) params.q = q;
 
-    const { data } = await api.get(
-      `scenario/${scenarioId}/summaries/`,
-      { signal, params },
-    );
+    const { data } = await api.get(`scenario/${scenarioId}/summaries/`, {
+      signal,
+      params,
+    });
     return data;
   } catch (e) {
     console.error(e);
@@ -291,10 +301,10 @@ async function fetchGroupedSummary(
     if (field.group_by) params.group_by = field.group_by;
     if (field.method) params.method = field.method;
 
-    const { data } = await api.get(
-      `scenario/${scenarioId}/summaries/`,
-      { signal, params },
-    );
+    const { data } = await api.get(`scenario/${scenarioId}/summaries/`, {
+      signal,
+      params,
+    });
     return data;
   } catch (e) {
     console.error(e);
@@ -400,7 +410,13 @@ const SummaryPanel = ({
 
   // Single request for all non-grouped fields
   const batchQuery = useQuery({
-    queryKey: ["summaries", scenarioId, "batch", batchFields.map((f) => f.columns), filters],
+    queryKey: [
+      "summaries",
+      scenarioId,
+      "batch",
+      batchFields.map((f) => f.columns),
+      filters,
+    ],
     queryFn: ({ signal }) =>
       fetchBatchSummaries(scenarioId, batchFields, filters, filterDefs, signal),
     retry: false,
@@ -448,7 +464,7 @@ const SummaryPanel = ({
     });
     return rows.sort((a, b) => {
       if (a.type === b.type) return 0;
-      return a.type === 'flat' ? -1 : 1;
+      return a.type === "flat" ? -1 : 1;
     });
   })();
 
@@ -460,7 +476,9 @@ const SummaryPanel = ({
     : summaryIsLoading;
   const isError = showingCluster ? clusterIsError : summaryIsError;
 
-  const title = showingCluster ? `Cluster - ${clusterId}` : "Summary *Filter disabled temporarily*";
+  const title = showingCluster
+    ? `Cluster - ${clusterId}`
+    : "Summary *Filter disabled temporarily*";
 
   return (
     <Box

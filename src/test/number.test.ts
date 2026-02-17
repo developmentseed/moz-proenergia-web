@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatNumber, formatDisplayNumber } from '@/utils/numer';
+import { formatNumber, formatDisplayNumber } from '@/utils/number';
 
 describe('formatNumber', () => {
   it('formats with locale separators', () => {
