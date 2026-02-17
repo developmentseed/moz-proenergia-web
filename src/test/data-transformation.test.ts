@@ -8,6 +8,7 @@ import {
   deriveSource,
   deriveLayerStyles,
   getColormap,
+  replaceSummaryIdColumn,
 } from '@/utils/data-transformation';
 
 describe('data-transformation', () => {
@@ -179,6 +180,56 @@ describe('data-transformation', () => {
     it('should use provided id', () => {
       const result = deriveSource('my-custom-id', 'file.json');
       expect(result.id).toBe('my-custom-id');
+    });
+  });
+
+  describe('replaceSummaryIdColumn', () => {
+    it('should replace "id" column with mainColumn', () => {
+      const fields = [
+        { columns: ['id', 'pop_count'], label: 'Population' },
+      ];
+      const result = replaceSummaryIdColumn(fields, 'technology');
+
+      expect(result).toEqual([
+        { columns: ['pop_count', 'technology'], label: 'Population' },
+      ]);
+    });
+
+    it('should not modify fields without "id" column', () => {
+      const fields = [
+        { columns: ['pop_count', 'area'], label: 'Stats' },
+      ];
+      const result = replaceSummaryIdColumn(fields, 'technology');
+
+      expect(result).toEqual([
+        { columns: ['pop_count', 'area'], label: 'Stats' },
+      ]);
+    });
+
+    it('should handle mix of fields with and without "id"', () => {
+      const fields = [
+        { columns: ['id', 'connections'], label: 'Connections' },
+        { columns: ['area'], label: 'Area' },
+        { columns: ['id'], label: 'Count' },
+      ];
+      const result = replaceSummaryIdColumn(fields, 'grid_type');
+
+      expect(result).toEqual([
+        { columns: ['connections', 'grid_type'], label: 'Connections' },
+        { columns: ['area'], label: 'Area' },
+        { columns: ['grid_type'], label: 'Count' },
+      ]);
+    });
+
+    it('should use DEFAULT_COL as mainColumn when visualization_column is empty', () => {
+      const fields = [
+        { columns: ['id'], label: 'Summary' },
+      ];
+      const result = replaceSummaryIdColumn(fields, 'default');
+
+      expect(result).toEqual([
+        { columns: ['default'], label: 'Summary' },
+      ]);
     });
   });
 

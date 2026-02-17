@@ -241,6 +241,18 @@ export async function fetchAllFilterOptions(
   }
 }
 
+// Replace 'id' in summary field columns with the main visualization column
+export function replaceSummaryIdColumn(fields: ApiSummaryField[], mainColumn: string): ApiSummaryField[] {
+  return fields.map(f => {
+    const idField = f.columns.includes('id');
+    if (idField) {
+      const newFields = [...f.columns.filter(c => c !== 'id'), mainColumn];
+      return { ...f, columns: newFields };
+    }
+    return f;
+  });
+}
+
 // Transform model metadata - give source definition to scenario
 export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetadata, 'filters' | 'layers'> & { filterFields: ApiFilterField[]; colorCoding: ColorCoding[] } {
   const modelId = String(apiModel.id);
@@ -263,6 +275,9 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
   // whwen visuaslization column is empty or null
   const mainColumn = (!apiModel.visualization_column || apiModel.visualization_column === '')? DEFAULT_COL: apiModel.visualization_column;
   const mainField = apiModel.filter_fields.find(f => f.column === mainColumn);
+  const filedNameToReplace = (!apiModel.visualization_column || apiModel.visualization_column === '')? apiModel.popup_fields[0].column : apiModel.visualization_column;
+  // ID column should be replaced to something else to make summary work
+  const summaryFields = replaceSummaryIdColumn(apiModel.summary_fields, filedNameToReplace);
 
   const main: Main = {
     id: slugify(mainColumn) + 'main-ids',
@@ -282,7 +297,7 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
       label: f.label,
       description: f.description,
     })),
-    summaryFields: apiModel.summary_fields,
+    summaryFields: summaryFields,
     filterFields: apiModel.filter_fields,
     colorCoding: apiModel.color_coding ?? [],
   };
