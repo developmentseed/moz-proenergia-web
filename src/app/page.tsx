@@ -48,7 +48,7 @@ export default function Home() {
         <Image
           src="/landing-image1.png"
           alt="Energy infrastructure illustration"
-          style={{ height: "100%", objectFit: "cover" }}
+          style={{ height: "100%", width: "100%", objectFit: "cover" }}
         />
       </Box>
     </Box>
