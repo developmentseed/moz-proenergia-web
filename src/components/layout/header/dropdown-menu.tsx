@@ -5,6 +5,7 @@ import Modal from "../../chakra/modal";
 import LoginForm from "../login-form";
 import { useAuth } from "@/utils/context/auth";
 import { LuExternalLink, LuCircleUser } from "react-icons/lu";
+import { controlZIndex } from "@/components/map/control-constant";
 
 const DropdownMenu = () => {
   const { login, logout, isAuthenticated, username } = useAuth();
@@ -33,8 +34,8 @@ const DropdownMenu = () => {
           </Button>
         </MenuTrigger>
 
-        <Menu.Positioner>
-          <MenuContent>
+        <Menu.Positioner >
+          <MenuContent zIndex={controlZIndex + 2}>
             {isAuthenticated ? (
               <MenuItem value="logout" onClick={() => logout()} cursor={"pointer"}>
                 Log out
