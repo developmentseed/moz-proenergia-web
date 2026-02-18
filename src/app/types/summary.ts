@@ -59,6 +59,7 @@ export interface GroupRow {
 
 export interface ChartRow {
   type: "chart";
+  chartType: "bar" | "line";
   label: string;
   description?: string;
   unit?: string;

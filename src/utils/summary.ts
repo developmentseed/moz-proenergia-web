@@ -6,8 +6,18 @@ function makeGroupOrChartRow(
   field: Field,
   items: SummaryItem[],
 ): GroupRow | ChartRow {
+  if (field.chart) {
+    return {
+      type: "chart",
+      chartType: field.chart,
+      label: field.label,
+      description: field.description,
+      unit: field.unit,
+      value: items,
+    };
+  }
   return {
-    type: field.chart ? "chart" : "group",
+    type: "group",
     label: field.label,
     description: field.description,
     unit: field.unit,

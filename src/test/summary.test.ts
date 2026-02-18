@@ -1,11 +1,6 @@
 import { describe, it, expect } from "vitest";
-import {
-  transformFieldSummary,
-  type BatchSummariesResponse,
-  type FlatRow,
-  type GroupRow,
-  type ChartRow,
-} from "../utils/summary";
+import { transformFieldSummary } from "../utils/summary";
+import type { BatchSummariesResponse, FlatRow, GroupRow, ChartRow } from "@/app/types/summary";
 import type { Field } from "@/app/types";
 
 import oneColumnString from "./example-responses/one-column-string.json";

@@ -141,6 +141,7 @@ const PanelBody = ({ data, isLoading, isClusterError }: PanelBodyProps) => {
               }
 
               if (row.type === "chart") {
+                if (row.chartType === "bar") {
                 return (
                   <Table.Row key={row.label}>
                     <Table.Cell colSpan={2} px={2} py={2}>
@@ -154,6 +155,8 @@ const PanelBody = ({ data, isLoading, isClusterError }: PanelBodyProps) => {
                     </Table.Cell>
                   </Table.Row>
                 );
+              } else return (<Text> Only Bar Chart is available.</Text>);
+
               }
 
               // Group type
