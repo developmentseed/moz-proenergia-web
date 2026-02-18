@@ -269,8 +269,9 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
   // whwen visuaslization column is empty or null
   const mainColumn = (!apiModel.visualization_column || apiModel.visualization_column === '')? DEFAULT_COL: apiModel.visualization_column;
   const mainField = apiModel.filter_fields.find(f => f.column === mainColumn);
-  const filedNameToReplace = (!apiModel.visualization_column || apiModel.visualization_column === '')? apiModel.popup_fields[0].column : apiModel.visualization_column;
-  // ID column should be replaced to something else to make summary work
+  const filedNameToReplace = apiModel.popup_fields[1].column;
+
+  //@NOTE: ID column should be replaced to something else to make summary work
   const summaryFields = replaceSummaryIdColumn(apiModel.summary_fields, filedNameToReplace);
 
   const main: Main = {

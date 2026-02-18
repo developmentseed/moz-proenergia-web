@@ -59,18 +59,39 @@ export interface GroupRow {
   value: SummaryItem[];
 }
 
+export interface ChartRow {
+  type: "chart";
+  label: string;
+  description?: string;
+  unit?: string;
+  value: SummaryItem[];
+}
+
 export interface ErrorRow {
   type: "error";
   label: string;
   key: string;
 }
 
-export type SummaryRow = FlatRow | GroupRow | ErrorRow;
+export type SummaryRow = FlatRow | GroupRow | ChartRow | ErrorRow;
 export type SummaryData = SummaryRow[];
 
 // ----- Transformation -----
 
 const DEFAULT_METHOD = "sum";
+
+function makeGroupOrChartRow(
+  field: Field,
+  items: SummaryItem[],
+): GroupRow | ChartRow {
+  return {
+    type: field.chart ? "chart" : "group",
+    label: field.label,
+    description: field.description,
+    unit: field.unit,
+    value: items,
+  };
+}
 
 function getNumericValue(stats: NumericGroupStats, method: NonNullable<Field["method"]>): number {
   if (stats.count === 0) return 0;
@@ -85,7 +106,7 @@ export function transformFieldSummary(
   const methodName = field.method || DEFAULT_METHOD;
 
   if (field.columns.length > 1 && field.group_by) console.warn("Multiple columns + groupby case, might result in unexected values");
-  // Multi-column → always GroupRow, one sub-row per column
+  // Multi-columns - treat each column as a sub-row of group
   if (field.columns.length > 1) {
     const items: SummaryItem[] = field.columns.map((col) => {
       const summary = response.summaries[col];
@@ -98,13 +119,7 @@ export function transformFieldSummary(
           : summary.count;
       return { key: col, label: col, value };
     });
-    return {
-      type: "group",
-      label: field.label,
-      description: field.description,
-      unit: field.unit,
-      value: items,
-    };
+    return makeGroupOrChartRow(field, items);
   }
 
   // Single column
@@ -125,17 +140,11 @@ export function transformFieldSummary(
   if (summary.type === "numeric") {
 
     if (summary.grouped) {
-      return {
-        type: "group",
-        label: field.label,
-        description: field.description,
-        unit: field.unit,
-        value: Object.entries(summary.grouped).map(([key, stats]) => ({
-          key,
-          label: key,
-          value: getNumericValue(stats, methodName),
-        })),
-      };
+      return makeGroupOrChartRow(field, Object.entries(summary.grouped).map(([key, stats]) => ({
+        key,
+        label: key,
+        value: getNumericValue(stats, methodName),
+      })));
     }
 
     return {
@@ -149,32 +158,20 @@ export function transformFieldSummary(
   }
 
   // response type string
-  // String type with grouped → GroupRow with per-group counts
+  // String type with grouped → per-group counts
   if (summary.grouped) {
-    return {
-      type: "group",
-      label: field.label,
-      description: field.description,
-      unit: field.unit,
-      value: Object.entries(summary.grouped).map(([key, group]) => ({
-        key,
-        label: key,
-        // Only count is avaiable for string type columns grouped
-        value: group.count,
-      })),
-    };
-  }
-
-  // String type GroupRow with value distribution
-  return {
-    type: "group",
-    label: field.label,
-    description: field.description,
-    unit: field.unit,
-    value: Object.entries(summary.values).map(([key, count]) => ({
+    return makeGroupOrChartRow(field, Object.entries(summary.grouped).map(([key, group]) => ({
       key,
       label: key,
-      value: count,
-    })),
-  };
+      // Only count is avaiable for string type columns grouped
+      value: group.count,
+    })));
+  }
+
+  // String type — value distribution
+  return makeGroupOrChartRow(field, Object.entries(summary.values).map(([key, count]) => ({
+    key,
+    label: key,
+    value: count,
+  })));
 }

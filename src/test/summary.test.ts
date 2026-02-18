@@ -4,13 +4,14 @@ import {
   type BatchSummariesResponse,
   type FlatRow,
   type GroupRow,
+  type ChartRow,
 } from "../utils/summary";
 import type { Field } from "@/app/types";
 
 import oneColumnString from "./example-responses/one-column-string.json";
 import twoColumnsNumeric from "./example-responses/two-columns-numeric.json";
 import twoColumnsGroupby from "./example-responses/two-columns-groupby.json";
-import twoColumnsNumericString from "./example-responses/twol-columns-numeric-string.json";
+// import twoColumnsNumericString from "./example-responses/twol-columns-numeric-string.json";
 import twoColumnsNumericStringGroupby from "./example-responses/two-columns-numeric-string-groupby.json";
 import groupByCountZero from "./example-responses/group-by-count-zero.json";
 
@@ -282,5 +283,100 @@ describe("transformFieldSummary — method variants", () => {
     const existingGrid = result.value.find((v) => v.key === "ExistingGrid");
     expect(existingGrid?.value).toBe(0);
     expect(Number.isNaN(existingGrid?.value)).toBe(false);
+  });
+});
+
+// ── Chart cases ─────────────────────────────────────────────────────
+
+describe("transformFieldSummary — chart row output", () => {
+  it("Input: single column, string, no group_by, chart=bar // Output: ChartRow", () => {
+    const field: Field = { columns: ["MGCapacityBins"], label: "Capacity Bins", chart: "bar" };
+    const result = transformFieldSummary(
+      oneColumnString as BatchSummariesResponse,
+      field,
+    );
+    expect(result.type).toBe("chart");
+    const chart = result as ChartRow;
+    expect(chart.value).toEqual([
+      { key: "0-50", label: "0-50", value: 1597 },
+      { key: "100-200", label: "100-200", value: 120 },
+      { key: "50-100", label: "50-100", value: 454 },
+      { key: ">200", label: ">200", value: 26 },
+    ]);
+  });
+
+  it("Input: single column, numeric, with group_by, chart=bar // Output: ChartRow", () => {
+    const field: Field = {
+      columns: ["NewHHConnectionsTotal"],
+      label: "HH Connections",
+      method: "sum",
+      group_by: "MGCapacityBins",
+      chart: "bar",
+    };
+    const result = transformFieldSummary(
+      twoColumnsGroupby as BatchSummariesResponse,
+      field,
+    );
+    expect(result.type).toBe("chart");
+  });
+
+  it("Input: single column, numeric, without group_by, chart=bar // Output: Ignroe chart, Flat row", () => {
+    const field: Field = {
+      columns: ["NewHHConnectionsTotal"],
+      label: "HH Connections",
+      method: "sum",
+      chart: "bar",
+    };
+    const result = transformFieldSummary(
+      twoColumnsNumeric as BatchSummariesResponse,
+      field,
+    );
+    expect(result.type).toBe("flat");
+  });
+
+  it("Input: single column, numeric, with group_by, count-zero, chart=bar // Output: ChartRow with 0 for null groups", () => {
+    const field: Field = {
+      columns: ["LCOETotal"],
+      label: "LCOE",
+      method: "sum",
+      group_by: "Technology2030",
+      chart: "bar",
+    };
+    const result = transformFieldSummary(
+      groupByCountZero as BatchSummariesResponse,
+      field,
+    );
+    expect(result.type).toBe("chart");
+    const chart = result as ChartRow;
+    expect(chart.value.find((v) => v.key === "MiniGrid_PV")?.value).toBe(21.4107);
+    expect(chart.value.find((v) => v.key === "ExistingGrid")?.value).toBe(0);
+  });
+
+  it("Input: multi-column, numeric, chart=bar // Output: ChartRow", () => {
+    const field: Field = {
+      columns: ["NewHHConnectionsTotal", "travel_time_cities_h"],
+      label: "Stats",
+      method: "sum",
+      chart: "bar",
+    };
+    const result = transformFieldSummary(
+      twoColumnsNumeric as BatchSummariesResponse,
+      field,
+    );
+    expect(result.type).toBe("chart");
+    const chart = result as ChartRow;
+    expect(chart.value[0].label).toBe("NewHHConnectionsTotal");
+    expect(chart.value[1].label).toBe("travel_time_cities_h");
+    expect(chart.value[0].value).toBe(439089.7747); //sum of NewHHConnectionsTotal
+    expect(chart.value[1].value).toBe(10741.6); // sum of travel_time_cities_h
+  });
+
+  it("Input: without chart field // Output: GroupRow (not ChartRow)", () => {
+    const field: Field = { columns: ["MGCapacityBins"], label: "Capacity Bins" };
+    const result = transformFieldSummary(
+      oneColumnString as BatchSummariesResponse,
+      field,
+    );
+    expect(result.type).toBe("group");
   });
 });

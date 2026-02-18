@@ -15,6 +15,7 @@ import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter } from "@/app/types";
 import { formatDisplayNumber } from "@/utils/numer";
 import { buildFilterQueryParam } from "@/utils/query-string-builder";
+import { SummaryBarChart } from "@/components/chakra/chart/bar";
 import {
   type BatchSummariesResponse,
   type SummaryData,
@@ -133,6 +134,22 @@ const PanelBody = ({ data, isLoading, isClusterError }: PanelBodyProps) => {
                       <Text textStyle="tableValue" textAlign="right">
                         {formatValue(row.value, row.key)}
                       </Text>
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              }
+
+              if (row.type === "chart") {
+                return (
+                  <Table.Row key={row.label}>
+                    <Table.Cell colSpan={2} px={2} py={2}>
+                      <Box display="flex" alignItems="center" gap={1} mb={2}>
+                        <Text textStyle="tableAttr">{row.description || row.label}</Text>
+                        {row.description && row.label !== row.description && (
+                          <InfoTip content={row.description} />
+                        )}
+                      </Box>
+                      <SummaryBarChart data={row.value} />
                     </Table.Cell>
                   </Table.Row>
                 );
@@ -300,7 +317,7 @@ const SummaryPanel = ({
       };
     },
   });
-
+  console.log(summaryData)
   // Views are mutually exclusive - cluster view never falls through to summary
   const showingCluster = !!clusterId;
   const dataToDisplay = showingCluster ? clusterData : summaryData;
