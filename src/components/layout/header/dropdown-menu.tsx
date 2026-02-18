@@ -6,6 +6,7 @@ import LoginForm from "../login-form";
 import { useAuth } from "@/utils/context/auth";
 import { LuExternalLink, LuCircleUser } from "react-icons/lu";
 import { controlZIndex } from "@/components/map/control-constant";
+import { SDI_PORTAL_URL } from "@/config/website";
 
 const DropdownMenu = () => {
   const { login, logout, isAuthenticated, username } = useAuth();
@@ -53,7 +54,7 @@ const DropdownMenu = () => {
               </MenuItem>
             )}
             <MenuItem value="sdi-portal" cursor={"pointer"} asChild>
-              <a href="https://proenergia-staging.ds.io/admin/" target="_blank" rel="noopener noreferrer">
+              <a href={SDI_PORTAL_URL} target="_blank" rel="noopener noreferrer">
                 <LuExternalLink /> SDI Portal 
               </a>
             </MenuItem>
