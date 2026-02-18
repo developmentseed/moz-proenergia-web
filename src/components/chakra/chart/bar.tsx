@@ -1,9 +1,9 @@
 "use client";
 
 import { Chart, useChart } from "@chakra-ui/charts";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
 import { type SummaryItem } from "@/app/types/summary";
-import { formatDisplayNumber} from "@/utils/numer";
+import { formatDisplayNumber } from "@/utils/numer";
 
 interface SummaryBarChartProps {
   data: SummaryItem[];
@@ -29,6 +29,11 @@ export const SummaryBarChart = ({ data, color = "orange" }: SummaryBarChartProps
           axisLine={false}
           tickLine={false}
           tickFormatter={(value) => formatDisplayNumber(value)}
+        />
+        <Tooltip
+          cursor={{ fill: chart.color("bg.muted") }}
+          formatter={(value) => formatDisplayNumber(value as number)}
+          content={<Chart.Tooltip />}
         />
         {chart.series.map((item) => (
           <Bar

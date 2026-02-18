@@ -335,7 +335,7 @@ const SummaryPanel = ({
     <Box
       position="absolute"
       top="4"
-      minWidth={"350px"}
+      width={"350px"}
       {...mapControlCommonStyleProps}
       zIndex={controlZIndex}
     >
