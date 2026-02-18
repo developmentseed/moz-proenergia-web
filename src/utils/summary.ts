@@ -4,17 +4,17 @@ import { type Field } from "@/app/types";
 
 export interface NumericGroupStats {
   count: number;
-  min: number;
-  max: number;
-  sum: number;
+  min: number | null;
+  max: number | null;
+  sum: number | null;
 }
 
 export interface BatchSummaryNumeric {
   type: "numeric";
   count: number;
-  min: number;
-  max: number;
-  sum: number;
+  min: number | null;
+  max: number | null;
+  sum: number | null;
   grouped?: Record<string, NumericGroupStats>;
 }
 
@@ -31,7 +31,7 @@ export interface BatchSummariesResponse {
   scenario_id: number;
   filters_applied: string;
   summaries: Record<string, BatchFieldSummary>;
-  group_by?: string;
+  group_by?: string[];
 }
 
 // ----- Row types -----
@@ -73,15 +73,16 @@ export type SummaryData = SummaryRow[];
 const DEFAULT_METHOD = "sum";
 
 function getNumericValue(stats: NumericGroupStats, method: NonNullable<Field["method"]>): number {
-  if (method === "average") return stats.sum / stats.count;
-  return stats[method] ?? stats[DEFAULT_METHOD];
+  if (stats.count === 0) return 0;
+  if (method === "average") return stats.sum! / stats.count;
+  return stats[method] ?? 0;
 }
 
 export function transformFieldSummary(
   response: BatchSummariesResponse,
   field: Field,
 ): SummaryRow {
-  const methodName = field.method || "sum";
+  const methodName = field.method || DEFAULT_METHOD;
 
   // Multi-column → always GroupRow, one sub-row per column
   if (field.columns.length > 1) {
@@ -141,6 +142,21 @@ export function transformFieldSummary(
       description: field.description,
       value: getNumericValue(summary, methodName),
       unit: field.unit,
+    };
+  }
+
+  // String type with grouped → GroupRow with per-group counts
+  if (summary.grouped) {
+    return {
+      type: "group",
+      label: field.label,
+      description: field.description,
+      unit: field.unit,
+      value: Object.entries(summary.grouped).map(([key, group]) => ({
+        key,
+        label: key,
+        value: group.count,
+      })),
     };
   }
 

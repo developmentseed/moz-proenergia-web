@@ -1,0 +1,76 @@
+
+{
+    "scenario_id": 4,
+    "filters_applied": "",
+    "summaries": {
+        "NewHHConnectionsTotal": {
+            "type": "numeric",
+            "count": 2197,
+            "min": 0.1952,
+            "max": 2368.6628,
+            "sum": 439089.7747,
+            "grouped": {
+                "0-50": {
+                    "count": 1597,
+                    "min": 0.1952,
+                    "max": 226.2554,
+                    "sum": 210291.391
+                },
+                "100-200": {
+                    "count": 120,
+                    "min": 400.3955,
+                    "max": 887.803,
+                    "sum": 67392.2084
+                },
+                "50-100": {
+                    "count": 454,
+                    "min": 201.72,
+                    "max": 425.1368,
+                    "sum": 129520.5174
+                },
+                ">200": {
+                    "count": 26,
+                    "min": 858.3771,
+                    "max": 2368.6628,
+                    "sum": 31885.6579
+                }
+            }
+        },
+        "travel_time_cities_h": {
+            "type": "numeric",
+            "count": 2197,
+            "min": 0.0,
+            "max": 16.5,
+            "sum": 10741.6,
+            "grouped": {
+                "0-50": {
+                    "count": 1597,
+                    "min": 0.0,
+                    "max": 16.5,
+                    "sum": 7925.5
+                },
+                "100-200": {
+                    "count": 120,
+                    "min": 0.3,
+                    "max": 14.4,
+                    "sum": 517.0
+                },
+                "50-100": {
+                    "count": 454,
+                    "min": 0.2,
+                    "max": 14.3,
+                    "sum": 2197.6
+                },
+                ">200": {
+                    "count": 26,
+                    "min": 0.3,
+                    "max": 11.2,
+                    "sum": 101.5
+                }
+            }
+        }
+    },
+    "group_by": [
+        "MGCapacityBins"
+    ]
+}
