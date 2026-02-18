@@ -54,7 +54,7 @@ const DropdownMenu = () => {
             )}
             <MenuItem value="sdi-portal" cursor={"pointer"} asChild>
               <a href="https://proenergia-staging.ds.io/admin/" target="_blank" rel="noopener noreferrer">
-                SDI Portal <LuExternalLink />
+                <LuExternalLink /> SDI Portal 
               </a>
             </MenuItem>
           </MenuContent>
