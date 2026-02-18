@@ -359,9 +359,3 @@ export function transformMainOptions(
     color: colorLookup.get(String(opt.value)) ?? defaultColor,
   }));
 }
-
-// @TODO: this will need to be filtered by scenario id
-export async function getVectorData() {
-  const apiVectors = await fetchVectors();
-  return apiVectors;
-}

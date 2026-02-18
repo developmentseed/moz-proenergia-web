@@ -84,6 +84,7 @@ export function transformFieldSummary(
 ): SummaryRow {
   const methodName = field.method || DEFAULT_METHOD;
 
+  if (field.columns.length > 1 && field.group_by) console.warn("Multiple columns + groupby case, might result in unexected values");
   // Multi-column → always GroupRow, one sub-row per column
   if (field.columns.length > 1) {
     const items: SummaryItem[] = field.columns.map((col) => {
@@ -122,6 +123,7 @@ export function transformFieldSummary(
   }
 
   if (summary.type === "numeric") {
+
     if (summary.grouped) {
       return {
         type: "group",
@@ -135,6 +137,7 @@ export function transformFieldSummary(
         })),
       };
     }
+
     return {
       type: "flat",
       key: column,
@@ -145,6 +148,7 @@ export function transformFieldSummary(
     };
   }
 
+  // response type string
   // String type with grouped → GroupRow with per-group counts
   if (summary.grouped) {
     return {
@@ -155,12 +159,13 @@ export function transformFieldSummary(
       value: Object.entries(summary.grouped).map(([key, group]) => ({
         key,
         label: key,
+        // Only count is avaiable for string type columns grouped
         value: group.count,
       })),
     };
   }
 
-  // String type → GroupRow with value distribution
+  // String type GroupRow with value distribution
   return {
     type: "group",
     label: field.label,

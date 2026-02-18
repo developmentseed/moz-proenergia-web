@@ -33,7 +33,7 @@ describe("transformFieldSummary — response shapes", () => {
     ]);
   });
 
-  it("Input: two columns, numeric, no group_by // Output: GroupRow with per-column sum", () => {
+  it("Input: two columns, numeric, no group_by, method sum // Output: GroupRow with per-column sum", () => {
     const field: Field = {
       columns: ["NewHHConnectionsTotal", "travel_time_cities_h"],
       label: "Stats",
