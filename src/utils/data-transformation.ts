@@ -156,9 +156,9 @@ export function deriveLayerStyles(sourceId: string, color: string): { circleLaye
   };
 }
 
-export async function fetchModels(): Promise<ModelGroupMetadata[]> {
+export async function fetchModels(signal?: AbortSignal): Promise<ModelGroupMetadata[]> {
   try {
-    const { data } = await api.get('model/');
+    const { data } = await api.get('model/', { signal });
     // @TODO return models as it is. Returning lcoe and mini grids until data getting ingested.
     return data.results;
   } catch(e) {
@@ -167,9 +167,9 @@ export async function fetchModels(): Promise<ModelGroupMetadata[]> {
   }
 }
 
-export async function fetchModelMetadata(slug: string): Promise<ApiModelResponse> {
+export async function fetchModelMetadata(slug: string, signal?: AbortSignal): Promise<ApiModelResponse> {
   try {
-    const { data } = await api.get(`model/${slug}/`);
+    const { data } = await api.get(`model/${slug}/`, { signal });
     return data;
   } catch(e) {
     console.error(e);
@@ -177,10 +177,11 @@ export async function fetchModelMetadata(slug: string): Promise<ApiModelResponse
   }
 }
 
-export async function fetchVectors({ modelId, token }: { modelId?: string, token?: string | null} = {}): Promise<ApiVectorResult[]> {
+export async function fetchVectors({ modelId, token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiVectorResult[]> {
   try {
     const endpoint = modelId? `vector/?model=${modelId}`: 'vector/';
     const { data } = await api.get(endpoint, {
+      signal,
       ...(token && {
         headers: { 'Authorization': `Token ${token}` }
       }),
@@ -204,12 +205,13 @@ export async function fetchVectors({ modelId, token }: { modelId?: string, token
 export async function fetchAllFilterOptions(
   scenarioId: string | number,
   columns: string[],
+  signal?: AbortSignal,
 ): Promise<Record<string, string[] | number[] | null>> {
   try {
     const fields = columns.join(',');
     const { data, status } = await api.get(
       `scenario/${scenarioId}/summaries/`,
-      { params: { fields } },
+      { signal, params: { fields } },
     );
     if (status !== 200) {
       console.warn(`fetchAllFilterOptions: returned status ${status}, using fallback`);
@@ -331,6 +333,8 @@ export function transformMainOptions(
   rawOptions: MapItemUnit[] | null,
   colorCoding: ColorCoding[]
 ): MapItemUnit[] {
+  console.log(rawOptions);
+  console.log(colorCoding);
   if (!Array.isArray(rawOptions)) return [];
 
   // Find default color (value: "any")

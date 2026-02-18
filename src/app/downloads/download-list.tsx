@@ -14,7 +14,7 @@ export const DownloadList = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['vector', token],
-    queryFn: () => fetchVectors({ token })
+    queryFn: ({ signal }) => fetchVectors({ token, signal })
   });
 
   const filteredData = data?.filter((item) =>

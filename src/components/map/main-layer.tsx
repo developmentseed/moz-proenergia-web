@@ -98,6 +98,7 @@ export const MainLayer = ({
       }
     };
   }, [map, symbolImageIds]);
+  console.log(main);
 
   const mainLayer: LayerSpecification = useMemo(
     () => ({
@@ -109,7 +110,7 @@ export const MainLayer = ({
       },
       ...(mapFilter ? { filter: mapFilter } : {}),
     }),
-    [main.id, main.column, main.options, scenario.layer, mapFilter]
+    [main, scenario.layer, mapFilter]
   );
 
   const symbolMainLayer:LayerSpecification = useMemo(

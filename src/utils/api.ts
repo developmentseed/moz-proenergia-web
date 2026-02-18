@@ -10,5 +10,5 @@ export const DEFAULT_COL = 'default';
 
 export const api = axios.create({
   baseURL: API_ENDPOINT,
-  timeout: 15000,
+  timeout: 10000,
 });

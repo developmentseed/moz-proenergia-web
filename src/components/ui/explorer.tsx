@@ -44,8 +44,8 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   // Query 1: Model metadata
   const { data: modelCore } = useQuery({
     queryKey: ["modelMetadata", modelId],
-    queryFn: async () => {
-      const apiModel = await fetchModelMetadata(modelId);
+    queryFn: async ({ signal }) => {
+      const apiModel = await fetchModelMetadata(modelId, signal);
       return transformModelCore(apiModel);
     },
   });
@@ -53,8 +53,8 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   // @TODO: reflect user authentication
   const { data: layers } = useQuery({
     queryKey: ["vectors", token],
-    queryFn: async () => {
-      const apiVectors = await fetchVectors({ modelId, token });
+    queryFn: async ({ signal }) => {
+      const apiVectors = await fetchVectors({ modelId, token, signal });
       return transformVectorsToLayers(apiVectors);
     },
   });
@@ -69,7 +69,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
 
   const { data: allFilterOptions } = useQuery({
     queryKey: ["filterOptions", modelCore?.id, filterColumns],
-    queryFn: () => fetchAllFilterOptions(defaultScenarioId!, filterColumns),
+    queryFn: ({ signal }) => fetchAllFilterOptions(defaultScenarioId!, filterColumns, signal),
     enabled: !!modelCore?.id && !!defaultScenarioId && filterColumns.length > 0,
   });
 
@@ -86,6 +86,10 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     const rawMainOptions = mainFilter
       ? (mainFilter.options as MapItemUnit[] | null)
       : [];
+    // PUE potentail filter fetching fail -> viz fail
+    console.log(modelCore)
+    console.log(rawMainOptions);
+    console.log(filters);
     const resolvedMainOptions = transformMainOptions(
       rawMainOptions,
       modelCore.colorCoding,
