@@ -52,7 +52,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   // contextual layers : separate context
   // @TODO: reflect user authentication
   const { data: layers } = useQuery({
-    queryKey: ["vectors", token],
+    queryKey: ["vectors", modelId, token],
     queryFn: async ({ signal }) => {
       const apiVectors = await fetchVectors({ modelId, token, signal });
       return transformVectorsToLayers(apiVectors);
@@ -87,7 +87,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
       ? (mainFilter.options as MapItemUnit[] | null)
       : [];
     // PUE potentail filter fetching fail -> viz fail
-    console.log(modelCore)
+    console.log(modelCore);
     console.log(rawMainOptions);
     console.log(filters);
     const resolvedMainOptions = transformMainOptions(
