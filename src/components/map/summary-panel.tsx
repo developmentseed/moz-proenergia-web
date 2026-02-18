@@ -17,11 +17,12 @@ import { formatDisplayNumber } from "@/utils/numer";
 import { buildFilterQueryParam } from "@/utils/query-string-builder";
 import { SummaryBarChart } from "@/components/chakra/chart/bar";
 import {
-  type BatchSummariesResponse,
-  type SummaryData,
-  type SummaryRow,
   transformFieldSummary,
 } from "@/utils/summary";
+import {
+  type BatchSummariesResponse,
+  type SummaryData,
+  type SummaryRow } from "@/app/types/summary";
 interface SummaryPanelProps {
   clusterId: string | null;
   scenarioId: string;
@@ -317,7 +318,7 @@ const SummaryPanel = ({
       };
     },
   });
-  console.log(summaryData)
+  console.log(summaryData);
   // Views are mutually exclusive - cluster view never falls through to summary
   const showingCluster = !!clusterId;
   const dataToDisplay = showingCluster ? clusterData : summaryData;

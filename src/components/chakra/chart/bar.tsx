@@ -2,15 +2,11 @@
 
 import { Chart, useChart } from "@chakra-ui/charts";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { type SummaryItem } from "@/app/types/summary";
 import { formatDisplayNumber} from "@/utils/numer";
 
-interface BarChartItem {
-  label: string;
-  value: number;
-}
-
 interface SummaryBarChartProps {
-  data: BarChartItem[];
+  data: SummaryItem[];
   color?: string;
 }
 
