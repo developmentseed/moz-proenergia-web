@@ -6,9 +6,10 @@ import {
   Text,
   Collapsible,
 } from "@chakra-ui/react";
-import { api } from "@/utils/api";
+import { api, CONCURRENCY_NUM } from "@/utils/api";
 import { InfoTip } from "../chakra/toggle-tip";
 import { LuChevronUp } from "react-icons/lu";
+ import pLimit from 'p-limit';
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter } from "@/app/types";
@@ -30,6 +31,8 @@ interface SummaryPanelProps {
   resetCluster: () => void;
 }
 
+// Limit the number of parallel requests going out
+const summaryLimit = pLimit(CONCURRENCY_NUM);
 
 interface PanelHeaderProps {
   subtitle: string;
@@ -236,7 +239,6 @@ async function fetchFieldSummary(
   }
 }
 
-
 const SummaryPanel = ({
   clusterId,
   scenarioId,
@@ -271,8 +273,10 @@ const SummaryPanel = ({
     queries: summaryFields.map((field) => ({
       queryKey: ["summaries", scenarioId, field.label, field.columns, field.group_by, filters],
       queryFn: async ({ signal }: { signal: AbortSignal }) => {
-        const response = await fetchFieldSummary(scenarioId, field, filters, filterDefs, signal);
-        return transformFieldSummary(response, field);
+        return summaryLimit(async () => {
+          const response = await fetchFieldSummary(scenarioId, field, filters, filterDefs, signal);
+          return transformFieldSummary(response, field);
+        });
       },
       retry: false,
       enabled: summaryEnabled,

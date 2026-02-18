@@ -5,10 +5,10 @@ export const MEDIA_URL_PREFIX = 'https://proenergia-staging.ds.io/media/';
 
 //@TODO
 export const STALE_TIME = 600000; // 1 hour
-
+export const CONCURRENCY_NUM = 3;
 export const DEFAULT_COL = 'default';
 
 export const api = axios.create({
   baseURL: API_ENDPOINT,
-  timeout: 10000,
+  timeout: 15000,
 });
