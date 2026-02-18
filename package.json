@@ -43,8 +43,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.0.8",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "16.1.6",
     "jsdom": "^27.4.0",
     "typescript": "^5",
     "vitest": "^4.0.18"
