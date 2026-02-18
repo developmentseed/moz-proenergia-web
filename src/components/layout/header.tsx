@@ -36,7 +36,8 @@ export const Header = ({
 }: HeaderProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const pathname = usePathname();
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
+
   // To show successful logout message
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -101,7 +102,7 @@ export const Header = ({
           {navigationItems.map((item) => {
             const isModal = item.href === "modal";
             if (isModal) {
-              if ((loggingOut) && !isModalOpen) {
+              if ((isAuthenticated || loggingOut) && !isModalOpen) {
                 return (
                   <LogoutButton
                     key={item.href}
