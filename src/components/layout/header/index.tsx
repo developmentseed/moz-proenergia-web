@@ -1,14 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { Box, Heading, Flex, HStack, Text, Link } from "@chakra-ui/react";
+import { Box, Heading, Flex, HStack, Text, Link, Separator } from "@chakra-ui/react";
 import NextLink from "next/link";
-import Modal from "../chakra/modal";
-import LoginForm from "./login-form";
-import { useAuth } from "@/utils/context/auth";
-import LogoutButton from "../ui/logout-button";
 import Image from "next/image";
+import DropdownMenu from "./dropdown-menu";
 
 export interface NavigationItem {
   label: string;
@@ -18,44 +14,25 @@ export interface NavigationItem {
 interface HeaderProps {
   logoSrc?: string;
   navigationItems?: NavigationItem[];
-  modalContent?: React.ReactNode;
-  modalTitle?: string;
 }
 
 const defaultNavigationItems: NavigationItem[] = [
   { label: "Explorer", href: "/models" },
   { label: "About", href: "/about" },
   { label: "Downloads", href: "/downloads" },
-  { label: "SDI Admin", href: "https://proenergia-staging.ds.io/admin/" },
-  { label: "Login", href: "modal" },
 ];
 
 export const Header = ({
   logoSrc = "/Logo.svg",
   navigationItems = defaultNavigationItems,
 }: HeaderProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const pathname = usePathname();
-  const { login, isAuthenticated } = useAuth();
-
-  // To show successful logout message
-  const [loggingOut, setLoggingOut] = useState(false);
 
   const isActive = (href: string) => {
-    if (href === "modal") return false;
     // For /model/* paths, match any model page to Explorer
     if (href.startsWith("/models") && pathname.startsWith("/model/"))
       return true;
     return pathname === href + "/";
-  };
-
-  const handleLinkClick = (href: string, e: React.MouseEvent) => {
-    if (href === "modal") {
-      e.preventDefault();
-    }
-  };
-  const onModalClose = () => {
-      setIsModalOpen(false);
   };
 
   return (
@@ -100,28 +77,6 @@ export const Header = ({
         {/* Navigation Items - Right */}
         <HStack fontFamily="body" gap={6}>
           {navigationItems.map((item) => {
-            const isModal = item.href === "modal";
-            if (isModal) {
-              if ((isAuthenticated || loggingOut) && !isModalOpen) {
-                return (
-                  <LogoutButton
-                    key={item.href}
-                    onLogoutStart={() => setLoggingOut(true)}
-                    onLogoutEnd={() => setLoggingOut(false)}
-                  />
-                );
-              }
-              return (
-                <Modal
-                  key={item.href}
-                  isOpen={isModalOpen}
-                  item={item}
-                  modalTitle={"Log in"}
-                  setIsModalOpen={setIsModalOpen}
-                  modalContent={<LoginForm onSubmit={login} onClose={onModalClose} />}
-                />
-              );
-            }
             const active = isActive(item.href);
             return (
               <Box key={item.href}>
@@ -130,7 +85,6 @@ export const Header = ({
                   fontWeight={active ? "bold" : "medium"}
                   color={active ? "fg" : "fg.muted"}
                   transition="color 0.2s"
-                  onClick={(e) => handleLinkClick(item.href, e)}
                   asChild
                   _hover={{ textDecoration: "none", outline: "none" }}
                 >
@@ -139,6 +93,8 @@ export const Header = ({
               </Box>
             );
           })}
+          <Separator orientation="vertical" height="4" />
+          <DropdownMenu />
         </HStack>
       </Flex>
     </Box>

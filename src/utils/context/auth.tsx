@@ -3,6 +3,7 @@
 import { createContext, PropsWithChildren, useContext, useState } from "react";
 import { api } from '@/utils/api';
 const TOKEN_KEY = "token";
+const USERNAME_KEY = "username";
 
 export interface LoginResponse {
   token: string;
@@ -10,6 +11,7 @@ export interface LoginResponse {
 
 export interface IAuthContext {
   token?: string | null;
+  username?: string | null;
   login: (username: string, password: string) => Promise<LoginResponse>;
   logout: () => void;
   isAuthenticated: boolean;
@@ -22,6 +24,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
     if (typeof window === 'undefined') return null;
     return localStorage.getItem(TOKEN_KEY);
   });
+  const [username, setUsername] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(USERNAME_KEY);
+  });
   const isAuthenticated = !!token;
 
   const login = (username: string, password: string): Promise<LoginResponse> => {
@@ -29,19 +35,24 @@ export function AuthProvider({ children }: PropsWithChildren) {
     return api.post<LoginResponse>('token-auth/', { username, password })
       .then((response) => {
         setToken(response.data.token);
+        setUsername(username);
         localStorage.setItem(TOKEN_KEY, response.data.token);
+        localStorage.setItem(USERNAME_KEY, username);
         return response.data;
       });
   };
 
   const logout = () => {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USERNAME_KEY);
     localStorage.removeItem("cache_date");
     setToken(null);
+    setUsername(null);
   };
 
   const contextValue = {
     token,
+    username,
     isAuthenticated,
     login,
     logout

@@ -4,7 +4,7 @@ import { Provider } from "@/components/chakra/provider";
 import ReactQueryProvider from "@/utils/context/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { WEBSITE_DESC, WEBSITE_TITLE } from "@/config/website";
-import Header from "@/components/layout/header";
+import Header from "@/components/layout/header/";
 import { AuthProvider } from "@/utils/context/auth";
 import { DM_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";

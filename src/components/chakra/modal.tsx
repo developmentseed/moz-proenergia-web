@@ -1,19 +1,16 @@
 import { type ReactNode } from 'react';
-import { CloseButton, Button, Dialog, Portal } from '@chakra-ui/react';
-import { type NavigationItem } from '../layout/header';
+import { CloseButton, Button, Dialog, Portal, createOverlay } from '@chakra-ui/react';
 
 type ModalProps = {
-  item: NavigationItem;
   modalTitle: string;
-  isOpen: boolean;
-  setIsModalOpen: (open:boolean)=> void;
   modalContent?: ReactNode
 }
 
-const Modal = ({ item, modalTitle, isOpen, setIsModalOpen, modalContent }: ModalProps) => {
+const Modal = createOverlay<ModalProps>((props) => {
+  const { modalTitle, modalContent, open, onOpenChange, onExitComplete } = props;
 
-  return <Dialog.Root open={isOpen} onOpenChange={(e) => setIsModalOpen(e.open)}>
-    <Dialog.Trigger asChild>
+  return <Dialog.Root open={open} onOpenChange={onOpenChange} onExitComplete={onExitComplete}>
+    {/* <Dialog.Trigger asChild>
       <Button
         padding={0}
         variant="plain"
@@ -23,7 +20,7 @@ const Modal = ({ item, modalTitle, isOpen, setIsModalOpen, modalContent }: Modal
       >
         {item.label}
       </Button>
-    </Dialog.Trigger>
+    </Dialog.Trigger> */}
     <Portal>
       <Dialog.Backdrop />
       <Dialog.Positioner>
@@ -47,6 +44,6 @@ const Modal = ({ item, modalTitle, isOpen, setIsModalOpen, modalContent }: Modal
       </Dialog.Positioner>
     </Portal>
   </Dialog.Root>;
-};
+})
 
 export default Modal;
