@@ -112,6 +112,7 @@ export const MainLayer = ({
     [main, scenario.layer, mapFilter]
   );
 
+  // To show clusters on low zoom
   const symbolMainLayer:LayerSpecification = useMemo(
     () => ({
       source: scenario.layer.source,
@@ -128,17 +129,20 @@ export const MainLayer = ({
           ...symbolImageIds.flatMap(({ value, imageId }) => [value, imageId]),
           '',
         ] as ExpressionSpecification : '',
-        'icon-overlap': 'cooperative',
+        'icon-overlap': 'always',
         'icon-size': ["interpolate", ["linear"], ["zoom"], mapConfig.minZoom, 0.02, mapConfig.polygonMinZoom, 0.03],
       },
       ...(mapFilter ? { filter: mapFilter } : {}),
     }),
     [main.id, main.column, scenario.layer, symbolImageIds, mapFilter]
   );
+
+  // Show all the data with muted colors so users know which ones are filtered
   const backgroundMainLayer: LayerSpecification = useMemo(
     () => ({
       id: main.id + 'bg',
       ...scenario.layer,
+      minzoom: mapConfig.polygonMinZoom,
       paint: {
         [getColorAttributeNamebyType('fill')]: '#CCCCCC',
       },
