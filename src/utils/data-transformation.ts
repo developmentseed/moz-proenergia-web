@@ -179,7 +179,7 @@ export async function fetchModelMetadata(slug: string, signal?: AbortSignal): Pr
 
 export async function fetchVectors({ modelId, token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiVectorResult[]> {
   try {
-    const endpoint = modelId? `vector/?model=${modelId}`: 'vector/';
+    const endpoint = `vector/`;
     const { data } = await api.get(endpoint, {
       signal,
       ...(token && {
@@ -333,8 +333,7 @@ export function transformMainOptions(
   rawOptions: MapItemUnit[] | null,
   colorCoding: ColorCoding[]
 ): MapItemUnit[] {
-  console.log(rawOptions);
-  console.log(colorCoding);
+
   if (!Array.isArray(rawOptions)) return [];
 
   // Find default color (value: "any")

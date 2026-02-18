@@ -86,10 +86,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     const rawMainOptions = mainFilter
       ? (mainFilter.options as MapItemUnit[] | null)
       : [];
-    // PUE potentail filter fetching fail -> viz fail
-    console.log(modelCore);
-    console.log(rawMainOptions);
-    console.log(filters);
+
     const resolvedMainOptions = transformMainOptions(
       rawMainOptions,
       modelCore.colorCoding,

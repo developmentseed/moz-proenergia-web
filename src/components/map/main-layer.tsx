@@ -98,7 +98,6 @@ export const MainLayer = ({
       }
     };
   }, [map, symbolImageIds]);
-  console.log(main);
 
   const mainLayer: LayerSpecification = useMemo(
     () => ({
