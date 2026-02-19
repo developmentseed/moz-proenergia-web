@@ -9,6 +9,7 @@ import { controlZIndex, mapControlCommonStyleProps } from './control-constant';
 import { LayerEntry } from './layer-entry';
 import { OpacityControl } from './opacity-control';
 import { ModalDialog } from '@/components/chakra/modal';
+import { useTranslation } from 'react-i18next';
 
 interface LegendProps {
   items: MapItemUnit[];
@@ -18,6 +19,7 @@ interface LegendProps {
 
 export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
   const { layers, activeLayers, toggleLayer, setLayerOpacity } = useContextualLayers();
+  const { t } = useTranslation();
   const contextualLayers = layers.filter(l => activeLayers.includes(l.id));
 
   const [mainOpacity, setMainOpacity] = useState(100);
@@ -42,7 +44,7 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
         <VStack align="stretch" gap={2}>
           <HStack w="full" align="center">
             <Text textStyle='tableAttr' mr="auto">
-              {main.label || "Legend"}
+              {main.label || t('map.legend')}
             </Text>
             <HStack gap={0} flexShrink={0}>
               <OpacityControl value={mainOpacity} onValueChange={handleMainOpacity}>
@@ -84,7 +86,7 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
                   <ScrollArea.Content spaceY="3" textStyle="sm">
                     <Box>
                       <Text textStyle='tableAttr' mb={2}>
-                        Additional layers
+                        {t('map.additionalLayers')}
                       </Text>
                       <VStack align="stretch" gap={0.5}>
                         {contextualLayers.map((layer) => (
@@ -112,7 +114,7 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
       </Box>
 
       <ModalDialog
-        modalTitle={main.label || 'Legend'}
+        modalTitle={main.label || t('map.legend')}
         modalContent={main.description ? (
           <Text fontSize="sm">{main.description}</Text>
         ) : (

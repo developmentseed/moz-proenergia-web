@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button, Text } from '@chakra-ui/react';
 import { useAuth } from '@/utils/context/auth';
+import { useTranslation } from 'react-i18next';
 
 interface LogoutButtonProps {
   onLogoutStart?: () => void;
@@ -12,6 +13,7 @@ interface LogoutButtonProps {
 export const LogoutButton = ({ onLogoutStart, onLogoutEnd }: LogoutButtonProps) => {
   const { logout } = useAuth();
   const [justLoggedOut, setJustLoggedOut] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!justLoggedOut) return;
@@ -31,7 +33,7 @@ export const LogoutButton = ({ onLogoutStart, onLogoutEnd }: LogoutButtonProps) 
   if (justLoggedOut) {
     return (
       <Text fontSize="sm" fontWeight="medium" color="green.600">
-        Log out successful
+        {t('auth.logout.success')}
       </Text>
     );
   }
@@ -45,7 +47,7 @@ export const LogoutButton = ({ onLogoutStart, onLogoutEnd }: LogoutButtonProps) 
       color="fg.muted"
       onClick={handleLogout}
     >
-      Log out
+      {t('auth.logout.button')}
     </Button>
   );
 };
