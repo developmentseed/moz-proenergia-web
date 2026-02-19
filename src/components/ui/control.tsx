@@ -3,11 +3,13 @@ import { Tab } from "@/components/chakra";
 import {
   type SliderValueChangeDetails,
   Box,
-  Collapsible,
+  Accordion,
   ScrollArea,
   Text,
+  Button,
+  IconButton,
 } from "@chakra-ui/react";
-import { LuChevronUp, LuLayers, LuSettings2 } from "react-icons/lu";
+import { LuChevronUp, LuInfo, LuLayers, LuSettings2 } from "react-icons/lu";
 import { FilterControl } from "./filters/filter-control";
 import { FilterLabel } from "./filters/filter-label";
 import { LayerControl } from "./layers/layer-control";
@@ -17,9 +19,11 @@ import { useFilters } from "@/utils/context/filters";
 import { ApplyActions } from "./apply-actions";
 // FilterType as enum
 import { FilterType, type Filter, type ItemUnit } from "@/app/types";
+import { Tooltip } from "./tooltip";
 
 interface ColGroup {
   title: string;
+  description?: string;
   items: Filter[];
 }
 
@@ -52,7 +56,14 @@ const FilterControlWrapper = memo(function FilterControlWrapper({
     [filter.id, filter.type, setPendingFilters],
   );
 
-  return <FilterControl config={filter} value={value} hasPending={hasPending} onChange={onChange} />;
+  return (
+    <FilterControl
+      config={filter}
+      value={value}
+      hasPending={hasPending}
+      onChange={onChange}
+    />
+  );
 });
 
 const LayersPanel = () => {
@@ -88,27 +99,41 @@ const CollapsibleGroup = memo(function CollapsibleGroup({
 }: {
   collapsibleItem: ColGroup;
 }) {
-  const { displayFilters, setPendingFilters, getFilterPendingStatus } = useFilters();
-  const pendingCount = collapsibleItem.items.filter((f) => getFilterPendingStatus(f.id)).length;
+  const { displayFilters, setPendingFilters, getFilterPendingStatus } =
+    useFilters();
+  const pendingCount = collapsibleItem.items.filter((f) =>
+    getFilterPendingStatus(f.id),
+  ).length;
   return (
-    <Collapsible.Root>
-      <Collapsible.Trigger
+    <Accordion.Item value={collapsibleItem.title}>
+      <Accordion.ItemTrigger
         display="flex"
         gap="2"
         alignItems="center"
-        justifyContent="space-between"
         width="100%"
         textStyle="collapsibleGroupTitle"
       >
-        <FilterLabel title={collapsibleItem.title} hasPending={pendingCount > 0} pendingCount={pendingCount} textStyle="collapsibleGroupTitle" />
-        <Collapsible.Indicator
-          transition="transform 0.2s"
-          _open={{ transform: "rotate(180deg)" }}
-        >
+        <FilterLabel
+          title={collapsibleItem.title}
+          hasPending={pendingCount > 0}
+          pendingCount={pendingCount}
+          textStyle="collapsibleGroupTitle"
+        />
+        {collapsibleItem.items[0].description && (
+          <Tooltip
+            content={collapsibleItem.items[0].description}
+            contentProps={{ css: { "--tooltip-bg": "colors.bg", color: "fg" } }}
+          >
+            <IconButton variant="ghost" size="xs" p={0}>
+              <LuInfo />
+            </IconButton>
+          </Tooltip>
+        )}
+        <Accordion.ItemIndicator ml="auto">
           <LuChevronUp />
-        </Collapsible.Indicator>
-      </Collapsible.Trigger>
-      <Collapsible.Content>
+        </Accordion.ItemIndicator>
+      </Accordion.ItemTrigger>
+      <Accordion.ItemContent>
         <Box mt={1}>
           {collapsibleItem.items?.map((matchingFilter) => (
             <FilterControlWrapper
@@ -119,14 +144,15 @@ const CollapsibleGroup = memo(function CollapsibleGroup({
             />
           ))}
         </Box>
-      </Collapsible.Content>
-    </Collapsible.Root>
+      </Accordion.ItemContent>
+    </Accordion.Item>
   );
 });
 
 const ControlsPanel = () => {
   const { model } = useModel();
-  const { displayFilters, setPendingFilters, getFilterPendingStatus } = useFilters();
+  const { displayFilters, setPendingFilters, getFilterPendingStatus } =
+    useFilters();
   if (!displayFilters) return <div>Please wait</div>;
 
   const adminFilterExists = model.filters.filter(
@@ -156,6 +182,7 @@ const ControlsPanel = () => {
   const noCollapsibleGroups = model.filters.filter(
     (f) => f.type === FilterType.numeric,
   );
+  console.log(collapsibleGroups);
 
   return (
     // To give space for scrollable area
@@ -164,11 +191,17 @@ const ControlsPanel = () => {
         <ScrollArea.Viewport>
           <ScrollArea.Content spaceY="4" pr={4}>
             {/* put collapsible groups first */}
-            {collapsibleGroups.map((group) => (
-              <Box key={group.title}>
-                <CollapsibleGroup collapsibleItem={group} />
-              </Box>
-            ))}
+            <Accordion.Root
+              collapsible
+              multiple
+              defaultValue={["b"]}
+              size="sm"
+              variant="plain"
+            >
+              {collapsibleGroups.map((group) => (
+                <CollapsibleGroup collapsibleItem={group} key={group.title} />
+              ))}
+            </Accordion.Root>
 
             {/* numeric data doesn't need to be collapsible */}
             {noCollapsibleGroups.map((matchingFilter) => (

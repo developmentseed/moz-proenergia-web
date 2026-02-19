@@ -6,7 +6,6 @@ import {
   Combobox,
   Portal,
   Tag,
-  Text,
   useFilter,
   useListCollection
 } from "@chakra-ui/react";
