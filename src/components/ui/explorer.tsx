@@ -34,12 +34,6 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const [isOpen, setIsOpen] = useState(true);
   const { token } = useAuth();
 
-  // Clear nuqs query params from the URL when leaving the explorer page
-  useEffect(() => {
-    return () => {
-      window.history.replaceState(null, '', window.location.pathname);
-    };
-  }, []);
 
   // Query 1: Model metadata
   const { data: modelCore } = useQuery({
