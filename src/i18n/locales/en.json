@@ -1,0 +1,113 @@
+{
+  "nav": {
+    "explorer": "Explorer",
+    "about": "About",
+    "downloads": "Downloads",
+    "login": "Login",
+    "logout": "Log out",
+    "sdiPortal": "SDI Portal"
+  },
+  "home": {
+    "title": "Mozambique Proenergia+ IEP",
+    "description": "A web platform for integrated energy planning and analysis in Mozambique. Proenergia+ IEP aims to increase access to energy and broadband services in project areas and strengthen the operational performance of the electric utility.",
+    "learnMore": "Learn More",
+    "viewModels": "View Models",
+    "imageAlt": "Energy infrastructure illustration"
+  },
+  "auth": {
+    "login": {
+      "title": "Log in",
+      "description": "Sign in to access your account",
+      "username": "Username",
+      "usernamePlaceholder": "Enter your username",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "submit": "Sign In",
+      "submitting": "Signing in...",
+      "validationError": "Please fill in all fields",
+      "success": "Login successful!"
+    },
+    "logout": {
+      "success": "Log out successful",
+      "button": "Log out"
+    }
+  },
+  "explorer": {
+    "model": "Model",
+    "scenario": "Scenario",
+    "collapsePanel": "Collapse panel",
+    "expandPanel": "Expand panel",
+    "controls": "Controls",
+    "layers": "Layers",
+    "areaSelection": "Area Selection",
+    "pleaseWait": "Please wait",
+    "reset": "Reset",
+    "apply": "Apply",
+    "loadingSummary": "Loading Summary data",
+    "analysis": "analysis",
+    "summary": "Summary",
+    "cluster": "Cluster - {{clusterId}}",
+    "failedClusterData": "Failed to load cluster data.",
+    "onlyBarChart": "Only Bar Chart is available.",
+    "errorNotReady": "This data doesn't look like it is ready. Make sure there are scenarios related to this model.",
+    "returnToModels": "Return to models"
+  },
+  "downloads": {
+    "title": "Downloads",
+    "searchPlaceholder": "Search datasets...",
+    "noData": "No data found",
+    "source": "Source:",
+    "updated": "Updated:",
+    "download": "Download"
+  },
+  "filters": {
+    "typeToSearch": "Type to search",
+    "selected": "{{count}} selected",
+    "noItemsFound": "No items found"
+  },
+  "map": {
+    "legend": "Legend",
+    "additionalLayers": "Additional layers"
+  },
+  "breadcrumbs": {
+    "about": "About",
+    "downloads": "Downloads"
+  },
+  "labels": {
+    "Admin_1": { "label": "Province", "description": "Administrative level 1" },
+    "District": { "label": "District", "description": "Administrative level 2" },
+    "Posto": { "label": "Posto", "description": "Administrative level 3" },
+    "Localidade": { "label": "Localidade", "description": "Administrative level 4" },
+    "PopStartYear": { "label": "Population", "description": "Population in the settlement" },
+    "NewHHConnectionsTotal": { "label": "Connections", "description": "New connections in the settlement" },
+    "Technology2030": { "label": "Technology", "description": "Chosen least-cost technology" },
+    "CurrentMVLineDist": { "label": "MV Distance", "description": "Distance to MV lines" },
+    "ElecStart": { "label": "Electrification Status", "description": "0 if currently unelectrified, 1 if electrified" },
+    "Region": { "label": "Province", "description": "Administrative level 1" },
+    "Postos": { "label": "Posto", "description": "Administrative level 3" },
+    "Population 2025": { "label": "Population", "description": "Population in settlement" },
+    "Distance from MV power lines": { "label": "MV Distance", "description": "Distance to MV (EDM) lines" },
+    "Electrification status (IEP study)": { "label": "Electrification Status", "description": "Elec. status in base year" },
+    "Least-cost electrification mode (IEP results)": { "label": "Least-Cost Elec. Tech", "description": "Least-cost elec. technology (from LC analysis)" },
+    "Ground_Survey": { "label": "Ground-truthing", "description": "Surveyed → No/Yes" },
+    "Fresh Markets Accessibility - class": { "label": "Local", "description": "Accessibility to local markets" },
+    "National Market Accessibility - class": { "label": "National", "description": "Accessibility to national-reach markets (major towns)" },
+    "Export Market Accessibility - class": { "label": "Export", "description": "Accessibility to export markets (airports, ports)" },
+    "PUE_potential": { "label": "PUE Potential", "description": "Classification of potential as [None | Low | Medium | High | Very High]" },
+    "ExistingMG": { "label": "Existing Mini-grid", "description": "Yes/No (1=Yes, 0=No)" },
+    "ProdUseIndexClassified": { "label": "Productive Potential (AgCAP)", "description": "Potential for productive demand from AgCAP model (None/Low/Medium/High/Very High)" },
+    "GroundSurvey": { "label": "Ground-truthing", "description": "Surveyed → No/Yes" },
+    "Status": { "label": "Operational Status", "description": "None/Pre-feasibility/Feasibility/Tender/Allocated" },
+    "Schools": { "label": "Education Facility", "description": "Settlement contains school(s): Yes - No" },
+    "HealthFacilities": { "label": "Health", "description": "Settlement contains health facility/facilities: Yes - No" },
+    "MGCapacityBins": { "label": "Capacity", "description": "Mini-grid capacity, classified into 3-4 bins" },
+    "TravelTimeClassified": { "label": "Accessibility", "description": "Accessibility by travel time from cities" },
+    "travel_time_cities_h": { "label": "Accessibility", "description": "Accessibility by travel time from cities, can be continuous or classified" },
+    "CategoryFull": { "label": "Type of Social Facility", "description": "Health | Education (with further classification)?" },
+    "ElecAccess": { "label": "Electrification Status", "description": "Electrified | Non-electrified" },
+    "CurrentElecTech": { "label": "Current Elec Technology", "description": "None/Grid/Off-grid" },
+    "LeastCostTech": { "label": "Least-Cost Elec Technology", "description": "Grid/Mini-grid/Standalone solar" },
+    "Calibrated_pop": { "label": "Population", "description": "Population in the settlement" },
+    "max_benefit_tech": { "label": "Technology", "description": "Chosen least-cost technology" }
+  }
+}

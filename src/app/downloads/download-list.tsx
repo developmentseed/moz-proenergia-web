@@ -2,15 +2,17 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { SimpleGrid, Box, Spinner, Center, Text } from "@chakra-ui/react";
+import { SimpleGrid, Box, Spinner, Center } from "@chakra-ui/react";
 import { useAuth } from "@/utils/context/auth";
 import { DownloadDataCard } from "@/components/chakra/card";
 import { Search } from "@/components/ui/search";
 import { fetchVectors } from "@/utils/data-transformation";
+import { useTranslation } from "react-i18next";
 
 export const DownloadList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { token } = useAuth();
+  const { t } = useTranslation();
 
   const { data, isLoading } = useQuery({
     queryKey: ['vector', token],
@@ -36,7 +38,7 @@ export const DownloadList = () => {
         <Search
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search datasets..."
+          placeholder={t('downloads.searchPlaceholder')}
         />
       </Box>
 
@@ -51,7 +53,9 @@ export const DownloadList = () => {
           highlight={searchQuery}
         />
       ))}
-      {!filteredData || filteredData.length === 0 && <Center py={10}> No data found</Center>}
+      {(!filteredData || filteredData.length === 0) && (
+        <Center py={10}>{t('downloads.noData')}</Center>
+      )}
     </SimpleGrid>
   );
 };

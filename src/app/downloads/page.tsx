@@ -1,25 +1,15 @@
+'use client';
+
 import { Shell } from "@/components/layout/shell";
 import { DownloadList } from "./download-list";
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from '@tanstack/react-query';
-import { fetchVectors } from "@/utils/data-transformation";
+import { useTranslation } from "react-i18next";
 
-export default async function Page() {
-
-  // const queryClient = new QueryClient();
-  // await queryClient.prefetchQuery({
-  //   queryKey: ['vector'],
-  //   queryFn: () => fetchVectors()
-  // });
+export default function Page() {
+  const { t } = useTranslation();
 
   return (
-    <Shell breadcrumb={[{ label: "Downloads" }]}>
-      {/* <HydrationBoundary state={dehydrate(queryClient)}> */}
+    <Shell breadcrumb={[{ label: t('breadcrumbs.downloads') }]}>
       <DownloadList />
-      {/* </HydrationBoundary> */}
     </Shell>
   );
 }

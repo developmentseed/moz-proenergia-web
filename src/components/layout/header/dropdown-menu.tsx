@@ -7,9 +7,11 @@ import { useAuth } from "@/utils/context/auth";
 import { LuExternalLink, LuCircleUser } from "react-icons/lu";
 import { controlZIndex } from "@/components/map/control-constant";
 import { SDI_PORTAL_URL } from "@/config/website";
+import { useTranslation } from "react-i18next";
 
 const DropdownMenu = () => {
   const { login, logout, isAuthenticated, username } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -31,7 +33,7 @@ const DropdownMenu = () => {
                 <LuCircleUser />
                 <Text maxW="80px" truncate>{username}</Text>
               </Box>
-            ) : "Login"}
+            ) : t('nav.login')}
           </Button>
         </MenuTrigger>
 
@@ -39,23 +41,23 @@ const DropdownMenu = () => {
           <MenuContent zIndex={controlZIndex + 2}>
             {isAuthenticated ? (
               <MenuItem value="logout" onClick={() => logout()} cursor={"pointer"}>
-                Log out
+                {t('nav.logout')}
               </MenuItem>
             ) : (
               <MenuItem value="login" cursor={"pointer"} onClick={() => {
                 requestAnimationFrame(() => {
                   Modal.open("login-modal", {
-                    modalTitle: "Log in",
+                    modalTitle: t('auth.login.title'),
                     modalContent: <LoginForm onSubmit={login} onClose={() => Modal.close("login-modal")} />
                   });
                 });
               }}>
-                Log in
+                {t('nav.login')}
               </MenuItem>
             )}
             <MenuItem value="sdi-portal" cursor={"pointer"} asChild>
               <a href={SDI_PORTAL_URL} target="_blank" rel="noopener noreferrer">
-                <LuExternalLink /> SDI Portal 
+                <LuExternalLink /> {t('nav.sdiPortal')}
               </a>
             </MenuItem>
           </MenuContent>

@@ -1,3 +1,5 @@
+"use client";
+
 import { memo, useCallback } from "react";
 import { Tab } from "@/components/chakra";
 import {
@@ -17,6 +19,7 @@ import { useFilters } from "@/utils/context/filters";
 import { ApplyActions } from "./apply-actions";
 // FilterType as enum
 import { FilterType, type Filter, type ItemUnit } from "@/app/types";
+import { useTranslation } from "react-i18next";
 
 interface ColGroup {
   title: string;
@@ -57,7 +60,9 @@ const FilterControlWrapper = memo(function FilterControlWrapper({
 
 const LayersPanel = () => {
   const { layers, toggleLayer, activeLayers } = useContextualLayers();
-  if (!activeLayers) return <div>Please wait</div>;
+  const { t } = useTranslation();
+
+  if (!activeLayers) return <div>{t('explorer.pleaseWait')}</div>;
 
   const setLayerOnChange = useCallback(
     (param: { [x: string]: boolean }) => {
@@ -127,7 +132,9 @@ const CollapsibleGroup = memo(function CollapsibleGroup({
 const ControlsPanel = () => {
   const { model } = useModel();
   const { displayFilters, setPendingFilters, getFilterPendingStatus } = useFilters();
-  if (!displayFilters) return <div>Please wait</div>;
+  const { t } = useTranslation();
+
+  if (!displayFilters) return <div>{t('explorer.pleaseWait')}</div>;
 
   const adminFilterExists = model.filters.filter(
     (f) => f.type === FilterType.admin,
@@ -135,7 +142,7 @@ const ControlsPanel = () => {
   const adminFilter = !!adminFilterExists.length
     ? [
         {
-          title: "Area Selection",
+          title: t('explorer.areaSelection'),
           items: model.filters.filter((f) => f.type === FilterType.admin),
         },
       ]
@@ -193,30 +200,32 @@ const ControlsPanel = () => {
   );
 };
 
-const tabItems = [
-  {
-    id: "controls",
-    label: (
-      <>
-        <LuSettings2 />
-        <Text textStyle="subTitle">Controls</Text>
-      </>
-    ),
-    Component: ControlsPanel,
-  },
-  {
-    id: "layers",
-    label: (
-      <>
-        <LuLayers />
-        <Text textStyle="subTitle">Layers</Text>
-      </>
-    ),
-    Component: LayersPanel,
-  },
-];
-
 const Control = () => {
+  const { t } = useTranslation();
+
+  const tabItems = [
+    {
+      id: "controls",
+      label: (
+        <>
+          <LuSettings2 />
+          <Text textStyle="subTitle">{t('explorer.controls')}</Text>
+        </>
+      ),
+      Component: ControlsPanel,
+    },
+    {
+      id: "layers",
+      label: (
+        <>
+          <LuLayers />
+          <Text textStyle="subTitle">{t('explorer.layers')}</Text>
+        </>
+      ),
+      Component: LayersPanel,
+    },
+  ];
+
   return <Tab items={tabItems} />;
 };
 

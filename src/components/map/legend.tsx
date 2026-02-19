@@ -1,7 +1,10 @@
+'use client';
+
 import { Box, VStack, HStack, Text, Separator, ScrollArea } from '@chakra-ui/react';
 import { type MapItemUnit } from '@/app/types';
 import { useContextualLayers } from '@/utils/context/contextual-layers';
 import { controlZIndex, mapControlCommonStyleProps } from './control-constant';
+import { useTranslation } from 'react-i18next';
 
 interface LegendProps {
   items: MapItemUnit[];
@@ -9,6 +12,7 @@ interface LegendProps {
 
 export function Legend({ items }: LegendProps) {
   const { layers, activeLayers } = useContextualLayers();
+  const { t } = useTranslation();
   const contextualLayers = layers.filter(l => activeLayers.includes(l.id));
   return (
     <Box
@@ -21,7 +25,7 @@ export function Legend({ items }: LegendProps) {
     >
       <VStack align="stretch" gap={2}>
         <Text textStyle='tableAttr' mb={1}>
-          Legend
+          {t('map.legend')}
         </Text>
         {items.map((item) => (
           <HStack key={item.value} gap={2}>
@@ -44,7 +48,7 @@ export function Legend({ items }: LegendProps) {
                 <ScrollArea.Content spaceY="4" textStyle="sm">
                   <Box>
                     <Text textStyle='tableAttr' mb={1}>
-                      Additional layers
+                      {t('map.additionalLayers')}
                     </Text>
                     {contextualLayers.map((layer) => (
                       <HStack id='hstsack' key={layer.id} gap={2} mt={1}>
@@ -55,10 +59,10 @@ export function Legend({ items }: LegendProps) {
                           borderRadius="100%"
                           border='1px solid black'
                           flexShrink={0}
-                />
+                        />
                         <Text textStyle='tableValue'>{layer.label}</Text>
                       </HStack>
-            ))}
+                    ))}
                   </Box>
                 </ScrollArea.Content>
               </ScrollArea.Viewport>

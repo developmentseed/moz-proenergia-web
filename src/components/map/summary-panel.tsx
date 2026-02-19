@@ -1,3 +1,5 @@
+'use client';
+
 import { memo, useState, useEffect } from "react";
 import {
   Box,
@@ -9,7 +11,7 @@ import {
 import { api, CONCURRENCY_NUM } from "@/utils/api";
 import { InfoTip } from "../chakra/toggle-tip";
 import { LuChevronUp } from "react-icons/lu";
- import pLimit from 'p-limit';
+import pLimit from 'p-limit';
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter } from "@/app/types";
@@ -23,6 +25,8 @@ import {
   type BatchSummariesResponse,
   type SummaryData,
   type SummaryRow } from "@/app/types/summary";
+import { useTranslation } from "react-i18next";
+
 interface SummaryPanelProps {
   clusterId: string | null;
   scenarioId: string;
@@ -84,6 +88,8 @@ const tableCellStyleProps = {
 };
 
 const PanelBody = ({ data, isLoading, isClusterError }: PanelBodyProps) => {
+  const { t } = useTranslation();
+
   return (
     <Box maxHeight={400} width="100%" overflowY="auto" pb={4}>
       {isLoading && (
@@ -95,7 +101,7 @@ const PanelBody = ({ data, isLoading, isClusterError }: PanelBodyProps) => {
       {!isLoading && isClusterError && (
         <Box px={4} py={4}>
           <Text color="fg.error" textStyle="tableValue">
-            Failed to load cluster data.
+            {t('explorer.failedClusterData')}
           </Text>
         </Box>
       )}
@@ -108,11 +114,11 @@ const PanelBody = ({ data, isLoading, isClusterError }: PanelBodyProps) => {
                 return (
                   <Table.Row key={row.key} bg="panelBg">
                     <Table.Cell {...tableCellStyleProps}>
-                      <Text textStyle="tableAttr">{row.label}</Text>
+                      <Text textStyle="tableAttr">{t(`labels.${row.key}.label`, { defaultValue: row.label })}</Text>
                     </Table.Cell>
                     <Table.Cell {...tableCellStyleProps}>
                       <Text textStyle="tableValue" textAlign="right" color="fg.error">
-                        error
+                        {t('common.error', 'error')}
                       </Text>
                     </Table.Cell>
                   </Table.Row>
@@ -125,9 +131,12 @@ const PanelBody = ({ data, isLoading, isClusterError }: PanelBodyProps) => {
                     <Table.Cell {...tableCellStyleProps}>
                       {" "}
                       <Box display="flex" alignItems="center" gap={1}>
-                        <Text textStyle="tableAttr">{row.label} { row.unit && `(${row.unit})`} </Text>
+                        <Text textStyle="tableAttr">
+                          {t(`labels.${row.key}.label`, { defaultValue: row.label })}
+                          {row.unit && ` (${row.unit})`}
+                        </Text>
                         {row.description && (
-                          <InfoTip content={row.description} />
+                          <InfoTip content={t(`labels.${row.key}.description`, { defaultValue: row.description })} />
                         )}
                       </Box>
                     </Table.Cell>
@@ -155,7 +164,7 @@ const PanelBody = ({ data, isLoading, isClusterError }: PanelBodyProps) => {
                     </Table.Cell>
                   </Table.Row>
                 );
-              } else return (<Text> Only Bar Chart is available.</Text>);
+              } else return (<Text>{t('explorer.onlyBarChart')}</Text>);
 
               }
 
@@ -165,7 +174,9 @@ const PanelBody = ({ data, isLoading, isClusterError }: PanelBodyProps) => {
                   <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
                     <Box display="flex" alignItems="center" gap={1}>
                       {/* group type should have description as label */}
-                      <Text textStyle="tableAttr"> {row.description || row.label}</Text>
+                      <Text textStyle="tableAttr">
+                        {row.description || row.label}
+                      </Text>
                     </Box>
                   </Table.Cell>
                 </Table.Row>,
@@ -269,6 +280,8 @@ const SummaryPanel = ({
   filterDefs,
   resetCluster,
 }: SummaryPanelProps) => {
+  const { t } = useTranslation();
+
   const {
     data: clusterData,
     isLoading: clusterIsLoading,
@@ -329,7 +342,9 @@ const SummaryPanel = ({
     ? clusterIsLoading || clusterIsFetching
     : summaryIsLoading;
 
-  const title = showingCluster ? `Cluster - ${clusterId}` : "Summary";
+  const title = showingCluster
+    ? t('explorer.cluster', { clusterId })
+    : t('explorer.summary');
 
   return (
     <Box
@@ -340,7 +355,7 @@ const SummaryPanel = ({
       zIndex={controlZIndex}
     >
       <Collapsible.Root defaultOpen>
-        <PanelHeader subtitle="analysis" title={title} />
+        <PanelHeader subtitle={t('explorer.analysis')} title={title} />
         <Collapsible.Content>
           <PanelBody
             data={dataToDisplay}

@@ -1,5 +1,8 @@
-import { Text, Card, Heading, Box } from "@chakra-ui/react";
+'use client';
+
+import { Card, Heading, Box } from "@chakra-ui/react";
 import { LuDownload } from "react-icons/lu";
+import { useTranslation } from "react-i18next";
 
 const HighlightText = ({
   text,
@@ -70,6 +73,8 @@ export const DownloadDataCard = ({
   downloadUrl: string;
   highlight?: string;
 }) => {
+  const { t } = useTranslation();
+
   return (
     <Card.Root size="md" borderRadius={0}>
       <Card.Header>
@@ -83,10 +88,10 @@ export const DownloadDataCard = ({
           <HighlightText text={description} highlight={highlight} />
         </p>
         <p style={{ marginTop: "0.5rem", fontSize: "0.875rem" }}>
-          Source: {source}
+          {t('downloads.source')} {source}
         </p>
         <p style={{ fontSize: "0.875rem" }}>
-          Updated: {new Date(updated).toLocaleDateString()}
+          {t('downloads.updated')} {new Date(updated).toLocaleDateString()}
         </p>
       </Card.Body>
       <Card.Footer>
@@ -97,7 +102,7 @@ export const DownloadDataCard = ({
             alignItems="center"
             textDecoration={"underline"}
           >
-            Download
+            {t('downloads.download')}
             <Box pl={2}>
               <LuDownload />
             </Box>
