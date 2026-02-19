@@ -28,6 +28,7 @@ interface MainLayerProps {
   clusterId: string | null;
 }
 
+//@TODO different cartography per model
 export const MainLayer = ({
   scenario,
   main,
@@ -36,12 +37,15 @@ export const MainLayer = ({
 }: MainLayerProps) => {
   const { current: map } = useMap();
   const [hoveredCluster, setHoveredCluster] = useState<string | null>(null);
-
   // Handle hover events directly on the map - so we can avoid re-render of the whole map related components
   useEffect(() => {
     if (!map) return;
 
     const handleMouseMove = (e: maplibregl.MapLayerMouseEvent) => {
+      if (map.getZoom() <= 9) {
+        setHoveredCluster(null);
+        return;
+      }
       const feature = e.features?.[0];
       setHoveredCluster(feature?.properties?.id ?? null);
     };
@@ -103,7 +107,7 @@ export const MainLayer = ({
     () => ({
       ...scenario.layer,
       id: main.id,
-      minzoom: mapConfig.polygonMinZoom,
+      // minzoom: mapConfig.polygonMinZoom,
       paint: {
         [getColorAttributeNamebyType('fill')]: buildMatchExpression(main, '#66ff'),
       },
@@ -112,30 +116,30 @@ export const MainLayer = ({
     [main, scenario.layer, mapFilter]
   );
 
-  // To show clusters on low zoom
-  const symbolMainLayer:LayerSpecification = useMemo(
-    () => ({
-      source: scenario.layer.source,
-      "source-layer": scenario.layer['source-layer'],
-      id: main.id + '-symbol',
-      type: 'symbol' as const,
-      minzoom: mapConfig.minZoom,
-      maxzoom: mapConfig.polygonMinZoom,
-      layout: {
-        'symbol-placement': 'point',
-        'icon-image': symbolImageIds.length ? [
-          'match',
-          main.column === DEFAULT_COL ? ['literal', DEFAULT_COL] : ['get', main.column],
-          ...symbolImageIds.flatMap(({ value, imageId }) => [value, imageId]),
-          '',
-        ] as ExpressionSpecification : '',
-        'icon-overlap': 'always',
-        'icon-size': ["interpolate", ["linear"], ["zoom"], mapConfig.minZoom, 0.02, mapConfig.polygonMinZoom, 0.03],
-      },
-      ...(mapFilter ? { filter: mapFilter } : {}),
-    }),
-    [main.id, main.column, scenario.layer, symbolImageIds, mapFilter]
-  );
+  // To show clusters (More like center point) on low zoom
+  // const symbolMainLayer:LayerSpecification = useMemo(
+  //   () => ({
+  //     source: scenario.layer.source,
+  //     "source-layer": scenario.layer['source-layer'],
+  //     id: main.id + '-symbol',
+  //     type: 'symbol' as const,
+  //     minzoom: mapConfig.minZoom,
+  //     maxzoom: mapConfig.polygonMinZoom,
+  //     layout: {
+  //       'symbol-placement': 'point',
+  //       'icon-image': symbolImageIds.length ? [
+  //         'match',
+  //         main.column === DEFAULT_COL ? ['literal', DEFAULT_COL] : ['get', main.column],
+  //         ...symbolImageIds.flatMap(({ value, imageId }) => [value, imageId]),
+  //         '',
+  //       ] as ExpressionSpecification : '',
+  //       'icon-overlap': 'cooperative',
+  //       'icon-size': ["interpolate", ["linear"], ["zoom"], mapConfig.minZoom, 0.01, mapConfig.polygonMinZoom, 0.005],
+  //     },
+  //     ...(mapFilter ? { filter: mapFilter } : {}),
+  //   }),
+  //   [main.id, main.column, scenario.layer, symbolImageIds, mapFilter]
+  // );
 
   // Show all the data with muted colors so users know which ones are filtered
   const backgroundMainLayer: LayerSpecification = useMemo(
@@ -182,7 +186,7 @@ export const MainLayer = ({
     <Source key={scenario.id} id={scenario.id} {...scenario.source}>
       <MapLayer {...mainLayer} />
       <MapLayer {...backgroundMainLayer} beforeId={main.id} />
-      <MapLayer {...symbolMainLayer} />
+      {/* <MapLayer {...symbolMainLayer} /> */}
       <MapLayer {...selectedClusterLayer} />
       <MapLayer {...hoveredClusterLayer} />
     </Source>
