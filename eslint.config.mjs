@@ -18,6 +18,8 @@ const eslintConfig = defineConfig([
       "no-multi-spaces": ["error"],
       // Disallow trailing whitespace at the end of lines
       "no-trailing-spaces": ["error"],
+      // Disallow console.log (allow warn and error)
+      "no-console": ["error", { "allow": ["warn", "error"] }],
       // Limit multiple empty lines
       "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 0, "maxBOF": 0 }],
     },
