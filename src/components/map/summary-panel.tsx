@@ -321,7 +321,7 @@ const SummaryPanel = ({
       };
     },
   });
-  console.log(summaryData);
+
   // Views are mutually exclusive - cluster view never falls through to summary
   const showingCluster = !!clusterId;
   const dataToDisplay = showingCluster ? clusterData : summaryData;
