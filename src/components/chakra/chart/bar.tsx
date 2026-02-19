@@ -3,7 +3,7 @@
 import { Chart, useChart } from "@chakra-ui/charts";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
 import { type SummaryItem } from "@/app/types/summary";
-import { formatDisplayNumber } from "@/utils/numer";
+import { formatDisplayNumber } from "@/utils/number";
 
 interface SummaryBarChartProps {
   data: SummaryItem[];

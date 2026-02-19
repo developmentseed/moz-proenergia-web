@@ -13,7 +13,7 @@ import { LuChevronUp } from "react-icons/lu";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter } from "@/app/types";
-import { formatDisplayNumber } from "@/utils/numer";
+import { formatDisplayNumber } from "@/utils/number";
 import { buildFilterQueryParam } from "@/utils/query-string-builder";
 import { SummaryBarChart } from "@/components/chakra/chart/bar";
 import {
@@ -85,7 +85,7 @@ const tableCellStyleProps = {
 
 const PanelBody = ({ data, isLoading, isClusterError }: PanelBodyProps) => {
   return (
-    <Box maxHeight={400} width="100%" overflowY="auto" pb={4}>
+    <Box maxHeight={400} width="100%" overflowY="auto" py={4}>
       {isLoading && (
         <Box display="flex" alignItems="center" justifyContent="center" py={8}>
           <Spinner size="xl" />
@@ -125,14 +125,19 @@ const PanelBody = ({ data, isLoading, isClusterError }: PanelBodyProps) => {
                     <Table.Cell {...tableCellStyleProps}>
                       {" "}
                       <Box display="flex" alignItems="center" gap={1}>
-                        <Text textStyle="tableAttr">{row.label} { row.unit && `(${row.unit})`} </Text>
+                        <Text textStyle="tableAttr">
+                          {row.label}{" "}
+                          <Text as="span" fontWeight="normal">
+                            {row.unit && `(${row.unit})`}{" "}
+                          </Text>
+                        </Text>
                         {row.description && (
                           <InfoTip content={row.description} />
                         )}
                       </Box>
                     </Table.Cell>
                     <Table.Cell {...tableCellStyleProps}>
-                      <Text textStyle="tableValue" textAlign="right">
+                      <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
                         {formatValue(row.value, row.key)}
                       </Text>
                     </Table.Cell>
@@ -165,7 +170,14 @@ const PanelBody = ({ data, isLoading, isClusterError }: PanelBodyProps) => {
                   <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
                     <Box display="flex" alignItems="center" gap={1}>
                       {/* group type should have description as label */}
-                      <Text textStyle="tableAttr"> {row.description || row.label}</Text>
+                      <Text textStyle="tableAttr">
+                        {" "}
+                        {row.description || row.label}
+                        <Text as="span" fontWeight="normal">
+                          {" "}
+                          {row.unit && `(${row.unit})`}
+                        </Text>
+                      </Text>
                     </Box>
                   </Table.Cell>
                 </Table.Row>,
@@ -175,12 +187,10 @@ const PanelBody = ({ data, isLoading, isClusterError }: PanelBodyProps) => {
                       <Text textStyle="tableAttr" pt={1} pb={1}>
                         {" "}
                         {item.label}
-                        {" "}
-                        {row.unit && `(${row.unit})`}
                       </Text>
                     </Table.Cell>
                     <Table.Cell {...tableCellStyleProps}>
-                      <Text textStyle="tableValue" textAlign="right">
+                      <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
                         {formatValue(item.value, item.key)}
                       </Text>
                     </Table.Cell>
@@ -249,10 +259,10 @@ async function fetchFieldSummary(
     // @TODO: enable. method
     // if (field.method) params.method = field.method;
 
-    const { data } = await api.get(
-      `scenario/${scenarioId}/summaries/`,
-      { signal, params },
-    );
+    const { data } = await api.get(`scenario/${scenarioId}/summaries/`, {
+      signal,
+      params,
+    });
     return data;
   } catch (e) {
     console.error(e);

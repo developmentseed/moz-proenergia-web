@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Stack, Input, Flex, Slider } from '@chakra-ui/react';
 import { type SliderValueChangeDetails } from '@chakra-ui/react';
-import { formatNumber } from '@/utils/numer';
+import { formatNumber } from '@/utils/number';
 import { FilterLabel } from './filter-label';
 
 interface TextRangeProps {
