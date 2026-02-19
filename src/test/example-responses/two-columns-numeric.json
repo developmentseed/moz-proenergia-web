@@ -1,0 +1,21 @@
+
+{
+    "scenario_id": 4,
+    "filters_applied": "",
+    "summaries": {
+        "NewHHConnectionsTotal": {
+            "type": "numeric",
+            "count": 2197,
+            "min": 0.1952,
+            "max": 2368.6628,
+            "sum": 439089.7747
+        },
+        "travel_time_cities_h": {
+            "type": "numeric",
+            "count": 2197,
+            "min": 0.0,
+            "max": 16.5,
+            "sum": 10741.6
+        }
+    }
+}

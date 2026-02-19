@@ -1,46 +1,28 @@
-import { memo, useMemo, useState, useEffect } from "react";
+import { memo, useState, useEffect } from "react";
 import {
   Box,
   Table,
   Spinner,
   Text,
-  Alert,
   Collapsible,
 } from "@chakra-ui/react";
-import { api } from "@/utils/api";
+import { api, CONCURRENCY_NUM } from "@/utils/api";
 import { InfoTip } from "../chakra/toggle-tip";
 import { LuChevronUp } from "react-icons/lu";
+ import pLimit from 'p-limit';
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter } from "@/app/types";
 import { formatDisplayNumber } from "@/utils/number";
 import { buildFilterQueryParam } from "@/utils/query-string-builder";
-interface SummaryItem {
-  key: string;
-  label: string;
-  value: number | string;
-}
-
-interface FlatRow {
-  type: "flat";
-  label: string;
-  key: string;
-  description?: string;
-  unit?: string;
-  value: number | string;
-}
-
-interface GroupRow {
-  type: "group";
-  label: string;
-  description?: string;
-  unit?: string;
-  value: SummaryItem[];
-}
-
-type SummaryRow = FlatRow | GroupRow;
-
-type SummaryData = SummaryRow[];
+import { SummaryBarChart } from "@/components/chakra/chart/bar";
+import {
+  transformFieldSummary,
+} from "@/utils/summary";
+import {
+  type BatchSummariesResponse,
+  type SummaryData,
+  type SummaryRow } from "@/app/types/summary";
 interface SummaryPanelProps {
   clusterId: string | null;
   scenarioId: string;
@@ -51,39 +33,8 @@ interface SummaryPanelProps {
   resetCluster: () => void;
 }
 
-// ----- Batch Summaries API types -----
-
-interface NumericGroupStats {
-  count: number;
-  min: number;
-  max: number;
-  sum: number;
-}
-
-interface BatchSummaryNumeric {
-  type: "numeric";
-  count: number;
-  min: number;
-  max: number;
-  sum: number;
-  grouped?: Record<string, NumericGroupStats>;
-}
-
-interface BatchSummaryString {
-  type: "string";
-  count: number;
-  values: Record<string, number>;
-  grouped?: Record<string, { count: number; values: Record<string, number> }>;
-}
-
-type BatchFieldSummary = BatchSummaryNumeric | BatchSummaryString;
-
-interface BatchSummariesResponse {
-  scenario_id: number;
-  filters_applied: string;
-  summaries: Record<string, BatchFieldSummary>;
-  group_by?: string;
-}
+// Limit the number of parallel requests going out
+const summaryLimit = pLimit(CONCURRENCY_NUM);
 
 interface PanelHeaderProps {
   subtitle: string;
@@ -118,7 +69,7 @@ const PanelHeader = ({ title, subtitle }: PanelHeaderProps) => (
 interface PanelBodyProps {
   data: SummaryData | undefined;
   isLoading: boolean;
-  isError: boolean;
+  isClusterError?: boolean;
 }
 
 const formatValue = (value: string | number, column?: string) => {
@@ -131,7 +82,8 @@ const tableCellStyleProps = {
   py: 1,
   px: 4,
 };
-const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
+
+const PanelBody = ({ data, isLoading, isClusterError }: PanelBodyProps) => {
   return (
     <Box maxHeight={400} width="100%" overflowY="auto" py={4}>
       {isLoading && (
@@ -140,20 +92,33 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
         </Box>
       )}
 
-      {isError && (
-        <Alert.Root status="error">
-          <Alert.Indicator />
-          <Alert.Content>
-            <Alert.Title>Failed to load the data</Alert.Title>
-            <Alert.Description>Please try again later.</Alert.Description>
-          </Alert.Content>
-        </Alert.Root>
+      {!isLoading && isClusterError && (
+        <Box px={4} py={4}>
+          <Text color="fg.error" textStyle="tableValue">
+            Failed to load cluster data.
+          </Text>
+        </Box>
       )}
 
-      {!isLoading && !isError && data && (
+      {!isLoading && !isClusterError && data && (
         <Table.Root size="sm">
           <Table.Body>
             {data.map((row) => {
+              if (row.type === "error") {
+                return (
+                  <Table.Row key={row.key} bg="panelBg">
+                    <Table.Cell {...tableCellStyleProps}>
+                      <Text textStyle="tableAttr">{row.label}</Text>
+                    </Table.Cell>
+                    <Table.Cell {...tableCellStyleProps}>
+                      <Text textStyle="tableValue" textAlign="right" color="fg.error">
+                        error
+                      </Text>
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              }
+
               if (row.type === "flat") {
                 return (
                   <Table.Row key={row.key} bg="panelBg">
@@ -178,6 +143,25 @@ const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
                     </Table.Cell>
                   </Table.Row>
                 );
+              }
+
+              if (row.type === "chart") {
+                if (row.chartType === "bar") {
+                return (
+                  <Table.Row key={row.label}>
+                    <Table.Cell colSpan={2} px={2} py={2}>
+                      <Box display="flex" alignItems="center" gap={1} mb={2}>
+                        <Text textStyle="tableAttr">{row.description || row.label}</Text>
+                        {row.description && row.label !== row.description && (
+                          <InfoTip content={row.description} />
+                        )}
+                      </Box>
+                      <SummaryBarChart data={row.value} />
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              } else return (<Text> Only Bar Chart is available.</Text>);
+
               }
 
               // Group type
@@ -258,33 +242,7 @@ async function fetchClusterData(
   }
 }
 
-async function fetchBatchSummaries(
-  scenarioId: string,
-  fields: Field[],
-  filters: Record<string, [number, number] | string[] | null>,
-  filterDefs: Filter[],
-  signal: AbortSignal,
-): Promise<BatchSummariesResponse> {
-  try {
-    const fieldNames = fields.flatMap((f) => f.columns).join(",");
-    const params: Record<string, string> = { fields: fieldNames };
-
-    // @TODO: enable filter
-    // const q = buildFilterQueryParam(filters, filterDefs);
-    // if (q) params.q = q;
-
-    const { data } = await api.get(`scenario/${scenarioId}/summaries/`, {
-      signal,
-      params,
-    });
-    return data;
-  } catch (e) {
-    console.error(e);
-    throw new Error("Failed to fetch summary data");
-  }
-}
-
-async function fetchGroupedSummary(
+async function fetchFieldSummary(
   scenarioId: string,
   field: Field,
   filters: Record<string, [number, number] | string[] | null>,
@@ -295,11 +253,11 @@ async function fetchGroupedSummary(
     const fields = field.columns.join(",");
 
     const params: Record<string, string> = { fields };
-    // @TODO: enable filter
-    // const q = buildFilterQueryParam(filters, filterDefs);
-    // if (q) params.q = q;
+    const q = buildFilterQueryParam(filters, filterDefs);
+    if (q) params.q = q;
     if (field.group_by) params.group_by = field.group_by;
-    if (field.method) params.method = field.method;
+    // @TODO: enable. method
+    // if (field.method) params.method = field.method;
 
     const { data } = await api.get(`scenario/${scenarioId}/summaries/`, {
       signal,
@@ -310,62 +268,6 @@ async function fetchGroupedSummary(
     console.error(e);
     throw new Error("Failed to fetch summary data");
   }
-}
-
-function transformFieldSummary(
-  response: BatchSummariesResponse,
-  field: Field,
-): SummaryRow {
-  const column = field.columns[0];
-  const summary = response.summaries[column];
-
-  if (!summary || summary.count === 0) {
-    return {
-      type: "flat",
-      key: column,
-      label: `${field.label} (Total)`,
-      description: field.description,
-      value: 0,
-      unit: field.unit,
-    };
-  }
-
-  if (summary.type === "numeric") {
-    if (summary.grouped) {
-      return {
-        type: "group",
-        label: field.label,
-        description: field.description,
-        unit: field.unit,
-        value: Object.entries(summary.grouped).map(([key, stats]) => ({
-          key,
-          label: key,
-          value: stats.sum,
-        })),
-      };
-    }
-    return {
-      type: "flat",
-      key: column,
-      label: `${field.label} (Total)`,
-      description: field.description,
-      value: summary.sum,
-      unit: field.unit,
-    };
-  }
-
-  // String type → GroupRow with value distribution
-  return {
-    type: "group",
-    label: field.label,
-    description: field.description,
-    unit: field.unit,
-    value: Object.entries(summary.values).map(([key, count]) => ({
-      key,
-      label: key,
-      value: count,
-    })),
-  };
 }
 
 const SummaryPanel = ({
@@ -397,76 +299,38 @@ const SummaryPanel = ({
     return () => cancelIdleCallback(id);
   }, []);
 
-  // Split fields: batch those without group_by, separate those with group_by
-  const { batchFields, groupedFields } = useMemo(() => {
-    const batch: Field[] = [];
-    const grouped: Field[] = [];
-    for (const f of summaryFields) {
-      if (f.group_by) grouped.push(f);
-      else batch.push(f);
-    }
-    return { batchFields: batch, groupedFields: grouped };
-  }, [summaryFields]);
-
-  // Single request for all non-grouped fields
-  const batchQuery = useQuery({
-    queryKey: [
-      "summaries",
-      scenarioId,
-      "batch",
-      batchFields.map((f) => f.columns),
-      filters,
-    ],
-    queryFn: ({ signal }) =>
-      fetchBatchSummaries(scenarioId, batchFields, filters, filterDefs, signal),
-    retry: false,
-    enabled: summaryEnabled && batchFields.length > 0,
-  });
-
-  // Separate request per grouped field
-  const groupedQueries = useQueries({
-    queries: groupedFields.map((field) => ({
-      queryKey: ["summaries", scenarioId, field.label, field.columns, filters],
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        fetchGroupedSummary(scenarioId, field, filters, filterDefs, signal),
+  // One request per summary field, transformed in queryFn
+  const { data: summaryData, isLoading: summaryIsLoading } = useQueries({
+    queries: summaryFields.map((field) => ({
+      queryKey: ["summaries", scenarioId, field.label, field.columns, field.group_by, filters],
+      queryFn: async ({ signal }: { signal: AbortSignal }) => {
+        return summaryLimit(async () => {
+          const response = await fetchFieldSummary(scenarioId, field, filters, filterDefs, signal);
+          return transformFieldSummary(response, field);
+        });
+      },
       retry: false,
       enabled: summaryEnabled,
     })),
+    combine: (results) => {
+      const isLoading = results.some((r) => r.isLoading);
+      const allSettled = results.every((r) => r.data || r.isError);
+      if (!allSettled) return { data: undefined, isLoading };
+
+      const rows: SummaryRow[] = results.map((r, i) =>
+        r.isError || !r.data
+          ? { type: "error" as const, label: summaryFields[i].label, key: summaryFields[i].columns[0] }
+          : r.data
+      );
+      return {
+        data: rows.sort((a, b) => {
+          if (a.type === b.type) return 0;
+          return a.type === 'flat' || a.type === 'error' ? -1 : 1;
+        }),
+        isLoading,
+      };
+    },
   });
-
-  const batchReady = batchFields.length === 0 || !!batchQuery.data;
-  const groupedReady = groupedQueries.every((q) => q.data);
-
-  const summaryIsLoading =
-    (batchFields.length > 0 && batchQuery.isLoading) ||
-    groupedQueries.some((q) => q.isLoading);
-  const summaryIsError =
-    batchQuery.isError || groupedQueries.some((q) => q.isError);
-
-  const noMatchingData =
-    batchReady &&
-    groupedReady &&
-    (batchFields.length === 0 ||
-      Object.values(batchQuery.data!.summaries).every((s) => s.count === 0)) &&
-    groupedQueries.every((q) =>
-      Object.values(q.data!.summaries).every((s) => s.count === 0),
-    );
-
-  // Recombine results in original order, then sort flat rows before group rows
-  const summaryData: SummaryData | undefined = (() => {
-    if (!batchReady || !groupedReady) return undefined;
-    let groupedIdx = 0;
-    const rows = summaryFields.map((field) => {
-      if (field.group_by) {
-        return transformFieldSummary(groupedQueries[groupedIdx++].data!, field);
-      }
-      return transformFieldSummary(batchQuery.data!, field);
-    });
-    return rows.sort((a, b) => {
-      if (a.type === b.type) return 0;
-      return a.type === "flat" ? -1 : 1;
-    });
-  })();
 
   // Views are mutually exclusive - cluster view never falls through to summary
   const showingCluster = !!clusterId;
@@ -474,36 +338,25 @@ const SummaryPanel = ({
   const isLoading = showingCluster
     ? clusterIsLoading || clusterIsFetching
     : summaryIsLoading;
-  const isError = showingCluster ? clusterIsError : summaryIsError;
 
-  const title = showingCluster
-    ? `Cluster - ${clusterId}`
-    : "Summary *Filter disabled temporarily*";
+  const title = showingCluster ? `Cluster - ${clusterId}` : "Summary";
 
   return (
     <Box
       position="absolute"
       top="4"
-      minWidth={"350px"}
+      width={"350px"}
       {...mapControlCommonStyleProps}
       zIndex={controlZIndex}
     >
       <Collapsible.Root defaultOpen>
         <PanelHeader subtitle="analysis" title={title} />
         <Collapsible.Content>
-          {!showingCluster && noMatchingData ? (
-            <Box px={4} py={8} textAlign="center">
-              <Text textStyle="tableAttr" color="fg.muted">
-                No matching data for the current filters.
-              </Text>
-            </Box>
-          ) : (
-            <PanelBody
-              data={dataToDisplay}
-              isLoading={isLoading}
-              isError={isError}
-            />
-          )}
+          <PanelBody
+            data={dataToDisplay}
+            isLoading={isLoading}
+            isClusterError={showingCluster && clusterIsError}
+          />
         </Collapsible.Content>
       </Collapsible.Root>
     </Box>

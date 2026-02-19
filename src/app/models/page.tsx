@@ -12,7 +12,7 @@ export default async function ModelsPage() {
 
   await queryClient.prefetchQuery({
     queryKey: ['models'],
-    queryFn: fetchModels,
+    queryFn: ({ signal }) => fetchModels(signal),
   });
 
   return (

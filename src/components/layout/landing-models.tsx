@@ -13,7 +13,7 @@ export default function ModelCards() {
 
   const { data: models } = useQuery({
     queryKey: ['models'],
-    queryFn: fetchModels,
+    queryFn: ({ signal }) => fetchModels(signal),
   });
 
   return (

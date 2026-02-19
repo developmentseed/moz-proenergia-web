@@ -33,11 +33,14 @@ type FiltersContextType = {
   filters: Record<string, [number, number] | string[] | null>;
   // Display values for UI controls (pending takes precedence)
   displayFilters: Record<string, [number, number] | string[] | null>;
+  // Changed filter values to apply to summary queries
+  updatedFilters: Record<string, [number, number] | string[] | null>;
   // Pending change handlers
   setPendingFilters: (updates: Record<string, unknown>) => void;
   // Apply action
   applyPendingChanges: () => void;
   hasPendingChanges: boolean;
+  changedFilters: Record<string, unknown>;
   getFilterPendingStatus: (filterId: string) => boolean;
   setFilters: SetValues<DynamicFilterParsers>;
   resetAllFilters: () => void;
@@ -57,6 +60,25 @@ export function FiltersProvider({
     () => createFilterParsers(filterDefs),
     [filterDefs]
   );
+
+  // Build default values from filter definitions to see which filters were updated
+  const defaultFilters = useMemo(() => {
+    const defaults: Record<string, unknown> = {};
+    for (const filter of filterDefs) {
+      switch (filter.type) {
+        case FilterType.numeric:
+          defaults[filter.id] = filter.options;
+          break;
+        case FilterType.checkbox:
+          defaults[filter.id] = filter.options.map(o => o.value);
+          break;
+        case FilterType.admin:
+          defaults[filter.id] = [];
+          break;
+      }
+    }
+    return defaults;
+  }, [filterDefs]);
 
   // Filter state from URL
   const [filters, setFilters] = useQueryStates<DynamicFilterParsers>(filterParsers, {
@@ -84,11 +106,30 @@ export function FiltersProvider({
     return pendingFilters !== null;
   }, [pendingFilters]);
 
-  // Check if a specific filter has pending changes
+  // Filters updated (visually) compared to the default ones
+  const changedFilters = useMemo(() => {
+    return Object.entries(displayFilters).reduce((acc, [key, val]) => {
+      if (stableStringify(val) !== stableStringify(defaultFilters[key])) {
+        acc[key] = val;
+      }
+      return acc;
+    }, {} as Record<string, [number, number] | string[] | null>);
+  }, [displayFilters, defaultFilters, stableStringify]);
+
+    // Filters "applied" compared to the default ones
+  const updatedFilters = useMemo(() => {
+    return Object.entries(filters).reduce((acc, [key, val]) => {
+      if (stableStringify(val) !== stableStringify(defaultFilters[key])) {
+        acc[key] = val;
+      }
+      return acc;
+    }, {} as Record<string, [number, number] | string[] | null>);
+  }, [filters, defaultFilters, stableStringify]);
+
+  // Check if a specific filter differs from its original default
   const getFilterPendingStatus = useCallback((filterId: string): boolean => {
-    if (!pendingFilters) return false;
-    return filterId in pendingFilters;
-  }, [pendingFilters]);
+    return filterId in changedFilters;
+  }, [changedFilters]);
 
   // Pending change handlers — only stores keys that differ from applied state
   const setPendingFilters = useCallback((updates: Record<string, unknown>) => {
@@ -129,10 +170,12 @@ export function FiltersProvider({
     setPendingFilters,
     applyPendingChanges,
     hasPendingChanges,
+    changedFilters,
+    updatedFilters,
     getFilterPendingStatus,
     setFilters,
     resetAllFilters,
-  }), [filters, displayFilters, setPendingFilters, applyPendingChanges, hasPendingChanges, getFilterPendingStatus, setFilters, resetAllFilters]);
+  }), [filters, displayFilters, setPendingFilters, applyPendingChanges, hasPendingChanges,updatedFilters, changedFilters, getFilterPendingStatus, setFilters, resetAllFilters]);
 
   return (
     <FiltersContext.Provider value={value}>

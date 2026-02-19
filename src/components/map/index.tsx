@@ -3,6 +3,8 @@ import { Map, ViewStateChangeEvent, NavigationControl } from 'react-map-gl/mapli
 import { Box } from '@chakra-ui/react';
 import * as pmtiles from 'pmtiles';
 import * as maplibregl from 'maplibre-gl';
+import { type RequestTransformFunction } from 'maplibre-gl';
+import { isMapboxURL, transformMapboxUrl } from 'maplibregl-mapbox-request-transformer';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import mapConfig from '@/config/map.json';
 import { useModel } from "@/utils/context/model";
@@ -15,6 +17,14 @@ import SummaryPanel from './summary-panel';
 import { Legend } from './legend';
 import { ContextualLayer } from './contextual-layer';
 import { MainLayer } from './main-layer';
+import basemapStyle from './basemap-style.json';
+
+const transformRequest: RequestTransformFunction = (url, resourceType) => {
+  if (isMapboxURL(url)) {
+    return transformMapboxUrl(url, resourceType, process.env.NEXT_PUBLIC_MAPBOX_TOKEN);
+  }
+  return { url };
+};
 
 interface MainMapProps {
  main: Main;
@@ -34,11 +44,11 @@ const MainMap = ({ main }: MainMapProps) => {
   },[]);
 
   const { model, scenarioId } = useModel();
-  const { filters } = useFilters();
+  const { updatedFilters } = useFilters();
 
   const mapFilter = useMemo(() => {
-    return buildExpressionWithFilter(model.filters, filters);
-  }, [filters, model.filters]);
+    return buildExpressionWithFilter(model.filters, updatedFilters);
+  }, [updatedFilters, model.filters]);
 
   const scenario = model.scenarios.find(s => s.id === scenarioId)!;
 
@@ -58,8 +68,11 @@ const MainMap = ({ main }: MainMapProps) => {
       style={{ width: '100%', height: '100%' }}
       onClick={onClick}
       onMoveEnd={(e:ViewStateChangeEvent) => { setCoordinates({ lng: e.viewState.longitude, lat: e.viewState.latitude , zoom: e.viewState.zoom });}}
-      mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
-      interactiveLayerIds={[main.id]}
+      // @ts-expect-error mapbox style to maplibre style
+      mapStyle={basemapStyle}
+      validateStyle={false}
+      transformRequest={transformRequest}
+      interactiveLayerIds={zoom > 9 ? [main.id] : []}
         >
       <ContextualLayer mainId={main.id} />
       <MainLayer
@@ -71,7 +84,7 @@ const MainMap = ({ main }: MainMapProps) => {
       <NavigationControl position='bottom-left' />
     </Map>
     <Legend items={main.options} />
-    <SummaryPanel clusterId={selected} scenarioId={scenarioId} popupFields={model.popupFields} summaryFields={model.summaryFields} filters={filters} filterDefs={model.filters} resetCluster={resetCluster} />
+    <SummaryPanel clusterId={selected} scenarioId={scenarioId} popupFields={model.popupFields} summaryFields={model.summaryFields} filters={updatedFilters} filterDefs={model.filters} resetCluster={resetCluster} />
   </Box>;
 };
 

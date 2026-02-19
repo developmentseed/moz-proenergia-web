@@ -1,6 +1,6 @@
 import { LayerProps } from "react-map-gl/maplibre";
 import { interpolateWarm } from 'd3-scale-chromatic';
-import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
+import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, Field, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
 import { api, MEDIA_URL_PREFIX, DEFAULT_COL } from '@/utils/api';
 import { sortFilterOptions } from '@/config/filters';
 import mapConfig from '@/config/map.json';
@@ -22,21 +22,13 @@ export interface ColorCoding {
   color: string;
   value: string;
 }
-export interface ApiSummaryField {
-  columns: string[];
-  label: string;
-  description?: string;
-  group_by?: string;
-  method?: string;
-  unit?: string;
-}
 
 export interface ApiModelResponse {
   id: number;
   name: string;
   filter_fields: ApiFilterField[];
   popup_fields: ApiFilterField[];
-  summary_fields: ApiSummaryField[];
+  summary_fields: Field[];
   scenarios: ApiScenario[];
   visualization_column: string | null; // for main column
   color_coding: ColorCoding[]
@@ -132,10 +124,12 @@ export function deriveLayerStyles(sourceId: string, color: string): { circleLaye
       source: sourceId,
       'source-layer': mapConfig.sourceLayerName,
       type: 'circle',
-      //@TODO: style
-      "paint": {
+      paint: {
         "circle-color": color,
-        "circle-radius": 2
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 2, 10, 5, 15, 6],
+        "circle-opacity": 0.8,
+        "circle-stroke-color": "#fff",
+        "circle-stroke-width": ["interpolate", ["linear"], ["zoom"], 5, 0, 10, 0.5, 15, 1],
       },
       filter: ["==", ["geometry-type"], "Point"],
     },
@@ -144,9 +138,10 @@ export function deriveLayerStyles(sourceId: string, color: string): { circleLaye
       source: sourceId,
       'source-layer': mapConfig.sourceLayerName,
       type: 'line',
-      //@TODO: style
-      "paint": {
-        "line-color":  color
+      paint: {
+        "line-color": color,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 5, 0.5, 10, 1.5, 15, 3],
+        "line-opacity": 0.8,
       },
       filter: ["==", ["geometry-type"], "LineString"],
     },
@@ -155,18 +150,19 @@ export function deriveLayerStyles(sourceId: string, color: string): { circleLaye
       source: sourceId,
       'source-layer': mapConfig.sourceLayerName,
       type: 'fill',
-      //@TODO: style
-      "paint": {
-        "fill-color": color
+      paint: {
+        "fill-color": color,
+        "fill-opacity": ["interpolate", ["linear"], ["zoom"], 5, 0.3, 10, 0.5, 15, 0.7],
+        "fill-outline-color": color,
       },
       filter: ["==", ["geometry-type"], "Polygon"]
     },
   };
 }
 
-export async function fetchModels(): Promise<ModelGroupMetadata[]> {
+export async function fetchModels(signal?: AbortSignal): Promise<ModelGroupMetadata[]> {
   try {
-    const { data } = await api.get('model/');
+    const { data } = await api.get('model/', { signal });
     // @TODO return models as it is. Returning lcoe and mini grids until data getting ingested.
     return data.results;
   } catch(e) {
@@ -175,9 +171,9 @@ export async function fetchModels(): Promise<ModelGroupMetadata[]> {
   }
 }
 
-export async function fetchModelMetadata(slug: string): Promise<ApiModelResponse> {
+export async function fetchModelMetadata(slug: string, signal?: AbortSignal): Promise<ApiModelResponse> {
   try {
-    const { data } = await api.get(`model/${slug}/`);
+    const { data } = await api.get(`model/${slug}/`, { signal });
     return data;
   } catch(e) {
     console.error(e);
@@ -185,10 +181,11 @@ export async function fetchModelMetadata(slug: string): Promise<ApiModelResponse
   }
 }
 
-export async function fetchVectors({ modelId, token }: { modelId?: string, token?: string | null} = {}): Promise<ApiVectorResult[]> {
+export async function fetchVectors({ modelId, token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiVectorResult[]> {
   try {
-    const endpoint = modelId? `vector/?model=${modelId}`: 'vector/';
+    const endpoint = `vector/`;
     const { data } = await api.get(endpoint, {
+      signal,
       ...(token && {
         headers: { 'Authorization': `Token ${token}` }
       }),
@@ -212,12 +209,13 @@ export async function fetchVectors({ modelId, token }: { modelId?: string, token
 export async function fetchAllFilterOptions(
   scenarioId: string | number,
   columns: string[],
+  signal?: AbortSignal,
 ): Promise<Record<string, string[] | number[] | null>> {
   try {
     const fields = columns.join(',');
     const { data, status } = await api.get(
       `scenario/${scenarioId}/summaries/`,
-      { params: { fields } },
+      { signal, params: { fields } },
     );
     if (status !== 200) {
       console.warn(`fetchAllFilterOptions: returned status ${status}, using fallback`);
@@ -242,7 +240,7 @@ export async function fetchAllFilterOptions(
 }
 
 // Replace 'id' in summary field columns with the main visualization column
-export function replaceSummaryIdColumn(fields: ApiSummaryField[], mainColumn: string): ApiSummaryField[] {
+export function replaceSummaryIdColumn(fields: Field[], mainColumn: string): Field[] {
   return fields.map(f => {
     const idField = f.columns.includes('id');
     if (idField) {
@@ -259,7 +257,7 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
 
   const scenarios: Scenario[] = apiModel.scenarios
     // @TODO: Filtering LCOE model until performance improvement
-    .filter(s => s.id !== 1)
+    // .filter(s => s.id !== 1)
     .filter(s => s.model_file !== null)
     .map(s => ({
       id: String(s.id),
@@ -275,8 +273,9 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
   // whwen visuaslization column is empty or null
   const mainColumn = (!apiModel.visualization_column || apiModel.visualization_column === '')? DEFAULT_COL: apiModel.visualization_column;
   const mainField = apiModel.filter_fields.find(f => f.column === mainColumn);
-  const filedNameToReplace = (!apiModel.visualization_column || apiModel.visualization_column === '')? apiModel.popup_fields[0].column : apiModel.visualization_column;
-  // ID column should be replaced to something else to make summary work
+  const filedNameToReplace = apiModel.popup_fields[1].column;
+
+  //@NOTE: ID column should be replaced to something else to make summary work
   const summaryFields = replaceSummaryIdColumn(apiModel.summary_fields, filedNameToReplace);
 
   const main: Main = {
@@ -339,6 +338,7 @@ export function transformMainOptions(
   rawOptions: MapItemUnit[] | null,
   colorCoding: ColorCoding[]
 ): MapItemUnit[] {
+
   if (!Array.isArray(rawOptions)) return [];
 
   // Find default color (value: "any")
@@ -363,10 +363,4 @@ export function transformMainOptions(
     label: opt.label,
     color: colorLookup.get(String(opt.value)) ?? defaultColor,
   }));
-}
-
-// @TODO: this will need to be filtered by scenario id
-export async function getVectorData() {
-  const apiVectors = await fetchVectors();
-  return apiVectors;
 }

@@ -9,8 +9,9 @@ export interface Field {
   label: string;
   description?: string;
   group_by?: string;
-  method?: string;
+  method?: 'count' | 'min' | 'max' | 'sum' | 'average';
   unit?: string;
+  chart?: 'bar' | 'line';
 }
 export interface MapItemUnit extends ItemUnit {
   color?: string;
