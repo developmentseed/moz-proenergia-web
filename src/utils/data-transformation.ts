@@ -124,10 +124,12 @@ export function deriveLayerStyles(sourceId: string, color: string): { circleLaye
       source: sourceId,
       'source-layer': mapConfig.sourceLayerName,
       type: 'circle',
-      //@TODO: style
-      "paint": {
+      paint: {
         "circle-color": color,
-        "circle-radius": 2
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 2, 10, 5, 15, 6],
+        "circle-opacity": 0.8,
+        "circle-stroke-color": "#fff",
+        "circle-stroke-width": ["interpolate", ["linear"], ["zoom"], 5, 0, 10, 0.5, 15, 1],
       },
       filter: ["==", ["geometry-type"], "Point"],
     },
@@ -136,9 +138,10 @@ export function deriveLayerStyles(sourceId: string, color: string): { circleLaye
       source: sourceId,
       'source-layer': mapConfig.sourceLayerName,
       type: 'line',
-      //@TODO: style
-      "paint": {
-        "line-color":  color
+      paint: {
+        "line-color": color,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 5, 0.5, 10, 1.5, 15, 3],
+        "line-opacity": 0.8,
       },
       filter: ["==", ["geometry-type"], "LineString"],
     },
@@ -147,9 +150,10 @@ export function deriveLayerStyles(sourceId: string, color: string): { circleLaye
       source: sourceId,
       'source-layer': mapConfig.sourceLayerName,
       type: 'fill',
-      //@TODO: style
-      "paint": {
-        "fill-color": color
+      paint: {
+        "fill-color": color,
+        "fill-opacity": ["interpolate", ["linear"], ["zoom"], 5, 0.3, 10, 0.5, 15, 0.7],
+        "fill-outline-color": color,
       },
       filter: ["==", ["geometry-type"], "Polygon"]
     },
