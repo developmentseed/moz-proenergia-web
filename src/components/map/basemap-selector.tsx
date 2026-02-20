@@ -33,6 +33,12 @@ export const BASEMAP_OPTIONS: BasemapOption[] = [
     thumbnailUrl: thumbnail("mapbox/light-v11"),
   },
   {
+    id: "dark",
+    name: "Dark",
+    styleUrl: "mapbox://styles/mapbox/dark-v11",
+    thumbnailUrl: thumbnail("mapbox/dark-v11"),
+  },
+  {
     id: "satellite",
     name: "Satellite",
     styleUrl: "mapbox://styles/mapbox/satellite-v9",
