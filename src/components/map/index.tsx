@@ -3,10 +3,9 @@ import {
   Map,
   ViewStateChangeEvent,
   NavigationControl,
-  useMap,
   ScaleControl,
 } from "react-map-gl/maplibre";
-import { Box, IconButton } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import * as pmtiles from "pmtiles";
 import * as maplibregl from "maplibre-gl";
 import { type RequestTransformFunction } from "maplibre-gl";
@@ -19,10 +18,9 @@ import mapConfig from "@/config/map.json";
 import { useModel } from "@/utils/context/model";
 import { useFilters } from "@/utils/context/filters";
 import {
-  DEFAULT_COORDS,
-  DEFAULT_ZOOM,
   useCoordinates,
 } from "./hooks/use-coordinates";
+import { CenterMapControl } from './recenter-button';
 import { useMouseEvent } from "./hooks/use-mouse-event";
 import { type Main } from "@/app/types";
 import { buildExpressionWithFilter } from "@/utils/map/filter";
@@ -31,7 +29,6 @@ import { Legend } from "./legend";
 import { ContextualLayer } from "./contextual-layer";
 import { MainLayer } from "./main-layer";
 import basemapStyle from "./basemap-style.json";
-import { LuScan } from "react-icons/lu";
 
 const transformRequest: RequestTransformFunction = (url, resourceType) => {
   if (isMapboxURL(url)) {
@@ -46,41 +43,6 @@ const transformRequest: RequestTransformFunction = (url, resourceType) => {
 
 interface MainMapProps {
   main: Main;
-}
-function CenterMapControl() {
-  const { current: map } = useMap();
-  if (!map) return;
-  const resetCenter = useCallback(() => {
-    map.flyTo({
-      center: [DEFAULT_COORDS[1], DEFAULT_COORDS[0]],
-      zoom: DEFAULT_ZOOM,
-    });
-  }, [map]);
-
-  const { lng: viewLng, lat: viewLat } = map.getCenter();
-  const viewZoom = map.getZoom();
-  const isInitialViewState =
-    viewLng === DEFAULT_COORDS[1] &&
-    viewLat === DEFAULT_COORDS[0] &&
-    viewZoom === DEFAULT_ZOOM;
-
-  return (
-    <IconButton
-      aria-label="Center map"
-      bg="bg"
-      position="absolute"
-      bottom={28}
-      left={2}
-      size="xs"
-      variant="surface"
-      zIndex={1000}
-      onClick={resetCenter}
-      _hover={{ bg: "bg.muted" }}
-      disabled={isInitialViewState}
-    >
-      <LuScan />
-    </IconButton>
-  );
 }
 
 const MainMap = ({ main }: MainMapProps) => {
