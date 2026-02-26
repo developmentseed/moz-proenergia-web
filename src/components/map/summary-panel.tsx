@@ -1,14 +1,16 @@
 import { memo, useState, useEffect } from "react";
 import {
   Box,
+  Flex,
   Table,
   Spinner,
   Text,
   Collapsible,
+  IconButton,
 } from "@chakra-ui/react";
 import { api } from "@/utils/api";
 import { InfoTip } from "../chakra/toggle-tip";
-import { LuChevronUp } from "react-icons/lu";
+import { LuChevronUp, LuChevronLeft } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter } from "@/app/types";
@@ -30,9 +32,10 @@ interface SummaryPanelProps {
 interface PanelHeaderProps {
   subtitle: string;
   title: string;
+  onBack?: () => void;
 }
 
-const PanelHeader = ({ title, subtitle }: PanelHeaderProps) => (
+const PanelHeader = ({ title, subtitle, onBack }: PanelHeaderProps) => (
   <Collapsible.Trigger
     display="flex"
     flexDirection="column"
@@ -44,7 +47,22 @@ const PanelHeader = ({ title, subtitle }: PanelHeaderProps) => (
     _open={{ borderBottom: "1px solid", borderColor: "panelBorder" }}
   >
     <Text textStyle="subTitle">{subtitle}</Text>
-    <Text textStyle="modelTitle">{title}</Text>
+    <Flex gap={1} align="center">
+      {onBack && (
+        <IconButton
+          aria-label="Back to national summary"
+          variant="ghost"
+          size="2xs"
+          onClick={(e) => {
+            e.stopPropagation();
+            onBack();
+          }}
+        >
+          <LuChevronLeft />
+        </IconButton>
+      )}
+      <Text textStyle="modelTitle">{title}</Text>
+    </Flex>
     <Collapsible.Indicator
       transition="transform 0.2s"
       _open={{ transform: "rotate(180deg)" }}
@@ -314,7 +332,7 @@ const SummaryPanel = ({
       zIndex={controlZIndex}
     >
       <Collapsible.Root defaultOpen>
-        <PanelHeader subtitle="analysis" title={title} />
+        <PanelHeader subtitle="analysis" title={title} onBack={showingCluster ? resetCluster : undefined} />
         <Collapsible.Content>
           <PanelBody
             data={dataToDisplay}
