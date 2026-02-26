@@ -17,7 +17,7 @@ export const FilterControl = memo(function FilterControl({ config, value, hasPen
         <TextRange
           title={config.label}
           hasPending={hasPending}
-          // description={config.description}
+          description={config.description}
           min={config.options[0]}
           max={config.options[1]}
           value={value as number[]}
@@ -30,7 +30,6 @@ export const FilterControl = memo(function FilterControl({ config, value, hasPen
         <CheckboxGroup
           title={config.label}
           label={config.label}
-          // description={config.description}
           items={config.options}
           value={value as string[]}
           onChange={onChange}
@@ -42,7 +41,6 @@ export const FilterControl = memo(function FilterControl({ config, value, hasPen
       return (
         <Combobox
           title={config.label}
-          // description={config.description}
           items={items}
           value={value as (string[] | undefined)}
           onChange={onChange}
