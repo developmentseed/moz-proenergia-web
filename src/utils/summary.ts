@@ -71,7 +71,7 @@ export function transformFieldSummary(
 
   if (summary.type === "numeric") {
 
-    if (summary.grouped) {
+    if (field.group_by && summary.grouped) {
       return makeGroupOrChartRow(field, Object.entries(summary.grouped).map(([key, stats]) => ({
         key,
         label: key,
@@ -91,7 +91,7 @@ export function transformFieldSummary(
 
   // response type string
   // String type with grouped → per-group counts
-  if (summary.grouped) {
+  if (field.group_by && summary.grouped) {
     return makeGroupOrChartRow(field, Object.entries(summary.grouped).map(([key, group]) => ({
       key,
       label: key,
