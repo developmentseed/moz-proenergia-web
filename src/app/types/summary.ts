@@ -7,20 +7,22 @@ export interface NumericGroupStats {
   sum: number | null;
 }
 
+export type StringGroupStats = { count: number; values: Record<string, number> };
+
 export interface BatchSummaryNumeric {
   type: "numeric";
   count: number;
   min: number | null;
   max: number | null;
   sum: number | null;
-  grouped?: Record<string, NumericGroupStats>;
+  grouped?: Record<string, NumericGroupStats | Record<string, NumericGroupStats>>;
 }
 
 export interface BatchSummaryString {
   type: "string";
   count: number;
   values: Record<string, number>;
-  grouped?: Record<string, { count: number; values: Record<string, number> }>;
+  grouped?: Record<string, StringGroupStats | Record<string, StringGroupStats>>;
 }
 
 export type BatchFieldSummary = BatchSummaryNumeric | BatchSummaryString;
@@ -72,5 +74,29 @@ export interface ErrorRow {
   key: string;
 }
 
-export type SummaryRow = FlatRow | GroupRow | ChartRow | ErrorRow;
+export interface NestedGroupData {
+  key: string;
+  label: string;
+  total: number;
+  items: SummaryItem[];
+}
+
+export interface NestedGroupRow {
+  type: "nested-group";
+  label: string;
+  description?: string;
+  unit?: string;
+  value: NestedGroupData[];
+}
+
+export interface NestedChartRow {
+  type: "nested-chart";
+  chartType: "pie";
+  label: string;
+  description?: string;
+  unit?: string;
+  value: NestedGroupData[];
+}
+
+export type SummaryRow = FlatRow | GroupRow | ChartRow | ErrorRow | NestedGroupRow | NestedChartRow;
 export type SummaryData = SummaryRow[];
