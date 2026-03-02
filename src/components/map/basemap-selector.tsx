@@ -21,7 +21,7 @@ export interface BasemapOption {
   id: string;
   name: string;
   /** Mapbox style URL passed to mapStyle, or null for the local JSON basemap */
-  styleUrl: string | null;
+  styleUrl: string;
   thumbnailUrl: string;
 }
 
@@ -29,7 +29,7 @@ export const BASEMAP_OPTIONS: BasemapOption[] = [
   {
     id: "light",
     name: "Light",
-    styleUrl: null, // caller falls back to local basemap-style.json
+    styleUrl: "/basemap-style.json",
     thumbnailUrl: thumbnail("mapbox/light-v11"),
   },
   {

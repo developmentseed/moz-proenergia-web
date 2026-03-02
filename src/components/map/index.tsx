@@ -28,8 +28,6 @@ import SummaryPanel from "./summary-panel";
 import { Legend } from "./legend";
 import { ContextualLayer } from "./contextual-layer";
 import { MainLayer } from "./main-layer";
-import basemapStyle from "./basemap-style.json";
-import { LuScan } from "react-icons/lu";
 import { BasemapSelector, BASEMAP_OPTIONS } from "./basemap-selector";
 
 const transformRequest: RequestTransformFunction = (url, resourceType) => {
@@ -70,14 +68,13 @@ const MainMap = ({ main }: MainMapProps) => {
   const scenario = model.scenarios.find((s) => s.id === scenarioId)!;
 
   const [currentBasemapId, setCurrentBasemapId] = useState("light");
+  const selectedBasemap =
+    BASEMAP_OPTIONS.find((o) => o.id === currentBasemapId) ?? BASEMAP_OPTIONS[0];
 
   const resetCluster = useCallback(() => {
     setSelected(null);
   }, [setSelected]);
 
-  const selectedBasemap =
-    BASEMAP_OPTIONS.find((o) => o.id === currentBasemapId) ?? BASEMAP_OPTIONS[0];
-  const mapStyle = selectedBasemap.styleUrl ?? basemapStyle;
 
   return (
     <Box w="100%" h="100%" className="map-container" position="relative">
@@ -100,9 +97,7 @@ const MainMap = ({ main }: MainMapProps) => {
             zoom: e.viewState.zoom,
           });
         }}
-        // @ts-expect-error mapbox style to maplibre style
-        mapStyle={mapStyle}
-        validateStyle={false}
+        mapStyle={selectedBasemap.styleUrl}
         transformRequest={transformRequest}
         interactiveLayerIds={zoom > 9 ? [main.id] : []}
       >
