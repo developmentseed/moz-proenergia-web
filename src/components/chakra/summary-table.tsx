@@ -105,8 +105,8 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight }: SummaryTab
                     </Table.Cell>
                   </Table.Row>
                 );
-              } else return (<Text> Only Bar Chart is available.</Text>);
-
+                // @TODO: Handle this edge case internally? 
+              } else return (<Text key={row.label}> Only Bar Chart is available.</Text>);
               }
               // @TODO: bring doublepiechart
               // if (row.type === "nested-chart") {
@@ -163,40 +163,40 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight }: SummaryTab
                   ]),
                 ];
               }
-
-              // Group type
-              return [
-                <Table.Row key={row.label} bg="gray.200">
-                  <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
-                    <Box display="flex" alignItems="center" gap={1}>
-                      {/* group type should have description as label */}
-                      <Text textStyle="tableAttr">
-                        {" "}
-                        {row.description || row.label}
-                        <Text as="span" fontWeight="normal">
+              if (row.type === "group") {
+                return [
+                  <Table.Row key={row.label} bg="gray.200">
+                    <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
+                      <Box display="flex" alignItems="center" gap={1}>
+                        {/* group type should have description as label */}
+                        <Text textStyle="tableAttr">
                           {" "}
-                          {row.unit && `(${row.unit})`}
+                          {row.description || row.label}
+                          <Text as="span" fontWeight="normal">
+                            {" "}
+                            {row.unit && `(${row.unit})`}
+                          </Text>
                         </Text>
-                      </Text>
-                    </Box>
-                  </Table.Cell>
-                </Table.Row>,
-                ...row.value.map((item) => (
-                  <Table.Row key={item.key} bg="panelBg">
-                    <Table.Cell {...tableCellStyleProps} pl={6}>
-                      <Text textStyle="tableAttr" pt={1} pb={1}>
-                        {" "}
-                        {item.label}
-                      </Text>
+                      </Box>
                     </Table.Cell>
-                    <Table.Cell {...tableCellStyleProps}>
-                      <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
-                        {formatValue(item.value, item.key)}
-                      </Text>
-                    </Table.Cell>
-                  </Table.Row>
-                )),
-              ];
+                  </Table.Row>,
+                  ...row.value.map((item) => (
+                    <Table.Row key={item.key} bg="panelBg">
+                      <Table.Cell {...tableCellStyleProps} pl={6}>
+                        <Text textStyle="tableAttr" pt={1} pb={1}>
+                          {" "}
+                          {item.label}
+                        </Text>
+                      </Table.Cell>
+                      <Table.Cell {...tableCellStyleProps}>
+                        <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
+                          {formatValue(item.value, item.key)}
+                        </Text>
+                      </Table.Cell>
+                    </Table.Row>
+                  )),
+                ];
+              }
             })}
           </Table.Body>
         </Table.Root>
