@@ -182,7 +182,6 @@ const ControlsPanel = () => {
   const noCollapsibleGroups = model.filters.filter(
     (f) => f.type === FilterType.numeric,
   );
-  console.log(collapsibleGroups);
 
   return (
     // To give space for scrollable area
