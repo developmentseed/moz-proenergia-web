@@ -124,7 +124,7 @@ const CollapsibleGroup = memo(function CollapsibleGroup({
             content={collapsibleItem.items[0].description}
             contentProps={{ css: { "--tooltip-bg": "colors.bg", color: "fg" } }}
           >
-            <IconButton variant="ghost" size="xs" p={0}>
+            <IconButton as='span' variant="ghost" size="xs" p={0}>
               <LuInfo />
             </IconButton>
           </Tooltip>
