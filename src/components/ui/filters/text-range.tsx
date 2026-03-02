@@ -3,9 +3,11 @@ import { Box, Stack, Input, Flex, Slider } from '@chakra-ui/react';
 import { type SliderValueChangeDetails } from '@chakra-ui/react';
 import { formatNumber } from '@/utils/number';
 import { FilterLabel } from './filter-label';
+import { InfoTip } from '@/components/chakra/toggle-tip';
 
 interface TextRangeProps {
   title: string;
+  description?: string;
   min: number;
   max: number;
   value: number[];
@@ -16,6 +18,7 @@ interface TextRangeProps {
 
 export const TextRange = ({
   title,
+  description,
   min,
   max,
   value,
@@ -118,7 +121,12 @@ export const TextRange = ({
 
   return (
     <Stack gap={2} width="full">
-      <FilterLabel title={title} hasPending={hasPending} />
+      <Flex align="center" gap={1}>
+        <FilterLabel title={title} hasPending={hasPending} />
+        {description && title !== description && (
+          <InfoTip content={description} />
+        )}
+      </Flex>
 
       <Box width="full">
         <Slider.Root

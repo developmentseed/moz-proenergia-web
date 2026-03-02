@@ -1,28 +1,24 @@
 import { memo, useState, useEffect } from "react";
 import {
   Box,
+  Flex,
   Table,
   Spinner,
   Text,
   Collapsible,
+  IconButton,
 } from "@chakra-ui/react";
-import { api, CONCURRENCY_NUM } from "@/utils/api";
+import { api } from "@/utils/api";
 import { InfoTip } from "../chakra/toggle-tip";
-import { LuChevronUp } from "react-icons/lu";
- import pLimit from 'p-limit';
-import { useQuery, useQueries } from "@tanstack/react-query";
+import { LuChevronUp, LuChevronLeft } from "react-icons/lu";
+import { useQuery } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter } from "@/app/types";
 import { formatDisplayNumber } from "@/utils/number";
 import { buildFilterQueryParam } from "@/utils/query-string-builder";
 import { SummaryBarChart } from "@/components/chakra/chart/bar";
-import {
-  transformFieldSummary,
-} from "@/utils/summary";
-import {
-  type BatchSummariesResponse,
-  type SummaryData,
-  type SummaryRow } from "@/app/types/summary";
+import { transformFieldSummary } from "@/utils/summary";
+import { type SummaryData, type SummaryRow } from "@/app/types/summary";
 interface SummaryPanelProps {
   clusterId: string | null;
   scenarioId: string;
@@ -33,15 +29,13 @@ interface SummaryPanelProps {
   resetCluster: () => void;
 }
 
-// Limit the number of parallel requests going out
-const summaryLimit = pLimit(CONCURRENCY_NUM);
-
 interface PanelHeaderProps {
   subtitle: string;
   title: string;
+  onBack?: () => void;
 }
 
-const PanelHeader = ({ title, subtitle }: PanelHeaderProps) => (
+const PanelHeader = ({ title, subtitle, onBack }: PanelHeaderProps) => (
   <Collapsible.Trigger
     display="flex"
     flexDirection="column"
@@ -53,7 +47,22 @@ const PanelHeader = ({ title, subtitle }: PanelHeaderProps) => (
     _open={{ borderBottom: "1px solid", borderColor: "panelBorder" }}
   >
     <Text textStyle="subTitle">{subtitle}</Text>
-    <Text textStyle="modelTitle">{title}</Text>
+    <Flex gap={1} align="center">
+      {onBack && (
+        <IconButton
+          aria-label="Back to national summary"
+          variant="ghost"
+          size="2xs"
+          onClick={(e) => {
+            e.stopPropagation();
+            onBack();
+          }}
+        >
+          <LuChevronLeft />
+        </IconButton>
+      )}
+      <Text textStyle="modelTitle">{title}</Text>
+    </Flex>
     <Collapsible.Indicator
       transition="transform 0.2s"
       _open={{ transform: "rotate(180deg)" }}
@@ -242,34 +251,6 @@ async function fetchClusterData(
   }
 }
 
-async function fetchFieldSummary(
-  scenarioId: string,
-  field: Field,
-  filters: Record<string, [number, number] | string[] | null>,
-  filterDefs: Filter[],
-  signal: AbortSignal,
-): Promise<BatchSummariesResponse> {
-  try {
-    const fields = field.columns.join(",");
-
-    const params: Record<string, string> = { fields };
-    const q = buildFilterQueryParam(filters, filterDefs);
-    if (q) params.q = q;
-    if (field.group_by) params.group_by = field.group_by;
-    // @TODO: enable. method
-    // if (field.method) params.method = field.method;
-
-    const { data } = await api.get(`scenario/${scenarioId}/summaries/`, {
-      signal,
-      params,
-    });
-    return data;
-  } catch (e) {
-    console.error(e);
-    throw new Error("Failed to fetch summary data");
-  }
-}
-
 const SummaryPanel = ({
   clusterId,
   scenarioId,
@@ -299,37 +280,38 @@ const SummaryPanel = ({
     return () => cancelIdleCallback(id);
   }, []);
 
-  // One request per summary field, transformed in queryFn
-  const { data: summaryData, isLoading: summaryIsLoading } = useQueries({
-    queries: summaryFields.map((field) => ({
-      queryKey: ["summaries", scenarioId, field.label, field.columns, field.group_by, filters],
-      queryFn: async ({ signal }: { signal: AbortSignal }) => {
-        return summaryLimit(async () => {
-          const response = await fetchFieldSummary(scenarioId, field, filters, filterDefs, signal);
-          return transformFieldSummary(response, field);
-        });
-      },
-      retry: false,
-      enabled: summaryEnabled,
-    })),
-    combine: (results) => {
-      const isLoading = results.some((r) => r.isLoading);
-      const allSettled = results.every((r) => r.data || r.isError);
-      if (!allSettled) return { data: undefined, isLoading };
+  // Single batch request for all summary fields
+  const allColumns = summaryFields.flatMap((f) => f.columns);
+  const groupBy = summaryFields.find((f) => f.group_by)?.group_by;
 
-      const rows: SummaryRow[] = results.map((r, i) =>
-        r.isError || !r.data
-          ? { type: "error" as const, label: summaryFields[i].label, key: summaryFields[i].columns[0] }
-          : r.data
+  const { data: summaryData, isLoading: summaryIsLoading } = useQuery({
+    queryKey: ["summaries", scenarioId, allColumns, groupBy, filters],
+    queryFn: async ({ signal }) => {
+      const params: Record<string, string> = { fields: allColumns.join(",") };
+      const q = buildFilterQueryParam(filters, filterDefs);
+      if (q) params.q = q;
+      if (groupBy) params.group_by = groupBy;
+
+      const { data } = await api.get(
+        `scenario/${scenarioId}/summaries/`,
+        { signal, params },
       );
-      return {
-        data: rows.sort((a, b) => {
-          if (a.type === b.type) return 0;
-          return a.type === 'flat' || a.type === 'error' ? -1 : 1;
-        }),
-        isLoading,
-      };
+
+      const rows: SummaryRow[] = summaryFields.map((field) => {
+        try {
+          return transformFieldSummary(data, field);
+        } catch {
+          return { type: "error" as const, label: field.label, key: field.columns[0] };
+        }
+      });
+
+      return rows.sort((a, b) => {
+        if (a.type === b.type) return 0;
+        return a.type === "flat" || a.type === "error" ? -1 : 1;
+      });
     },
+    retry: false,
+    enabled: summaryEnabled,
   });
 
   // Views are mutually exclusive - cluster view never falls through to summary
@@ -350,7 +332,7 @@ const SummaryPanel = ({
       zIndex={controlZIndex}
     >
       <Collapsible.Root defaultOpen>
-        <PanelHeader subtitle="analysis" title={title} />
+        <PanelHeader subtitle="analysis" title={title} onBack={showingCluster ? resetCluster : undefined} />
         <Collapsible.Content>
           <PanelBody
             data={dataToDisplay}
