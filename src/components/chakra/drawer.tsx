@@ -37,7 +37,7 @@ export const ChakraDrawer = ({ href, title, open, onOpenChange, triggerContent, 
                 <NextLink href={href}>
                   Go to Explorer
                 </NextLink>
-              </Button>L
+              </Button>
             </Drawer.Footer>
             <Drawer.CloseTrigger asChild>
               <CloseButton size="sm" />
