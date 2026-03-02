@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { transformFieldSummary } from "../utils/summary";
-import type { BatchSummariesResponse, FlatRow, GroupRow, ChartRow } from "@/app/types/summary";
+import { transformFieldSummary, isNestedGrouped } from "../utils/summary";
+import type { BatchSummariesResponse, FlatRow, GroupRow, ChartRow, NestedGroupRow, NestedChartRow } from "@/app/types/summary";
 import type { Field } from "@/app/types";
 
 import oneColumnString from "./example-responses/one-column-string.json";
@@ -9,6 +9,7 @@ import twoColumnsGroupby from "./example-responses/two-columns-groupby.json";
 // import twoColumnsNumericString from "./example-responses/twol-columns-numeric-string.json";
 import twoColumnsNumericStringGroupby from "./example-responses/two-columns-numeric-string-groupby.json";
 import groupByCountZero from "./example-responses/group-by-count-zero.json";
+import multiGroupBy from "./example-responses/multi-group-by.json";
 
 // ── Response shape cases ────────────────────────────────────────────
 
@@ -372,6 +373,97 @@ describe("transformFieldSummary — chart row output", () => {
       oneColumnString as BatchSummariesResponse,
       field,
     );
+    expect(result.type).toBe("group");
+  });
+});
+
+// ── Multi group_by cases ──────────────────────────────────────────
+
+describe("isNestedGrouped", () => {
+  it("detects single-level grouped (has count at first level)", () => {
+    const singleLevel = { "0-50": { count: 1597, min: 0, max: 100, sum: 210291 } };
+    expect(isNestedGrouped(singleLevel)).toBe(false);
+  });
+
+  it("detects two-level nested grouped", () => {
+    const nested = {
+      "ExistingGrid": {
+        "Cabo Delgado": { count: 347, min: 4.9, max: 340273, sum: 2407733 },
+      },
+    };
+    expect(isNestedGrouped(nested)).toBe(true);
+  });
+
+  it("returns false for empty object", () => {
+    expect(isNestedGrouped({})).toBe(false);
+  });
+});
+
+describe("transformFieldSummary — multi group_by", () => {
+  it("single column, numeric, multi group_by → NestedGroupRow", () => {
+    const field: Field = {
+      columns: ["Pop2030"],
+      label: "Population 2030",
+      method: "sum",
+      group_by: ["Technology2030", "Admin_1"],
+    };
+    const result = transformFieldSummary(
+      multiGroupBy as BatchSummariesResponse,
+      field,
+    );
+    expect(result.type).toBe("nested-group");
+    const nested = result as NestedGroupRow;
+
+    // Should have 4 L1 groups
+    expect(nested.value).toHaveLength(4);
+    const l1Keys = nested.value.map((g) => g.key);
+    expect(l1Keys).toContain("ExistingGrid");
+    expect(l1Keys).toContain("GridExtension");
+    expect(l1Keys).toContain("MiniGrid_PV");
+    expect(l1Keys).toContain("SHS");
+
+    // ExistingGrid should have 10 L2 items (provinces)
+    const existingGrid = nested.value.find((g) => g.key === "ExistingGrid")!;
+    expect(existingGrid.items).toHaveLength(10);
+
+    // Check a specific L2 value
+    const caboDelgado = existingGrid.items.find((i) => i.key === "Cabo Delgado");
+    expect(caboDelgado?.value).toBe(2407733.747);
+
+    // Total should be sum of all L2 items
+    expect(existingGrid.total).toBeCloseTo(24554622.6654, 1);
+  });
+
+  it("single column, numeric, multi group_by, chart=bar → NestedChartRow (pie)", () => {
+    const field: Field = {
+      columns: ["Pop2030"],
+      label: "Population 2030",
+      method: "sum",
+      group_by: ["Technology2030", "Admin_1"],
+      chart: "bar",
+    };
+    const result = transformFieldSummary(
+      multiGroupBy as BatchSummariesResponse,
+      field,
+    );
+    expect(result.type).toBe("nested-chart");
+    const nested = result as NestedChartRow;
+    expect(nested.chartType).toBe("pie");
+    expect(nested.value).toHaveLength(4);
+  });
+
+  it("single column, numeric, single group_by still produces GroupRow (not NestedGroupRow)", () => {
+    const field: Field = {
+      columns: ["NewHHConnectionsTotal"],
+      label: "HH Connections",
+      method: "sum",
+      group_by: ["MGCapacityBins"],
+    };
+    const result = transformFieldSummary(
+      twoColumnsGroupby as BatchSummariesResponse,
+      field,
+    );
+    // Single-level grouped should still produce GroupRow
     expect(result.type).toBe("group");
   });
 });
