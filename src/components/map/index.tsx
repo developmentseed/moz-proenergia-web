@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useCallback } from "react";
+import { useEffect, useMemo, useCallback, useState } from "react";
 import {
   Map,
   ViewStateChangeEvent,
@@ -29,6 +29,8 @@ import { Legend } from "./legend";
 import { ContextualLayer } from "./contextual-layer";
 import { MainLayer } from "./main-layer";
 import basemapStyle from "./basemap-style.json";
+import { LuScan } from "react-icons/lu";
+import { BasemapSelector, BASEMAP_OPTIONS } from "./basemap-selector";
 
 const transformRequest: RequestTransformFunction = (url, resourceType) => {
   if (isMapboxURL(url)) {
@@ -67,9 +69,15 @@ const MainMap = ({ main }: MainMapProps) => {
 
   const scenario = model.scenarios.find((s) => s.id === scenarioId)!;
 
+  const [currentBasemapId, setCurrentBasemapId] = useState("light");
+
   const resetCluster = useCallback(() => {
     setSelected(null);
   }, [setSelected]);
+
+  const selectedBasemap =
+    BASEMAP_OPTIONS.find((o) => o.id === currentBasemapId) ?? BASEMAP_OPTIONS[0];
+  const mapStyle = selectedBasemap.styleUrl ?? basemapStyle;
 
   return (
     <Box w="100%" h="100%" className="map-container" position="relative">
@@ -93,7 +101,7 @@ const MainMap = ({ main }: MainMapProps) => {
           });
         }}
         // @ts-expect-error mapbox style to maplibre style
-        mapStyle={basemapStyle}
+        mapStyle={mapStyle}
         validateStyle={false}
         transformRequest={transformRequest}
         interactiveLayerIds={zoom > 9 ? [main.id] : []}
@@ -108,6 +116,10 @@ const MainMap = ({ main }: MainMapProps) => {
         <ScaleControl position="bottom-left" />
         <NavigationControl showCompass={false} position="bottom-left" />
         <CenterMapControl />
+        <BasemapSelector
+          currentBasemapId={currentBasemapId}
+          onBasemapChange={setCurrentBasemapId}
+        />
       </Map>
       <Legend items={main.options} />
       <SummaryPanel
