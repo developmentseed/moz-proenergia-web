@@ -8,10 +8,11 @@ import {
 } from '@tanstack/react-query';
 import { slugify } from '@/utils/data-transformation';
 import { fetchModels } from '@/utils/data-transformation';
-import { SimpleGrid, Text } from '@chakra-ui/react';
+import { SimpleGrid, Text, Box } from '@chakra-ui/react';
+import { DrawerSummaryTable } from './drawer-summary-table';
 
 export default function ModelCards() {
-  const [selectedModel, setSelectedModel] = useState<{ name: string; description: string; slug: string } | null>(null);
+  const [selectedModel, setSelectedModel] = useState<{ id: string; name: string; description: string; slug: string } | null>(null);
 
   const { data: models } = useQuery({
     queryKey: ['models'],
@@ -22,7 +23,7 @@ export default function ModelCards() {
     <>
       <SimpleGrid columns={3} py={6} gap={6}>
         {models?.map(e => (
-          <div key={e.id} onClick={() => setSelectedModel({ name: e.name, description: e.description, slug: slugify(e.name) })} style={{ cursor: 'pointer' }}>
+          <div key={e.id} onClick={() => setSelectedModel({ id: String(e.id), name: e.name, description: e.description, slug: slugify(e.name) })} style={{ cursor: 'pointer' }}>
             <Card title={e.name} description={e.description} />
           </div>
         ))}
@@ -36,11 +37,16 @@ export default function ModelCards() {
           onOpenChange={(details) => {
             if (!details.open) setSelectedModel(null);
           }}
-        >
-          {selectedModel.description && (
+          triggerContent= {selectedModel.description && (
             <Text color="fg.muted">{selectedModel.description}</Text>
           )}
-        </ChakraDrawer>
+          drawerContent={
+            <Box>
+              {selectedModel.description || "Description for Model"}
+              <DrawerSummaryTable modelId={selectedModel.id} />
+            </Box>
+          }
+        />
       )}
     </>
   );
