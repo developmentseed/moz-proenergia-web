@@ -109,7 +109,7 @@ export function useSummaryQuery({
         return transformRows(bucket.fields, data);
       },
       retry: false,
-      enabled,
+      enabled
     })),
   });
 
