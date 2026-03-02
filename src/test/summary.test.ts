@@ -467,3 +467,103 @@ describe("transformFieldSummary — multi group_by", () => {
     expect(result.type).toBe("group");
   });
 });
+
+// ── bucketFieldsByGroupBy ───────────────────────────────────────────
+
+import { bucketFieldsByGroupBy } from "@/hooks/use-summary-query";
+
+describe("bucketFieldsByGroupBy", () => {
+  it("all fields with no group_by → single bucket with empty groupBy", () => {
+    const fields: Field[] = [
+      { columns: ["Pop2030"], label: "Population", method: "sum" },
+      { columns: ["HHConnections"], label: "Connections", method: "sum" },
+    ];
+    const buckets = bucketFieldsByGroupBy(fields);
+    expect(buckets).toHaveLength(1);
+    expect(buckets[0].groupBy).toEqual([]);
+    expect(buckets[0].fields).toHaveLength(2);
+    expect(buckets[0].columns).toEqual(["Pop2030", "HHConnections"]);
+  });
+
+  it("all fields with same group_by → single bucket", () => {
+    const fields: Field[] = [
+      { columns: ["Pop2030"], label: "Pop", method: "sum", group_by: ["Tech"] },
+      { columns: ["HH"], label: "HH", method: "sum", group_by: ["Tech"] },
+    ];
+    const buckets = bucketFieldsByGroupBy(fields);
+    expect(buckets).toHaveLength(1);
+    expect(buckets[0].groupBy).toEqual(["Tech"]);
+    expect(buckets[0].fields).toHaveLength(2);
+    expect(buckets[0].columns).toEqual(["Pop2030", "HH"]);
+  });
+
+  it("no-group-by fields merge into first grouped bucket", () => {
+    const fields: Field[] = [
+      { columns: ["Pop2030"], label: "Pop", method: "sum" },
+      { columns: ["HH"], label: "HH", method: "sum", group_by: ["Tech"] },
+    ];
+    const buckets = bucketFieldsByGroupBy(fields);
+    expect(buckets).toHaveLength(1);
+    expect(buckets[0].groupBy).toEqual(["Tech"]);
+    // no-group-by field is prepended
+    expect(buckets[0].fields[0].label).toBe("Pop");
+    expect(buckets[0].fields[1].label).toBe("HH");
+    expect(buckets[0].columns).toEqual(["Pop2030", "HH"]);
+  });
+
+  it("different single group_by values → separate buckets", () => {
+    const fields: Field[] = [
+      { columns: ["Pop2030"], label: "Pop", method: "sum", group_by: ["Tech"] },
+      { columns: ["HH"], label: "HH", method: "sum", group_by: ["Admin"] },
+    ];
+    const buckets = bucketFieldsByGroupBy(fields);
+    expect(buckets).toHaveLength(2);
+    expect(buckets[0].groupBy).toEqual(["Tech"]);
+    expect(buckets[0].columns).toEqual(["Pop2030"]);
+    expect(buckets[1].groupBy).toEqual(["Admin"]);
+    expect(buckets[1].columns).toEqual(["HH"]);
+  });
+
+  it("no-group-by fields merge into first bucket when multiple group_by values exist", () => {
+    const fields: Field[] = [
+      { columns: ["Total"], label: "Total", method: "sum" },
+      { columns: ["Pop2030"], label: "Pop", method: "sum", group_by: ["Tech"] },
+      { columns: ["HH"], label: "HH", method: "sum", group_by: ["Admin"] },
+    ];
+    const buckets = bucketFieldsByGroupBy(fields);
+    expect(buckets).toHaveLength(2);
+    // no-group-by merged into first bucket
+    expect(buckets[0].fields).toHaveLength(2);
+    expect(buckets[0].fields[0].label).toBe("Total");
+    expect(buckets[0].fields[1].label).toBe("Pop");
+    expect(buckets[0].groupBy).toEqual(["Tech"]);
+    expect(buckets[1].groupBy).toEqual(["Admin"]);
+  });
+
+  it("single group_by and multi group_by → separate buckets", () => {
+    const fields: Field[] = [
+      { columns: ["Pop2030"], label: "Pop", method: "sum", group_by: ["Tech"] },
+      { columns: ["HH"], label: "HH", method: "sum", group_by: ["Tech", "Admin"] },
+    ];
+    const buckets = bucketFieldsByGroupBy(fields);
+    expect(buckets).toHaveLength(2);
+    expect(buckets[0].groupBy).toEqual(["Tech"]);
+    expect(buckets[1].groupBy).toEqual(["Tech", "Admin"]);
+  });
+
+  it("same multi group_by in different order → same bucket (sorted key)", () => {
+    const fields: Field[] = [
+      { columns: ["Pop2030"], label: "Pop", method: "sum", group_by: ["Admin", "Tech"] },
+      { columns: ["HH"], label: "HH", method: "sum", group_by: ["Tech", "Admin"] },
+    ];
+    const buckets = bucketFieldsByGroupBy(fields);
+    expect(buckets).toHaveLength(1);
+    expect(buckets[0].fields).toHaveLength(2);
+    expect(buckets[0].columns).toEqual(["Pop2030", "HH"]);
+  });
+
+  it("empty fields array → empty buckets", () => {
+    const buckets = bucketFieldsByGroupBy([]);
+    expect(buckets).toHaveLength(0);
+  });
+});

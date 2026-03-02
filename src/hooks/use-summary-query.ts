@@ -1,5 +1,4 @@
-import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { api } from "@/utils/api";
 import { buildFilterQueryParam } from "@/utils/query-string-builder";
 import { transformFieldSummary } from "@/utils/summary";
@@ -12,6 +11,12 @@ interface UseSummaryQueryOptions {
   filters?: Record<string, [number, number] | string[] | null>;
   filterDefs?: Filter[];
   enabled?: boolean;
+}
+
+interface QueryBucket {
+  fields: Field[];
+  columns: string[];
+  groupBy: string[];
 }
 
 function transformRows(fields: Field[], data: unknown): SummaryRow[] {
@@ -28,16 +33,46 @@ function transformRows(fields: Field[], data: unknown): SummaryRow[] {
   });
 }
 
-function sortRows(rows: SummaryRow[]): SummaryData {
-  return rows.sort((a, b) => {
-    if (a.type === b.type) return 0;
-    return a.type === "flat" || a.type === "error" ? -1 : 1;
-  });
-}
+/**
+ * Bucket fields by their group_by value.
+ * Fields sharing the same group_by share one API call.
+ * Fields with no group_by are merged into the first bucket to save the number of queries
+ * (the API response always includes ungrouped totals).
+ */
+export function bucketFieldsByGroupBy(fields: Field[]): QueryBucket[] {
+  const bucketMap = new Map<string, { fields: Field[]; groupBy: string[] }>();
+  const noGroupByFields: Field[] = [];
 
-// This hook assumes that one scenario has consistent group_by
-// Group no group_by summaryFields and multiple(two) group_by summary fields separately
-// merge them and return the whole data as each summary row
+  for (const f of fields) {
+    if (!f.group_by || f.group_by.length === 0) {
+      noGroupByFields.push(f);
+    } else {
+      const key = [...f.group_by].sort().join(",");
+      const existing = bucketMap.get(key);
+      if (existing) {
+        existing.fields.push(f);
+      } else {
+        bucketMap.set(key, { fields: [f], groupBy: f.group_by });
+      }
+    }
+  }
+
+  const buckets = Array.from(bucketMap.values());
+
+  if (noGroupByFields.length > 0) {
+    if (buckets.length > 0) {
+      buckets[0].fields = [...noGroupByFields, ...buckets[0].fields];
+    } else {
+      buckets.push({ fields: noGroupByFields, groupBy: [] });
+    }
+  }
+
+  return buckets.map((b) => ({
+    fields: b.fields,
+    columns: b.fields.flatMap((f) => f.columns),
+    groupBy: b.groupBy,
+  }));
+}
 
 export function useSummaryQuery({
   scenarioId,
@@ -46,84 +81,49 @@ export function useSummaryQuery({
   filterDefs,
   enabled = true,
 }: UseSummaryQueryOptions) {
-  // Split fields: 0-1 group_by → standard query, 2 group_by → separate query
-  const { standard, multiGroup } = useMemo(() => {
-    const standard: Field[] = [];
-    const multiGroup: Field[] = [];
-    for (const f of summaryFields) {
-      if (f.group_by && typeof f.group_by !== 'string' && f.group_by.length > 1) {
-        multiGroup.push(f);
-      } else {
-        standard.push(f);
-      }
-    }
-    return { standard, multiGroup };
-  }, [summaryFields]);
+  const buckets = bucketFieldsByGroupBy(summaryFields);
+  const filterQuery =
+    filters && filterDefs ? buildFilterQueryParam(filters, filterDefs) : "";
 
-  const standardColumns = standard.flatMap((f) => f.columns);
-  const standardGroupBy = [...new Set(standard.flatMap((f) => f.group_by ?? []))];
+  const queries = useQueries({
+    queries: buckets.map((bucket) => ({
+      queryKey: [
+        "summaries",
+        scenarioId,
+        bucket.columns,
+        bucket.groupBy,
+        filters ?? {},
+      ],
+      queryFn: async ({ signal }: { signal: AbortSignal }) => {
+        const params: Record<string, string> = {
+          fields: bucket.columns.join(","),
+        };
+        if (filterQuery) params.q = filterQuery;
+        if (bucket.groupBy.length > 0)
+          params.group_by = bucket.groupBy.join(",");
 
-  const multiGroupColumns = multiGroup.flatMap((f) => f.columns);
-  const multiGroupBy = [...new Set(multiGroup.flatMap((f) => f.group_by ?? []))];
-
-  const filterQuery = filters && filterDefs
-        ? buildFilterQueryParam(filters, filterDefs)
-        : "";
-
-  // Query 1: standard fields (0 or 1 group_by)
-  const standardQuery = useQuery({
-    queryKey: ["summaries", scenarioId, standardColumns, standardGroupBy, filters ?? {}],
-    queryFn: async ({ signal }) => {
-      const params: Record<string, string> = {
-        fields: standardColumns.join(","),
-      };
-      if (filterQuery) params.q = filterQuery;
-      if (standardGroupBy.length > 0)
-        params.group_by = standardGroupBy.join(",");
-
-      const { data } = await api.get(
-        `scenario/${scenarioId}/summaries/`,
-        { signal, params },
-      );
-      return transformRows(standard, data);
-    },
-    retry: false,
-    enabled: enabled && standard.length > 0,
+        const { data } = await api.get(
+          `scenario/${scenarioId}/summaries/`,
+          { signal, params },
+        );
+        return transformRows(bucket.fields, data);
+      },
+      retry: false,
+      enabled,
+    })),
   });
 
-  // Query 2: multi-group-by fields (2 group_by columns)
-  const multiGroupQuery = useQuery({
-    queryKey: ["summaries-multi", scenarioId, multiGroupColumns, multiGroupBy, filters ?? {}],
-    queryFn: async ({ signal }) => {
-      const params: Record<string, string> = {
-        fields: multiGroupColumns.join(","),
-      };
-      if (filterQuery) params.q = filterQuery;
-      params.group_by = multiGroupBy.join(",");
+  const allRows = queries.flatMap((q) => q.data ?? []);
+  const anyHasData = queries.some((q) => q.data != null);
 
-      const { data } = await api.get(
-        `scenario/${scenarioId}/summaries/`,
-        { signal, params },
-      );
-      return transformRows(multiGroup, data);
-    },
-    retry: false,
-    enabled: enabled && multiGroup.length > 0,
-  });
+  const data: SummaryData | undefined = anyHasData
+    ? [...allRows].sort((a, b) => {
+        if (a.type === b.type) return 0;
+        return a.type === "flat" || a.type === "error" ? -1 : 1;
+      })
+    : undefined;
 
-  // Merge results
-  const data = useMemo<SummaryData | undefined>(() => {
-    const standardRows = standardQuery.data ?? [];
-    const multiGroupRows = multiGroupQuery.data ?? [];
-    const merged = [...standardRows, ...multiGroupRows];
-    if (merged.length === 0 && !standardQuery.data && !multiGroupQuery.data)
-      return undefined;
-    return sortRows(merged);
-  }, [standardQuery.data, multiGroupQuery.data]);
-
-  const isLoading =
-    (standard.length > 0 && standardQuery.isLoading) ||
-    (multiGroup.length > 0 && multiGroupQuery.isLoading);
+  const isLoading = queries.some((q) => q.isLoading);
 
   return { data, isLoading };
 }
