@@ -7,6 +7,13 @@ function makeGroupOrChartRow(
   items: SummaryItem[],
 ): GroupRow | ChartRow {
   if (field.chart) {
+    const numericValues = items
+      .map((item) => item.value)
+      .filter((v): v is number => typeof v === "number");
+    const average =
+      numericValues.length > 0
+        ? numericValues.reduce((sum, v) => sum + v, 0) / numericValues.length
+        : undefined;
     return {
       type: "chart",
       chartType: field.chart,
@@ -14,6 +21,7 @@ function makeGroupOrChartRow(
       description: field.description,
       unit: field.unit,
       value: items,
+      average,
     };
   }
   return {
