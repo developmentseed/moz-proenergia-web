@@ -1,16 +1,17 @@
 "use client";
 
 import { Chart, useChart } from "@chakra-ui/charts";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, ReferenceLine } from "recharts";
 import { type SummaryItem } from "@/app/types/summary";
 import { formatDisplayNumber } from "@/utils/number";
 
 interface SummaryBarChartProps {
   data: SummaryItem[];
   color?: string;
+  average?: number;
 }
 
-export const SummaryBarChart = ({ data, color = "orange" }: SummaryBarChartProps) => {
+export const SummaryBarChart = ({ data, color = "orange", average }: SummaryBarChartProps) => {
   const chart = useChart({
     data,
     series: [{ name: "value", color }],
@@ -35,6 +36,19 @@ export const SummaryBarChart = ({ data, color = "orange" }: SummaryBarChartProps
           formatter={(value) => formatDisplayNumber(value as number)}
           content={<Chart.Tooltip />}
         />
+        {average !== undefined && (
+          <ReferenceLine
+            y={average}
+            stroke="#888"
+            strokeDasharray="4 4"
+            label={{
+              value: `Avg: ${formatDisplayNumber(average)}`,
+              position: "insideRight",
+              fontSize: 11,
+              fill: "#333",
+            }}
+          />
+        )}
         {chart.series.map((item) => (
           <Bar
             key={item.name}

@@ -133,8 +133,8 @@ const SummaryPanel = ({
   // Defer summary fetches so map tiles get network priority
   const [summaryEnabled, setSummaryEnabled] = useState(false);
   useEffect(() => {
-    const id = requestIdleCallback(() => setSummaryEnabled(true));
-    return () => cancelIdleCallback(id);
+    const id = setTimeout(() => setSummaryEnabled(true), 150);
+    return () => clearTimeout(id);
   }, []);
 
   const { data: summaryData, isLoading: summaryIsLoading } = useSummaryQuery({
@@ -142,7 +142,7 @@ const SummaryPanel = ({
     summaryFields,
     filters,
     filterDefs,
-    enabled: summaryEnabled,
+    enabled: true,
   });
 
   // Views are mutually exclusive - cluster view never falls through to summary
