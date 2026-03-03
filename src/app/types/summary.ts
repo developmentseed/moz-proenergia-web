@@ -67,6 +67,7 @@ export interface ChartRow {
   unit?: string;
   value: SummaryItem[];
   average?: number;
+  colorMap?: Record<string, string>;
 }
 
 export interface ErrorRow {

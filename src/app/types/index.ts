@@ -12,6 +12,7 @@ export interface Field {
   method?: 'count' | 'min' | 'max' | 'sum' | 'average';
   unit?: string;
   chart?: 'bar' | 'line';
+  colors?: Record<string, string>;
 }
 export interface MapItemUnit extends ItemUnit {
   color?: string;

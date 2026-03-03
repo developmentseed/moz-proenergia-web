@@ -10,7 +10,7 @@ import { api } from "@/utils/api";
 import { LuChevronUp, LuChevronLeft } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
-import { type Field, type Filter } from "@/app/types";
+import { type Field, type Filter, type Main } from "@/app/types";
 import { type SummaryData } from "@/app/types/summary";
 import { SummaryTable } from "@/components/chakra/summary-table";
 import { useSummaryQuery } from "@/hooks/use-summary-query";
@@ -22,6 +22,7 @@ interface SummaryPanelProps {
   filters: Record<string, [number, number] | string[] | null>;
   filterDefs: Filter[];
   resetCluster: () => void;
+  main?: Main;
 }
 
 interface PanelHeaderProps {
@@ -116,6 +117,7 @@ const SummaryPanel = ({
   filters,
   filterDefs,
   resetCluster,
+  main,
 }: SummaryPanelProps) => {
   const {
     data: clusterData,
@@ -143,6 +145,7 @@ const SummaryPanel = ({
     filters,
     filterDefs,
     enabled: true,
+    main,
   });
 
   // Views are mutually exclusive - cluster view never falls through to summary

@@ -125,6 +125,7 @@ const MainMap = ({ main }: MainMapProps) => {
         filters={updatedFilters}
         filterDefs={model.filters}
         resetCluster={resetCluster}
+        main={main}
       />
     </Box>
   );

@@ -5,6 +5,8 @@ const DEFAULT_METHOD = "sum";
 function makeGroupOrChartRow(
   field: Field,
   items: SummaryItem[],
+  mainColorMap?: Record<string, string>,
+  mainColumn?: string,
 ): GroupRow | ChartRow {
   if (field.chart) {
     const numericValues = items
@@ -14,6 +16,8 @@ function makeGroupOrChartRow(
       numericValues.length > 0
         ? numericValues.reduce((sum, v) => sum + v, 0) / numericValues.length
         : undefined;
+    const colorMap = field.colors
+      ?? (field.group_by && mainColumn && field.group_by.includes(mainColumn) && mainColorMap ? mainColorMap : undefined);
     return {
       type: "chart",
       chartType: field.chart,
@@ -22,6 +26,7 @@ function makeGroupOrChartRow(
       unit: field.unit,
       value: items,
       average,
+      colorMap,
     };
   }
   return {
@@ -71,6 +76,8 @@ export function isNestedGrouped(grouped: Record<string, unknown>): boolean {
 export function transformFieldSummary(
   response: BatchSummariesResponse,
   field: Field,
+  mainColorMap?: Record<string, string>,
+  mainColumn?: string,
 ): SummaryRow {
   const methodName = field.method || DEFAULT_METHOD;
 
@@ -88,7 +95,7 @@ export function transformFieldSummary(
           : summary.count;
       return { key: col, label: col, value };
     });
-    return makeGroupOrChartRow(field, items);
+    return makeGroupOrChartRow(field, items, mainColorMap, mainColumn);
   }
 
   // Single column
@@ -130,7 +137,7 @@ export function transformFieldSummary(
         key,
         label: key,
         value: getNumericValue(stats, methodName),
-      })));
+      })), mainColorMap, mainColumn);
     }
 
     return {
@@ -170,7 +177,7 @@ export function transformFieldSummary(
       label: key,
       // Only count is avaiable for string type columns grouped
       value: group.count,
-    })));
+    })), mainColorMap, mainColumn);
   }
 
   // String type — value distribution
@@ -178,5 +185,5 @@ export function transformFieldSummary(
     key,
     label: key,
     value: count,
-  })));
+  })), mainColorMap, mainColumn);
 }

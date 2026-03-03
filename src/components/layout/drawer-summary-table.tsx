@@ -29,6 +29,7 @@ export function DrawerSummaryTable({ modelId }: DrawerSummaryTableProps) {
     scenarioId: scenarioId ?? "",
     summaryFields: modelCore?.summaryFields ?? [],
     enabled: !!scenarioId,
+    main: modelCore?.main,
   });
 
   return (

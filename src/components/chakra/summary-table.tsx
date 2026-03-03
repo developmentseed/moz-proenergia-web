@@ -101,7 +101,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight }: SummaryTab
                           <InfoTip content={row.description} />
                         )}
                       </Box>
-                      <SummaryBarChart data={row.value} average={row.average} />
+                      <SummaryBarChart data={row.value} average={row.average} colorMap={row.colorMap} />
                     </Table.Cell>
                   </Table.Row>
                 );

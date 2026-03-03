@@ -2,8 +2,8 @@ import { useQueries } from "@tanstack/react-query";
 import { api } from "@/utils/api";
 import { buildFilterQueryParam } from "@/utils/query-string-builder";
 import { transformFieldSummary } from "@/utils/summary";
-import { type Field, type Filter } from "@/app/types";
 import { type SummaryRow, type SummaryData } from "@/app/types/summary";
+import { type Field, type Filter, type Main } from "@/app/types";
 
 interface UseSummaryQueryOptions {
   scenarioId: string;
@@ -11,6 +11,7 @@ interface UseSummaryQueryOptions {
   filters?: Record<string, [number, number] | string[] | null>;
   filterDefs?: Filter[];
   enabled?: boolean;
+  main?: Main;
 }
 
 interface QueryBucket {
@@ -19,10 +20,15 @@ interface QueryBucket {
   groupBy: string[];
 }
 
-function transformRows(fields: Field[], data: unknown): SummaryRow[] {
+function transformRows(
+  fields: Field[],
+  data: unknown,
+  mainColorMap?: Record<string, string>,
+  mainColumn?: string,
+): SummaryRow[] {
   return fields.map((field) => {
     try {
-      return transformFieldSummary(data as any, field);
+      return transformFieldSummary(data as any, field, mainColorMap, mainColumn);
     } catch {
       return {
         type: "error" as const,
@@ -80,10 +86,16 @@ export function useSummaryQuery({
   filters,
   filterDefs,
   enabled = true,
+  main,
 }: UseSummaryQueryOptions) {
   const buckets = bucketFieldsByGroupBy(summaryFields);
   const filterQuery =
     filters && filterDefs ? buildFilterQueryParam(filters, filterDefs) : "";
+  const mainColorMap = main?.options
+    ? Object.fromEntries(
+        main.options.filter((o) => o.color).map((o) => [o.value, o.color!]),
+      )
+    : undefined;
 
   const queries = useQueries({
     queries: buckets.map((bucket) => ({
@@ -106,7 +118,7 @@ export function useSummaryQuery({
           `scenario/${scenarioId}/summaries/`,
           { signal, params },
         );
-        return transformRows(bucket.fields, data);
+        return transformRows(bucket.fields, data, mainColorMap, main?.column);
       },
       retry: false,
       enabled
