@@ -26,6 +26,7 @@ interface MainLayerProps {
   main: Main;
   mapFilter?: FilterSpecification | null;
   clusterId: string | null;
+  opacity?: number; // 0–1
 }
 
 //@TODO different cartography per model
@@ -34,6 +35,7 @@ export const MainLayer = ({
   main,
   mapFilter,
   clusterId,
+  opacity = 1,
 }: MainLayerProps) => {
   const { current: map } = useMap();
   const [hoveredCluster, setHoveredCluster] = useState<string | null>(null);
@@ -110,10 +112,11 @@ export const MainLayer = ({
       // minzoom: mapConfig.polygonMinZoom,
       paint: {
         [getColorAttributeNamebyType('fill')]: buildMatchExpression(main, '#66ff'),
+        'fill-opacity': opacity,
       },
       ...(mapFilter ? { filter: mapFilter } : {}),
-    }),
-    [main, scenario.layer, mapFilter]
+    } as LayerSpecification),
+    [main, scenario.layer, mapFilter, opacity]
   );
 
   // To show clusters (More like center point) on low zoom
