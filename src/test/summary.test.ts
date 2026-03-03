@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { transformFieldSummary } from "../utils/summary";
-import type { BatchSummariesResponse, FlatRow, GroupRow, ChartRow } from "@/app/types/summary";
+import { transformFieldSummary, isNestedGrouped } from "../utils/summary";
+import type { BatchSummariesResponse, FlatRow, GroupRow, ChartRow, NestedGroupRow, NestedChartRow } from "@/app/types/summary";
 import type { Field } from "@/app/types";
 
 import oneColumnString from "./example-responses/one-column-string.json";
@@ -9,6 +9,7 @@ import twoColumnsGroupby from "./example-responses/two-columns-groupby.json";
 // import twoColumnsNumericString from "./example-responses/twol-columns-numeric-string.json";
 import twoColumnsNumericStringGroupby from "./example-responses/two-columns-numeric-string-groupby.json";
 import groupByCountZero from "./example-responses/group-by-count-zero.json";
+import multiGroupBy from "./example-responses/multi-group-by.json";
 
 // ── Response shape cases ────────────────────────────────────────────
 
@@ -373,5 +374,196 @@ describe("transformFieldSummary — chart row output", () => {
       field,
     );
     expect(result.type).toBe("group");
+  });
+});
+
+// ── Multi group_by cases ──────────────────────────────────────────
+
+describe("isNestedGrouped", () => {
+  it("detects single-level grouped (has count at first level)", () => {
+    const singleLevel = { "0-50": { count: 1597, min: 0, max: 100, sum: 210291 } };
+    expect(isNestedGrouped(singleLevel)).toBe(false);
+  });
+
+  it("detects two-level nested grouped", () => {
+    const nested = {
+      "ExistingGrid": {
+        "Cabo Delgado": { count: 347, min: 4.9, max: 340273, sum: 2407733 },
+      },
+    };
+    expect(isNestedGrouped(nested)).toBe(true);
+  });
+
+  it("returns false for empty object", () => {
+    expect(isNestedGrouped({})).toBe(false);
+  });
+});
+
+describe("transformFieldSummary — multi group_by", () => {
+  it("single column, numeric, multi group_by → NestedGroupRow", () => {
+    const field: Field = {
+      columns: ["Pop2030"],
+      label: "Population 2030",
+      method: "sum",
+      group_by: ["Technology2030", "Admin_1"],
+    };
+    const result = transformFieldSummary(
+      multiGroupBy as BatchSummariesResponse,
+      field,
+    );
+    expect(result.type).toBe("nested-group");
+    const nested = result as NestedGroupRow;
+
+    // Should have 4 L1 groups
+    expect(nested.value).toHaveLength(4);
+    const l1Keys = nested.value.map((g) => g.key);
+    expect(l1Keys).toContain("ExistingGrid");
+    expect(l1Keys).toContain("GridExtension");
+    expect(l1Keys).toContain("MiniGrid_PV");
+    expect(l1Keys).toContain("SHS");
+
+    // ExistingGrid should have 10 L2 items (provinces)
+    const existingGrid = nested.value.find((g) => g.key === "ExistingGrid")!;
+    expect(existingGrid.items).toHaveLength(10);
+
+    // Check a specific L2 value
+    const caboDelgado = existingGrid.items.find((i) => i.key === "Cabo Delgado");
+    expect(caboDelgado?.value).toBe(2407733.747);
+
+    // Total should be sum of all L2 items
+    expect(existingGrid.total).toBeCloseTo(24554622.6654, 1);
+  });
+
+  it("single column, numeric, multi group_by, chart=bar → NestedChartRow (pie)", () => {
+    const field: Field = {
+      columns: ["Pop2030"],
+      label: "Population 2030",
+      method: "sum",
+      group_by: ["Technology2030", "Admin_1"],
+      chart: "bar",
+    };
+    const result = transformFieldSummary(
+      multiGroupBy as BatchSummariesResponse,
+      field,
+    );
+    expect(result.type).toBe("nested-chart");
+    const nested = result as NestedChartRow;
+    expect(nested.chartType).toBe("pie");
+    expect(nested.value).toHaveLength(4);
+  });
+
+  it("single column, numeric, single group_by still produces GroupRow (not NestedGroupRow)", () => {
+    const field: Field = {
+      columns: ["NewHHConnectionsTotal"],
+      label: "HH Connections",
+      method: "sum",
+      group_by: ["MGCapacityBins"],
+    };
+    const result = transformFieldSummary(
+      twoColumnsGroupby as BatchSummariesResponse,
+      field,
+    );
+    // Single-level grouped should still produce GroupRow
+    expect(result.type).toBe("group");
+  });
+});
+
+// ── bucketFieldsByGroupBy ───────────────────────────────────────────
+
+import { bucketFieldsByGroupBy } from "@/hooks/use-summary-query";
+
+describe("bucketFieldsByGroupBy", () => {
+  it("all fields with no group_by → single bucket with empty groupBy", () => {
+    const fields: Field[] = [
+      { columns: ["Pop2030"], label: "Population", method: "sum" },
+      { columns: ["HHConnections"], label: "Connections", method: "sum" },
+    ];
+    const buckets = bucketFieldsByGroupBy(fields);
+    expect(buckets).toHaveLength(1);
+    expect(buckets[0].groupBy).toEqual([]);
+    expect(buckets[0].fields).toHaveLength(2);
+    expect(buckets[0].columns).toEqual(["Pop2030", "HHConnections"]);
+  });
+
+  it("all fields with same group_by → single bucket", () => {
+    const fields: Field[] = [
+      { columns: ["Pop2030"], label: "Pop", method: "sum", group_by: ["Tech"] },
+      { columns: ["HH"], label: "HH", method: "sum", group_by: ["Tech"] },
+    ];
+    const buckets = bucketFieldsByGroupBy(fields);
+    expect(buckets).toHaveLength(1);
+    expect(buckets[0].groupBy).toEqual(["Tech"]);
+    expect(buckets[0].fields).toHaveLength(2);
+    expect(buckets[0].columns).toEqual(["Pop2030", "HH"]);
+  });
+
+  it("no-group-by fields merge into first grouped bucket", () => {
+    const fields: Field[] = [
+      { columns: ["Pop2030"], label: "Pop", method: "sum" },
+      { columns: ["HH"], label: "HH", method: "sum", group_by: ["Tech"] },
+    ];
+    const buckets = bucketFieldsByGroupBy(fields);
+    expect(buckets).toHaveLength(1);
+    expect(buckets[0].groupBy).toEqual(["Tech"]);
+    // no-group-by field is prepended
+    expect(buckets[0].fields[0].label).toBe("Pop");
+    expect(buckets[0].fields[1].label).toBe("HH");
+    expect(buckets[0].columns).toEqual(["Pop2030", "HH"]);
+  });
+
+  it("different single group_by values → separate buckets", () => {
+    const fields: Field[] = [
+      { columns: ["Pop2030"], label: "Pop", method: "sum", group_by: ["Tech"] },
+      { columns: ["HH"], label: "HH", method: "sum", group_by: ["Admin"] },
+    ];
+    const buckets = bucketFieldsByGroupBy(fields);
+    expect(buckets).toHaveLength(2);
+    expect(buckets[0].groupBy).toEqual(["Tech"]);
+    expect(buckets[0].columns).toEqual(["Pop2030"]);
+    expect(buckets[1].groupBy).toEqual(["Admin"]);
+    expect(buckets[1].columns).toEqual(["HH"]);
+  });
+
+  it("no-group-by fields merge into first bucket when multiple group_by values exist", () => {
+    const fields: Field[] = [
+      { columns: ["Total"], label: "Total", method: "sum" },
+      { columns: ["Pop2030"], label: "Pop", method: "sum", group_by: ["Tech"] },
+      { columns: ["HH"], label: "HH", method: "sum", group_by: ["Admin"] },
+    ];
+    const buckets = bucketFieldsByGroupBy(fields);
+    expect(buckets).toHaveLength(2);
+    // no-group-by merged into first bucket
+    expect(buckets[0].fields).toHaveLength(2);
+    expect(buckets[0].fields[0].label).toBe("Total");
+    expect(buckets[0].fields[1].label).toBe("Pop");
+    expect(buckets[0].groupBy).toEqual(["Tech"]);
+    expect(buckets[1].groupBy).toEqual(["Admin"]);
+  });
+
+  it("single group_by and multi group_by → separate buckets", () => {
+    const fields: Field[] = [
+      { columns: ["Pop2030"], label: "Pop", method: "sum", group_by: ["Tech"] },
+      { columns: ["HH"], label: "HH", method: "sum", group_by: ["Tech", "Admin"] },
+    ];
+    const buckets = bucketFieldsByGroupBy(fields);
+    expect(buckets).toHaveLength(2);
+    expect(buckets[0].groupBy).toEqual(["Tech"]);
+    expect(buckets[1].groupBy).toEqual(["Tech", "Admin"]);
+  });
+
+  it("same multi group_by in different order → same bucket (sorted key)", () => {
+    const fields: Field[] = [
+      { columns: ["Pop2030"], label: "Pop", method: "sum", group_by: ["Admin", "Tech"] },
+      { columns: ["HH"], label: "HH", method: "sum", group_by: ["Tech", "Admin"] },
+    ];
+    const buckets = bucketFieldsByGroupBy(fields);
+    expect(buckets).toHaveLength(1);
+    expect(buckets[0].fields).toHaveLength(2);
+    expect(buckets[0].columns).toEqual(["Pop2030", "HH"]);
+  });
+
+  it("empty fields array → empty buckets", () => {
+    const buckets = bucketFieldsByGroupBy([]);
+    expect(buckets).toHaveLength(0);
   });
 });

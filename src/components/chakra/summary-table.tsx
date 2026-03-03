@@ -7,6 +7,7 @@ import {
 import { InfoTip } from "./toggle-tip";
 import { formatDisplayNumber } from "@/utils/number";
 import { SummaryBarChart } from "@/components/chakra/chart/bar";
+// import { SummaryDoublePieChart } from "@/components/chakra/chart/pie";
 import { type SummaryData } from "@/app/types/summary";
 
 const formatValue = (value: string | number, column?: string) => {
@@ -104,43 +105,98 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight }: SummaryTab
                     </Table.Cell>
                   </Table.Row>
                 );
-              } else return (<Text> Only Bar Chart is available.</Text>);
-
+                // @TODO: Handle this edge case internally? 
+              } else return (<Text key={row.label}> Only Bar Chart is available.</Text>);
               }
+              // @TODO: bring doublepiechart
+              // if (row.type === "nested-chart") {
+              //   return (
+              //     <Table.Row key={row.label}>
+              //       <Table.Cell colSpan={2} px={2} py={2}>
+              //         <Box display="flex" alignItems="center" gap={1} mb={2}>
+              //           <Text textStyle="tableAttr">{row.description || row.label}</Text>
+              //           {row.description && row.label !== row.description && (
+              //             <InfoTip content={row.description} />
+              //           )}
+              //         </Box>
+              //         <SummaryDoublePieChart data={row.value} />
+              //       </Table.Cell>
+              //     </Table.Row>
+              //   );
+              // }
 
-              // Group type
-              return [
-                <Table.Row key={row.label} bg="gray.200">
-                  <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
-                    <Box display="flex" alignItems="center" gap={1}>
-                      {/* group type should have description as label */}
-                      <Text textStyle="tableAttr">
-                        {" "}
-                        {row.description || row.label}
-                        <Text as="span" fontWeight="normal">
-                          {" "}
-                          {row.unit && `(${row.unit})`}
+              if (row.type === "nested-group") {
+                return [
+                  <Table.Row key={row.label} bg="gray.200">
+                    <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <Text textStyle="tableAttr">
+                          {row.description || row.label}
+                          <Text as="span" fontWeight="normal">
+                            {" "}
+                            {row.unit && `(${row.unit})`}
+                          </Text>
                         </Text>
-                      </Text>
-                    </Box>
-                  </Table.Cell>
-                </Table.Row>,
-                ...row.value.map((item) => (
-                  <Table.Row key={item.key} bg="panelBg">
-                    <Table.Cell {...tableCellStyleProps} pl={6}>
-                      <Text textStyle="tableAttr" pt={1} pb={1}>
-                        {" "}
-                        {item.label}
-                      </Text>
+                      </Box>
                     </Table.Cell>
-                    <Table.Cell {...tableCellStyleProps}>
-                      <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
-                        {formatValue(item.value, item.key)}
-                      </Text>
+                  </Table.Row>,
+                  ...row.value.flatMap((group) => [
+                    <Table.Row key={`${row.label}-${group.key}`} bg="gray.100">
+                      <Table.Cell pl={4} py={1} colSpan={2} fontWeight="semibold">
+                        <Text textStyle="tableAttr" fontSize="sm">{group.label}</Text>
+                      </Table.Cell>
+                    </Table.Row>,
+                    ...group.items.map((item) => (
+                      <Table.Row key={`${group.key}-${item.key}`} bg="panelBg">
+                        <Table.Cell {...tableCellStyleProps} pl={8}>
+                          <Text textStyle="tableAttr" pt={1} pb={1}>
+                            {item.label}
+                          </Text>
+                        </Table.Cell>
+                        <Table.Cell {...tableCellStyleProps}>
+                          <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
+                            {formatValue(item.value, item.key)}
+                          </Text>
+                        </Table.Cell>
+                      </Table.Row>
+                    )),
+                  ]),
+                ];
+              }
+              if (row.type === "group") {
+                return [
+                  <Table.Row key={row.label} bg="gray.200">
+                    <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
+                      <Box display="flex" alignItems="center" gap={1}>
+                        {/* group type should have description as label */}
+                        <Text textStyle="tableAttr">
+                          {" "}
+                          {row.description || row.label}
+                          <Text as="span" fontWeight="normal">
+                            {" "}
+                            {row.unit && `(${row.unit})`}
+                          </Text>
+                        </Text>
+                      </Box>
                     </Table.Cell>
-                  </Table.Row>
-                )),
-              ];
+                  </Table.Row>,
+                  ...row.value.map((item) => (
+                    <Table.Row key={item.key} bg="panelBg">
+                      <Table.Cell {...tableCellStyleProps} pl={6}>
+                        <Text textStyle="tableAttr" pt={1} pb={1}>
+                          {" "}
+                          {item.label}
+                        </Text>
+                      </Table.Cell>
+                      <Table.Cell {...tableCellStyleProps}>
+                        <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
+                          {formatValue(item.value, item.key)}
+                        </Text>
+                      </Table.Cell>
+                    </Table.Row>
+                  )),
+                ];
+              }
             })}
           </Table.Body>
         </Table.Root>

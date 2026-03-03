@@ -242,12 +242,13 @@ export async function fetchAllFilterOptions(
 // Replace 'id' in summary field columns with the main visualization column
 export function replaceSummaryIdColumn(fields: Field[], mainColumn: string): Field[] {
   return fields.map(f => {
+    const groupBy = typeof f.group_by === 'string' ? [f.group_by] : f.group_by;
     const idField = f.columns.includes('id');
     if (idField) {
       const newFields = [...f.columns.filter(c => c !== 'id'), mainColumn];
-      return { ...f, columns: newFields };
+      return { ...f, columns: newFields, group_by: groupBy };
     }
-    return f;
+    return groupBy !== f.group_by ? { ...f, group_by: groupBy } : f;
   });
 }
 

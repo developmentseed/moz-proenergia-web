@@ -8,7 +8,7 @@ export interface Field {
   columns: string[];
   label: string;
   description?: string;
-  group_by?: string;
+  group_by?: string[];
   method?: 'count' | 'min' | 'max' | 'sum' | 'average';
   unit?: string;
   chart?: 'bar' | 'line';
