@@ -156,9 +156,9 @@ const SummaryPanel = ({
       <Box
         {...mapControlCommonStyleProps}
         width={ControlPanelWidth}
+        height="100%"
         display="flex"
         flexDirection="column"
-        height="100%"
         zIndex={controlZIndex}
       >
         <PanelHeader
@@ -166,12 +166,13 @@ const SummaryPanel = ({
           title={title}
           onBack={showingCluster ? resetCluster : undefined}
         />
-
-        <SummaryTable
-          data={dataToDisplay}
-          isLoading={isLoading}
-          isError={showingCluster && clusterIsError}
-        />
+        <Box pl={4} pr={2} flex={1} minHeight={0} overflowY="auto">
+          <SummaryTable
+            data={dataToDisplay}
+            isLoading={isLoading}
+            isError={showingCluster && clusterIsError}
+          />
+        </Box>
       </Box>
     </Box>
   );

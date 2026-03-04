@@ -5,7 +5,7 @@ import {
   NavigationControl,
   ScaleControl,
 } from "react-map-gl/maplibre";
-import { Box, Flex, IconButton } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import * as pmtiles from "pmtiles";
 import * as maplibregl from "maplibre-gl";
 import { type RequestTransformFunction } from "maplibre-gl";
@@ -29,9 +29,9 @@ import { Legend } from "./legend";
 import { ContextualLayer } from "./contextual-layer";
 import { MainLayer } from "./main-layer";
 import { BasemapSelector, BASEMAP_OPTIONS } from "./basemap-selector";
-import { LuPanelRightClose, LuPanelRightOpen } from "react-icons/lu";
 import { AnimationTime, ControlPanelWidth } from "../ui/main-panel";
-import { Tooltip } from "../ui/tooltip";
+import { useToggle } from "@/hooks/use-toggle";
+import { PanelToggleButton } from "../ui/panel-toggle-button";
 
 const transformRequest: RequestTransformFunction = (url, resourceType) => {
   if (isMapboxURL(url)) {
@@ -51,7 +51,7 @@ interface MainMapProps {
 const MainMap = ({ main }: MainMapProps) => {
   const [{ lat, lng, zoom }, setCoordinates] = useCoordinates();
   const { selected, setSelected, onClick } = useMouseEvent();
-  const [isOpen, setIsOpen] = useState(true);
+  const { isOpen, toggle } = useToggle(true);
 
   // Attach pmtile protocol to MapLibre
   useEffect(() => {
@@ -124,35 +124,14 @@ const MainMap = ({ main }: MainMapProps) => {
         <Legend items={main.options} />
       </Box>
 
-      {/* Toggle button tab — sits at the left edge of the summary panel */}
-      <Box
-        position="absolute"
-        right={isOpen ? `calc(${ControlPanelWidth}px - 1px)` : 0}
-        top="8"
-        transform="translateY(-50%)"
-        zIndex={1000}
-        transition={`right ${AnimationTime} ease`}
-      >
-        <Tooltip content={isOpen ? "Collapse analysis panel" : "Expand analysis panel"}>
-          <IconButton
-            aria-label={isOpen ? "Collapse analysis panel" : "Expand analysis panel"}
-            onClick={() => setIsOpen(!isOpen)}
-            variant="solid"
-            size="sm"
-            bg="panelBg"
-            border="1px solid"
-            borderColor="panelBorder"
-            borderRight="none"
-            borderRightRadius={0}
-          >
-            {isOpen ? (
-              <LuPanelRightClose stroke="gray" />
-              ) : (
-                <LuPanelRightOpen stroke="gray" />
-              )}
-          </IconButton>
-        </Tooltip>
-      </Box>
+      <PanelToggleButton
+        isOpen={isOpen}
+        onToggle={toggle}
+        side="right"
+        label="analysis panel"
+        panelWidth={ControlPanelWidth}
+        animationTime={AnimationTime}
+      />
 
       {/* Summary panel slides in/out from the right */}
       <SummaryPanel

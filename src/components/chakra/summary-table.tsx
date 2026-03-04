@@ -316,6 +316,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
             </Accordion.Item>
           ))}
         </Accordion.Root>
+
       )}
 
       {!isLoading && !isError && data && !collapsible && (
