@@ -26,6 +26,7 @@ import {
 } from "@/utils/data-transformation";
 import { MapItemUnit, type ModelMetadata } from "@/app/types";
 import MainPanel from "./main-panel";
+import { Tooltip } from "./tooltip";
 
 const ControlPanelWidth = 350;
 const AnimationTime = "0.3s";
@@ -130,6 +131,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
         <Box flex={1} height="full" p={2}>
           <Skeleton width="full" height="full" />
         </Box>
+        <Skeleton width={ControlPanelWidth} height="full" />
       </Flex>
     );
   }
@@ -141,32 +143,34 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
           <Flex id="container" width="full" height="full" position="relative">
             <MainPanel isOpen={isOpen} />
             {/* Toggle Button Tab */}
-            <Box
-              position="absolute"
-              left={isOpen ? `calc(${ControlPanelWidth}px - 1px)` : 0}
-              top="8"
-              transform="translateY(-50%)"
-              zIndex={1000}
-              transition={`left ${AnimationTime} ease`}
-            >
-              <IconButton
-                aria-label={isOpen ? "Collapse panel" : "Expand panel"}
-                onClick={() => setIsOpen(!isOpen)}
-                variant="solid"
-                size="sm"
-                bg="panelBg"
-                border="1px solid"
-                borderColor="panelBorder"
-                borderLeft="none"
-                borderLeftRadius={0}
+            <Tooltip content={isOpen ? "Collapse control panel" : "Expand control panel"}>
+              <Box
+                position="absolute"
+                left={isOpen ? `calc(${ControlPanelWidth}px - 1px)` : 0}
+                top="8"
+                transform="translateY(-50%)"
+                zIndex={1000}
+                transition={`left ${AnimationTime} ease`}
               >
-                {isOpen ? (
-                  <LuPanelLeftClose stroke="gray" />
-                ) : (
-                  <LuPanelLeftOpen stroke="gray" />
-                )}
-              </IconButton>
-            </Box>
+                <IconButton
+                  aria-label={isOpen ? "Collapse control panel" : "Expand control panel"}
+                  onClick={() => setIsOpen(!isOpen)}
+                  variant="solid"
+                  size="sm"
+                  bg="panelBg"
+                  border="1px solid"
+                  borderColor="panelBorder"
+                  borderLeft="none"
+                  borderLeftRadius={0}
+                >
+                  {isOpen ? (
+                    <LuPanelLeftClose stroke="gray" />
+                  ) : (
+                    <LuPanelLeftOpen stroke="gray" />
+                  )}
+                </IconButton>
+              </Box>
+            </Tooltip>
 
             <Box
               transition={`width ${AnimationTime} ease`}

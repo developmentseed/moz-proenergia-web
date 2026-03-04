@@ -31,6 +31,7 @@ import { MainLayer } from "./main-layer";
 import { BasemapSelector, BASEMAP_OPTIONS } from "./basemap-selector";
 import { LuPanelRightClose, LuPanelRightOpen } from "react-icons/lu";
 import { AnimationTime, ControlPanelWidth } from "../ui/main-panel";
+import { Tooltip } from "../ui/tooltip";
 
 const transformRequest: RequestTransformFunction = (url, resourceType) => {
   if (isMapboxURL(url)) {
@@ -132,23 +133,25 @@ const MainMap = ({ main }: MainMapProps) => {
         zIndex={1000}
         transition={`right ${AnimationTime} ease`}
       >
-        <IconButton
-          aria-label={isOpen ? "Collapse panel" : "Expand panel"}
-          onClick={() => setIsOpen(!isOpen)}
-          variant="solid"
-          size="sm"
-          bg="panelBg"
-          border="1px solid"
-          borderColor="panelBorder"
-          borderRight="none"
-          borderRightRadius={0}
-        >
-          {isOpen ? (
-            <LuPanelRightClose stroke="gray" />
-          ) : (
-            <LuPanelRightOpen stroke="gray" />
-          )}
-        </IconButton>
+        <Tooltip content={isOpen ? "Collapse analysis panel" : "Expand analysis panel"}>
+          <IconButton
+            aria-label={isOpen ? "Collapse analysis panel" : "Expand analysis panel"}
+            onClick={() => setIsOpen(!isOpen)}
+            variant="solid"
+            size="sm"
+            bg="panelBg"
+            border="1px solid"
+            borderColor="panelBorder"
+            borderRight="none"
+            borderRightRadius={0}
+          >
+              {isOpen ? (
+                <LuPanelRightClose stroke="gray" />
+              ) : (
+                <LuPanelRightOpen stroke="gray" />
+              )}
+          </IconButton>
+        </Tooltip>
       </Box>
 
       {/* Summary panel slides in/out from the right */}
