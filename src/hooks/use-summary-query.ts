@@ -28,12 +28,14 @@ function transformRows(
 ): SummaryRow[] {
   return fields.map((field) => {
     try {
-      return transformFieldSummary(data as any, field, mainColorMap, mainColumn);
+      const row = transformFieldSummary(data as any, field, mainColorMap, mainColumn);
+      return { ...row, category: field.category };
     } catch {
       return {
         type: "error" as const,
         label: field.label,
         key: field.columns[0],
+        category: field.category,
       };
     }
   });
