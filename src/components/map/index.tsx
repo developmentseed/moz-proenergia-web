@@ -99,7 +99,7 @@ const MainMap = ({ main }: MainMapProps) => {
         }}
         mapStyle={selectedBasemap.styleUrl}
         transformRequest={transformRequest}
-        interactiveLayerIds={zoom > 9 ? [main.id] : []}
+        interactiveLayerIds={zoom > 9 ? [main.id, main.id + '-line', main.id + '-circle'] : []}
       >
         <ContextualLayer mainId={main.id} />
         <MainLayer
