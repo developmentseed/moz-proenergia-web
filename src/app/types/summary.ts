@@ -40,6 +40,7 @@ export interface SummaryItem {
   key: string;
   label: string;
   value: number | string;
+  [x: string]: string | number;
 }
 
 export interface FlatRow {
