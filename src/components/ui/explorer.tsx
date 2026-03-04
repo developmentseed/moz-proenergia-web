@@ -123,7 +123,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     );
   }
 
-  if (!modelData) {
+  if (!modelData || !layers) {
     return (
       <Flex id="container" width="full" height="full" position="relative">
         <Skeleton width={ControlPanelWidth} height="full" />
