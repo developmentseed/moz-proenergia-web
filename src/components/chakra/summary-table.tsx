@@ -100,7 +100,7 @@ function ChartValueRows({ row }: { row: ChartRow }) {
         <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
           <Box display="flex" alignItems="center" gap={1}>
             <Text textStyle="tableAttr">
-              {row.description || row.label}
+              {row.label}
               <Text as="span" fontWeight="normal">
                 {" "}{row.unit && `(${row.unit})`}
               </Text>
@@ -161,15 +161,17 @@ function GroupRowView({ row }: { row: GroupRow }) {
       <Table.Row key={row.label + '-group-row'} bg="gray.200">
         <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
           <Box display="flex" alignItems="center" gap={1}>
-            {/* group type should have description as label */}
             <Text textStyle="tableAttr">
               {" "}
-              {row.description || row.label}
+              {row.label}
               <Text as="span" fontWeight="normal">
                 {" "}
                 {row.unit && `(${row.unit})`}
               </Text>
             </Text>
+            {row.description && row.label !== row.description && (
+              <InfoTip content={row.description} />
+            )}
           </Box>
         </Table.Cell>
       </Table.Row>
@@ -199,12 +201,15 @@ function NestedGroupRowView({ row }: { row: NestedGroupRow }) {
         <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
           <Box display="flex" alignItems="center" gap={1}>
             <Text textStyle="tableAttr">
-              {row.description || row.label}
+              {row.label}
               <Text as="span" fontWeight="normal">
                 {" "}
                 {row.unit && `(${row.unit})`}
               </Text>
             </Text>
+            {row.description && row.label !== row.description && (
+              <InfoTip content={row.description} />
+            )}
           </Box>
         </Table.Cell>
       </Table.Row>
