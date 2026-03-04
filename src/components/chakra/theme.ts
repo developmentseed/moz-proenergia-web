@@ -88,7 +88,7 @@ export const textStyles = defineTextStyles({
       color: 'fg',
       fontFamily:  "body",
       fontSize: "xs",
-      fontWeight: 600,
+      fontWeight: 400,
       lineHeight: '0.85rem'
     }
   },
