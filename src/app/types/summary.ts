@@ -64,7 +64,7 @@ export interface GroupRow {
 
 export interface ChartRow {
   type: "chart";
-  chartType: "bar" | "line";
+  chartType: "bar" | "line" | "donut";
   label: string;
   description?: string;
   category?: string;

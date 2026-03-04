@@ -9,7 +9,7 @@ import { LuChevronUp } from "react-icons/lu";
 import { InfoTip } from "./toggle-tip";
 import { formatDisplayNumber } from "@/utils/number";
 import { SummaryBarChart } from "@/components/chakra/chart/bar";
-// import { SummaryDoublePieChart } from "@/components/chakra/chart/pie";
+import { SummaryDonutChart } from "@/components/chakra/chart/pie";
 import {
   type SummaryData,
   type SummaryRow,
@@ -92,40 +92,60 @@ function FlatRowView({ row }: { row: FlatRow }) {
   );
 }
 
+function ChartValueRows({ row }: { row: ChartRow }) {
+  return (
+    <>
+      <Table.Row bg="gray.200">
+        <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
+          <Box display="flex" alignItems="center" gap={1}>
+            <Text textStyle="tableAttr">
+              {row.description || row.label}
+              <Text as="span" fontWeight="normal">
+                {" "}{row.unit && `(${row.unit})`}
+              </Text>
+            </Text>
+            {row.description && row.label !== row.description && (
+              <InfoTip content={row.description} />
+            )}
+          </Box>
+        </Table.Cell>
+      </Table.Row>
+      {row.value.map((item) => (
+        <Table.Row key={item.key} bg="panelBg">
+          <Table.Cell {...tableCellStyleProps} pl={6}>
+            <Text textStyle="tableAttr" pt={1} pb={1}>{item.label}</Text>
+          </Table.Cell>
+          <Table.Cell {...tableCellStyleProps}>
+            <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
+              {formatValue(item.value, item.key)}
+            </Text>
+          </Table.Cell>
+        </Table.Row>
+      ))}
+    </>
+  );
+}
+
 function ChartRowView({ row }: { row: ChartRow }) {
   if (row.chartType === "bar") {
     return (
       <>
-        <Table.Row bg="gray.200">
-          <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
-            <Box display="flex" alignItems="center" gap={1}>
-              <Text textStyle="tableAttr">
-                {row.description || row.label}
-                <Text as="span" fontWeight="normal">
-                  {" "}{row.unit && `(${row.unit})`}
-                </Text>
-              </Text>
-              {row.description && row.label !== row.description && (
-                <InfoTip content={row.description} />
-              )}
-            </Box>
-          </Table.Cell>
-        </Table.Row>
-        {row.value.map((item) => (
-          <Table.Row key={item.key} bg="panelBg">
-            <Table.Cell {...tableCellStyleProps} pl={6}>
-              <Text textStyle="tableAttr" pt={1} pb={1}>{item.label}</Text>
-            </Table.Cell>
-            <Table.Cell {...tableCellStyleProps}>
-              <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
-                {formatValue(item.value, item.key)}
-              </Text>
-            </Table.Cell>
-          </Table.Row>
-        ))}
+        <ChartValueRows row={row} />
         <Table.Row>
           <Table.Cell colSpan={2} px={2} py={2}>
-            <SummaryBarChart data={row.value} average={row.average} colorMap={row.colorMap} />
+            <SummaryBarChart data={row.value} average={row.average} colorMap={row.colorMap} unit={row.unit} />
+          </Table.Cell>
+        </Table.Row>
+      </>
+    );
+  }
+  if (row.chartType === "donut") {
+    return (
+      <>
+        <ChartValueRows row={row} />
+        <Table.Row>
+          <Table.Cell colSpan={2} px={2} py={2}>
+            <SummaryDonutChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
       </>
