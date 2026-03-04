@@ -14,10 +14,11 @@ export function Legend({ items }: LegendProps) {
     <Box
       position="absolute"
       bottom={10}
+      right={3}
       p={2}
-      {...mapControlCommonStyleProps}
       zIndex={controlZIndex}
       minW="150px"
+      {...mapControlCommonStyleProps}
     >
       <VStack align="stretch" gap={2}>
         <Text textStyle='tableAttr' mb={1}>
