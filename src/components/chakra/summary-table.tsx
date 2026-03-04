@@ -158,7 +158,7 @@ function ChartRowView({ row }: { row: ChartRow }) {
 function GroupRowView({ row }: { row: GroupRow }) {
   return (
     <>
-      <Table.Row key={row.label} bg="gray.200">
+      <Table.Row key={row.label + '-group-row'} bg="gray.200">
         <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
           <Box display="flex" alignItems="center" gap={1}>
             {/* group type should have description as label */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Chart, useChart } from "@chakra-ui/charts";
+import { Chart, useChart, type UseChartProps } from "@chakra-ui/charts";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, ReferenceLine, Label } from "recharts";
 import { type SummaryItem } from "@/app/types/summary";
 import { formatDisplayNumber } from "@/utils/number";

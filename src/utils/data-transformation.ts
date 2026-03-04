@@ -284,7 +284,7 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
   const main: Main = {
     id: slugify(mainColumn) + 'main-ids',
     column: mainColumn,
-    label: mainField?.label || mainColumn,
+    label: mainField?.label || makeLabel(mainColumn),
     description: mainField?.description,
     options: [], // Options fetched separately
   };
