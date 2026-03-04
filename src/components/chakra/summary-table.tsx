@@ -165,7 +165,7 @@ function ChartRowView({ row }: { row: ChartRow }) {
       </>
     );
   }
-  return <Text> Only Bar Chart is available.</Text>;
+  return <Text> Only Bar/Stacked/Donut Chart is available.</Text>;
 }
 
 function GroupRowView({ row }: { row: GroupRow }) {

@@ -171,6 +171,7 @@ const SummaryPanel = ({
             data={dataToDisplay}
             isLoading={isLoading}
             isError={showingCluster && clusterIsError}
+            collapsible={!showingCluster}
           />
         </Box>
       </Box>
