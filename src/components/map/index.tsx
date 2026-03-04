@@ -101,13 +101,13 @@ const MainMap = ({ main }: MainMapProps) => {
         transformRequest={transformRequest}
         interactiveLayerIds={zoom > 9 ? [main.id] : []}
       >
-        <ContextualLayer mainId={main.id} />
         <MainLayer
           scenario={scenario}
           main={main}
           mapFilter={mapFilter}
           clusterId={selected}
         />
+        <ContextualLayer />
         <ScaleControl position="bottom-left" />
         <NavigationControl showCompass={false} position="bottom-left" />
         <CenterMapControl />
