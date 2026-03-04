@@ -288,6 +288,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
           defaultValue={groups.length > 0 ? [groups[0].category] : []}
           size="sm"
           variant="plain"
+          lazyMount={true}
         >
           {groups.map((group) => (
             <Accordion.Item key={group.category} value={group.category}>
