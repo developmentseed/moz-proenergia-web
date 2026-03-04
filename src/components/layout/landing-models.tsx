@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from "@chakra-ui/react";
 import { Card } from '@/components/chakra';
+import NextLink from "next/link";
 import { ChakraDrawer } from '@/components/chakra/drawer';
 import {
   useQuery
@@ -32,7 +34,6 @@ export default function ModelCards() {
       {selectedModel && (
         <ChakraDrawer
           title={selectedModel.name}
-          href={`/model/${selectedModel.slug}`}
           open={!!selectedModel}
           onOpenChange={(details) => {
             if (!details.open) setSelectedModel(null);
@@ -45,6 +46,13 @@ export default function ModelCards() {
               {selectedModel.description || "Description for Model"}
               <DrawerSummaryTable modelId={selectedModel.id} />
             </Box>
+          }
+          drawerFooterContent={
+            <Button asChild>
+              <NextLink href={`/model/${selectedModel.slug}`}>
+                Go to Explorer
+              </NextLink>
+            </Button>
           }
         />
       )}

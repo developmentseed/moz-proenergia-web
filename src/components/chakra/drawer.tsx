@@ -2,21 +2,32 @@
 
 import { type ReactNode } from "react";
 import { Button, CloseButton, Drawer, Portal } from "@chakra-ui/react";
-import NextLink from "next/link";
 
 interface ChakraDrawerProps {
   title: string;
-  href: string;
   open: boolean;
   onOpenChange: (details: any) => void;
   triggerContent: ReactNode;
   drawerContent?: ReactNode;
+  drawerFooterContent?: ReactNode;
+  size?: "xs" | "sm" | "md" | "lg" | "xl" | "full";
 }
 
-export const ChakraDrawer = ({ href, title, open, onOpenChange, triggerContent, drawerContent }: ChakraDrawerProps) => {
-
+export const ChakraDrawer = ({
+  title,
+  open,
+  onOpenChange,
+  triggerContent,
+  drawerContent,
+  drawerFooterContent,
+  size = "md",
+}: ChakraDrawerProps) => {
   return (
-    <Drawer.Root open={open} onOpenChange={(e) => onOpenChange(e.open)}>
+    <Drawer.Root
+      open={open}
+      onOpenChange={(e) => onOpenChange(e.open)}
+      size={size}
+    >
       <Drawer.Trigger asChild>
         <Button variant="plain" size="sm">
           {triggerContent}
@@ -29,16 +40,10 @@ export const ChakraDrawer = ({ href, title, open, onOpenChange, triggerContent, 
             <Drawer.Header>
               <Drawer.Title> {title} </Drawer.Title>
             </Drawer.Header>
-            <Drawer.Body>
-              {drawerContent}
-            </Drawer.Body>
-            <Drawer.Footer>
-              <Button asChild>
-                <NextLink href={href}>
-                  Go to Explorer
-                </NextLink>
-              </Button>
-            </Drawer.Footer>
+            <Drawer.Body>{drawerContent}</Drawer.Body>
+            {drawerFooterContent && (
+              <Drawer.Footer>{drawerFooterContent}</Drawer.Footer>
+            )}
             <Drawer.CloseTrigger asChild>
               <CloseButton size="sm" />
             </Drawer.CloseTrigger>
