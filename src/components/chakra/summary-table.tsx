@@ -10,6 +10,7 @@ import { InfoTip } from "./toggle-tip";
 import { formatDisplayNumber } from "@/utils/number";
 import { SummaryBarChart } from "@/components/chakra/chart/bar";
 import { SummaryDonutChart } from "@/components/chakra/chart/pie";
+import { SummaryStackedBarChart } from "@/components/chakra/chart/stacked";
 import {
   type SummaryData,
   type SummaryRow,
@@ -147,6 +148,18 @@ function ChartRowView({ row }: { row: ChartRow }) {
         <Table.Row>
           <Table.Cell colSpan={2} px={2} py={2}>
             <SummaryDonutChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
+          </Table.Cell>
+        </Table.Row>
+      </>
+    );
+  }
+  if (row.chartType === "stacked") {
+    return (
+      <>
+        <ChartValueRows row={row} />
+        <Table.Row>
+          <Table.Cell colSpan={2} px={2} py={2}>
+            <SummaryStackedBarChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
       </>
