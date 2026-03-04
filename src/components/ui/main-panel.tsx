@@ -6,8 +6,8 @@ import { Select } from "@/components/chakra";
 import { Control as ControlPanel } from "./control";
 import { useModel } from "@/utils/context/model";
 
-const ControlPanelWidth = 350;
-const AnimationTime = "0.3s";
+export const ControlPanelWidth = 350;
+export const AnimationTime = "0.32s";
 
 const MainPanel = ({ isOpen }: { isOpen: boolean }) => {
   const { model, scenarioId, setScenarioId } = useModel();

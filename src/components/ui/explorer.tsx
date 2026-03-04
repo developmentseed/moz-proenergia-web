@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import MainMap from "@/components/map";
-import { LuPanelRightOpen, LuPanelLeftOpen } from "react-icons/lu";
+import { LuPanelLeftOpen, LuPanelLeftClose } from "react-icons/lu";
 import { useAuth } from "@/utils/context/auth";
 import {
   fetchModelMetadata,
@@ -148,9 +148,6 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
               transform="translateY(-50%)"
               zIndex={1000}
               transition={`left ${AnimationTime} ease`}
-              border="1px solid"
-              borderColor="panelBorder"
-              borderLeft="none"
             >
               <IconButton
                 aria-label={isOpen ? "Collapse panel" : "Expand panel"}
@@ -158,11 +155,13 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
                 variant="solid"
                 size="sm"
                 bg="panelBg"
+                border="1px solid"
+                borderColor="panelBorder"
                 borderLeft="none"
-                borderRadius={0}
+                borderLeftRadius={0}
               >
                 {isOpen ? (
-                  <LuPanelRightOpen stroke="gray" />
+                  <LuPanelLeftClose stroke="gray" />
                 ) : (
                   <LuPanelLeftOpen stroke="gray" />
                 )}

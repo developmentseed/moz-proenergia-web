@@ -1,19 +1,15 @@
 import { memo, useState, useEffect } from "react";
-import {
-  Box,
-  Flex,
-  Text,
-  Collapsible,
-  IconButton,
-} from "@chakra-ui/react";
+import { Box, Flex, Text, IconButton } from "@chakra-ui/react";
 import { api } from "@/utils/api";
-import { LuChevronUp, LuChevronLeft } from "react-icons/lu";
+import { LuChevronLeft } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter, type Main } from "@/app/types";
 import { type SummaryData } from "@/app/types/summary";
 import { SummaryTable } from "@/components/chakra/summary-table";
 import { useSummaryQuery } from "@/hooks/use-summary-query";
+import { AnimationTime, ControlPanelWidth } from "../ui/main-panel";
+
 interface SummaryPanelProps {
   clusterId: string | null;
   scenarioId: string;
@@ -23,6 +19,7 @@ interface SummaryPanelProps {
   filterDefs: Filter[];
   resetCluster: () => void;
   main?: Main;
+  isOpen: boolean;
 }
 
 interface PanelHeaderProps {
@@ -32,15 +29,13 @@ interface PanelHeaderProps {
 }
 
 const PanelHeader = ({ title, subtitle, onBack }: PanelHeaderProps) => (
-  <Collapsible.Trigger
+  <Box
     display="flex"
     flexDirection="column"
     alignItems="start"
     justifyContent="space-between"
     width="100%"
-    px={4}
-    py={2}
-    _open={{ borderBottom: "1px solid", borderColor: "panelBorder" }}
+    p={4}
   >
     <Text textStyle="subTitle">{subtitle}</Text>
     <Flex gap={1} align="center">
@@ -59,18 +54,8 @@ const PanelHeader = ({ title, subtitle, onBack }: PanelHeaderProps) => (
       )}
       <Text textStyle="modelTitle">{title}</Text>
     </Flex>
-    <Collapsible.Indicator
-      transition="transform 0.2s"
-      _open={{ transform: "rotate(180deg)" }}
-      position="absolute"
-      right={2}
-      top={2}
-    >
-      <LuChevronUp />
-    </Collapsible.Indicator>
-  </Collapsible.Trigger>
+  </Box>
 );
-
 
 function transformClusterData(
   data: Record<string, string | number>,
@@ -118,6 +103,7 @@ const SummaryPanel = ({
   filterDefs,
   resetCluster,
   main,
+  isOpen,
 }: SummaryPanelProps) => {
   const {
     data: clusterData,
@@ -159,23 +145,34 @@ const SummaryPanel = ({
 
   return (
     <Box
-      position="absolute"
-      top="4"
-      width={"350px"}
-      {...mapControlCommonStyleProps}
-      zIndex={controlZIndex}
+      position="relative"
+      bg="panelBg"
+      borderLeftWidth={isOpen ? "1px" : 0}
+      borderLeftStyle={"solid"}
+      borderLeftColor="panelBorder"
+      transition={`width ${AnimationTime} ease`}
+      width={isOpen ? ControlPanelWidth : 0}
     >
-      <Collapsible.Root defaultOpen>
-        <PanelHeader subtitle="analysis" title={title} onBack={showingCluster ? resetCluster : undefined} />
-        <Collapsible.Content>
-          <SummaryTable
-            data={dataToDisplay}
-            isLoading={isLoading}
-            isError={showingCluster && clusterIsError}
-            maxHeight={400}
-          />
-        </Collapsible.Content>
-      </Collapsible.Root>
+      <Box
+        {...mapControlCommonStyleProps}
+        width={ControlPanelWidth}
+        display="flex"
+        flexDirection="column"
+        height="100%"
+        zIndex={controlZIndex}
+      >
+        <PanelHeader
+          subtitle="analysis"
+          title={title}
+          onBack={showingCluster ? resetCluster : undefined}
+        />
+
+        <SummaryTable
+          data={dataToDisplay}
+          isLoading={isLoading}
+          isError={showingCluster && clusterIsError}
+        />
+      </Box>
     </Box>
   );
 };
