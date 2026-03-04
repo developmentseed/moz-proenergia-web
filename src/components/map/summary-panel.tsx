@@ -173,6 +173,7 @@ const SummaryPanel = ({
             isLoading={isLoading}
             isError={showingCluster && clusterIsError}
             maxHeight={400}
+            collapsible={!showingCluster}
           />
         </Collapsible.Content>
       </Collapsible.Root>

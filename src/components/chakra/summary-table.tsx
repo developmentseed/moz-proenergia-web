@@ -36,6 +36,7 @@ interface SummaryTableProps {
   isLoading: boolean;
   isError?: boolean;
   maxHeight?: number | string;
+  collapsible?: boolean;
 }
 
 const FALLBACK_CATEGORY = "etc.";
@@ -243,7 +244,7 @@ function SummaryRowView({ row }: { row: SummaryRow }) {
   }
 }
 
-export const SummaryTable = ({ data, isLoading, isError, maxHeight }: SummaryTableProps) => {
+export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible = true }: SummaryTableProps) => {
   const groups = data ? groupByCategory(data) : [];
 
   return (
@@ -262,7 +263,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight }: SummaryTab
         </Box>
       )}
 
-      {!isLoading && !isError && data && (
+      {!isLoading && !isError && data && collapsible && (
         <Accordion.Root
           collapsible
           multiple
@@ -288,7 +289,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight }: SummaryTab
                 <Table.Root size="sm">
                   <Table.Body>
                     {group.rows.map((row) => (
-                      <SummaryRowView key={row.type === "error" || row.type === "flat" ? row.key : row.label} row={row} />
+                      <SummaryRowView key={row.type === "error" || row.type === "flat" ? row.key + 'row': row.label} row={row} />
                     ))}
                   </Table.Body>
                 </Table.Root>
@@ -296,6 +297,16 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight }: SummaryTab
             </Accordion.Item>
           ))}
         </Accordion.Root>
+      )}
+
+      {!isLoading && !isError && data && !collapsible && (
+        <Table.Root size="sm">
+          <Table.Body>
+            {data.map((row) => (
+              <SummaryRowView key={row.type === "error" || row.type === "flat" ? row.key : row.label} row={row} />
+            ))}
+          </Table.Body>
+        </Table.Root>
       )}
     </Box>
   );
