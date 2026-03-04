@@ -46,7 +46,7 @@ export const SummaryBarChart = ({ data, color = "orange", average, colorMap, uni
         <YAxis
           axisLine={false}
           tickLine={false}
-          tickFormatter={(value) => formatDisplayNumber(value) + (unit ? ` ${unit}` : "")}
+          tickFormatter={(value) => formatDisplayNumber(value)}
         />
         <Tooltip
           cursor={{ fill: chart.color("bg.muted") }}
