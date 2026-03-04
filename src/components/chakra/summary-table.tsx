@@ -285,7 +285,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
         <Accordion.Root
           collapsible
           multiple
-          defaultValue={groups.map((g) => g.category)}
+          defaultValue={groups.length > 0 ? [groups[0].category] : []}
           size="sm"
           variant="plain"
         >
