@@ -23,8 +23,10 @@ import {
   transformVectorsToLayers,
   transformFilterField,
   transformMainOptions,
+  transformOptions
 } from "@/utils/data-transformation";
-import { MapItemUnit, type ModelMetadata } from "@/app/types";
+import { type ModelMetadata } from "@/app/types";
+import { DEFAULT_COL } from "@/utils/api";
 import MainPanel from "./main-panel";
 import { Tooltip } from "./tooltip";
 
@@ -35,7 +37,6 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const [isOpen, setIsOpen] = useState(true);
   const { token } = useAuth();
 
-
   // Query 1: Model metadata
   const { data: modelCore } = useQuery({
     queryKey: ["modelMetadata", modelId],
@@ -45,7 +46,6 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     },
   });
   // contextual layers : separate context
-  // @TODO: reflect user authentication
   const { data: layers } = useQuery({
     queryKey: ["vectors", modelId, token],
     queryFn: async ({ signal }) => {
@@ -57,10 +57,12 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const defaultScenarioId = modelCore?.scenarios[0]?.id;
 
   // Filter options (single batch fetch, cached per scenario)
-  const filterColumns = useMemo(
-    () => (modelCore?.filterFields ?? []).map((f) => f.column),
-    [modelCore?.filterFields],
-  );
+  const columns = (modelCore?.filterFields ?? []).map((f) => f.column);
+  const mainCol = modelCore?.main.column;
+  if (mainCol && mainCol !== DEFAULT_COL && !columns.includes(mainCol)) {
+    columns.push(mainCol);
+  }
+  const filterColumns = columns;
 
   const { data: allFilterOptions } = useQuery({
     queryKey: ["filterOptions", modelCore?.id, filterColumns],
@@ -76,11 +78,8 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
       transformFilterField(field, allFilterOptions[field.column] ?? null),
     );
 
-    // Find. main option among filters (filters always have main, other wise, options are empty for main)
-    const mainFilter = filters.find((f) => f.column === modelCore.main.column);
-    const rawMainOptions = mainFilter
-      ? (mainFilter.options as MapItemUnit[] | null)
-      : [];
+    // allFilterOptions should have model core's main at this point.
+    const rawMainOptions = transformOptions(allFilterOptions[modelCore.main.column] ?? null);
 
     const resolvedMainOptions = transformMainOptions(
       rawMainOptions,
@@ -123,8 +122,8 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
       </Box>
     );
   }
-  // @TODO: detach layers
-  if (!modelData || !layers) {
+
+  if (!modelData) {
     return (
       <Flex id="container" width="full" height="full" position="relative">
         <Skeleton width={ControlPanelWidth} height="full" />

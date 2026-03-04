@@ -85,41 +85,41 @@ const MainMap = ({ main }: MainMapProps) => {
       <Box flex={1} h="full" position="relative">
         <Map
           initialViewState={{
-            longitude: lng,
-            latitude: lat,
-            zoom: zoom,
-            padding: { top: 20, bottom: 20, left: 20, right: 20 },
-          }}
+          longitude: lng,
+          latitude: lat,
+          zoom: zoom,
+          padding: { top: 20, bottom: 20, left: 20, right: 20 },
+        }}
           dragRotate={false}
           touchZoomRotate={false}
           minZoom={mapConfig.minZoom}
           style={{ width: "100%", height: "100%" }}
           onClick={onClick}
           onMoveEnd={(e: ViewStateChangeEvent) => {
-            setCoordinates({
-              lng: e.viewState.longitude,
-              lat: e.viewState.latitude,
-              zoom: e.viewState.zoom,
-            });
-          }}
+          setCoordinates({
+            lng: e.viewState.longitude,
+            lat: e.viewState.latitude,
+            zoom: e.viewState.zoom,
+          });
+        }}
           mapStyle={selectedBasemap.styleUrl}
           transformRequest={transformRequest}
-          interactiveLayerIds={zoom > 9 ? [main.id] : []}
-        >
-          <ContextualLayer mainId={main.id} />
+          interactiveLayerIds={zoom > 9 ? [main.id, main.id + '-line', main.id + '-circle'] : []}
+      >
           <MainLayer
             scenario={scenario}
             main={main}
             mapFilter={mapFilter}
             clusterId={selected}
-          />
+        />
+          <ContextualLayer />
           <ScaleControl position="bottom-left" />
           <NavigationControl showCompass={false} position="bottom-left" />
           <CenterMapControl />
           <BasemapSelector
             currentBasemapId={currentBasemapId}
             onBasemapChange={setCurrentBasemapId}
-          />
+        />
         </Map>
         <Legend items={main.options} />
       </Box>
@@ -145,8 +145,8 @@ const MainMap = ({ main }: MainMapProps) => {
             borderRight="none"
             borderRightRadius={0}
           >
-              {isOpen ? (
-                <LuPanelRightClose stroke="gray" />
+            {isOpen ? (
+              <LuPanelRightClose stroke="gray" />
               ) : (
                 <LuPanelRightOpen stroke="gray" />
               )}

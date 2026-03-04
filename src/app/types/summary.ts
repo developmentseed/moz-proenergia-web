@@ -40,6 +40,7 @@ export interface SummaryItem {
   key: string;
   label: string;
   value: number | string;
+  [x: string]: string | number;
 }
 
 export interface FlatRow {
@@ -47,6 +48,7 @@ export interface FlatRow {
   label: string;
   key: string;
   description?: string;
+  category?: string;
   unit?: string;
   value: number | string;
 }
@@ -55,15 +57,17 @@ export interface GroupRow {
   type: "group";
   label: string;
   description?: string;
+  category?: string;
   unit?: string;
   value: SummaryItem[];
 }
 
 export interface ChartRow {
   type: "chart";
-  chartType: "bar" | "line";
+  chartType: "bar" | "donut" | "stacked";
   label: string;
   description?: string;
+  category?: string;
   unit?: string;
   value: SummaryItem[];
   average?: number;
@@ -74,6 +78,7 @@ export interface ErrorRow {
   type: "error";
   label: string;
   key: string;
+  category?: string;
 }
 
 export interface NestedGroupData {
@@ -87,6 +92,7 @@ export interface NestedGroupRow {
   type: "nested-group";
   label: string;
   description?: string;
+  category?: string;
   unit?: string;
   value: NestedGroupData[];
 }
@@ -96,6 +102,7 @@ export interface NestedChartRow {
   chartType: "pie";
   label: string;
   description?: string;
+  category?: string;
   unit?: string;
   value: NestedGroupData[];
 }

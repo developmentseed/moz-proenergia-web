@@ -8,10 +8,11 @@ export interface Field {
   columns: string[];
   label: string;
   description?: string;
+  category?: string;
   group_by?: string[];
   method?: 'count' | 'min' | 'max' | 'sum' | 'average';
   unit?: string;
-  chart?: 'bar' | 'line';
+  chart?: 'bar' | 'line' | 'donut' | 'stacked';
   colors?: Record<string, string>;
 }
 export interface MapItemUnit extends ItemUnit {

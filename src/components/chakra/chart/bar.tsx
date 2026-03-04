@@ -10,9 +10,10 @@ interface SummaryBarChartProps {
   color?: string;
   average?: number;
   colorMap?: Record<string, string>;
+  unit?: string;
 }
 
-export const SummaryBarChart = ({ data, color = "orange", average, colorMap }: SummaryBarChartProps) => {
+export const SummaryBarChart = ({ data, color = "orange", average, colorMap, unit }: SummaryBarChartProps) => {
   const chart = useChart(
     colorMap
       ? {
@@ -49,7 +50,7 @@ export const SummaryBarChart = ({ data, color = "orange", average, colorMap }: S
         />
         <Tooltip
           cursor={{ fill: chart.color("bg.muted") }}
-          formatter={(value) => formatDisplayNumber(value as number)}
+          formatter={(value) => formatDisplayNumber(value as number) + (unit ? ` ${unit}` : "")}
           content={<Chart.Tooltip />}
         />
         {average !== undefined && (
@@ -58,7 +59,7 @@ export const SummaryBarChart = ({ data, color = "orange", average, colorMap }: S
             stroke="#888"
             strokeDasharray="4 4"
             label={<Label
-              value={`Avg: ${formatDisplayNumber(average)}`}
+              value={`Avg: ${formatDisplayNumber(average)}${unit ? ` ${unit}` : ""}`}
               position="insideRight"
               fontSize={11}
               fill="#333"

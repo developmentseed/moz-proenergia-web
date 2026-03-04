@@ -81,7 +81,6 @@ export function transformFieldSummary(
 ): SummaryRow {
   const methodName = field.method || DEFAULT_METHOD;
 
-  if (field.columns.length > 1 && field.group_by) console.warn("Multiple columns + groupby case, might result in unexected values");
   // Multi-columns - treat each column as a sub-row of group
   if (field.columns.length > 1) {
     const items: SummaryItem[] = field.columns.map((col) => {

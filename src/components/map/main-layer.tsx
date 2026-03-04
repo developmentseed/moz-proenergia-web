@@ -3,22 +3,18 @@ import { Source, Layer as MapLayer, useMap } from 'react-map-gl/maplibre';
 import {
   type LayerSpecification,
   type FilterSpecification,
-  type ExpressionSpecification,
 } from 'maplibre-gl';
 import mapConfig from '@/config/map.json';
-import { DEFAULT_COL } from '@/utils/api';
 import { buildMatchExpression } from '@/utils/map/filter';
 import { type Scenario, type Main } from '@/app/types';
 
-function getColorAttributeNamebyType(type: string) {
-  switch (type){
-    case('fill'):
-      return 'fill-color';
-    case('line'):
-      return 'line-color';
-    default:
-      return 'fill-color';
-  }
+// Combine geometry-type filter with an optional map filter
+function withGeometryFilter(
+  geometryType: string,
+  extra?: FilterSpecification | null,
+): FilterSpecification {
+  const geo: FilterSpecification = ['==', ['geometry-type'], geometryType];
+  return extra ? ['all', geo, extra] as FilterSpecification : geo;
 }
 
 interface MainLayerProps {
@@ -37,7 +33,11 @@ export const MainLayer = ({
 }: MainLayerProps) => {
   const { current: map } = useMap();
   const [hoveredCluster, setHoveredCluster] = useState<string | null>(null);
-  // Handle hover events directly on the map - so we can avoid re-render of the whole map related components
+
+  const lineLayerId = main.id + '-line';
+  const circleLayerId = main.id + '-circle';
+
+  // Handle hover events on all geometry layer types
   useEffect(() => {
     if (!map) return;
 
@@ -54,141 +54,233 @@ export const MainLayer = ({
       setHoveredCluster(null);
     };
 
-    map.on('mousemove', main.id, handleMouseMove);
-    map.on('mouseleave', main.id, handleMouseLeave);
-
-    return () => {
-      map.off('mousemove', main.id, handleMouseMove);
-      map.off('mouseleave', main.id, handleMouseLeave);
-    };
-  }, [map, main.id]);
-  const symbolImageIds = useMemo(
-    () => main.options.map((opt) => ({
-      value: opt.value,
-      imageId: `${main.id}-symbol-${opt.value}`,
-      color: opt.color || '#CCCCCC',
-    })),
-    [main.id, main.options]
-  );
-
-  useEffect(() => {
-    if (!map || symbolImageIds.length === 0) return;
-
-    const addedIds: string[] = [];
-
-    for (const { imageId, color } of symbolImageIds) {
-      if (map.hasImage(imageId)) continue;
-      const svgText = `<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="5" fill="${color}" /></svg>`;
-      const src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText);
-      const image = new Image();
-      image.onload = () => {
-        if (!map.hasImage(imageId)) {
-          map.addImage(imageId, image);
-          addedIds.push(imageId);
-        }
-      };
-      image.src = src;
+    const layerIds = [main.id, lineLayerId, circleLayerId];
+    for (const id of layerIds) {
+      map.on('mousemove', id, handleMouseMove);
+      map.on('mouseleave', id, handleMouseLeave);
     }
 
     return () => {
-      try {
-        for (const id of addedIds) {
-          if (map.hasImage(id)) {
-            map.removeImage(id);
-          }
-        }
-      } catch {
-        // Map already removed
+      for (const id of layerIds) {
+        map.off('mousemove', id, handleMouseMove);
+        map.off('mouseleave', id, handleMouseLeave);
       }
     };
-  }, [map, symbolImageIds]);
+  }, [map, main.id, lineLayerId, circleLayerId]);
 
-  const mainLayer: LayerSpecification = useMemo(
+  // --- Main visualization layers (one per geometry type) ---
+  const mainFillLayer: LayerSpecification = useMemo(
     () => ({
-      ...scenario.layer,
+      source: scenario.layer.source,
+      'source-layer': scenario.layer['source-layer'],
       id: main.id,
-      // minzoom: mapConfig.polygonMinZoom,
+      type: 'fill' as const,
       paint: {
-        [getColorAttributeNamebyType('fill')]: buildMatchExpression(main, '#66ff'),
+        'fill-color': buildMatchExpression(main, '#66ff'),
       },
-      ...(mapFilter ? { filter: mapFilter } : {}),
+      filter: withGeometryFilter('Polygon', mapFilter),
     }),
-    [main, scenario.layer, mapFilter]
+    [main, scenario.layer, mapFilter],
   );
 
-  // To show clusters (More like center point) on low zoom
-  // const symbolMainLayer:LayerSpecification = useMemo(
-  //   () => ({
-  //     source: scenario.layer.source,
-  //     "source-layer": scenario.layer['source-layer'],
-  //     id: main.id + '-symbol',
-  //     type: 'symbol' as const,
-  //     minzoom: mapConfig.minZoom,
-  //     maxzoom: mapConfig.polygonMinZoom,
-  //     layout: {
-  //       'symbol-placement': 'point',
-  //       'icon-image': symbolImageIds.length ? [
-  //         'match',
-  //         main.column === DEFAULT_COL ? ['literal', DEFAULT_COL] : ['get', main.column],
-  //         ...symbolImageIds.flatMap(({ value, imageId }) => [value, imageId]),
-  //         '',
-  //       ] as ExpressionSpecification : '',
-  //       'icon-overlap': 'cooperative',
-  //       'icon-size': ["interpolate", ["linear"], ["zoom"], mapConfig.minZoom, 0.01, mapConfig.polygonMinZoom, 0.005],
-  //     },
-  //     ...(mapFilter ? { filter: mapFilter } : {}),
-  //   }),
-  //   [main.id, main.column, scenario.layer, symbolImageIds, mapFilter]
-  // );
-
-  // Show all the data with muted colors so users know which ones are filtered
-  const backgroundMainLayer: LayerSpecification = useMemo(
+  const mainLineLayer: LayerSpecification = useMemo(
     () => ({
-      id: main.id + 'bg',
-      ...scenario.layer,
+      source: scenario.layer.source,
+      'source-layer': scenario.layer['source-layer'],
+      id: lineLayerId,
+      type: 'line' as const,
+      paint: {
+        'line-color': buildMatchExpression(main, '#66ff'),
+        'line-width': ['interpolate', ['linear'], ['zoom'], 5, 0.5, 10, 1.5, 15, 3],
+        'line-opacity': 0.8,
+      },
+      filter: withGeometryFilter('LineString', mapFilter),
+    }),
+    [main, lineLayerId, scenario.layer, mapFilter],
+  );
+
+  const mainCircleLayer: LayerSpecification = useMemo(
+    () => ({
+      source: scenario.layer.source,
+      'source-layer': scenario.layer['source-layer'],
+      id: circleLayerId,
+      type: 'circle' as const,
+      paint: {
+        'circle-color': buildMatchExpression(main, '#66ff'),
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 2, 10, 5, 15, 6],
+        'circle-opacity': 0.8,
+        'circle-stroke-color': '#fff',
+        'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 5, 0, 10, 0.5, 15, 1],
+      },
+      filter: withGeometryFilter('Point', mapFilter),
+    }),
+    [main, circleLayerId, scenario.layer, mapFilter],
+  );
+
+  // --- Background layers (muted, so users see which features are filtered out) ---
+  const bgFillLayer: LayerSpecification = useMemo(
+    () => ({
+      id: main.id + '-bg',
+      source: scenario.layer.source,
+      'source-layer': scenario.layer['source-layer'],
+      type: 'fill' as const,
+      minzoom: mapConfig.polygonMinZoom,
+      paint: { 'fill-color': '#CCCCCC' },
+      filter: ['==', ['geometry-type'], 'Polygon'] as FilterSpecification,
+    }),
+    [main.id, scenario.layer],
+  );
+
+  const bgLineLayer: LayerSpecification = useMemo(
+    () => ({
+      id: main.id + '-bg-line',
+      source: scenario.layer.source,
+      'source-layer': scenario.layer['source-layer'],
+      type: 'line' as const,
+      minzoom: mapConfig.polygonMinZoom,
+      paint: { 'line-color': '#CCCCCC', 'line-width': 1, 'line-opacity': 0.5 },
+      filter: ['==', ['geometry-type'], 'LineString'] as FilterSpecification,
+    }),
+    [main.id, scenario.layer],
+  );
+
+  const bgCircleLayer: LayerSpecification = useMemo(
+    () => ({
+      id: main.id + '-bg-circle',
+      source: scenario.layer.source,
+      'source-layer': scenario.layer['source-layer'],
+      type: 'circle' as const,
       minzoom: mapConfig.polygonMinZoom,
       paint: {
-        [getColorAttributeNamebyType('fill')]: '#CCCCCC',
+        'circle-color': '#CCCCCC',
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 2, 10, 5, 15, 6],
+        'circle-opacity': 0.5,
       },
+      filter: ['==', ['geometry-type'], 'Point'] as FilterSpecification,
     }),
-    [main.id, scenario.layer]
+    [main.id, scenario.layer],
   );
 
-  const selectedClusterLayer: LayerSpecification = useMemo(
+  // --- Selected cluster highlight layers ---
+  const selectedFillLayer: LayerSpecification = useMemo(
     () => ({
-      ...scenario.layer,
-      id: main.id + 'selected',
-      type: 'line',
-      paint: {
-        'line-color': '#533',
-        'line-width': 2,
-      },
-      filter: ['==', ['get', 'id'], clusterId],
+      source: scenario.layer.source,
+      'source-layer': scenario.layer['source-layer'],
+      id: main.id + '-selected',
+      type: 'line' as const,
+      paint: { 'line-color': '#533', 'line-width': 2 },
+      filter: ['all',
+        ['==', ['geometry-type'], 'Polygon'],
+        ['==', ['get', 'id'], clusterId],
+      ] as FilterSpecification,
     }),
-    [main.id, scenario.layer, clusterId]
+    [main.id, scenario.layer, clusterId],
   );
 
-  const hoveredClusterLayer: LayerSpecification = useMemo(
+  const selectedLineLayer: LayerSpecification = useMemo(
     () => ({
-      ...scenario.layer,
-      id: main.id + 'hovered',
-      type: 'line',
-      paint: {
-        'line-color': '#979',
-        'line-width': 2,
-      },
-      filter: ['==', ['get', 'id'], hoveredCluster],
+      source: scenario.layer.source,
+      'source-layer': scenario.layer['source-layer'],
+      id: main.id + '-selected-line',
+      type: 'line' as const,
+      paint: { 'line-color': '#533', 'line-width': 4 },
+      filter: ['all',
+        ['==', ['geometry-type'], 'LineString'],
+        ['==', ['get', 'id'], clusterId],
+      ] as FilterSpecification,
     }),
-    [main.id, scenario.layer, hoveredCluster]
+    [main.id, scenario.layer, clusterId],
+  );
+
+  const selectedCircleLayer: LayerSpecification = useMemo(
+    () => ({
+      source: scenario.layer.source,
+      'source-layer': scenario.layer['source-layer'],
+      id: main.id + '-selected-circle',
+      type: 'circle' as const,
+      paint: {
+        'circle-color': 'transparent',
+        'circle-radius': 8,
+        'circle-stroke-color': '#533',
+        'circle-stroke-width': 2,
+      },
+      filter: ['all',
+        ['==', ['geometry-type'], 'Point'],
+        ['==', ['get', 'id'], clusterId],
+      ] as FilterSpecification,
+    }),
+    [main.id, scenario.layer, clusterId],
+  );
+
+  // --- Hovered cluster highlight layers ---
+  const hoveredFillLayer: LayerSpecification = useMemo(
+    () => ({
+      source: scenario.layer.source,
+      'source-layer': scenario.layer['source-layer'],
+      id: main.id + '-hovered',
+      type: 'line' as const,
+      paint: { 'line-color': '#979', 'line-width': 2 },
+      filter: ['all',
+        ['==', ['geometry-type'], 'Polygon'],
+        ['==', ['get', 'id'], hoveredCluster],
+      ] as FilterSpecification,
+    }),
+    [main.id, scenario.layer, hoveredCluster],
+  );
+
+  const hoveredLineLayer: LayerSpecification = useMemo(
+    () => ({
+      source: scenario.layer.source,
+      'source-layer': scenario.layer['source-layer'],
+      id: main.id + '-hovered-line',
+      type: 'line' as const,
+      paint: { 'line-color': '#979', 'line-width': 4 },
+      filter: ['all',
+        ['==', ['geometry-type'], 'LineString'],
+        ['==', ['get', 'id'], hoveredCluster],
+      ] as FilterSpecification,
+    }),
+    [main.id, scenario.layer, hoveredCluster],
+  );
+
+  const hoveredCircleLayer: LayerSpecification = useMemo(
+    () => ({
+      source: scenario.layer.source,
+      'source-layer': scenario.layer['source-layer'],
+      id: main.id + '-hovered-circle',
+      type: 'circle' as const,
+      paint: {
+        'circle-color': 'transparent',
+        'circle-radius': 8,
+        'circle-stroke-color': '#979',
+        'circle-stroke-width': 2,
+      },
+      filter: ['all',
+        ['==', ['geometry-type'], 'Point'],
+        ['==', ['get', 'id'], hoveredCluster],
+      ] as FilterSpecification,
+    }),
+    [main.id, scenario.layer, hoveredCluster],
   );
 
   return (
     <Source key={scenario.id} id={scenario.id} {...scenario.source}>
-      <MapLayer {...mainLayer} />
-      <MapLayer {...backgroundMainLayer} beforeId={main.id} />
-      {/* <MapLayer {...symbolMainLayer} /> */}
-      <MapLayer {...selectedClusterLayer} />
-      <MapLayer {...hoveredClusterLayer} />
+      {/* Background layers (behind main) */}
+      <MapLayer {...bgFillLayer} />
+      <MapLayer {...bgLineLayer} />
+      <MapLayer {...bgCircleLayer} />
+      {/* Main visualization layers */}
+      <MapLayer {...mainFillLayer} />
+      <MapLayer {...mainLineLayer} />
+      <MapLayer {...mainCircleLayer} />
+      {/* Selected cluster highlights */}
+      <MapLayer {...selectedFillLayer} />
+      <MapLayer {...selectedLineLayer} />
+      <MapLayer {...selectedCircleLayer} />
+      {/* Hovered cluster highlights */}
+      <MapLayer {...hoveredFillLayer} />
+      <MapLayer {...hoveredLineLayer} />
+      <MapLayer {...hoveredCircleLayer} />
     </Source>
   );
 };
