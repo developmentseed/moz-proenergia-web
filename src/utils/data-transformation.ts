@@ -139,7 +139,7 @@ export function deriveSource(id: string, filePath: string) {
   };
 }
 
-export function deriveLayerStyles(sourceId: string, color: string): { circleLayer: LayerProps; lineLayer: LayerProps, polygonLayer:LayerProps } {
+export function deriveLayerStyles(sourceId: string, color: string, opacity: number = 1): { circleLayer: LayerProps; lineLayer: LayerProps, polygonLayer:LayerProps } {
   return {
     circleLayer: {
       id:`${sourceId}-circle-layer`,
@@ -149,7 +149,7 @@ export function deriveLayerStyles(sourceId: string, color: string): { circleLaye
       paint: {
         "circle-color": color,
         "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 2, 10, 5, 15, 6],
-        "circle-opacity": 0.8,
+        "circle-opacity": 0.8 * opacity,
         "circle-stroke-color": "#fff",
         "circle-stroke-width": ["interpolate", ["linear"], ["zoom"], 5, 0, 10, 0.5, 15, 1],
       },
@@ -163,7 +163,7 @@ export function deriveLayerStyles(sourceId: string, color: string): { circleLaye
       paint: {
         "line-color": color,
         "line-width": ["interpolate", ["linear"], ["zoom"], 5, 0.5, 10, 1.5, 15, 3],
-        "line-opacity": 0.8,
+        "line-opacity": 0.8 * opacity,
       },
       filter: ["==", ["geometry-type"], "LineString"],
     },
@@ -174,7 +174,7 @@ export function deriveLayerStyles(sourceId: string, color: string): { circleLaye
       type: 'fill',
       paint: {
         "fill-color": color,
-        "fill-opacity": ["interpolate", ["linear"], ["zoom"], 5, 0.3, 10, 0.5, 15, 0.7],
+        "fill-opacity": 0.5 * opacity,
         "fill-outline-color": color,
       },
       filter: ["==", ["geometry-type"], "Polygon"]

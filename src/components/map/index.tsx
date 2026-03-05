@@ -71,6 +71,7 @@ const MainMap = ({ main }: MainMapProps) => {
 
   const scenario = model.scenarios.find((s) => s.id === scenarioId)!;
 
+  const [mainLayerOpacity, setMainLayerOpacity] = useState(100);
   const [currentBasemapId, setCurrentBasemapId] = useState("light");
   const selectedBasemap =
     BASEMAP_OPTIONS.find((o) => o.id === currentBasemapId) ?? BASEMAP_OPTIONS[0];
@@ -106,11 +107,12 @@ const MainMap = ({ main }: MainMapProps) => {
           transformRequest={transformRequest}
           interactiveLayerIds={zoom > 9 ? [main.id, main.id + '-line', main.id + '-circle'] : []}
       >
-          <MainLayer
-            scenario={scenario}
-            main={main}
-            mapFilter={mapFilter}
-            clusterId={selected}
+        <MainLayer
+          scenario={scenario}
+          main={main}
+          mapFilter={mapFilter}
+          clusterId={selected}
+          opacity={mainLayerOpacity / 100}
         />
           <ContextualLayer />
           <ScaleControl position="bottom-left" />
@@ -121,7 +123,7 @@ const MainMap = ({ main }: MainMapProps) => {
             onBasemapChange={setCurrentBasemapId}
         />
         </Map>
-        <Legend items={main.options} />
+        <Legend items={main.options} main={main} onMainOpacityChange={setMainLayerOpacity} />
       </Box>
 
       <PanelToggleButton
