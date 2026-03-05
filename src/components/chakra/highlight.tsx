@@ -7,14 +7,11 @@ interface HighlightProps {
 
 export function Highlight({ items }: HighlightProps) {
   return (
-    <HStack gap={4} wrap="wrap">
+    <HStack gap={2} wrap="wrap" align="start">
       {items.map((item) => (
         <Stat.Root key={item.id} flex="1" minW="0">
-          <Stat.Label fontSize='xs'>{item.label}</Stat.Label>
-          <Stat.ValueText fontSize='md'>{item.id}</Stat.ValueText>
-          {item.description && (
-            <Stat.HelpText>{item.description}</Stat.HelpText>
-          )}
+          <Stat.ValueText fontSize="lg">{item.id}</Stat.ValueText>
+          <Stat.Label fontSize="xs">{item.label}</Stat.Label>
         </Stat.Root>
       ))}
     </HStack>

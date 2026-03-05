@@ -278,8 +278,8 @@ function HighlightRowView({ row }: { row: HighlightRow }) {
   }));
   return (
     <>
-      <Table.Row bg="bg.muted" h="30px" mt={1}>
-        <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
+      <Table.Row h="30px">
+        <Table.Cell colSpan={2} p={0.5} border="none">
           <Box display="flex" alignItems="center" gap={1}>
             <Text textStyle="tableAttr" fontWeight="bold">
               {row.label}
@@ -294,7 +294,7 @@ function HighlightRowView({ row }: { row: HighlightRow }) {
         </Table.Cell>
       </Table.Row>
       <Table.Row bg="panelBg">
-        <Table.Cell colSpan={2} py={2}>
+        <Table.Cell colSpan={2} px={0}>
           <Highlight items={items} />
         </Table.Cell>
       </Table.Row>
