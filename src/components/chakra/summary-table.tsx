@@ -316,7 +316,6 @@ function SummaryRowView({ row }: { row: SummaryRow }) {
 
 export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible = true }: SummaryTableProps) => {
   const groups = data ? groupByCategory(data) : [];
-  console.log(data);
   return (
     <Box maxHeight={maxHeight} width="100%">
       {isLoading && (

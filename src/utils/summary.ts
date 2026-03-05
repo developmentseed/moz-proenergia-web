@@ -175,6 +175,16 @@ export function transformFieldSummary(
       })), mainColorMap, mainColumn, methodTotal);
     }
 
+    if (field.chart === "highlight") {
+      return {
+        type: "highlight",
+        label: field.label,
+        description: field.description,
+        unit: field.unit,
+        value: [{ key: column, label: makeLabel(column), value: getNumericValue(summary, methodName) }],
+      };
+    }
+
     return {
       type: "flat",
       key: column,
