@@ -43,6 +43,14 @@ interface SummaryTableProps {
   collapsible?: boolean;
 }
 
+function sortChartFirst(rows: SummaryRow[]): SummaryRow[] {
+  return [...rows].sort((a, b) => {
+    const aIsChart = a.type === "chart" || a.type === "highlight" ? 0 : 1;
+    const bIsChart = b.type === "chart" || b.type === "highlight" ? 0 : 1;
+    return aIsChart - bIsChart;
+  });
+}
+
 function groupByCategory(rows: SummaryRow[]): { category: string | null; rows: SummaryRow[] }[] {
   const map = new Map<string | null, SummaryRow[]>();
   for (const row of rows) {
@@ -100,7 +108,7 @@ function MethodTotalRow({ item }: { item?: SummaryItem }) {
   return (
     <Table.Row bg="panelBg">
       <Table.Cell {...tableCellStyleProps}>
-        <Text textStyle="tableAttr" fontWeight="semibold">{item.label}</Text>
+        <Text textStyle="tableAttr"><Text as="span" fontWeight="semibold">Total</Text> ({item.label})</Text>
       </Table.Cell>
       <Table.Cell {...tableCellStyleProps}>
         <Text textStyle="tableValue" textAlign="right" fontFamily="mono" fontWeight="semibold">
@@ -114,21 +122,6 @@ function MethodTotalRow({ item }: { item?: SummaryItem }) {
 function ChartValueRows({ row }: { row: ChartRow }) {
   return (
     <>
-      <Table.Row bg="bg.muted" h="30px" mt={1}>
-        <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
-          <Box display="flex" alignItems="center" gap={1}>
-            <Text textStyle="tableAttr" fontWeight="bold">
-              {row.label}
-              <Text as="span" fontWeight="normal">
-                {" "}{row.unit && `(${row.unit})`}
-              </Text>
-            </Text>
-            {row.description && row.label !== row.description && (
-              <InfoTip content={row.description} />
-            )}
-          </Box>
-        </Table.Cell>
-      </Table.Row>
       {row.value.map((item) => (
         <Table.Row key={item.key} bg="panelBg">
           <Table.Cell {...tableCellStyleProps}>
@@ -150,36 +143,81 @@ function ChartRowView({ row }: { row: ChartRow }) {
   if (row.chartType === "bar") {
     return (
       <>
-        <ChartValueRows row={row} />
+        <Table.Row bg="bg.muted" h="30px" mt={1}>
+          <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Text textStyle="tableAttr" fontWeight="bold">
+                {row.label}
+                <Text as="span" fontWeight="normal">
+                  {" "}{row.unit && `(${row.unit})`}
+                </Text>
+              </Text>
+              {row.description && row.label !== row.description && (
+                <InfoTip content={row.description} />
+              )}
+            </Box>
+          </Table.Cell>
+        </Table.Row>
         <Table.Row>
           <Table.Cell colSpan={2}>
             <SummaryBarChart data={row.value} average={row.average} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
+        <ChartValueRows row={row} />
       </>
     );
   }
   if (row.chartType === "donut") {
     return (
       <>
-        <ChartValueRows row={row} />
+        <Table.Row bg="bg.muted" h="30px" mt={1}>
+          <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Text textStyle="tableAttr" fontWeight="bold">
+                {row.label}
+                <Text as="span" fontWeight="normal">
+                  {" "}{row.unit && `(${row.unit})`}
+                </Text>
+              </Text>
+              {row.description && row.label !== row.description && (
+                <InfoTip content={row.description} />
+              )}
+            </Box>
+          </Table.Cell>
+        </Table.Row>
         <Table.Row>
           <Table.Cell colSpan={2}>
             <SummaryDonutChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
+        <ChartValueRows row={row} />
       </>
     );
   }
   if (row.chartType === "stacked") {
     return (
       <>
-        <ChartValueRows row={row} />
+        <Table.Row bg="bg.muted" h="30px" mt={1}>
+          <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Text textStyle="tableAttr" fontWeight="bold">
+                {row.label}
+                <Text as="span" fontWeight="normal">
+                  {" "}{row.unit && `(${row.unit})`}
+                </Text>
+              </Text>
+              {row.description && row.label !== row.description && (
+                <InfoTip content={row.description} />
+              )}
+            </Box>
+          </Table.Cell>
+        </Table.Row>
         <Table.Row>
           <Table.Cell colSpan={2} px={2} py={2}>
             <SummaryStackedBarChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
+        <ChartValueRows row={row} />
       </>
     );
   }
@@ -340,7 +378,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
             {uncategorized && (
               <Table.Root size="sm">
                 <Table.Body>
-                  {uncategorized.rows.map((row) => (
+                  {sortChartFirst(uncategorized.rows).map((row) => (
                     <SummaryRowView key={row.type === "error" || row.type === "flat" ? row.key + 'row' : row.label} row={row} />
                   ))}
                 </Table.Body>
@@ -373,7 +411,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
                     <Accordion.ItemContent>
                       <Table.Root size="sm">
                         <Table.Body>
-                          {group.rows.map((row) => (
+                          {sortChartFirst(group.rows).map((row) => (
                             <SummaryRowView key={row.type === "error" || row.type === "flat" ? row.key + 'row' : row.label} row={row} />
                           ))}
                         </Table.Body>
@@ -390,7 +428,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
       {!isLoading && !isError && data && !collapsible && (
         <Table.Root size="sm">
           <Table.Body>
-            {data.map((row) => (
+            {sortChartFirst(data).map((row) => (
               <SummaryRowView key={row.type === "error" || row.type === "flat" ? row.key : row.label} row={row} />
             ))}
           </Table.Body>
