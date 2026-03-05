@@ -111,5 +111,15 @@ export interface NestedChartRow {
   methodTotal?: SummaryItem;
 }
 
-export type SummaryRow = FlatRow | GroupRow | ChartRow | ErrorRow | NestedGroupRow | NestedChartRow;
+export interface HighlightRow {
+  type: "highlight";
+  label: string;
+  description?: string;
+  category?: string;
+  unit?: string;
+  value: SummaryItem[];
+  methodTotal?: SummaryItem;
+}
+
+export type SummaryRow = FlatRow | GroupRow | ChartRow | ErrorRow | NestedGroupRow | NestedChartRow | HighlightRow;
 export type SummaryData = SummaryRow[];
