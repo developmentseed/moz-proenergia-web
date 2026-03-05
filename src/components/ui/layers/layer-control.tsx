@@ -5,7 +5,7 @@ import { type CheckboxCheckedChangeDetails, Text, Box, Switch, IconButton } from
 import { LuInfo } from "react-icons/lu";
 import { MEDIA_URL_PREFIX } from "@/utils/api";
 import { DownloadButton } from "@/components/chakra/download-button";
-import { LayerInfoModal } from "@/components/map/layer-info-modal";
+import { ModalDialog } from "@/components/chakra/modal";
 import { type Layer } from "@/app/types";
 
 interface LayerControlProps {
@@ -49,10 +49,17 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
         </Box>
       </Box>
 
-      <LayerInfoModal
-        layer={{ id: layer.id, name: layer.label, description: layer.description }}
+      <ModalDialog
+        modalTitle={layer.label}
+        modalContent={layer.description ? (
+          <Text fontSize="sm">{layer.description}</Text>
+        ) : (
+          <Text fontSize="sm" color="fg.muted" fontStyle="italic">
+            No description available.
+          </Text>
+        )}
         open={infoOpen}
-        onOpenChange={setInfoOpen}
+        onOpenChange={({ open }) => setInfoOpen(open)}
       />
     </>
   );

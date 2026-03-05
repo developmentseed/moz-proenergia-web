@@ -8,7 +8,7 @@ import { useContextualLayers } from '@/utils/context/contextual-layers';
 import { controlZIndex, mapControlCommonStyleProps } from './control-constant';
 import { LayerEntry } from './layer-entry';
 import { OpacityControl } from './opacity-control';
-import { LayerInfoModal } from './layer-info-modal';
+import { ModalDialog } from '@/components/chakra/modal';
 
 interface LegendProps {
   items: MapItemUnit[];
@@ -26,12 +26,6 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
   const handleMainOpacity = (opacity: number) => {
     setMainOpacity(opacity);
     onMainOpacityChange(opacity);
-  };
-
-  const mainLegendLayer = {
-    id: main.id,
-    name: main.label,
-    description: main.description,
   };
 
   return (
@@ -117,10 +111,17 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
         </VStack>
       </Box>
 
-      <LayerInfoModal
-        layer={mainLegendLayer}
+      <ModalDialog
+        modalTitle={main.label || 'Legend'}
+        modalContent={main.description ? (
+          <Text fontSize="sm">{main.description}</Text>
+        ) : (
+          <Text fontSize="sm" color="fg.muted" fontStyle="italic">
+            No description available.
+          </Text>
+        )}
         open={mainInfoOpen}
-        onOpenChange={setMainInfoOpen}
+        onOpenChange={({ open }) => setMainInfoOpen(open)}
       />
     </>
   );

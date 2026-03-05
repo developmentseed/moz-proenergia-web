@@ -5,7 +5,7 @@ import { Box, Text, IconButton, HStack } from '@chakra-ui/react';
 import { Tooltip } from '@/components/ui/tooltip';
 import { LuX, LuInfo, LuDroplet } from 'react-icons/lu';
 import { OpacityControl } from './opacity-control';
-import { LayerInfoModal } from './layer-info-modal';
+import { ModalDialog } from '@/components/chakra/modal';
 import type { LegendLayer } from './types';
 
 type LayerEntryProps = LegendLayer & {
@@ -63,10 +63,17 @@ export function LayerEntry({ id, name, description, color, switchLayer, setOpaci
         </HStack>
       </HStack>
 
-      <LayerInfoModal
-        layer={{ id, name, description }}
+      <ModalDialog
+        modalTitle={name}
+        modalContent={description ? (
+          <Text fontSize="sm">{description}</Text>
+        ) : (
+          <Text fontSize="sm" color="fg.muted" fontStyle="italic">
+            No description available.
+          </Text>
+        )}
         open={infoOpen}
-        onOpenChange={setInfoOpen}
+        onOpenChange={({ open }) => setInfoOpen(open)}
       />
     </>
   );
