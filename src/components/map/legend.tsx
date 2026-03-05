@@ -62,7 +62,7 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
           </HStack>
 
           {items.map((item) => (
-            <HStack key={item.value} gap={2}>
+            <HStack key={item.id} gap={2}>
               <Box
                 w="3"
                 h="3"
@@ -91,7 +91,7 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
                           <Box key={layer.id}>
                             <LayerEntry
                               id={layer.id}
-                              name={layer.label}
+                              label={layer.label}
                               description={layer.description}
                               color={layer.color ?? '#888888'}
                               switchLayer={(id) => toggleLayer({ [id]: false })}

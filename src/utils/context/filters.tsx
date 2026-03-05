@@ -16,7 +16,7 @@ const createFilterParsers = (filters: Filter[]) => {
         acc[filter.id] = parseAsArrayOf(parseAsString).withDefault([]);
         return acc;
       case FilterType.checkbox:
-        acc[filter.id] = parseAsArrayOf(parseAsString).withDefault(filter.options.map(o => o.value));
+        acc[filter.id] = parseAsArrayOf(parseAsString).withDefault(filter.options.map(o => o.id));
         return acc;
       default:
         return acc;
@@ -70,7 +70,7 @@ export function FiltersProvider({
           defaults[filter.id] = filter.options;
           break;
         case FilterType.checkbox:
-          defaults[filter.id] = filter.options.map(o => o.value);
+          defaults[filter.id] = filter.options.map(o => o.id);
           break;
         case FilterType.admin:
           defaults[filter.id] = [];

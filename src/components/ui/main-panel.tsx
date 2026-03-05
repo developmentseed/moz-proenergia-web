@@ -16,7 +16,7 @@ const MainPanel = ({ isOpen }: { isOpen: boolean }) => {
     setScenarioId(e.target.value);
   };
   const scenarioItems = model.scenarios.map((s) => ({
-    value: s.id,
+    id: s.id,
     label: s.label,
     description: s.description,
   }));

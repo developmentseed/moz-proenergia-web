@@ -20,7 +20,7 @@ const Select = ({ title, items, value, multi, onChange }: SelectProps) => {
           value={value}
           onChange={onChange}
       >
-          {items.map(item => <option value={item.value} key={item.value}>{item.label}</option>)}
+          {items.map(item => <option value={item.id} key={item.id}>{item.label}</option>)}
         </NativeSelect.Field>
         <NativeSelect.Indicator />
       </NativeSelect.Root>

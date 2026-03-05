@@ -54,8 +54,8 @@ export const ChakraCombobox = ({ title, items, value, onChange }: ChakraCombobox
           <Combobox.Content>
             <Combobox.Empty>No items found</Combobox.Empty>
             {collection.items.map((item) => (
-              <Combobox.Item item={item} key={item.value}>
-                <Checkbox.Root checked={value?.includes(item.value)} pointerEvents="none">
+              <Combobox.Item item={item} key={item.id}>
+                <Checkbox.Root checked={value?.includes(item.id)} pointerEvents="none">
                   <Checkbox.HiddenInput />
                   <Checkbox.Control width={4} height={4} mr={1} />
                 </Checkbox.Root>

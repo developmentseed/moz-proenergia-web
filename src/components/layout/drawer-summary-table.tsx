@@ -34,7 +34,7 @@ export function DrawerSummaryTable({ modelId }: DrawerSummaryTableProps) {
       ...modelCore.main,
       options: modelCore.colorCoding
         .filter((c) => c.value && c.color)
-        .map((c) => ({ value: c.value, label: c.value, color: c.color })),
+        .map((c) => ({ id: c.value, label: c.value, color: c.color })),
     };
   }, [modelCore]);
 

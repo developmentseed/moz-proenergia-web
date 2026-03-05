@@ -6,15 +6,15 @@ import { Tooltip } from '@/components/ui/tooltip';
 import { LuX, LuInfo, LuDroplet } from 'react-icons/lu';
 import { OpacityControl } from './opacity-control';
 import { ModalDialog } from '@/components/chakra/modal';
-import type { LegendLayer } from './types';
+import type { ItemUnit } from '@/app/types';
 
-type LayerEntryProps = LegendLayer & {
+type LayerEntryProps = ItemUnit & {
   color: string;
   switchLayer: (layerId: string) => void;
   setOpacity: (layerId: string, opacity: number) => void;
 };
 
-export function LayerEntry({ id, name, description, color, switchLayer, setOpacity: setOpacityStore }: LayerEntryProps) {
+export function LayerEntry({ id, label, description, color, switchLayer, setOpacity: setOpacityStore }: LayerEntryProps) {
   const [infoOpen, setInfoOpen] = useState(false);
   const [opacity, setOpacity] = useState(100);
 
@@ -29,7 +29,7 @@ export function LayerEntry({ id, name, description, color, switchLayer, setOpaci
         <HStack mr="auto" minW={0} gap={1.5} align="center">
           <Box w="10px" h="10px" rounded="xs" bg={color} flexShrink={0} />
           <Text fontSize="xs" lineClamp={1}>
-            {name}
+            {label}
           </Text>
         </HStack>
         <HStack gap={0} flexShrink={0}>
@@ -64,7 +64,7 @@ export function LayerEntry({ id, name, description, color, switchLayer, setOpaci
       </HStack>
 
       <ModalDialog
-        modalTitle={name}
+        modalTitle={label}
         modalContent={description ? (
           <Text fontSize="sm">{description}</Text>
         ) : (

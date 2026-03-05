@@ -121,7 +121,7 @@ export function transformOptions(
 
   return options.map(opt => {
       return {
-        value: String(opt),
+        id: String(opt),
         label: makeLabel(String(opt)),
         color: colorLookup?.get(opt) ?? undefined
       };
@@ -370,7 +370,7 @@ export function transformMainOptions(
   // When options are missing (ex. no column to visualize)
   if (rawOptions.length === 0) {
     return [{
-      value: DEFAULT_COL,
+      id: DEFAULT_COL,
       label: DEFAULT_COL,
       color: defaultColor,
     }];
@@ -383,8 +383,8 @@ export function transformMainOptions(
   );
 
   return rawOptions.map(opt => ({
-    value: String(opt.value),
+    id: String(opt.id),
     label: opt.label,
-    color: colorLookup.get(String(opt.value)) ?? defaultColor,
+    color: colorLookup.get(String(opt.id)) ?? defaultColor,
   }));
 }

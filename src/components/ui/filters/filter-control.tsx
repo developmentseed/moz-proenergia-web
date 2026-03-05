@@ -37,7 +37,7 @@ export const FilterControl = memo(function FilterControl({ config, value, hasPen
       );
 
     case 'admin':
-      const items = config.options.map(s => ({ label: s, value: s }));
+      const items = config.options.map(s => ({ label: s, id: s }));
       return (
         <Combobox
           title={config.label}
