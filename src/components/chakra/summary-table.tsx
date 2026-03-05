@@ -68,7 +68,7 @@ function ErrorRowView({ row }: { row: ErrorRow }) {
 function FlatRowView({ row }: { row: FlatRow }) {
   return (
     <Table.Row key={row.key} bg="panelBg">
-      <Table.Cell {...tableCellStyleProps}>
+      <Table.Cell {...tableCellStyleProps} p={0.5}>
         {" "}
         <Box display="flex" alignItems="center" gap={1}>
           <Text textStyle="tableAttr">
@@ -94,8 +94,8 @@ function FlatRowView({ row }: { row: FlatRow }) {
 function ChartValueRows({ row }: { row: ChartRow }) {
   return (
     <>
-      <Table.Row bg="gray.200">
-        <Table.Cell colSpan={2} fontWeight="bold">
+      <Table.Row bg="bg.muted" h="30px" mt={1}>
+        <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
           <Box display="flex" alignItems="center" gap={1}>
             <Text textStyle="tableAttr">
               {row.label}
@@ -156,8 +156,8 @@ function ChartRowView({ row }: { row: ChartRow }) {
 function GroupRowView({ row }: { row: GroupRow }) {
   return (
     <>
-      <Table.Row key={row.label + '-group-row'} bg="gray.200">
-        <Table.Cell colSpan={2} fontWeight="bold">
+      <Table.Row key={row.label + '-group-row'} bg="bg.muted" h="30px" mt={1}>
+        <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
           <Box display="flex" alignItems="center" gap={1}>
             <Text textStyle="tableAttr">
               {" "}
@@ -195,7 +195,7 @@ function GroupRowView({ row }: { row: GroupRow }) {
 function NestedGroupRowView({ row }: { row: NestedGroupRow }) {
   return (
     <>
-      <Table.Row key={row.label} bg="gray.200">
+      <Table.Row key={row.label} bg="bg.muted" height="30px" mt={1}>
         <Table.Cell colSpan={2} fontWeight="bold">
           <Box display="flex" alignItems="center" gap={1}>
             <Text textStyle="tableAttr">
