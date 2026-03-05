@@ -1,4 +1,5 @@
 import { type Field } from "@/app/types";
+import { makeLabel } from "./data-transformation";
 import { type SummaryItem, type GroupRow, type ChartRow, type NestedGroupRow, type NestedChartRow, type NestedGroupData, type BatchSummariesResponse, type SummaryRow, type NumericGroupStats } from "@/app/types/summary";
 const DEFAULT_METHOD = "sum";
 
@@ -7,6 +8,7 @@ function makeGroupOrChartRow(
   items: SummaryItem[],
   mainColorMap?: Record<string, string>,
   mainColumn?: string,
+  methodTotal?: SummaryItem,
 ): GroupRow | ChartRow {
   if (field.chart) {
     const numericValues = items
@@ -21,43 +23,48 @@ function makeGroupOrChartRow(
     return {
       type: "chart",
       chartType: field.chart,
-      label: field.label,
+      label: makeLabel(field.label),
       description: field.description,
       unit: field.unit,
       value: items,
       average,
       colorMap,
+      methodTotal,
     };
   }
   return {
     type: "group",
-    label: field.label,
+    label: makeLabel(field.label),
     description: field.description,
     unit: field.unit,
     value: items,
+    methodTotal,
   };
 }
 
 function makeNestedGroupOrChartRow(
   field: Field,
   groups: NestedGroupData[],
+  methodTotal?: SummaryItem,
 ): NestedGroupRow | NestedChartRow {
   if (field.chart) {
     return {
       type: "nested-chart",
       chartType: "pie",
-      label: field.label,
+      label: makeLabel(field.label),
       description: field.description,
       unit: field.unit,
       value: groups,
+      methodTotal,
     };
   }
   return {
     type: "nested-group",
-    label: field.label,
+    label: makeLabel(field.label),
     description: field.description,
     unit: field.unit,
     value: groups,
+    methodTotal,
   };
 }
 
@@ -65,6 +72,22 @@ function getNumericValue(stats: NumericGroupStats, method: NonNullable<Field["me
   if (stats.count === 0) return 0;
   if (method === "average") return stats.sum! / stats.count;
   return stats[method] ?? 0;
+}
+
+function aggregateItems(items: SummaryItem[], method: NonNullable<Field["method"]>): number {
+  const values = items.map((item) => (typeof item.value === "number" ? item.value : 0));
+  if (values.length === 0) return 0;
+  switch (method) {
+    case "sum":
+    case "count":
+      return values.reduce((a, b) => a + b, 0);
+    case "min":
+      return Math.min(...values);
+    case "max":
+      return Math.max(...values);
+    case "average":
+      return values.reduce((a, b) => a + b, 0) / values.length;
+  }
 }
 
 /** Detect if grouped data has two-level nesting (multi group_by) */
@@ -86,15 +109,16 @@ export function transformFieldSummary(
     const items: SummaryItem[] = field.columns.map((col) => {
       const summary = response.summaries[col];
       if (!summary || summary.count === 0) {
-        return { key: col, label: col, value: 0 };
+        return { key: col, label: makeLabel(col), value: 0 };
       }
       const value =
         summary.type === "numeric"
           ? getNumericValue(summary, methodName)
           : summary.count;
-      return { key: col, label: col, value };
+      return { key: col, label: makeLabel(col), value };
     });
-    return makeGroupOrChartRow(field, items, mainColorMap, mainColumn);
+    const methodTotal: SummaryItem = { key: methodName, label: makeLabel(methodName), value: aggregateItems(items, methodName) };
+    return makeGroupOrChartRow(field, items, mainColorMap, mainColumn, methodTotal);
   }
 
   // Single column
@@ -105,7 +129,7 @@ export function transformFieldSummary(
     return {
       type: "flat",
       key: column,
-      label: `${field.label} (Total)`,
+      label: field.label,
       description: field.description,
       value: 0,
       unit: field.unit,
@@ -121,28 +145,30 @@ export function transformFieldSummary(
         const groups: NestedGroupData[] = Object.entries(nestedGrouped).map(([l1Key, l2Map]) => {
           const items: SummaryItem[] = Object.entries(l2Map).map(([l2Key, stats]) => ({
             key: l2Key,
-            label: l2Key,
+            label: makeLabel(l2Key),
             value: getNumericValue(stats, methodName),
           }));
           const total = items.reduce((sum, item) => sum + (typeof item.value === "number" ? item.value : 0), 0);
-          return { key: l1Key, label: l1Key, total, items };
+          return { key: l1Key, label: makeLabel(l1Key), total, items };
         });
-        return makeNestedGroupOrChartRow(field, groups);
+        const methodTotal: SummaryItem = { key: methodName, label: makeLabel(methodName), value: getNumericValue(summary, methodName) };
+        return makeNestedGroupOrChartRow(field, groups, methodTotal);
       }
 
       // Single-level grouping
       const singleGrouped = summary.grouped as Record<string, NumericGroupStats>;
+      const methodTotal: SummaryItem = { key: methodName, label: makeLabel(methodName), value: getNumericValue(summary, methodName) };
       return makeGroupOrChartRow(field, Object.entries(singleGrouped).map(([key, stats]) => ({
         key,
-        label: key,
+        label: makeLabel(key),
         value: getNumericValue(stats, methodName),
-      })), mainColorMap, mainColumn);
+      })), mainColorMap, mainColumn, methodTotal);
     }
 
     return {
       type: "flat",
       key: column,
-      label: `${field.label} (Total)`,
+      label: makeLabel(field.label),
       description: field.description,
       value: getNumericValue(summary, methodName),
       unit: field.unit,
@@ -159,30 +185,33 @@ export function transformFieldSummary(
       const groups: NestedGroupData[] = Object.entries(nestedGrouped).map(([l1Key, l2Map]) => {
         const items: SummaryItem[] = Object.entries(l2Map).map(([l2Key, group]) => ({
           key: l2Key,
-          label: l2Key,
+          label: makeLabel(l2Key),
           value: group.count,
         }));
         const total = items.reduce((sum, item) => sum + (typeof item.value === "number" ? item.value : 0), 0);
-        return { key: l1Key, label: l1Key, total, items };
+        return { key: l1Key, label: makeLabel(l1Key), total, items };
       });
-      return makeNestedGroupOrChartRow(field, groups);
+      const methodTotal: SummaryItem = { key: methodName, label: makeLabel(methodName), value: summary.count };
+      return makeNestedGroupOrChartRow(field, groups, methodTotal);
     }
 
     // Single-level grouping
     type SingleStringGroup = { count: number; values: Record<string, number> };
     const singleGrouped = summary.grouped as Record<string, SingleStringGroup>;
+    const methodTotal: SummaryItem = { key: methodName, label: makeLabel(methodName), value: summary.count };
     return makeGroupOrChartRow(field, Object.entries(singleGrouped).map(([key, group]) => ({
       key,
       label: key,
       // Only count is avaiable for string type columns grouped
       value: group.count,
-    })), mainColorMap, mainColumn);
+    })), mainColorMap, mainColumn, methodTotal);
   }
 
   // String type — value distribution
+  const methodTotal: SummaryItem = { key: methodName, label: makeLabel(methodName), value: summary.count };
   return makeGroupOrChartRow(field, Object.entries(summary.values).map(([key, count]) => ({
     key,
     label: key,
     value: count,
-  })), mainColorMap, mainColumn);
+  })), mainColorMap, mainColumn, methodTotal);
 }

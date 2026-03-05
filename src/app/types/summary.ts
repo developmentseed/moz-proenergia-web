@@ -60,6 +60,7 @@ export interface GroupRow {
   category?: string;
   unit?: string;
   value: SummaryItem[];
+  methodTotal?: SummaryItem;
 }
 
 export interface ChartRow {
@@ -72,6 +73,7 @@ export interface ChartRow {
   value: SummaryItem[];
   average?: number;
   colorMap?: Record<string, string>;
+  methodTotal?: SummaryItem;
 }
 
 export interface ErrorRow {
@@ -95,6 +97,7 @@ export interface NestedGroupRow {
   category?: string;
   unit?: string;
   value: NestedGroupData[];
+  methodTotal?: SummaryItem;
 }
 
 export interface NestedChartRow {
@@ -105,6 +108,7 @@ export interface NestedChartRow {
   category?: string;
   unit?: string;
   value: NestedGroupData[];
+  methodTotal?: SummaryItem;
 }
 
 export type SummaryRow = FlatRow | GroupRow | ChartRow | ErrorRow | NestedGroupRow | NestedChartRow;

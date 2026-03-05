@@ -14,6 +14,7 @@ import { SummaryStackedBarChart } from "@/components/chakra/chart/stacked";
 import {
   type SummaryData,
   type SummaryRow,
+  type SummaryItem,
   type ErrorRow,
   type FlatRow,
   type ChartRow,
@@ -92,6 +93,22 @@ function FlatRowView({ row }: { row: FlatRow }) {
   );
 }
 
+function MethodTotalRow({ item }: { item?: SummaryItem }) {
+  if (!item) return null;
+  return (
+    <Table.Row bg="panelBg">
+      <Table.Cell {...tableCellStyleProps}>
+        <Text textStyle="tableAttr" fontWeight="semibold">{item.label}</Text>
+      </Table.Cell>
+      <Table.Cell {...tableCellStyleProps}>
+        <Text textStyle="tableValue" textAlign="right" fontFamily="mono" fontWeight="semibold">
+          {formatValue(item.value, item.key)}
+        </Text>
+      </Table.Cell>
+    </Table.Row>
+  );
+}
+
 function ChartValueRows({ row }: { row: ChartRow }) {
   return (
     <>
@@ -122,6 +139,7 @@ function ChartValueRows({ row }: { row: ChartRow }) {
           </Table.Cell>
         </Table.Row>
       ))}
+      <MethodTotalRow item={row.methodTotal} />
     </>
   );
 }
@@ -201,6 +219,7 @@ function GroupRowView({ row }: { row: GroupRow }) {
           </Table.Cell>
         </Table.Row>
       ))}
+      <MethodTotalRow item={row.methodTotal} />
     </>
   );
 }
@@ -245,6 +264,7 @@ function NestedGroupRowView({ row }: { row: NestedGroupRow }) {
           </Table.Row>
         )),
       ])}
+      <MethodTotalRow item={row.methodTotal} />
     </>
   );
 }
