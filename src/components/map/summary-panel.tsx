@@ -36,6 +36,8 @@ const PanelHeader = ({ title, subtitle, onBack }: PanelHeaderProps) => (
     justifyContent="space-between"
     width="100%"
     p={4}
+    borderBottom="1px solid"
+    borderColor="border"
   >
     <Text textStyle="subTitle">{subtitle}</Text>
     <Flex gap={1} align="center">
@@ -166,7 +168,7 @@ const SummaryPanel = ({
           title={title}
           onBack={showingCluster ? resetCluster : undefined}
         />
-        <Box pl={4} pr={2} flex={1} minHeight={0} overflowY="auto">
+        <Box p={4} pt={0} flex={1} minHeight={0} overflowY="auto">
           <SummaryTable
             data={dataToDisplay}
             isLoading={isLoading}

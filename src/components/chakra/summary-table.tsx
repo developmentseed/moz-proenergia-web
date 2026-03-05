@@ -28,8 +28,8 @@ const formatValue = (value: string | number, column?: string) => {
 };
 
 const tableCellStyleProps = {
-  py: 1,
-  px: 4,
+  py: 0.5,
+  px: 1,
 };
 
 interface SummaryTableProps {
@@ -40,12 +40,10 @@ interface SummaryTableProps {
   collapsible?: boolean;
 }
 
-const FALLBACK_CATEGORY = "etc.";
-
-function groupByCategory(rows: SummaryRow[]): { category: string; rows: SummaryRow[] }[] {
-  const map = new Map<string, SummaryRow[]>();
+function groupByCategory(rows: SummaryRow[]): { category: string | null; rows: SummaryRow[] }[] {
+  const map = new Map<string | null, SummaryRow[]>();
   for (const row of rows) {
-    const cat = row.category || FALLBACK_CATEGORY;
+    const cat = row.category || null;
     const arr = map.get(cat);
     if (arr) arr.push(row);
     else map.set(cat, [row]);
@@ -71,7 +69,7 @@ function ErrorRowView({ row }: { row: ErrorRow }) {
 function FlatRowView({ row }: { row: FlatRow }) {
   return (
     <Table.Row key={row.key} bg="panelBg">
-      <Table.Cell {...tableCellStyleProps}>
+      <Table.Cell {...tableCellStyleProps} p={0.5}>
         {" "}
         <Box display="flex" alignItems="center" gap={1}>
           <Text textStyle="tableAttr">
@@ -97,10 +95,10 @@ function FlatRowView({ row }: { row: FlatRow }) {
 function ChartValueRows({ row }: { row: ChartRow }) {
   return (
     <>
-      <Table.Row bg="gray.200">
-        <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
+      <Table.Row bg="bg.muted" h="30px" mt={1}>
+        <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
           <Box display="flex" alignItems="center" gap={1}>
-            <Text textStyle="tableAttr">
+            <Text textStyle="tableAttr" fontWeight="bold">
               {row.label}
               <Text as="span" fontWeight="normal">
                 {" "}{row.unit && `(${row.unit})`}
@@ -114,8 +112,8 @@ function ChartValueRows({ row }: { row: ChartRow }) {
       </Table.Row>
       {row.value.map((item) => (
         <Table.Row key={item.key} bg="panelBg">
-          <Table.Cell {...tableCellStyleProps} pl={6}>
-            <Text textStyle="tableAttr" pt={1} pb={1}>{item.label}</Text>
+          <Table.Cell {...tableCellStyleProps}>
+            <Text textStyle="tableAttr">{item.label}</Text>
           </Table.Cell>
           <Table.Cell {...tableCellStyleProps}>
             <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
@@ -134,7 +132,7 @@ function ChartRowView({ row }: { row: ChartRow }) {
       <>
         <ChartValueRows row={row} />
         <Table.Row>
-          <Table.Cell colSpan={2} px={2} py={2}>
+          <Table.Cell colSpan={2}>
             <SummaryBarChart data={row.value} average={row.average} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
@@ -146,7 +144,7 @@ function ChartRowView({ row }: { row: ChartRow }) {
       <>
         <ChartValueRows row={row} />
         <Table.Row>
-          <Table.Cell colSpan={2} px={2} py={2}>
+          <Table.Cell colSpan={2}>
             <SummaryDonutChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
@@ -171,10 +169,10 @@ function ChartRowView({ row }: { row: ChartRow }) {
 function GroupRowView({ row }: { row: GroupRow }) {
   return (
     <>
-      <Table.Row key={row.label + '-group-row'} bg="gray.200">
-        <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
+      <Table.Row key={row.label + '-group-row'} bg="bg.muted" h="30px" mt={1}>
+        <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
           <Box display="flex" alignItems="center" gap={1}>
-            <Text textStyle="tableAttr">
+            <Text textStyle="tableAttr" fontWeight="bold">
               {" "}
               {row.label}
               <Text as="span" fontWeight="normal">
@@ -190,8 +188,8 @@ function GroupRowView({ row }: { row: GroupRow }) {
       </Table.Row>
       {row.value.map((item) => (
         <Table.Row key={item.key} bg="panelBg">
-          <Table.Cell {...tableCellStyleProps} pl={6}>
-            <Text textStyle="tableAttr" pt={1} pb={1}>
+          <Table.Cell {...tableCellStyleProps}>
+            <Text textStyle="tableAttr">
               {" "}
               {item.label}
             </Text>
@@ -210,10 +208,10 @@ function GroupRowView({ row }: { row: GroupRow }) {
 function NestedGroupRowView({ row }: { row: NestedGroupRow }) {
   return (
     <>
-      <Table.Row key={row.label} bg="gray.200">
-        <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
+      <Table.Row key={row.label} bg="bg.muted" height="30px" mt={1}>
+        <Table.Cell colSpan={2} fontWeight="bold">
           <Box display="flex" alignItems="center" gap={1}>
-            <Text textStyle="tableAttr">
+            <Text textStyle="tableAttr" fontWeight="bold">
               {row.label}
               <Text as="span" fontWeight="normal">
                 {" "}
@@ -228,14 +226,14 @@ function NestedGroupRowView({ row }: { row: NestedGroupRow }) {
       </Table.Row>
       {row.value.flatMap((group) => [
         <Table.Row key={`${row.label}-${group.key}`} bg="gray.100">
-          <Table.Cell pl={4} py={1} colSpan={2} fontWeight="semibold">
+          <Table.Cell colSpan={2} fontWeight="semibold">
             <Text textStyle="tableAttr" fontSize="sm">{group.label}</Text>
           </Table.Cell>
         </Table.Row>,
         ...group.items.map((item) => (
           <Table.Row key={`${group.key}-${item.key}`} bg="panelBg">
-            <Table.Cell {...tableCellStyleProps} pl={8}>
-              <Text textStyle="tableAttr" pt={1} pb={1}>
+            <Table.Cell {...tableCellStyleProps}>
+              <Text textStyle="tableAttr">
                 {item.label}
               </Text>
             </Table.Cell>
@@ -266,7 +264,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
   const groups = data ? groupByCategory(data) : [];
 
   return (
-    <Box maxHeight={maxHeight} width="100%" overflowY="auto" py={4}>
+    <Box maxHeight={maxHeight} width="100%">
       {isLoading && (
         <Box display="flex" alignItems="center" justifyContent="center" py={8}>
           <Spinner size="xl" />
@@ -281,43 +279,60 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
         </Box>
       )}
 
-      {!isLoading && !isError && data && collapsible && (
-        <Accordion.Root
-          collapsible
-          multiple
-          defaultValue={groups.length > 0 ? [groups[0].category] : []}
-          size="sm"
-          variant="plain"
-          lazyMount={true}
-        >
-          {groups.map((group) => (
-            <Accordion.Item key={group.category} value={group.category}>
-              <Accordion.ItemTrigger
-                display="flex"
-                gap="2"
-                alignItems="center"
-                width="100%"
-                textStyle="collapsibleGroupTitle"
+      {!isLoading && !isError && data && collapsible && (() => {
+        const uncategorized = groups.find((g) => g.category === null);
+        const categorized = groups.filter((g) => g.category !== null) as { category: string; rows: SummaryRow[] }[];
+        return (
+          <>
+            {uncategorized && (
+              <Table.Root size="sm">
+                <Table.Body>
+                  {uncategorized.rows.map((row) => (
+                    <SummaryRowView key={row.type === "error" || row.type === "flat" ? row.key + 'row' : row.label} row={row} />
+                  ))}
+                </Table.Body>
+              </Table.Root>
+            )}
+            {categorized.length > 0 && (
+              <Accordion.Root
+                collapsible
+                multiple
+                defaultValue={categorized.length > 0 ? [categorized[0].category] : []}
+                size="sm"
+                variant="outline"
+                lazyMount={true}
               >
-                {group.category}
-                <Accordion.ItemIndicator ml="auto">
-                  <LuChevronUp />
-                </Accordion.ItemIndicator>
-              </Accordion.ItemTrigger>
-              <Accordion.ItemContent>
-                <Table.Root size="sm">
-                  <Table.Body>
-                    {group.rows.map((row) => (
-                      <SummaryRowView key={row.type === "error" || row.type === "flat" ? row.key + 'row': row.label} row={row} />
-                    ))}
-                  </Table.Body>
-                </Table.Root>
-              </Accordion.ItemContent>
-            </Accordion.Item>
-          ))}
-        </Accordion.Root>
-
-      )}
+                {categorized.map((group) => (
+                  <Accordion.Item key={group.category} value={group.category} mx={-4}
+                      px={4}>
+                    <Accordion.ItemTrigger
+                      display="flex"
+                      gap="2"
+                      alignItems="center"
+                      width="100%"
+                      textStyle="collapsibleGroupTitle"
+                    >
+                      {group.category}
+                      <Accordion.ItemIndicator ml="auto">
+                        <LuChevronUp />
+                      </Accordion.ItemIndicator>
+                    </Accordion.ItemTrigger>
+                    <Accordion.ItemContent>
+                      <Table.Root size="sm">
+                        <Table.Body>
+                          {group.rows.map((row) => (
+                            <SummaryRowView key={row.type === "error" || row.type === "flat" ? row.key + 'row' : row.label} row={row} />
+                          ))}
+                        </Table.Body>
+                      </Table.Root>
+                    </Accordion.ItemContent>
+                  </Accordion.Item>
+                ))}
+              </Accordion.Root>
+            )}
+          </>
+        );
+      })()}
 
       {!isLoading && !isError && data && !collapsible && (
         <Table.Root size="sm">

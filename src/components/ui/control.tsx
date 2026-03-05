@@ -112,6 +112,7 @@ const CollapsibleGroup = memo(function CollapsibleGroup({
         alignItems="center"
         width="100%"
         textStyle="collapsibleGroupTitle"
+        pb={0.5}
       >
         <FilterLabel
           title={collapsibleItem.title}
@@ -124,7 +125,7 @@ const CollapsibleGroup = memo(function CollapsibleGroup({
             content={collapsibleItem.items[0].description}
             contentProps={{ css: { "--tooltip-bg": "colors.bg", color: "fg" } }}
           >
-            <IconButton as='span' variant="ghost" size="xs" p={0}>
+            <IconButton as='span' variant="ghost" size="2xs" p={0}>
               <LuInfo />
             </IconButton>
           </Tooltip>
@@ -185,7 +186,7 @@ const ControlsPanel = () => {
 
   return (
     // To give space for scrollable area
-    <Box p={4} pr={0} h="full">
+    <Box p={4} pt={0} pr={0} h="full">
       <ScrollArea.Root h="calc(100% - 3.5rem - 1px)">
         <ScrollArea.Viewport>
           <ScrollArea.Content spaceY="4" pr={4}>

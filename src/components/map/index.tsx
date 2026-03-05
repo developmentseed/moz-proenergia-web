@@ -51,7 +51,7 @@ interface MainMapProps {
 const MainMap = ({ main }: MainMapProps) => {
   const [{ lat, lng, zoom }, setCoordinates] = useCoordinates();
   const { selected, setSelected, onClick } = useMouseEvent();
-  const { isOpen, toggle } = useToggle(true);
+  const { isOpen, toggle, open } = useToggle(true);
 
   // Attach pmtile protocol to MapLibre
   useEffect(() => {
@@ -79,6 +79,12 @@ const MainMap = ({ main }: MainMapProps) => {
   const resetCluster = useCallback(() => {
     setSelected(null);
   }, [setSelected]);
+
+  useEffect(() => {
+    if (selected !== null) {
+      open();
+    }
+  }, [selected, open]);
 
   return (
     <Flex w="100%" h="100%" className="map-container" position="relative">
