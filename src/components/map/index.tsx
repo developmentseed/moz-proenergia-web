@@ -5,7 +5,7 @@ import {
   NavigationControl,
   ScaleControl,
 } from "react-map-gl/maplibre";
-import { Box } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import * as pmtiles from "pmtiles";
 import * as maplibregl from "maplibre-gl";
 import { type RequestTransformFunction } from "maplibre-gl";
@@ -29,6 +29,9 @@ import { Legend } from "./legend";
 import { ContextualLayer } from "./contextual-layer";
 import { MainLayer } from "./main-layer";
 import { BasemapSelector, BASEMAP_OPTIONS } from "./basemap-selector";
+import { AnimationTime, ControlPanelWidth } from "../ui/main-panel";
+import { useToggle } from "@/hooks/use-toggle";
+import { PanelToggleButton } from "../ui/panel-toggle-button";
 
 const transformRequest: RequestTransformFunction = (url, resourceType) => {
   if (isMapboxURL(url)) {
@@ -48,6 +51,7 @@ interface MainMapProps {
 const MainMap = ({ main }: MainMapProps) => {
   const [{ lat, lng, zoom }, setCoordinates] = useCoordinates();
   const { selected, setSelected, onClick } = useMouseEvent();
+  const { isOpen, toggle } = useToggle(true);
 
   // Attach pmtile protocol to MapLibre
   useEffect(() => {
@@ -76,33 +80,33 @@ const MainMap = ({ main }: MainMapProps) => {
     setSelected(null);
   }, [setSelected]);
 
-
   return (
-    <Box w="100%" h="100%" className="map-container" position="relative">
-      <Map
-        initialViewState={{
+    <Flex w="100%" h="100%" className="map-container" position="relative">
+      {/* Map takes all remaining width */}
+      <Box flex={1} h="full" position="relative">
+        <Map
+          initialViewState={{
           longitude: lng,
           latitude: lat,
           zoom: zoom,
           padding: { top: 20, bottom: 20, left: 20, right: 20 },
         }}
-        dragRotate={false}
-        touchZoomRotate={false}
-        minZoom={mapConfig.minZoom}
-        style={{ width: "100%", height: "100%" }}
-        onClick={onClick}
-        onMoveEnd={(e: ViewStateChangeEvent) => {
+          dragRotate={false}
+          touchZoomRotate={false}
+          minZoom={mapConfig.minZoom}
+          style={{ width: "100%", height: "100%" }}
+          onClick={onClick}
+          onMoveEnd={(e: ViewStateChangeEvent) => {
           setCoordinates({
             lng: e.viewState.longitude,
             lat: e.viewState.latitude,
             zoom: e.viewState.zoom,
           });
         }}
-        mapStyle={selectedBasemap.styleUrl}
-        transformRequest={transformRequest}
-        interactiveLayerIds={zoom > 9 ? [main.id] : []}
+          mapStyle={selectedBasemap.styleUrl}
+          transformRequest={transformRequest}
+          interactiveLayerIds={zoom > 9 ? [main.id, main.id + '-line', main.id + '-circle'] : []}
       >
-        <ContextualLayer mainId={main.id} />
         <MainLayer
           scenario={scenario}
           main={main}
@@ -110,15 +114,28 @@ const MainMap = ({ main }: MainMapProps) => {
           clusterId={selected}
           opacity={mainLayerOpacity / 100}
         />
-        <ScaleControl position="bottom-left" />
-        <NavigationControl showCompass={false} position="bottom-left" />
-        <CenterMapControl />
-        <BasemapSelector
-          currentBasemapId={currentBasemapId}
-          onBasemapChange={setCurrentBasemapId}
+          <ContextualLayer />
+          <ScaleControl position="bottom-left" />
+          <NavigationControl showCompass={false} position="bottom-left" />
+          <CenterMapControl />
+          <BasemapSelector
+            currentBasemapId={currentBasemapId}
+            onBasemapChange={setCurrentBasemapId}
         />
-      </Map>
-      <Legend items={main.options} main={main} onMainOpacityChange={setMainLayerOpacity} />
+        </Map>
+        <Legend items={main.options} />
+      </Box>
+
+      <PanelToggleButton
+        isOpen={isOpen}
+        onToggle={toggle}
+        side="right"
+        label="analysis panel"
+        panelWidth={ControlPanelWidth}
+        animationTime={AnimationTime}
+      />
+
+      {/* Summary panel slides in/out from the right */}
       <SummaryPanel
         clusterId={selected}
         scenarioId={scenarioId}
@@ -127,8 +144,10 @@ const MainMap = ({ main }: MainMapProps) => {
         filters={updatedFilters}
         filterDefs={model.filters}
         resetCluster={resetCluster}
+        main={main}
+        isOpen={isOpen}
       />
-    </Box>
+    </Flex>
   );
 };
 

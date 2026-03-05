@@ -4,7 +4,28 @@ import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, Field, MapItemUn
 import { api, MEDIA_URL_PREFIX, DEFAULT_COL } from '@/utils/api';
 import { sortFilterOptions } from '@/config/filters';
 import mapConfig from '@/config/map.json';
-const ADMIN_COLUMNS = ['Admin_1', 'District', 'Posto', 'Localidade'];
+const ADMIN_COLUMNS = [
+  "Admin_1",
+  "Admin_2",
+  "Admin_3",
+  "Admin_4",
+  "Region",
+  "Regions",
+  "Região",
+  "Regiões",
+  "Province",
+  "Provinces",
+  "Província",
+  "Províncias",
+  "District",
+  "Districts",
+  "Distrito",
+  "Distritos",
+  "Posto",
+  "Postos",
+  "Localidade",
+  "Localidades",
+];
 
 // ----- API Response Types -----
 export interface ApiFilterField {
@@ -32,6 +53,7 @@ export interface ApiModelResponse {
   scenarios: ApiScenario[];
   visualization_column: string | null; // for main column
   color_coding: ColorCoding[]
+  metric_field_types: Record<string, string>
 }
 
 export interface ApiVectorResult {
@@ -239,15 +261,18 @@ export async function fetchAllFilterOptions(
   }
 }
 
-// Replace 'id' in summary field columns with the main visualization column
-export function replaceSummaryIdColumn(fields: Field[], mainColumn: string): Field[] {
+export function replaceSummaryIdColumn(fields: Field[], metricField: Record<string,string>): Field[] {
   return fields.map(f => {
+    const groupBy = typeof f.group_by === 'string' ? [f.group_by] : f.group_by;
     const idField = f.columns.includes('id');
     if (idField) {
-      const newFields = [...f.columns.filter(c => c !== 'id'), mainColumn];
-      return { ...f, columns: newFields };
+      // Replace 'id' in summary field columns with the main visualization column
+      // @TODO: Falling back to Posto should not happen
+      const filedNameToReplace = Object.keys(metricField).find(value => value !=='id') || 'Posto';
+      const newFields = [...f.columns.filter(c => c !== 'id'), filedNameToReplace];
+      return { ...f, columns: newFields, group_by: groupBy };
     }
-    return f;
+    return groupBy !== f.group_by ? { ...f, group_by: groupBy } : f;
   });
 }
 
@@ -273,15 +298,14 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
   // whwen visuaslization column is empty or null
   const mainColumn = (!apiModel.visualization_column || apiModel.visualization_column === '')? DEFAULT_COL: apiModel.visualization_column;
   const mainField = apiModel.filter_fields.find(f => f.column === mainColumn);
-  const filedNameToReplace = apiModel.popup_fields[1].column;
 
   //@NOTE: ID column should be replaced to something else to make summary work
-  const summaryFields = replaceSummaryIdColumn(apiModel.summary_fields, filedNameToReplace);
+  const summaryFields = replaceSummaryIdColumn(apiModel.summary_fields, apiModel.metric_field_types);
 
   const main: Main = {
     id: slugify(mainColumn) + 'main-ids',
     column: mainColumn,
-    label: mainField?.label || mainColumn,
+    label: mainField?.label || makeLabel(mainColumn),
     description: mainField?.description,
     options: [], // Options fetched separately
   };

@@ -7,20 +7,22 @@ export interface NumericGroupStats {
   sum: number | null;
 }
 
+export type StringGroupStats = { count: number; values: Record<string, number> };
+
 export interface BatchSummaryNumeric {
   type: "numeric";
   count: number;
   min: number | null;
   max: number | null;
   sum: number | null;
-  grouped?: Record<string, NumericGroupStats>;
+  grouped?: Record<string, NumericGroupStats | Record<string, NumericGroupStats>>;
 }
 
 export interface BatchSummaryString {
   type: "string";
   count: number;
   values: Record<string, number>;
-  grouped?: Record<string, { count: number; values: Record<string, number> }>;
+  grouped?: Record<string, StringGroupStats | Record<string, StringGroupStats>>;
 }
 
 export type BatchFieldSummary = BatchSummaryNumeric | BatchSummaryString;
@@ -38,6 +40,7 @@ export interface SummaryItem {
   key: string;
   label: string;
   value: number | string;
+  [x: string]: string | number;
 }
 
 export interface FlatRow {
@@ -45,6 +48,7 @@ export interface FlatRow {
   label: string;
   key: string;
   description?: string;
+  category?: string;
   unit?: string;
   value: number | string;
 }
@@ -53,24 +57,55 @@ export interface GroupRow {
   type: "group";
   label: string;
   description?: string;
+  category?: string;
   unit?: string;
   value: SummaryItem[];
 }
 
 export interface ChartRow {
   type: "chart";
-  chartType: "bar" | "line";
+  chartType: "bar" | "donut" | "stacked";
   label: string;
   description?: string;
+  category?: string;
   unit?: string;
   value: SummaryItem[];
+  average?: number;
+  colorMap?: Record<string, string>;
 }
 
 export interface ErrorRow {
   type: "error";
   label: string;
   key: string;
+  category?: string;
 }
 
-export type SummaryRow = FlatRow | GroupRow | ChartRow | ErrorRow;
+export interface NestedGroupData {
+  key: string;
+  label: string;
+  total: number;
+  items: SummaryItem[];
+}
+
+export interface NestedGroupRow {
+  type: "nested-group";
+  label: string;
+  description?: string;
+  category?: string;
+  unit?: string;
+  value: NestedGroupData[];
+}
+
+export interface NestedChartRow {
+  type: "nested-chart";
+  chartType: "pie";
+  label: string;
+  description?: string;
+  category?: string;
+  unit?: string;
+  value: NestedGroupData[];
+}
+
+export type SummaryRow = FlatRow | GroupRow | ChartRow | ErrorRow | NestedGroupRow | NestedChartRow;
 export type SummaryData = SummaryRow[];
