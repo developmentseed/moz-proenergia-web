@@ -98,7 +98,7 @@ function ChartValueRows({ row }: { row: ChartRow }) {
       <Table.Row bg="bg.muted" h="30px" mt={1}>
         <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
           <Box display="flex" alignItems="center" gap={1}>
-            <Text textStyle="tableAttr">
+            <Text textStyle="tableAttr" fontWeight="bold">
               {row.label}
               <Text as="span" fontWeight="normal">
                 {" "}{row.unit && `(${row.unit})`}
@@ -172,7 +172,7 @@ function GroupRowView({ row }: { row: GroupRow }) {
       <Table.Row key={row.label + '-group-row'} bg="bg.muted" h="30px" mt={1}>
         <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
           <Box display="flex" alignItems="center" gap={1}>
-            <Text textStyle="tableAttr">
+            <Text textStyle="tableAttr" fontWeight="bold">
               {" "}
               {row.label}
               <Text as="span" fontWeight="normal">
@@ -211,7 +211,7 @@ function NestedGroupRowView({ row }: { row: NestedGroupRow }) {
       <Table.Row key={row.label} bg="bg.muted" height="30px" mt={1}>
         <Table.Cell colSpan={2} fontWeight="bold">
           <Box display="flex" alignItems="center" gap={1}>
-            <Text textStyle="tableAttr">
+            <Text textStyle="tableAttr" fontWeight="bold">
               {row.label}
               <Text as="span" fontWeight="normal">
                 {" "}
@@ -264,7 +264,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
   const groups = data ? groupByCategory(data) : [];
 
   return (
-    <Box maxHeight={maxHeight} width="100%" overflowY="auto" p={4}>
+    <Box maxHeight={maxHeight} width="100%">
       {isLoading && (
         <Box display="flex" alignItems="center" justifyContent="center" py={8}>
           <Spinner size="xl" />
@@ -299,11 +299,12 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
                 multiple
                 defaultValue={categorized.length > 0 ? [categorized[0].category] : []}
                 size="sm"
-                variant="plain"
+                variant="outline"
                 lazyMount={true}
               >
                 {categorized.map((group) => (
-                  <Accordion.Item key={group.category} value={group.category}>
+                  <Accordion.Item key={group.category} value={group.category} mx={-4}
+                      px={4}>
                     <Accordion.ItemTrigger
                       display="flex"
                       gap="2"
