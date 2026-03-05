@@ -108,7 +108,7 @@ function MethodTotalRow({ item }: { item?: SummaryItem }) {
   return (
     <Table.Row bg="panelBg">
       <Table.Cell {...tableCellStyleProps}>
-        <Text textStyle="tableAttr" fontWeight="semibold">{item.label}</Text>
+        <Text textStyle="tableAttr"><Text as="span" fontWeight="semibold">Total</Text> ({item.label})</Text>
       </Table.Cell>
       <Table.Cell {...tableCellStyleProps}>
         <Text textStyle="tableValue" textAlign="right" fontFamily="mono" fontWeight="semibold">
