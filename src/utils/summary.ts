@@ -1,6 +1,6 @@
 import { type Field } from "@/app/types";
 import { makeLabel } from "./data-transformation";
-import { type SummaryItem, type GroupRow, type ChartRow, type NestedGroupRow, type NestedChartRow, type NestedGroupData, type BatchSummariesResponse, type SummaryRow, type NumericGroupStats } from "@/app/types/summary";
+import { type SummaryItem, type GroupRow, type ChartRow, type HighlightRow, type NestedGroupRow, type NestedChartRow, type NestedGroupData, type BatchSummariesResponse, type SummaryRow, type NumericGroupStats } from "@/app/types/summary";
 const DEFAULT_METHOD = "sum";
 
 function makeGroupOrChartRow(
@@ -9,7 +9,17 @@ function makeGroupOrChartRow(
   mainColorMap?: Record<string, string>,
   mainColumn?: string,
   methodTotal?: SummaryItem,
-): GroupRow | ChartRow {
+): GroupRow | ChartRow | HighlightRow {
+  if (field.chart === "highlight") {
+    return {
+      type: "highlight",
+      label: field.label,
+      description: field.description,
+      unit: field.unit,
+      value: items,
+      methodTotal,
+    };
+  }
   if (field.chart) {
     const numericValues = items
       .map((item) => item.value)
