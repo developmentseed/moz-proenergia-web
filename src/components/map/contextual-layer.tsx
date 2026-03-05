@@ -1,14 +1,17 @@
 import { Source, Layer as MapLayer } from 'react-map-gl/maplibre';
+import { type Layer } from '@/app/types';
 import { useContextualLayers } from "@/utils/context/contextual-layers";
 import { deriveSource, deriveLayerStyles } from "@/utils/data-transformation";
 
 export const ContextualLayer = () => {
-  const { layers, activeLayers } = useContextualLayers();
+  const { layers, activeLayers, layerOpacities } = useContextualLayers();
   const contextualLayers = layers.filter(l => activeLayers.includes(l.id));
+
   return <>
-    {contextualLayers.map(layer => {
+    {contextualLayers.map((layer:Layer) => {
     const source = deriveSource(layer.id, layer.filePath);
-    const { circleLayer, lineLayer, polygonLayer } = deriveLayerStyles(layer.id, layer.color!);
+    const opacity = (layerOpacities[layer.id] ?? 100) / 100;
+    const { circleLayer, lineLayer, polygonLayer } = deriveLayerStyles(layer.id, layer.color!, opacity);
     return <Source key={layer.id} {...source} >
       <MapLayer {...circleLayer} />
       <MapLayer {...lineLayer} />

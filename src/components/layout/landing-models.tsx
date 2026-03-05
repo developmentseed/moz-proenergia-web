@@ -43,7 +43,7 @@ export default function ModelCards() {
           )}
           drawerContent={
             <Box>
-              {selectedModel.description || "Description for Model"}
+              <Text pb={2}>{selectedModel.description || "Description for Model"}</Text>
               <DrawerSummaryTable modelId={selectedModel.id} />
             </Box>
           }

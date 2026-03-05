@@ -95,7 +95,7 @@ export function useSummaryQuery({
     filters && filterDefs ? buildFilterQueryParam(filters, filterDefs) : "";
   const mainColorMap = main?.options
     ? Object.fromEntries(
-        main.options.filter((o) => o.color).map((o) => [o.value, o.color!]),
+        main.options.filter((o) => o.color).map((o) => [o.id, o.color!]),
       )
     : undefined;
 

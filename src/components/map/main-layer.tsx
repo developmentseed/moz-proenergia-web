@@ -22,6 +22,7 @@ interface MainLayerProps {
   main: Main;
   mapFilter?: FilterSpecification | null;
   clusterId: string | null;
+  opacity?: number; // 0–1
 }
 
 //@TODO different cartography per model
@@ -30,6 +31,7 @@ export const MainLayer = ({
   main,
   mapFilter,
   clusterId,
+  opacity = 1,
 }: MainLayerProps) => {
   const { current: map } = useMap();
   const [hoveredCluster, setHoveredCluster] = useState<string | null>(null);
@@ -77,10 +79,11 @@ export const MainLayer = ({
       type: 'fill' as const,
       paint: {
         'fill-color': buildMatchExpression(main, '#66ff'),
+        'fill-opacity': opacity,
       },
       filter: withGeometryFilter('Polygon', mapFilter),
     }),
-    [main, scenario.layer, mapFilter],
+    [main, scenario.layer, mapFilter, opacity],
   );
 
   const mainLineLayer: LayerSpecification = useMemo(
@@ -92,11 +95,11 @@ export const MainLayer = ({
       paint: {
         'line-color': buildMatchExpression(main, '#66ff'),
         'line-width': ['interpolate', ['linear'], ['zoom'], 5, 0.5, 10, 1.5, 15, 3],
-        'line-opacity': 0.8,
+        'line-opacity': opacity
       },
       filter: withGeometryFilter('LineString', mapFilter),
     }),
-    [main, lineLayerId, scenario.layer, mapFilter],
+    [main, lineLayerId, scenario.layer, mapFilter, opacity],
   );
 
   const mainCircleLayer: LayerSpecification = useMemo(
@@ -108,13 +111,13 @@ export const MainLayer = ({
       paint: {
         'circle-color': buildMatchExpression(main, '#66ff'),
         'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 2, 10, 5, 15, 6],
-        'circle-opacity': 0.8,
+        'circle-opacity': opacity,
         'circle-stroke-color': '#fff',
         'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 5, 0, 10, 0.5, 15, 1],
       },
       filter: withGeometryFilter('Point', mapFilter),
     }),
-    [main, circleLayerId, scenario.layer, mapFilter],
+    [main, circleLayerId, scenario.layer, mapFilter, opacity],
   );
 
   // --- Background layers (muted, so users see which features are filtered out) ---
@@ -125,10 +128,10 @@ export const MainLayer = ({
       'source-layer': scenario.layer['source-layer'],
       type: 'fill' as const,
       minzoom: mapConfig.polygonMinZoom,
-      paint: { 'fill-color': '#CCCCCC' },
+      paint: { 'fill-color': '#CCCCCC', 'fill-opacity': opacity },
       filter: ['==', ['geometry-type'], 'Polygon'] as FilterSpecification,
     }),
-    [main.id, scenario.layer],
+    [main.id, scenario.layer, opacity],
   );
 
   const bgLineLayer: LayerSpecification = useMemo(
@@ -138,10 +141,10 @@ export const MainLayer = ({
       'source-layer': scenario.layer['source-layer'],
       type: 'line' as const,
       minzoom: mapConfig.polygonMinZoom,
-      paint: { 'line-color': '#CCCCCC', 'line-width': 1, 'line-opacity': 0.5 },
+      paint: { 'line-color': '#CCCCCC', 'line-width': 1, 'line-opacity': opacity },
       filter: ['==', ['geometry-type'], 'LineString'] as FilterSpecification,
     }),
-    [main.id, scenario.layer],
+    [main.id, scenario.layer, opacity],
   );
 
   const bgCircleLayer: LayerSpecification = useMemo(
@@ -154,11 +157,11 @@ export const MainLayer = ({
       paint: {
         'circle-color': '#CCCCCC',
         'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 2, 10, 5, 15, 6],
-        'circle-opacity': 0.5,
+        'circle-opacity': opacity,
       },
       filter: ['==', ['geometry-type'], 'Point'] as FilterSpecification,
     }),
-    [main.id, scenario.layer],
+    [main.id, scenario.layer, opacity],
   );
 
   // --- Selected cluster highlight layers ---

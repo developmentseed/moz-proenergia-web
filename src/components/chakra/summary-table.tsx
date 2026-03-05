@@ -14,12 +14,15 @@ import { SummaryStackedBarChart } from "@/components/chakra/chart/stacked";
 import {
   type SummaryData,
   type SummaryRow,
+  type SummaryItem,
   type ErrorRow,
   type FlatRow,
   type ChartRow,
   type GroupRow,
   type NestedGroupRow,
+  type HighlightRow,
 } from "@/app/types/summary";
+import { Highlight } from "@/components/chakra/highlight";
 
 const formatValue = (value: string | number, column?: string) => {
   //@ts-expect-error @TODO
@@ -100,6 +103,22 @@ function FlatRowView({ row }: { row: FlatRow }) {
   );
 }
 
+function MethodTotalRow({ item }: { item?: SummaryItem }) {
+  if (!item) return null;
+  return (
+    <Table.Row bg="panelBg">
+      <Table.Cell {...tableCellStyleProps}>
+        <Text textStyle="tableAttr" fontWeight="semibold">{item.label}</Text>
+      </Table.Cell>
+      <Table.Cell {...tableCellStyleProps}>
+        <Text textStyle="tableValue" textAlign="right" fontFamily="mono" fontWeight="semibold">
+          {formatValue(item.value, item.key)}
+        </Text>
+      </Table.Cell>
+    </Table.Row>
+  );
+}
+
 function ChartValueRows({ row }: { row: ChartRow }) {
   return (
     <>
@@ -130,6 +149,7 @@ function ChartValueRows({ row }: { row: ChartRow }) {
           </Table.Cell>
         </Table.Row>
       ))}
+      <MethodTotalRow item={row.methodTotal} />
     </>
   );
 }
@@ -257,6 +277,7 @@ function GroupRowView({ row }: { row: GroupRow }) {
           </Table.Cell>
         </Table.Row>
       ))}
+      <MethodTotalRow item={row.methodTotal} />
     </>
   );
 }
@@ -301,6 +322,38 @@ function NestedGroupRowView({ row }: { row: NestedGroupRow }) {
           </Table.Row>
         )),
       ])}
+      <MethodTotalRow item={row.methodTotal} />
+    </>
+  );
+}
+
+function HighlightRowView({ row }: { row: HighlightRow }) {
+  const items = row.value.map((item) => ({
+    id: String(formatValue(item.value, item.key)),
+    label: item.label,
+  }));
+  return (
+    <>
+      <Table.Row h="30px">
+        <Table.Cell colSpan={2} p={0.5} border="none">
+          <Box display="flex" alignItems="center" gap={1}>
+            <Text textStyle="tableAttr" fontWeight="bold">
+              {row.label}
+              <Text as="span" fontWeight="normal">
+                {" "}{row.unit && `(${row.unit})`}
+              </Text>
+            </Text>
+            {row.description && row.label !== row.description && (
+              <InfoTip content={row.description} />
+            )}
+          </Box>
+        </Table.Cell>
+      </Table.Row>
+      <Table.Row bg="panelBg">
+        <Table.Cell colSpan={2} px={0}>
+          <Highlight items={items} />
+        </Table.Cell>
+      </Table.Row>
     </>
   );
 }
@@ -312,13 +365,13 @@ function SummaryRowView({ row }: { row: SummaryRow }) {
     case "chart": return <ChartRowView row={row} />;
     case "group": return <GroupRowView row={row} />;
     case "nested-group": return <NestedGroupRowView row={row} />;
+    case "highlight": return <HighlightRowView row={row} />;
     default: return null;
   }
 }
 
 export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible = true }: SummaryTableProps) => {
   const groups = data ? groupByCategory(data) : [];
-
   return (
     <Box maxHeight={maxHeight} width="100%">
       {isLoading && (

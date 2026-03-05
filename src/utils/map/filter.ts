@@ -44,7 +44,7 @@ export function buildMatchExpression(main: Main, fallback: string): ExpressionSp
     'match',
     main.column === DEFAULT_COL ? ['literal', DEFAULT_COL] : ['get', main.column],
     // Color should not be empty. Giving neon green color to bring awarness to user
-    ...main.options.flatMap((val) => val.color? [val.value, val.color]: [val.value, "#0f0"]),
+    ...main.options.flatMap((val) => val.color? [val.id, val.color]: [val.id, "#0f0"]),
     '#CCCCCC',
   ] as ExpressionSpecification;
 }
