@@ -40,6 +40,14 @@ interface SummaryTableProps {
   collapsible?: boolean;
 }
 
+function sortChartFirst(rows: SummaryRow[]): SummaryRow[] {
+  return [...rows].sort((a, b) => {
+    const aIsChart = a.type === "chart" ? 0 : 1;
+    const bIsChart = b.type === "chart" ? 0 : 1;
+    return aIsChart - bIsChart;
+  });
+}
+
 function groupByCategory(rows: SummaryRow[]): { category: string | null; rows: SummaryRow[] }[] {
   const map = new Map<string | null, SummaryRow[]>();
   for (const row of rows) {
@@ -130,36 +138,36 @@ function ChartRowView({ row }: { row: ChartRow }) {
   if (row.chartType === "bar") {
     return (
       <>
-        <ChartValueRows row={row} />
         <Table.Row>
           <Table.Cell colSpan={2}>
             <SummaryBarChart data={row.value} average={row.average} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
+        <ChartValueRows row={row} />
       </>
     );
   }
   if (row.chartType === "donut") {
     return (
       <>
-        <ChartValueRows row={row} />
         <Table.Row>
           <Table.Cell colSpan={2}>
             <SummaryDonutChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
+        <ChartValueRows row={row} />
       </>
     );
   }
   if (row.chartType === "stacked") {
     return (
       <>
-        <ChartValueRows row={row} />
         <Table.Row>
           <Table.Cell colSpan={2} px={2} py={2}>
             <SummaryStackedBarChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
+        <ChartValueRows row={row} />
       </>
     );
   }
@@ -287,7 +295,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
             {uncategorized && (
               <Table.Root size="sm">
                 <Table.Body>
-                  {uncategorized.rows.map((row) => (
+                  {sortChartFirst(uncategorized.rows).map((row) => (
                     <SummaryRowView key={row.type === "error" || row.type === "flat" ? row.key + 'row' : row.label} row={row} />
                   ))}
                 </Table.Body>
@@ -320,7 +328,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
                     <Accordion.ItemContent>
                       <Table.Root size="sm">
                         <Table.Body>
-                          {group.rows.map((row) => (
+                          {sortChartFirst(group.rows).map((row) => (
                             <SummaryRowView key={row.type === "error" || row.type === "flat" ? row.key + 'row' : row.label} row={row} />
                           ))}
                         </Table.Body>
@@ -337,7 +345,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
       {!isLoading && !isError && data && !collapsible && (
         <Table.Root size="sm">
           <Table.Body>
-            {data.map((row) => (
+            {sortChartFirst(data).map((row) => (
               <SummaryRowView key={row.type === "error" || row.type === "flat" ? row.key : row.label} row={row} />
             ))}
           </Table.Body>
