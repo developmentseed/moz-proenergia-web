@@ -45,8 +45,8 @@ interface SummaryTableProps {
 
 function sortChartFirst(rows: SummaryRow[]): SummaryRow[] {
   return [...rows].sort((a, b) => {
-    const aIsChart = a.type === "chart" ? 0 : 1;
-    const bIsChart = b.type === "chart" ? 0 : 1;
+    const aIsChart = a.type === "chart" || a.type === "highlight" ? 0 : 1;
+    const bIsChart = b.type === "chart" || b.type === "highlight" ? 0 : 1;
     return aIsChart - bIsChart;
   });
 }
@@ -122,21 +122,6 @@ function MethodTotalRow({ item }: { item?: SummaryItem }) {
 function ChartValueRows({ row }: { row: ChartRow }) {
   return (
     <>
-      {/* <Table.Row bg="bg.muted" h="30px" mt={1}>
-        <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
-          <Box display="flex" alignItems="center" gap={1}>
-            <Text textStyle="tableAttr" fontWeight="bold">
-              {row.label}
-              <Text as="span" fontWeight="normal">
-                {" "}{row.unit && `(${row.unit})`}
-              </Text>
-            </Text>
-            {row.description && row.label !== row.description && (
-              <InfoTip content={row.description} />
-            )}
-          </Box>
-        </Table.Cell>
-      </Table.Row> */}
       {row.value.map((item) => (
         <Table.Row key={item.key} bg="panelBg">
           <Table.Cell {...tableCellStyleProps}>
@@ -175,7 +160,6 @@ function ChartRowView({ row }: { row: ChartRow }) {
         </Table.Row>
         <Table.Row>
           <Table.Cell colSpan={2}>
-          {/* <Text fontSize="xs" fontWeight="bold" pb={2}>{row.label}</Text> */}
             <SummaryBarChart data={row.value} average={row.average} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
@@ -203,7 +187,6 @@ function ChartRowView({ row }: { row: ChartRow }) {
         </Table.Row>
         <Table.Row>
           <Table.Cell colSpan={2}>
-          {/* <Text fontSize="xs" fontWeight="bold" pb={2}>{row.label}</Text> */}
             <SummaryDonutChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
@@ -231,7 +214,6 @@ function ChartRowView({ row }: { row: ChartRow }) {
         </Table.Row>
         <Table.Row>
           <Table.Cell colSpan={2} px={2} py={2}>
-          {/* <Text fontSize="xs" fontWeight="bold" pb={2}>{row.label}</Text> */}
             <SummaryStackedBarChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
