@@ -4,7 +4,28 @@ import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, Field, MapItemUn
 import { api, MEDIA_URL_PREFIX, DEFAULT_COL } from '@/utils/api';
 import { sortFilterOptions } from '@/config/filters';
 import mapConfig from '@/config/map.json';
-const ADMIN_COLUMNS = ['Admin_1', 'Admin_2', 'Admin_3', 'Admin_4', 'Region', 'Province', 'District', 'Posto', 'Postos', 'Localidade'];
+const ADMIN_COLUMNS = [
+  "Admin_1",
+  "Admin_2",
+  "Admin_3",
+  "Admin_4",
+  "Region",
+  "Regions",
+  "Região",
+  "Regiões",
+  "Province",
+  "Provinces",
+  "Província",
+  "Províncias",
+  "District",
+  "Districts",
+  "Distrito",
+  "Distritos",
+  "Posto",
+  "Postos",
+  "Localidade",
+  "Localidades",
+];
 
 // ----- API Response Types -----
 export interface ApiFilterField {
