@@ -10,6 +10,7 @@ import { InfoTip } from "./toggle-tip";
 import { formatDisplayNumber } from "@/utils/number";
 import { SummaryBarChart } from "@/components/chakra/chart/bar";
 import { SummaryDonutChart } from "@/components/chakra/chart/pie";
+import { SummaryStackedBarChart } from "@/components/chakra/chart/stacked";
 import {
   type SummaryData,
   type SummaryRow,
@@ -150,7 +151,19 @@ function ChartRowView({ row }: { row: ChartRow }) {
       </>
     );
   }
-  return <Text> Only Bar Chart is available.</Text>;
+  if (row.chartType === "stacked") {
+    return (
+      <>
+        <ChartValueRows row={row} />
+        <Table.Row>
+          <Table.Cell colSpan={2} px={2} py={2}>
+            <SummaryStackedBarChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
+          </Table.Cell>
+        </Table.Row>
+      </>
+    );
+  }
+  return <Text> Only Bar/Stacked/Donut Chart is available.</Text>;
 }
 
 function GroupRowView({ row }: { row: GroupRow }) {
@@ -284,9 +297,10 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
               <Accordion.Root
                 collapsible
                 multiple
-                defaultValue={categorized.map((g) => g.category)}
+                defaultValue={categorized.length > 0 ? [categorized[0].category] : []}
                 size="sm"
                 variant="plain"
+                lazyMount={true}
               >
                 {categorized.map((group) => (
                   <Accordion.Item key={group.category} value={group.category}>

@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import MainMap from "@/components/map";
-import { LuPanelRightOpen, LuPanelLeftOpen } from "react-icons/lu";
+import { LuPanelLeftOpen, LuPanelLeftClose } from "react-icons/lu";
 import { useAuth } from "@/utils/context/auth";
 import {
   fetchModelMetadata,
@@ -28,6 +28,7 @@ import {
 import { type ModelMetadata } from "@/app/types";
 import { DEFAULT_COL } from "@/utils/api";
 import MainPanel from "./main-panel";
+import { Tooltip } from "./tooltip";
 
 const ControlPanelWidth = 350;
 const AnimationTime = "0.3s";
@@ -122,13 +123,14 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     );
   }
 
-  if (!modelData) {
+  if (!modelData || !layers) {
     return (
       <Flex id="container" width="full" height="full" position="relative">
         <Skeleton width={ControlPanelWidth} height="full" />
         <Box flex={1} height="full" p={2}>
           <Skeleton width="full" height="full" />
         </Box>
+        <Skeleton width={ControlPanelWidth} height="full" />
       </Flex>
     );
   }
@@ -140,33 +142,34 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
           <Flex id="container" width="full" height="full" position="relative">
             <MainPanel isOpen={isOpen} />
             {/* Toggle Button Tab */}
-            <Box
-              position="absolute"
-              left={isOpen ? `calc(${ControlPanelWidth}px - 1px)` : 0}
-              top="8"
-              transform="translateY(-50%)"
-              zIndex={1000}
-              transition={`left ${AnimationTime} ease`}
-              border="1px solid"
-              borderColor="panelBorder"
-              borderLeft="none"
-            >
-              <IconButton
-                aria-label={isOpen ? "Collapse panel" : "Expand panel"}
-                onClick={() => setIsOpen(!isOpen)}
-                variant="solid"
-                size="sm"
-                bg="panelBg"
-                borderLeft="none"
-                borderRadius={0}
+            <Tooltip content={isOpen ? "Collapse control panel" : "Expand control panel"}>
+              <Box
+                position="absolute"
+                left={isOpen ? `calc(${ControlPanelWidth}px - 1px)` : 0}
+                top="8"
+                transform="translateY(-50%)"
+                zIndex={1000}
+                transition={`left ${AnimationTime} ease`}
               >
-                {isOpen ? (
-                  <LuPanelRightOpen stroke="gray" />
-                ) : (
-                  <LuPanelLeftOpen stroke="gray" />
-                )}
-              </IconButton>
-            </Box>
+                <IconButton
+                  aria-label={isOpen ? "Collapse control panel" : "Expand control panel"}
+                  onClick={() => setIsOpen(!isOpen)}
+                  variant="solid"
+                  size="sm"
+                  bg="panelBg"
+                  border="1px solid"
+                  borderColor="panelBorder"
+                  borderLeft="none"
+                  borderLeftRadius={0}
+                >
+                  {isOpen ? (
+                    <LuPanelLeftClose stroke="gray" />
+                  ) : (
+                    <LuPanelLeftOpen stroke="gray" />
+                  )}
+                </IconButton>
+              </Box>
+            </Tooltip>
 
             <Box
               transition={`width ${AnimationTime} ease`}

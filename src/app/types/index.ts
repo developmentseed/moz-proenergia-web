@@ -12,7 +12,7 @@ export interface Field {
   group_by?: string[];
   method?: 'count' | 'min' | 'max' | 'sum' | 'average';
   unit?: string;
-  chart?: 'bar' | 'line' | 'donut';
+  chart?: 'bar' | 'donut' | 'stacked';
   colors?: Record<string, string>;
 }
 export interface MapItemUnit extends ItemUnit {

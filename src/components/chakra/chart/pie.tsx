@@ -4,20 +4,7 @@ import { Chart, useChart } from "@chakra-ui/charts";
 import { Label, Pie, PieChart, Sector, Tooltip } from "recharts";
 import { type SummaryItem } from "@/app/types/summary";
 import { formatDisplayNumber } from "@/utils/number";
-
-// @TODO: consolidate fallback colors to chart config
-const DEFAULT_COLORS = [
-  "blue.solid",
-  "orange.solid",
-  "pink.solid",
-  "green.solid",
-  "purple.solid",
-  "cyan.solid",
-  "yellow.solid",
-  "red.solid",
-  "teal.solid",
-  "gray.solid",
-];
+import { DEFAULT_COLORS } from "./config";
 
 interface SummaryDonutChartProps {
   data: SummaryItem[];
