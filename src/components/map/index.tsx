@@ -123,7 +123,7 @@ const MainMap = ({ main }: MainMapProps) => {
             onBasemapChange={setCurrentBasemapId}
         />
         </Map>
-        <Legend items={main.options} />
+        <Legend items={main.options} main={main} onMainOpacityChange={setMainLayerOpacity} />
       </Box>
 
       <PanelToggleButton
