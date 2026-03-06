@@ -22,6 +22,8 @@ export const ChakraCombobox = ({ title, items, value, onChange }: ChakraCombobox
 
   const { collection, filter } = useListCollection({
     initialItems: items,
+    itemToValue: (item) => item.id,
+    itemToString: (item) => item.label,
     filter: contains,
   });
 
@@ -39,7 +41,7 @@ export const ChakraCombobox = ({ title, items, value, onChange }: ChakraCombobox
       <Combobox.Label textStyle='allCapLabel'>{title}</Combobox.Label>
       <Combobox.Control>
         {value && value.length > 0 && (
-          <Tag.Root size="md" ml={1} position={'absolute'} top={1} p ={1.5} bg={"navBg"}>
+          <Tag.Root size="sm" ml={1} position={'absolute'} top={1} p ={1.5} bg={"navBg"}>
             <Tag.Label>{value.length} selected</Tag.Label>
           </Tag.Root>
         )}
