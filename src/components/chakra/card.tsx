@@ -49,7 +49,7 @@ export const ModelCard = ({
       _hover={{ bg: "yellow.subtle" }}
     >
       <Card.Header>
-        <Heading size="md"> {title} </Heading>
+        <Heading size="lg">{title}</Heading>
       </Card.Header>
       <Card.Body color="fg.muted">{truncatedClean(description, 250)}...</Card.Body>
     </Card.Root>

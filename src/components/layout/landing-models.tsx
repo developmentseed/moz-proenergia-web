@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from "@chakra-ui/react";
+import { Button, Heading } from "@chakra-ui/react";
 import { Card } from '@/components/chakra';
 import NextLink from "next/link";
 import { ChakraDrawer } from '@/components/chakra/drawer';
@@ -12,6 +12,7 @@ import { slugify } from '@/utils/data-transformation';
 import { fetchModels } from '@/utils/data-transformation';
 import { SimpleGrid, Text, Box } from '@chakra-ui/react';
 import { DrawerSummaryTable } from './drawer-summary-table';
+import { LuArrowRight } from 'react-icons/lu';
 
 export default function ModelCards() {
   const [selectedModel, setSelectedModel] = useState<{ id: string; name: string; description: string; slug: string } | null>(null);
@@ -23,7 +24,8 @@ export default function ModelCards() {
 
   return (
     <>
-      <SimpleGrid columns={2} py={6} gap={6}>
+      <Heading size="3xl">Models</Heading>
+      <SimpleGrid columns={2} py={6} gap={6} minChildWidth="md">
         {models?.map(e => (
           <div key={e.id} onClick={() => setSelectedModel({ id: String(e.id), name: e.name, description: e.description, slug: slugify(e.name) })} style={{ cursor: 'pointer' }}>
             <Card title={e.name} description={e.description} />
@@ -46,9 +48,10 @@ export default function ModelCards() {
             </Box>
           }
           drawerFooterContent={
-            <Button asChild>
+            <Button asChild variant="solid" colorPalette="yellow">
               <NextLink href={`/model/${selectedModel.slug}`}>
-                Go to Explorer
+                Explore Model
+                <LuArrowRight />
               </NextLink>
             </Button>
           }
