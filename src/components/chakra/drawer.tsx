@@ -7,7 +7,7 @@ interface ChakraDrawerProps {
   title: string;
   open: boolean;
   onOpenChange: (details: any) => void;
-  triggerContent: ReactNode;
+  triggerContent?: ReactNode;
   drawerContent?: ReactNode;
   drawerFooterContent?: ReactNode;
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "full";

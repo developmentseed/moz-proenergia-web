@@ -47,6 +47,7 @@ export interface ColorCoding {
 export interface ApiModelResponse {
   id: number;
   name: string;
+  description: string;
   filter_fields: ApiFilterField[];
   popup_fields: ApiFilterField[];
   summary_fields: Field[];

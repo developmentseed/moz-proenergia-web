@@ -23,7 +23,7 @@ export default function ModelCards() {
 
   return (
     <>
-      <SimpleGrid columns={3} py={6} gap={6}>
+      <SimpleGrid columns={2} py={6} gap={6}>
         {models?.map(e => (
           <div key={e.id} onClick={() => setSelectedModel({ id: String(e.id), name: e.name, description: e.description, slug: slugify(e.name) })} style={{ cursor: 'pointer' }}>
             <Card title={e.name} description={e.description} />
@@ -38,9 +38,7 @@ export default function ModelCards() {
           onOpenChange={(details) => {
             if (!details.open) setSelectedModel(null);
           }}
-          triggerContent= {selectedModel.description && (
-            <Text color="fg.muted">{selectedModel.description}</Text>
-          )}
+          triggerContent={null}
           drawerContent={
             <Box>
               <Text pb={2}>{selectedModel.description || "Description for Model"}</Text>
