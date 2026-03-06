@@ -23,10 +23,8 @@ import {
   transformVectorsToLayers,
   transformFilterField,
   transformMainOptions,
-  transformOptions
 } from "@/utils/data-transformation";
 import { type ModelMetadata } from "@/app/types";
-import { DEFAULT_COL } from "@/utils/api";
 import MainPanel from "./main-panel";
 import { Tooltip } from "./tooltip";
 
@@ -57,12 +55,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const defaultScenarioId = modelCore?.scenarios[0]?.id;
 
   // Filter options (single batch fetch, cached per scenario)
-  const columns = (modelCore?.filterFields ?? []).map((f) => f.column);
-  const mainCol = modelCore?.main.column;
-  if (mainCol && mainCol !== DEFAULT_COL && !columns.includes(mainCol)) {
-    columns.push(mainCol);
-  }
-  const filterColumns = columns;
+  const filterColumns = (modelCore?.filterFields ?? []).map((f) => f.column);
 
   const { data: allFilterOptions } = useQuery({
     queryKey: ["filterOptions", modelCore?.id, filterColumns],
@@ -78,11 +71,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
       transformFilterField(field, allFilterOptions[field.column] ?? null),
     );
 
-    // allFilterOptions should have model core's main at this point.
-    const rawMainOptions = transformOptions(allFilterOptions[modelCore.main.column] ?? null);
-
     const resolvedMainOptions = transformMainOptions(
-      rawMainOptions,
       modelCore.colorCoding,
     );
 
