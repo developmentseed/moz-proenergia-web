@@ -360,32 +360,27 @@ export function transformFilterField(
 
 // Transform main options using color_coding from backend
 export function transformMainOptions(
-  rawOptions: MapItemUnit[] | null,
   colorCoding: ColorCoding[]
 ): MapItemUnit[] {
-
-  if (!Array.isArray(rawOptions)) return [];
-
   // Find default color (value: "any")
   const defaultColor = colorCoding.find(c => c.value === DEFAULT_COL)?.color;
+
+  const options = colorCoding
+    .filter(c => c.value && c.value !== DEFAULT_COL && c.color)
+    .map(c => ({
+      id: c.value,
+      label: makeLabel(c.value),
+      color: c.color,
+    }));
+
   // When options are missing (ex. no column to visualize)
-  if (rawOptions.length === 0) {
+  if (options.length === 0) {
     return [{
       id: DEFAULT_COL,
       label: DEFAULT_COL,
       color: defaultColor,
     }];
   }
-  // Build color lookup map
-  const colorLookup = new Map(
-    colorCoding
-      .filter(c => c.value && c.color)
-      .map(c => [c.value, c.color])
-  );
 
-  return rawOptions.map(opt => ({
-    id: String(opt.id),
-    label: opt.label,
-    color: colorLookup.get(String(opt.id)) ?? defaultColor,
-  }));
+  return options;
 }
