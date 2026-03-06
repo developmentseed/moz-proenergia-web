@@ -41,7 +41,7 @@ export default function ModelCards() {
           triggerContent={null}
           drawerContent={
             <Box>
-              <Text pb={2}>{selectedModel.description || "Description for Model"}</Text>
+              <Text pb={8}>{selectedModel.description || "Description for Model"}</Text>
               <DrawerSummaryTable modelId={selectedModel.id} />
             </Box>
           }
