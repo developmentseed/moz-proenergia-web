@@ -9,7 +9,7 @@ interface ShellProps {
 
 export const Shell = ({ children, breadcrumb }: ShellProps) => {
   return (
-    <Container maxWidth="5xl">
+    <Container>
       <Box pt={8} pb={8}>
         {breadcrumb && <BreadcrumbNav items={breadcrumb} />}
         {children}
