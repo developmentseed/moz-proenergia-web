@@ -30,7 +30,6 @@ main {
 
 /* Sentry Feebdack Button */
 #sentry-feedback {
-  --page-margin: 0.5rem 44vw;
-  --actor-inset: auto auto 0 auto;
+  --actor-inset: auto 44.25vw 0 44.25vw;
   --font-size: 12px;
 }
