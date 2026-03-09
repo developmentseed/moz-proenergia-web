@@ -10,19 +10,16 @@ import { SideNav } from '@/components/layout/side-nav';
 import {
   fetchModels,
   slugify,
-  fetchModelMetadata,
-  fetchVectors,
-  transformModelCore,
-  transformVectorsToLayers,
 } from '@/utils/data-transformation';
-import { type ModelGroupMetadata } from '@/app/types';
 
+export const dynamicParams = false;
 // Generate pages per model id
 export async function generateStaticParams() {
   const res = await fetchModels();
   return res.map((model) => ({
     slug: slugify(model.name),
   }));
+  //.filter((m,idx) => idx < 4);
 }
 
 export default async function ModelPage({
