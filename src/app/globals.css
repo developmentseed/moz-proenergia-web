@@ -27,3 +27,9 @@ body {
 main {
   min-height: calc(100vh - 3.5rem - 1px);
 }
+
+/* Sentry Feebdack Button */
+#sentry-feedback {
+  --actor-inset: auto 44.25vw 0 44.25vw;
+  --font-size: 12px;
+}
