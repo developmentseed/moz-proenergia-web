@@ -35,7 +35,7 @@ export const BASEMAP_OPTIONS: BasemapOption[] = [
   {
     id: "dark",
     name: "Dark",
-    styleUrl: "mapbox://styles/mapbox/dark-v11",
+    styleUrl: "/dark-basemap-style.json",
     thumbnailUrl: thumbnail("mapbox/dark-v11"),
   },
   {
