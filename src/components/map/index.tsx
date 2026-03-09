@@ -49,7 +49,8 @@ interface MainMapProps {
 }
 
 const MainMap = ({ main }: MainMapProps) => {
-  const [{ lat, lng, zoom }, setCoordinates] = useCoordinates();
+  const { coords, setCoords } = useCoordinates();
+  const { lat, lng, zoom } = coords;
   const { selected, setSelected, onClick } = useMouseEvent();
   const { isOpen, toggle, open } = useToggle(true);
 
@@ -103,7 +104,7 @@ const MainMap = ({ main }: MainMapProps) => {
           style={{ width: "100%", height: "100%" }}
           onClick={onClick}
           onMoveEnd={(e: ViewStateChangeEvent) => {
-          setCoordinates({
+          setCoords({
             lng: e.viewState.longitude,
             lat: e.viewState.latitude,
             zoom: e.viewState.zoom,
@@ -113,12 +114,12 @@ const MainMap = ({ main }: MainMapProps) => {
           transformRequest={transformRequest}
           interactiveLayerIds={zoom > 9 ? [main.id, main.id + '-line', main.id + '-circle'] : []}
       >
-        <MainLayer
-          scenario={scenario}
-          main={main}
-          mapFilter={mapFilter}
-          clusterId={selected}
-          opacity={mainLayerOpacity / 100}
+          <MainLayer
+            scenario={scenario}
+            main={main}
+            mapFilter={mapFilter}
+            clusterId={selected}
+            opacity={mainLayerOpacity / 100}
         />
           <ContextualLayer />
           <ScaleControl position="bottom-left" />

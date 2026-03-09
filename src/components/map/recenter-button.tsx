@@ -14,7 +14,8 @@ import { controlZIndex } from "./control-constant";
 
 export function CenterMapControl() {
   const { current: map } = useMap();
-  const [{ lat: viewLat, lng: viewLng, zoom: viewZoom }] = useCoordinates();
+  const { coords } = useCoordinates();
+  const { lat: viewLat, lng: viewLng, zoom: viewZoom } = coords;
 
   const resetCenter = useCallback(() => {
     if (!map) return;

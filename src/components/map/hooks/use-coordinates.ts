@@ -4,7 +4,19 @@ import { useQueryStates, parseAsFloat, throttle } from 'nuqs';
 export const DEFAULT_COORDS = [-18.76303, 36.78403];
 export const DEFAULT_ZOOM = 5;
 
-export function useCoordinates() {
+interface Coordinates {
+  lat: number;
+  lng: number;
+  zoom: number;
+}
+
+interface UseCoordinatesReturn {
+  coords: Coordinates;
+  setCoords: (coords: Coordinates) => void;
+  removeCoordinates: () => void;
+}
+
+export function useCoordinates(): UseCoordinatesReturn {
   const [coords, setOriginCoords] = useQueryStates({
     lat: parseAsFloat.withDefault(DEFAULT_COORDS[0]),
     lng: parseAsFloat.withDefault(DEFAULT_COORDS[1]),
@@ -20,10 +32,10 @@ export function useCoordinates() {
       zoom: parseFloat(zoom.toFixed(5)),
     });
   };
-  const resetCoords = () => {
+  const removeCoordinates = () => {
     setOriginCoords({
       lat: null,lng: null, zoom: null
     });
   };
-  return [coords, setCoords, resetCoords] as const;
+  return { coords, setCoords, removeCoordinates };
 }

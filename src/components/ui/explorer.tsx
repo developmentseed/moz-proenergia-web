@@ -89,11 +89,14 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
       summaryFields: modelCore.summaryFields,
     };
   }, [modelCore, allFilterOptions]);
-  const [_, _1, resetCoords] = useCoordinates();
+
+  // Get rid of coordinates related query parameters when explorer is unmounted
+  const { removeCoordinates } = useCoordinates();
   useEffect(() => {
     return () => {
-      resetCoords();
+      removeCoordinates();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   },[]);
 
   // @TODO: A very hacky way of telling users that the data doesn't have related scenarios
