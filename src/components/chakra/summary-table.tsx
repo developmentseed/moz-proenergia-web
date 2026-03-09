@@ -30,10 +30,48 @@ const formatValue = (value: string | number, column?: string) => {
   else return value;
 };
 
-const tableCellStyleProps = {
-  py: 0.5,
-  px: 1,
+// ─── Row style props ────────────────────────────────────────────────────────
+const lastRowStyleProps = { "& > td": { borderBottom: "none" } };
+
+const summaryRowProps = {
+  bg: "panelBg",
+  _last: lastRowStyleProps,
 };
+
+const sectionHeaderRowProps = {
+  bg: "bg",
+  borderTopColor: "border",
+  borderTopWidth: "1px",
+  h: "30px",
+  _last: lastRowStyleProps,
+};
+
+// ─── Cell style props ───────────────────────────────────────────────────────
+const tableCellStyleProps = { py: 0.5, px: 1 };
+
+const sectionHeaderCellProps = {
+  colSpan: 2,
+  p: 0.5,
+  borderBottomColor: "fg.muted",
+};
+
+// ─── Text style props ───────────────────────────────────────────────────────
+const sectionHeaderLabelProps = {
+  textStyle: "tableAttr",
+  fontWeight: "bold",
+  fontSize: "sm",
+};
+
+const valueTextProps = {
+  textStyle: "tableValue",
+  textAlign: "right" as const,
+  fontFamily: "mono",
+};
+
+// ─── Layout props ───────────────────────────────────────────────────────────
+const labelBoxProps = { display: "flex", alignItems: "center", gap: 1 };
+
+// ────────────────────────────────────────────────────────────────────────────
 
 interface SummaryTableProps {
   data: SummaryData | undefined;
@@ -64,7 +102,7 @@ function groupByCategory(rows: SummaryRow[]): { category: string | null; rows: S
 
 function ErrorRowView({ row }: { row: ErrorRow }) {
   return (
-    <Table.Row key={row.key} bg="panelBg">
+    <Table.Row key={row.key} {...summaryRowProps}>
       <Table.Cell {...tableCellStyleProps}>
         <Text textStyle="tableAttr">{row.label}</Text>
       </Table.Cell>
@@ -82,7 +120,7 @@ function FlatRowView({ row }: { row: FlatRow }) {
     <Table.Row key={row.key} bg="panelBg">
       <Table.Cell {...tableCellStyleProps} p={0.5}>
         {" "}
-        <Box display="flex" alignItems="center" gap={1}>
+        <Box {...labelBoxProps}>
           <Text textStyle="tableAttr">
             {row.label}{" "}
             <Text as="span" fontWeight="normal">
@@ -95,7 +133,7 @@ function FlatRowView({ row }: { row: FlatRow }) {
         </Box>
       </Table.Cell>
       <Table.Cell {...tableCellStyleProps}>
-        <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
+        <Text {...valueTextProps}>
           {formatValue(row.value, row.key)}
         </Text>
       </Table.Cell>
@@ -106,12 +144,12 @@ function FlatRowView({ row }: { row: FlatRow }) {
 function MethodTotalRow({ item }: { item?: SummaryItem }) {
   if (!item) return null;
   return (
-    <Table.Row bg="panelBg">
-      <Table.Cell {...tableCellStyleProps}>
+    <Table.Row bg="panelBg" css={lastRowStyleProps}>
+      <Table.Cell {...tableCellStyleProps} pb={4}>
         <Text textStyle="tableAttr"><Text as="span" fontWeight="semibold">Total</Text> ({item.label})</Text>
       </Table.Cell>
-      <Table.Cell {...tableCellStyleProps}>
-        <Text textStyle="tableValue" textAlign="right" fontFamily="mono" fontWeight="semibold">
+      <Table.Cell {...tableCellStyleProps} pb={4}>
+        <Text {...valueTextProps} fontWeight="semibold">
           {formatValue(item.value, item.key)}
         </Text>
       </Table.Cell>
@@ -123,12 +161,12 @@ function ChartValueRows({ row }: { row: ChartRow }) {
   return (
     <>
       {row.value.map((item) => (
-        <Table.Row key={item.key} bg="panelBg">
+        <Table.Row key={item.key} {...summaryRowProps}>
           <Table.Cell {...tableCellStyleProps}>
             <Text textStyle="tableAttr">{item.label}</Text>
           </Table.Cell>
           <Table.Cell {...tableCellStyleProps}>
-            <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
+            <Text {...valueTextProps}>
               {formatValue(item.value, item.key)}
             </Text>
           </Table.Cell>
@@ -143,10 +181,10 @@ function ChartRowView({ row }: { row: ChartRow }) {
   if (row.chartType === "bar") {
     return (
       <>
-        <Table.Row bg="bg.muted" h="30px" mt={1}>
-          <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
-            <Box display="flex" alignItems="center" gap={1}>
-              <Text textStyle="tableAttr" fontWeight="bold">
+        <Table.Row {...sectionHeaderRowProps}>
+          <Table.Cell {...sectionHeaderCellProps}>
+            <Box {...labelBoxProps}>
+              <Text {...sectionHeaderLabelProps}>
                 {row.label}
                 <Text as="span" fontWeight="normal">
                   {" "}{row.unit && `(${row.unit})`}
@@ -158,8 +196,8 @@ function ChartRowView({ row }: { row: ChartRow }) {
             </Box>
           </Table.Cell>
         </Table.Row>
-        <Table.Row>
-          <Table.Cell colSpan={2}>
+        <Table.Row _last={lastRowStyleProps}>
+          <Table.Cell colSpan={2} border="none">
             <SummaryBarChart data={row.value} average={row.average} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
@@ -170,10 +208,10 @@ function ChartRowView({ row }: { row: ChartRow }) {
   if (row.chartType === "donut") {
     return (
       <>
-        <Table.Row bg="bg.muted" h="30px" mt={1}>
-          <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
-            <Box display="flex" alignItems="center" gap={1}>
-              <Text textStyle="tableAttr" fontWeight="bold">
+        <Table.Row {...sectionHeaderRowProps}>
+          <Table.Cell {...sectionHeaderCellProps}>
+            <Box {...labelBoxProps}>
+              <Text {...sectionHeaderLabelProps}>
                 {row.label}
                 <Text as="span" fontWeight="normal">
                   {" "}{row.unit && `(${row.unit})`}
@@ -185,8 +223,8 @@ function ChartRowView({ row }: { row: ChartRow }) {
             </Box>
           </Table.Cell>
         </Table.Row>
-        <Table.Row>
-          <Table.Cell colSpan={2}>
+        <Table.Row _last={lastRowStyleProps}>
+          <Table.Cell colSpan={2} border="none">
             <SummaryDonutChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
@@ -197,10 +235,10 @@ function ChartRowView({ row }: { row: ChartRow }) {
   if (row.chartType === "stacked") {
     return (
       <>
-        <Table.Row bg="bg.muted" h="30px" mt={1}>
-          <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
-            <Box display="flex" alignItems="center" gap={1}>
-              <Text textStyle="tableAttr" fontWeight="bold">
+        <Table.Row {...sectionHeaderRowProps}>
+          <Table.Cell {...sectionHeaderCellProps}>
+            <Box {...labelBoxProps}>
+              <Text {...sectionHeaderLabelProps}>
                 {row.label}
                 <Text as="span" fontWeight="normal">
                   {" "}{row.unit && `(${row.unit})`}
@@ -212,7 +250,7 @@ function ChartRowView({ row }: { row: ChartRow }) {
             </Box>
           </Table.Cell>
         </Table.Row>
-        <Table.Row>
+        <Table.Row _last={lastRowStyleProps}>
           <Table.Cell colSpan={2} px={2} py={2}>
             <SummaryStackedBarChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
@@ -227,10 +265,10 @@ function ChartRowView({ row }: { row: ChartRow }) {
 function GroupRowView({ row }: { row: GroupRow }) {
   return (
     <>
-      <Table.Row key={row.label + '-group-row'} bg="bg.muted" h="30px" mt={1}>
-        <Table.Cell colSpan={2} fontWeight="bold" p={0.5}>
-          <Box display="flex" alignItems="center" gap={1}>
-            <Text textStyle="tableAttr" fontWeight="bold">
+      <Table.Row key={row.label + '-group-row'} {...sectionHeaderRowProps}>
+        <Table.Cell {...sectionHeaderCellProps}>
+          <Box {...labelBoxProps}>
+            <Text {...sectionHeaderLabelProps}>
               {" "}
               {row.label}
               <Text as="span" fontWeight="normal">
@@ -245,7 +283,7 @@ function GroupRowView({ row }: { row: GroupRow }) {
         </Table.Cell>
       </Table.Row>
       {row.value.map((item) => (
-        <Table.Row key={item.key} bg="panelBg">
+        <Table.Row key={item.key} {...summaryRowProps}>
           <Table.Cell {...tableCellStyleProps}>
             <Text textStyle="tableAttr">
               {" "}
@@ -253,7 +291,7 @@ function GroupRowView({ row }: { row: GroupRow }) {
             </Text>
           </Table.Cell>
           <Table.Cell {...tableCellStyleProps}>
-            <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
+            <Text {...valueTextProps}>
               {formatValue(item.value, item.key)}
             </Text>
           </Table.Cell>
@@ -267,10 +305,10 @@ function GroupRowView({ row }: { row: GroupRow }) {
 function NestedGroupRowView({ row }: { row: NestedGroupRow }) {
   return (
     <>
-      <Table.Row key={row.label} bg="bg.muted" height="30px" mt={1}>
-        <Table.Cell colSpan={2} fontWeight="bold">
-          <Box display="flex" alignItems="center" gap={1}>
-            <Text textStyle="tableAttr" fontWeight="bold">
+      <Table.Row key={row.label} {...sectionHeaderRowProps}>
+        <Table.Cell colSpan={2} fontWeight="bold" borderBottomColor="fg.muted">
+          <Box {...labelBoxProps}>
+            <Text {...sectionHeaderLabelProps}>
               {row.label}
               <Text as="span" fontWeight="normal">
                 {" "}
@@ -284,20 +322,20 @@ function NestedGroupRowView({ row }: { row: NestedGroupRow }) {
         </Table.Cell>
       </Table.Row>
       {row.value.flatMap((group) => [
-        <Table.Row key={`${row.label}-${group.key}`} bg="gray.100">
-          <Table.Cell colSpan={2} fontWeight="semibold">
+        <Table.Row key={`${row.label}-${group.key}`} bg="bg" borderTopColor="border" borderTopWidth="1px" _last={lastRowStyleProps}>
+          <Table.Cell colSpan={2} fontWeight="semibold" borderBottomColor="fg.muted">
             <Text textStyle="tableAttr" fontSize="sm">{group.label}</Text>
           </Table.Cell>
         </Table.Row>,
         ...group.items.map((item) => (
-          <Table.Row key={`${group.key}-${item.key}`} bg="panelBg">
+          <Table.Row key={`${group.key}-${item.key}`} {...summaryRowProps}>
             <Table.Cell {...tableCellStyleProps}>
               <Text textStyle="tableAttr">
                 {item.label}
               </Text>
             </Table.Cell>
             <Table.Cell {...tableCellStyleProps}>
-              <Text textStyle="tableValue" textAlign="right" fontFamily="mono">
+              <Text {...valueTextProps}>
                 {formatValue(item.value, item.key)}
               </Text>
             </Table.Cell>
@@ -316,10 +354,10 @@ function HighlightRowView({ row }: { row: HighlightRow }) {
   }));
   return (
     <>
-      <Table.Row h="30px">
-        <Table.Cell colSpan={2} p={0.5} border="none">
-          <Box display="flex" alignItems="center" gap={1}>
-            <Text textStyle="tableAttr" fontWeight="bold">
+      <Table.Row bg="bg" borderTopColor="border" borderTopWidth="1px" h="30px" _last={lastRowStyleProps}>
+        <Table.Cell {...sectionHeaderCellProps}>
+          <Box {...labelBoxProps}>
+            <Text {...sectionHeaderLabelProps}>
               {row.label}
               <Text as="span" fontWeight="normal">
                 {" "}{row.unit && `(${row.unit})`}
@@ -331,8 +369,8 @@ function HighlightRowView({ row }: { row: HighlightRow }) {
           </Box>
         </Table.Cell>
       </Table.Row>
-      <Table.Row bg="panelBg">
-        <Table.Cell colSpan={2} px={0}>
+      <Table.Row {...summaryRowProps}>
+        <Table.Cell colSpan={2} px={0} border="none">
           <Highlight items={items} />
         </Table.Cell>
       </Table.Row>
@@ -401,14 +439,15 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
                       gap="2"
                       alignItems="center"
                       width="100%"
-                      textStyle="collapsibleGroupTitle"
+                      fontSize="md"
+                      fontWeight="semibold"
                     >
                       {group.category}
                       <Accordion.ItemIndicator ml="auto">
                         <LuChevronUp />
                       </Accordion.ItemIndicator>
                     </Accordion.ItemTrigger>
-                    <Accordion.ItemContent>
+                    <Accordion.ItemContent pb={4}>
                       <Table.Root size="sm">
                         <Table.Body>
                           {sortChartFirst(group.rows).map((row) => (
