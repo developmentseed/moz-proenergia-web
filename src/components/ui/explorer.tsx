@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useCoordinates } from "../map/hooks/use-coordinates";
 import { useQuery } from "@tanstack/react-query";
 import { ModelProvider } from "@/utils/context/model";
 import { ContextualLayersProvider } from "@/utils/context/contextual-layers";
@@ -88,6 +89,12 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
       summaryFields: modelCore.summaryFields,
     };
   }, [modelCore, allFilterOptions]);
+  const [_, _1, resetCoords] = useCoordinates();
+  useEffect(() => {
+    return () => {
+      resetCoords();
+    };
+  },[]);
 
   // @TODO: A very hacky way of telling users that the data doesn't have related scenarios
   // Assuming /vectors endpoints succeeded
