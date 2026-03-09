@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Heading } from "@chakra-ui/react";
+import { Button, Heading, Center, Spinner } from "@chakra-ui/react";
 import { Card } from '@/components/chakra';
 import NextLink from "next/link";
 import { ChakraDrawer } from '@/components/chakra/drawer';
@@ -31,6 +31,9 @@ export default function ModelCards() {
             <Card title={e.name} description={e.description} />
           </div>
         ))}
+        {!models && <Center py={10}>
+          <Spinner size="xl" />
+        </Center>}
       </SimpleGrid>
 
       {selectedModel && (
