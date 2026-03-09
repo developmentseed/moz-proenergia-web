@@ -58,7 +58,7 @@ export default function NotFound() {
       </Center>
     );
   }
-
+  // Finally, return explorer page if model was found
   return (
     <Flex h="calc(100vh - 3.5rem - 1px)" maxH="calc(100vh - 3.5rem - 1px)" overflow="hidden" width="100%">
       <SideNav models={models!} currentSlug={slug} />
