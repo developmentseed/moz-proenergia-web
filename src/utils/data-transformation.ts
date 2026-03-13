@@ -266,6 +266,32 @@ export async function fetchAllFilterOptions(
   }
 }
 
+// Merge filter options from multiple scenarios.
+// Numeric ranges take the overall [min, max]; string options take the union.
+export function mergeFilterOptions(
+  results: Record<string, string[] | number[] | null>[],
+): Record<string, string[] | number[] | null> {
+  if (results.length === 0) return {};
+  if (results.length === 1) return results[0];
+
+  const merged: Record<string, string[] | number[] | null> = {};
+  for (const column of Object.keys(results[0])) {
+    const vals = results.map(r => r[column] ?? []);
+    const numericRanges = vals.filter(
+      (v): v is [number, number] => v.length === 2 && typeof v[0] === 'number',
+    );
+    if (numericRanges.length > 0) {
+      merged[column] = [
+        Math.min(...numericRanges.map(v => v[0])),
+        Math.max(...numericRanges.map(v => v[1])),
+      ];
+    } else {
+      merged[column] = sortFilterOptions([...new Set((vals.flat() as string[]))]);
+    }
+  }
+  return merged;
+}
+
 export function replaceSummaryIdColumn(fields: Field[], metricField: Record<string,string>): Field[] {
   return fields.map(f => {
     const groupBy = typeof f.group_by === 'string' ? [f.group_by] : f.group_by;

@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useCoordinates } from "../map/hooks/use-coordinates";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import { ModelProvider } from "@/utils/context/model";
 import { ContextualLayersProvider } from "@/utils/context/contextual-layers";
 import { FiltersProvider } from "@/utils/context/filters";
@@ -20,6 +20,7 @@ import {
   fetchModelMetadata,
   fetchVectors,
   fetchAllFilterOptions,
+  mergeFilterOptions,
   transformModelCore,
   transformVectorsToLayers,
   transformFilterField,
@@ -55,13 +56,21 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
 
   const defaultScenarioId = modelCore?.scenarios[0]?.id;
 
-  // Filter options (single batch fetch, cached per scenario)
+  // Filter options — one query per scenario, results merged into a union
   const filterColumns = (modelCore?.filterFields ?? []).map((f) => f.column);
+  const scenarioIds = modelCore?.scenarios.map((s) => s.id) ?? [];
 
-  const { data: allFilterOptions } = useQuery({
-    queryKey: ["filterOptions", modelCore?.id, filterColumns],
-    queryFn: ({ signal }) => fetchAllFilterOptions(defaultScenarioId!, filterColumns, signal),
-    enabled: !!modelCore?.id && !!defaultScenarioId && filterColumns.length > 0,
+  const allFilterOptions = useQueries({
+    queries: scenarioIds.map((scenarioId) => ({
+      queryKey: ["filterOptions", scenarioId, filterColumns],
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        fetchAllFilterOptions(scenarioId, filterColumns, signal),
+      enabled: filterColumns.length > 0,
+    })),
+    combine: (results) => {
+      if (results.length === 0 || results.some((r) => !r.data)) return undefined;
+      return mergeFilterOptions(results.map((r) => r.data!));
+    },
   });
 
   // Combine filter options to main model
