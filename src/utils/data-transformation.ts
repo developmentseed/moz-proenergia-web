@@ -246,13 +246,17 @@ export async function fetchAllFilterOptions(
     }
     const result: Record<string, string[] | number[] | null> = {};
     for (const column of columns) {
-      const summary = data.summaries?.[column];
-      if (!summary) {
+      try {
+        const summary = data.summaries?.[column];
+        if (!summary) {
+          result[column] = [];
+        } else if (summary.type === 'numeric') {
+          result[column] = [Math.floor(summary.min), Math.ceil(summary.max)];
+        } else {
+          result[column] = sortFilterOptions(Object.keys(summary.values));
+        }
+      } catch {
         result[column] = [];
-      } else if (summary.type === 'numeric') {
-        result[column] = [Math.floor(summary.min), Math.ceil(summary.max)];
-      } else {
-        result[column] = sortFilterOptions(Object.keys(summary.values));
       }
     }
     return result;
