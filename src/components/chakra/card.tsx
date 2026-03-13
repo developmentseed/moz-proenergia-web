@@ -1,6 +1,7 @@
 import { truncatedClean } from "@/utils/format";
-import { Card, Heading, Box } from "@chakra-ui/react";
+import { Card, Heading, Box, Text } from "@chakra-ui/react";
 import { LuDownload } from "react-icons/lu";
+import ReactMarkdown from "react-markdown";
 
 const HighlightText = ({
   text,
@@ -41,6 +42,7 @@ export const ModelCard = ({
   title: string;
   description: string;
 }) => {
+  const truncatedDescription = truncatedClean(description, 250);
   return (
     <Card.Root
       size="md"
@@ -51,7 +53,12 @@ export const ModelCard = ({
       <Card.Header>
         <Heading size="lg">{title}</Heading>
       </Card.Header>
-      <Card.Body color="fg.muted">{truncatedClean(description, 250)}...</Card.Body>
+      <Card.Body color="fg.muted">
+        <ReactMarkdown
+        >
+          {`${truncatedDescription}...`}
+        </ReactMarkdown>
+      </Card.Body>
     </Card.Root>
   );
 };
