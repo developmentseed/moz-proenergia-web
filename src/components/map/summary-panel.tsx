@@ -1,7 +1,7 @@
 import { memo, useState, useEffect } from "react";
-import { Box, Flex, Text, IconButton } from "@chakra-ui/react";
+import { Box, Flex, Text, IconButton, Input, Field as ChakraField } from "@chakra-ui/react";
+import { LuChevronLeft, LuSearch } from "react-icons/lu";
 import { api } from "@/utils/api";
-import { LuChevronLeft } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter, type Main } from "@/app/types";
@@ -18,6 +18,7 @@ interface SummaryPanelProps {
   filters: Record<string, [number, number] | string[] | null>;
   filterDefs: Filter[];
   resetCluster: () => void;
+  onSelectCluster: (id: string) => void;
   main?: Main;
   isOpen: boolean;
 }
@@ -58,6 +59,48 @@ const PanelHeader = ({ title, subtitle, onBack }: PanelHeaderProps) => (
     </Flex>
   </Box>
 );
+
+interface ClusterSearchProps {
+  onSelectCluster: (id: string) => void;
+}
+
+const ClusterSearch = ({ onSelectCluster }: ClusterSearchProps) => {
+  const [value, setValue] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = value.trim();
+    if (trimmed) onSelectCluster(trimmed);
+  };
+
+  return (
+    <Box as="form" onSubmit={handleSubmit}>
+      <ChakraField.Root>
+        <ChakraField.Label fontSize="xs" color="fg.muted">
+          Navigate to cluster or site
+        </ChakraField.Label>
+        <Flex gap={1} width="full">
+          <Input
+            size="sm"
+            placeholder="Enter cluster ID…"
+            flexBasis="100%"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+          />
+          <IconButton
+            type="submit"
+            size="sm"
+            variant="surface"
+            aria-label="Navigate to cluster"
+            disabled={!value.trim()}
+          >
+            <LuSearch />
+          </IconButton>
+        </Flex>
+      </ChakraField.Root>
+    </Box>
+  );
+};
 
 function transformClusterData(
   data: Record<string, string | number>,
@@ -104,6 +147,7 @@ const SummaryPanel = ({
   filters,
   filterDefs,
   resetCluster,
+  onSelectCluster,
   main,
   isOpen,
 }: SummaryPanelProps) => {
@@ -176,6 +220,11 @@ const SummaryPanel = ({
             collapsible={!showingCluster}
           />
         </Box>
+        {!showingCluster && (
+          <Box p={4} borderTop="1px solid" borderColor="border">
+            <ClusterSearch onSelectCluster={onSelectCluster} />
+          </Box>
+        )}
       </Box>
     </Box>
   );

@@ -1,12 +1,35 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Source, Layer as MapLayer, useMap } from 'react-map-gl/maplibre';
 import {
+  LngLatBounds,
   type LayerSpecification,
   type FilterSpecification,
 } from 'maplibre-gl';
 import mapConfig from '@/config/map.json';
 import { buildMatchExpression } from '@/utils/map/filter';
 import { type Scenario, type Main } from '@/app/types';
+import { MOZ_BOUNDS } from './hooks/use-coordinates';
+
+// Compute a LngLatBounds from any supported GeoJSON geometry type
+function geometryBounds(geometry: GeoJSON.Geometry): LngLatBounds | null {
+  const bounds = new LngLatBounds();
+  const extend = (c: GeoJSON.Position) => bounds.extend([c[0], c[1]]);
+
+  if (geometry.type === 'Point') {
+    extend(geometry.coordinates);
+  } else if (geometry.type === 'LineString' || geometry.type === 'MultiPoint') {
+    geometry.coordinates.forEach(extend);
+  } else if (geometry.type === 'Polygon') {
+    geometry.coordinates[0].forEach(extend);
+  } else if (geometry.type === 'MultiLineString') {
+    geometry.coordinates.forEach((line) => line.forEach(extend));
+  } else if (geometry.type === 'MultiPolygon') {
+    geometry.coordinates.forEach((poly) => poly[0].forEach(extend));
+  } else {
+    return null;
+  }
+  return bounds.isEmpty() ? null : bounds;
+}
 
 // Combine geometry-type filter with an optional map filter
 function withGeometryFilter(
@@ -69,6 +92,94 @@ export const MainLayer = ({
       }
     };
   }, [map, main.id, lineLayerId, circleLayerId]);
+
+  // Pan/zoom the map to the selected cluster.
+  //
+  // querySourceFeatures only searches tiles currently in MapLibre's cache
+  // (the visible viewport), so we use a three-step strategy:
+  //
+  //   1. Attempt immediately — works when the feature is already on screen.
+  //   2. Wait for the map to finish loading its initial tiles, then retry —
+  //      handles the URL-load case where tiles are still in flight.
+  //   3. If still not found, snap the viewport to the full country extent
+  //      (no animation) so MapLibre loads tiles for all of Mozambique, then
+  //      do one final attempt — handles searching for off-screen clusters.
+  //
+  // NOTE: `idle` only fires on a transition *to* idle, not if the map is
+  // already idle (the common case after the user types in the search box).
+  // We detect this with map.loaded() and skip straight to step 3 when needed.
+  useEffect(() => {
+    if (!map || !clusterId) return;
+
+    // Query the vector tile source for a feature matching the given id value.
+    // The id property is stored as a number in the tiles but arrives as a
+    // string from URL state, so both types are tried by the caller.
+    const queryFeatureById = (idValue: string | number) =>
+      map.querySourceFeatures(scenario.id, {
+        sourceLayer: scenario.layer['source-layer'],
+        filter: ['==', ['get', 'id'], idValue],
+      });
+
+    // Fly to or fit the map to the given GeoJSON geometry.
+    const flyToGeometry = (geometry: GeoJSON.Geometry) => {
+      const bounds = geometryBounds(geometry);
+      if (!bounds) return;
+      if (geometry.type === 'Point') {
+        map.flyTo({ center: bounds.getCenter(), zoom: Math.max(map.getZoom(), 12) });
+      } else {
+        map.fitBounds(bounds, { padding: 80, maxZoom: 14 });
+      }
+    };
+
+    // Find the cluster in loaded tiles and navigate to it. Returns true if
+    // the feature was found (regardless of whether it had usable geometry).
+    const findClusterAndNavigate = () => {
+      // Try string id first (URL state), then numeric (tile storage format).
+      const features =
+        queryFeatureById(clusterId).length > 0
+          ? queryFeatureById(clusterId)
+          : queryFeatureById(Number(clusterId));
+
+      if (features.length === 0) return false;
+      const { geometry } = features[0];
+      if (geometry) flyToGeometry(geometry);
+      return true;
+    };
+
+    // Step 1: immediate attempt.
+    if (findClusterAndNavigate()) return;
+
+    let canceled = false;
+    let onCountryTilesLoaded: (() => void) | null = null;
+
+    // Step 3: snap to country extent (no animation) so MapLibre fetches tiles
+    // for all of Mozambique, then do one final query once those tiles settle.
+    const loadCountryTilesAndRetry = () => {
+      onCountryTilesLoaded = () => {
+        if (!canceled) findClusterAndNavigate();
+      };
+      map.fitBounds(MOZ_BOUNDS, { animate: false, maxZoom: 5 });
+      map.once('idle', onCountryTilesLoaded);
+    };
+
+    // Step 2: called once the current viewport's tiles have finished loading.
+    const onViewportTilesLoaded = () => {
+      if (canceled) return;
+      if (!findClusterAndNavigate()) loadCountryTilesAndRetry();
+    };
+
+    if (map.loaded()) {
+      onViewportTilesLoaded();
+    } else {
+      map.once('idle', onViewportTilesLoaded);
+    }
+
+    return () => {
+      canceled = true;
+      map.off('idle', onViewportTilesLoaded);
+      if (onCountryTilesLoaded) map.off('idle', onCountryTilesLoaded);
+    };
+  }, [clusterId, map, scenario.id, scenario.layer]);
 
   // --- Main visualization layers (one per geometry type) ---
   const mainFillLayer: LayerSpecification = useMemo(

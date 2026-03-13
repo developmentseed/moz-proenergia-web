@@ -4,6 +4,12 @@ import { useQueryStates, parseAsFloat, throttle } from 'nuqs';
 export const DEFAULT_COORDS = [-18.76303, 36.78403];
 export const DEFAULT_ZOOM = 5;
 
+/** Mozambique bounding box [west, south, east, north] used for map fitting. */
+export const MOZ_BOUNDS: [[number, number], [number, number]] = [
+  [30.2, -26.9],
+  [40.8, -10.5],
+];
+
 interface Coordinates {
   lat: number;
   lng: number;
