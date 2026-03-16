@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Button, Heading, Center, Spinner } from "@chakra-ui/react";
 import { Card } from '@/components/chakra';
+import ReactMarkdown from 'react-markdown';
+
 import NextLink from "next/link";
 import { ChakraDrawer } from '@/components/chakra/drawer';
 import {
@@ -46,7 +48,13 @@ export default function ModelCards() {
           triggerContent={null}
           drawerContent={
             <Box>
-              <Text pb={8}>{selectedModel.description || "Description for Model"}</Text>
+              <ReactMarkdown
+                components={{
+                  p: ({ children }) => <Text pb={8}>{children}</Text>,
+                }}
+              >
+                {selectedModel.description}
+              </ReactMarkdown>
               <DrawerSummaryTable modelId={selectedModel.id} />
             </Box>
           }
