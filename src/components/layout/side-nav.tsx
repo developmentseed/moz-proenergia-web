@@ -6,6 +6,7 @@ import Image from 'next/image';
 import modelConfig from '@/config/model.json';
 import { ModelGroupMetadata } from '@/app/types';
 import { slugify } from '@/utils/data-transformation';
+import { parseSortPrefix, stripSortPrefix } from '@/utils/string';
 import { Tooltip } from '../ui/tooltip';
 
 interface SideNavProps {
@@ -28,7 +29,7 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
       zIndex={100}
     >
       <VStack p={2} gap={2} align="center">
-        {models.map((model) => {
+        {[...models].sort((a, b) => parseSortPrefix(a.name) - parseSortPrefix(b.name)).map((model) => {
           const modelSlug = slugify(model.name);
           const isActive = modelSlug === currentSlug;
           const iconPath = getIconPath(model.id);
@@ -39,7 +40,7 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
               href={`/model/${modelSlug}`}
               style={{ textDecoration: 'none' }}
             >
-              <Tooltip content={model.name}>
+              <Tooltip content={stripSortPrefix(model.name)}>
                 <Box
                   display="flex"
                   alignItems="center"
@@ -57,12 +58,12 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
                   {iconPath ? (
                     <Image
                       src={iconPath}
-                      alt={model.name}
+                      alt={stripSortPrefix(model.name)}
                       width={20}
                       height={20}
                     />
                   ) : (
-                    model.name
+                    stripSortPrefix(model.name)
                   )}
                 </Box>
               </Tooltip>

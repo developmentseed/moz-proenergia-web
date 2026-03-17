@@ -2,6 +2,7 @@ import { LayerProps } from "react-map-gl/maplibre";
 import { interpolateWarm } from 'd3-scale-chromatic';
 import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, Field, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
 import { api, MEDIA_URL_PREFIX, DEFAULT_COL } from '@/utils/api';
+import { parseSortPrefix, stripSortPrefix } from '@/utils/string';
 import { sortFilterOptions } from '@/config/filters';
 import mapConfig from '@/config/map.json';
 const ADMIN_COLUMNS = [
@@ -289,9 +290,10 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
     // @TODO: Filtering LCOE model until performance improvement
     // .filter(s => s.id !== 1)
     .filter(s => s.model_file !== null)
+    .sort((a, b) => parseSortPrefix(a.name) - parseSortPrefix(b.name))
     .map(s => ({
       id: String(s.id),
-      label: s.name,
+      label: stripSortPrefix(s.name),
       source: deriveSource(String(s.id), s.model_file!),
       layer: {
         id: `${s.id}-main`,
@@ -317,7 +319,7 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
 
   return {
     id: modelId,
-    title: apiModel.name,
+    title: stripSortPrefix(apiModel.name),
     scenarios,
     main,
     popupFields: apiModel.popup_fields.map(f => ({
@@ -333,11 +335,13 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
 
 // Transform vectors to layers
 export function transformVectorsToLayers(apiVectors: ApiVectorResult[]): Layer[] {
-  return apiVectors.map(v => {
+  return [...apiVectors]
+    .sort((a, b) => parseSortPrefix(a.name) - parseSortPrefix(b.name))
+    .map(v => {
     const sourceId = String(v.id) + 'vector-source';
     return {
       id: sourceId,
-      label: v.name,
+      label: stripSortPrefix(v.name),
       description: v.description,
       filePath: v.raw_file,
       color: v.color,
