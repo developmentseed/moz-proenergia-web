@@ -127,7 +127,7 @@ const SummaryPanel = ({
     return () => clearTimeout(id);
   }, []);
 
-  const { data: summaryData, isLoading: summaryIsLoading } = useSummaryQuery({
+  const { data: summaryData, isLoading: summaryIsLoading, isError: summaryIsError } = useSummaryQuery({
     scenarioId,
     summaryFields,
     filters,
@@ -142,6 +142,7 @@ const SummaryPanel = ({
   const isLoading = showingCluster
     ? clusterIsLoading || clusterIsFetching
     : summaryIsLoading;
+  const isError = showingCluster ? clusterIsError : summaryIsError;
 
   const title = showingCluster ? `Cluster - ${clusterId}` : "Summary";
 
@@ -172,7 +173,7 @@ const SummaryPanel = ({
           <SummaryTable
             data={dataToDisplay}
             isLoading={isLoading}
-            isError={showingCluster && clusterIsError}
+            isError={isError}
             collapsible={!showingCluster}
           />
         </Box>

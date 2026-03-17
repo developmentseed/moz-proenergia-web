@@ -127,17 +127,32 @@ export function useSummaryQuery({
     })),
   });
 
-  const allRows = queries.flatMap((q) => q.data ?? []);
-  const anyHasData = queries.some((q) => q.data != null);
+  // For failed buckets, substitute error rows for each field so partial
+  // data still renders and the user sees which fields couldn't load.
+  const allRows = queries.flatMap((q, i) => {
+    if (q.data) return q.data;
+    if (q.isError) {
+      return buckets[i].fields.map((field): SummaryRow => ({
+        type: "error" as const,
+        label: field.label,
+        key: field.columns[0],
+        category: field.category,
+      }));
+    }
+    return [];
+  });
 
-  const data: SummaryData | undefined = anyHasData
+  const isLoading = queries.some((q) => q.isLoading);
+  const isError = queries.every((q) => q.isError);
+
+  // Return undefined while loading or when everything failed (caller shows
+  // a generic error message). Otherwise include error rows for partial failures.
+  const data: SummaryData | undefined = !isLoading && !isError
     ? [...allRows].sort((a, b) => {
         if (a.type === b.type) return 0;
         return a.type === "flat" || a.type === "error" ? -1 : 1;
       })
     : undefined;
 
-  const isLoading = queries.some((q) => q.isLoading);
-
-  return { data, isLoading };
+  return { data, isLoading, isError };
 }
