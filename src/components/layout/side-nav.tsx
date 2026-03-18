@@ -3,6 +3,7 @@
 import { Box, VStack } from '@chakra-ui/react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import modelConfig from '@/config/model.json';
 import { ModelGroupMetadata } from '@/app/types';
 import { slugify } from '@/utils/data-transformation';
@@ -14,6 +15,17 @@ interface SideNavProps {
 }
 
 export const SideNav = ({ models, currentSlug }: SideNavProps) => {
+  const searchParams = useSearchParams();
+  const lat = searchParams.get('lat');
+  const lng = searchParams.get('lng');
+  const zoom = searchParams.get('zoom');
+
+  const coordParams = new URLSearchParams();
+  if (lat) coordParams.set('lat', lat);
+  if (lng) coordParams.set('lng', lng);
+  if (zoom) coordParams.set('zoom', zoom);
+  const coordString = coordParams.toString();
+  
   const getIconPath = (modelId: string) => {
     const config = modelConfig.find((c) => String(c.model) === String(modelId));
     return config ? `/model-icon/${config.icon}` : `/model-icon/default.svg`;
@@ -36,7 +48,7 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
           return (
             <Link
               key={model.id}
-              href={`/model/${modelSlug}`}
+              href={`/model/${modelSlug}${coordString ? `?${coordString}` : ''}`}
               style={{ textDecoration: 'none' }}
             >
               <Tooltip content={model.name}>
