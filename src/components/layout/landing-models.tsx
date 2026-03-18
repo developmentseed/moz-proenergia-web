@@ -11,7 +11,6 @@ import {
   useQuery
 } from '@tanstack/react-query';
 import { slugify, fetchModels } from '@/utils/data-transformation';
-import { parseSortPrefix, stripSortPrefix } from '@/utils/string';
 import { SimpleGrid, Text, Box } from '@chakra-ui/react';
 import { DrawerSummaryTable } from './drawer-summary-table';
 import { LuArrowRight } from 'react-icons/lu';
@@ -28,9 +27,9 @@ export default function ModelCards() {
     <>
       <Heading size="3xl">Models</Heading>
       <SimpleGrid columns={2} py={6} gap={6} minChildWidth="md">
-        {[...(models ?? [])].sort((a, b) => parseSortPrefix(a.name) - parseSortPrefix(b.name)).map(e => (
-          <div key={e.id} onClick={() => setSelectedModel({ id: String(e.id), name: stripSortPrefix(e.name), description: e.description, slug: slugify(e.name) })} style={{ cursor: 'pointer' }}>
-            <Card title={stripSortPrefix(e.name)} description={e.description} />
+        {models?.map(e => (
+          <div key={e.id} onClick={() => setSelectedModel({ id: String(e.id), name: e.name, description: e.description, slug: slugify(e.name) })} style={{ cursor: 'pointer' }}>
+            <Card title={e.name} description={e.description} />
           </div>
         ))}
         {!models && <Center py={10}>
