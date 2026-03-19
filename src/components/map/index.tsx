@@ -131,6 +131,7 @@ const MainMap = ({ main }: MainMapProps) => {
             collapsed={true}
             countries="mz"
             reverseGeocode={true}
+            marker={false}
             showResultsWhileTyping={true}
             clearAndBlurOnEsc={true}
             zoom={12}
