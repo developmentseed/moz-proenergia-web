@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useCallback, useState } from "react";
+import { useEffect, useMemo, useCallback, useState, useRef } from "react";
 import {
   Map,
   ViewStateChangeEvent,
@@ -49,9 +49,19 @@ interface MainMapProps {
 }
 
 const MainMap = ({ main }: MainMapProps) => {
-  const { coords, setCoords } = useCoordinates();
+  const { coords, setCoords, removeCoordinates } = useCoordinates();
   const { lat, lng, zoom } = coords;
   const { selected, setSelected, onClick } = useMouseEvent();
+
+  // Capture the cluster ID that was present in the URL at mount time.
+  const initialClusterId = useRef(selected);
+
+  // If the page loaded with a cluster ID already in the URL, clear any stale
+  // lat/lng/zoom params so the map can navigate freely to the cluster.
+  useEffect(() => {
+    if (initialClusterId.current) removeCoordinates();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // intentionally runs once on mount
   const { isOpen, toggle, open } = useToggle(true);
 
   // Attach pmtile protocol to MapLibre
@@ -80,6 +90,13 @@ const MainMap = ({ main }: MainMapProps) => {
   const resetCluster = useCallback(() => {
     setSelected(null);
   }, [setSelected]);
+
+  // Clear viewport coords before navigating so stale lat/lng/zoom don't
+  // persist alongside the cluster ID in the URL.
+  const selectClusterFromSearch = useCallback((id: string) => {
+    removeCoordinates();
+    setSelected(id);
+  }, [removeCoordinates, setSelected]);
 
   useEffect(() => {
     if (selected !== null) {
@@ -151,6 +168,7 @@ const MainMap = ({ main }: MainMapProps) => {
         filters={updatedFilters}
         filterDefs={model.filters}
         resetCluster={resetCluster}
+        onSelectCluster={selectClusterFromSearch}
         main={main}
         isOpen={isOpen}
       />
