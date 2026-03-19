@@ -14,6 +14,7 @@ import {
   transformMapboxUrl,
 } from "maplibregl-mapbox-request-transformer";
 import "maplibre-gl/dist/maplibre-gl.css";
+import "@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css";
 import mapConfig from "@/config/map.json";
 import { useModel } from "@/utils/context/model";
 import { useFilters } from "@/utils/context/filters";
@@ -21,6 +22,7 @@ import {
   useCoordinates,
 } from "./hooks/use-coordinates";
 import { CenterMapControl } from './recenter-button';
+import GeocoderControl from './geocoder-control';
 import { useMouseEvent } from "./hooks/use-mouse-event";
 import { type Main } from "@/app/types";
 import { buildExpressionWithFilter } from "@/utils/map/filter";
@@ -124,6 +126,16 @@ const MainMap = ({ main }: MainMapProps) => {
           <ContextualLayer />
           <ScaleControl position="bottom-left" />
           <NavigationControl showCompass={false} position="bottom-left" />
+          <GeocoderControl
+            position="bottom-left"
+            collapsed={true}
+            countries="mz"
+            reverseGeocode={true}
+            marker={false}
+            showResultsWhileTyping={true}
+            clearAndBlurOnEsc={true}
+            zoom={12}
+          />
           <CenterMapControl />
           <BasemapSelector
             currentBasemapId={currentBasemapId}

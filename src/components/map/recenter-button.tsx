@@ -35,8 +35,8 @@ export function CenterMapControl() {
       aria-label="Center map"
       bg="bg"
       position="absolute"
-      bottom={28}
-      left={2}
+      bottom="12.5rem"
+      left="10px"
       size="xs"
       variant="surface"
       zIndex={controlZIndex}
