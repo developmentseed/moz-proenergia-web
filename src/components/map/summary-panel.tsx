@@ -116,7 +116,15 @@ const RelatedModels = ({ clusterId }: RelatedModelsProps) => {
     queryFn: ({ signal }) => fetchModels(signal),
   });
 
-  const related = models?.filter((m) => String(m.id) !== model.id) ?? [];
+  const currentModelData = models?.find((m) => String(m.id) === model.id);
+  const currentVectorDatasetId = currentModelData?.scenarios[0]?.vector_dataset?.id;
+
+  const related = models?.filter((m) => {
+    if (String(m.id) === model.id) return false;
+    if (!currentVectorDatasetId) return false;
+    return m.scenarios[0]?.vector_dataset?.id === currentVectorDatasetId;
+  }) ?? [];
+
   if (related.length === 0) return null;
 
   return (
