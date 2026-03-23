@@ -10,8 +10,7 @@ import { ChakraDrawer } from '@/components/chakra/drawer';
 import {
   useQuery
 } from '@tanstack/react-query';
-import { slugify } from '@/utils/data-transformation';
-import { fetchModels } from '@/utils/data-transformation';
+import { slugify, fetchModels } from '@/utils/data-transformation';
 import { SimpleGrid, Text, Box } from '@chakra-ui/react';
 import { DrawerSummaryTable } from './drawer-summary-table';
 import { LuArrowRight } from 'react-icons/lu';

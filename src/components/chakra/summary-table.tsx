@@ -8,6 +8,7 @@ import {
 import { LuChevronUp } from "react-icons/lu";
 import { InfoTip } from "./toggle-tip";
 import { formatDisplayNumber } from "@/utils/number";
+import { parseSortPrefix, stripSortPrefix } from "@/utils/string";
 import { SummaryBarChart } from "@/components/chakra/chart/bar";
 import { SummaryDonutChart } from "@/components/chakra/chart/pie";
 import { SummaryStackedBarChart } from "@/components/chakra/chart/stacked";
@@ -391,7 +392,13 @@ function SummaryRowView({ row }: { row: SummaryRow }) {
 }
 
 export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible = true }: SummaryTableProps) => {
-  const groups = data ? groupByCategory(data) : [];
+  const groups = data
+    ? groupByCategory(data).sort((a, b) => {
+        if (a.category === null) return -1;
+        if (b.category === null) return 1;
+        return parseSortPrefix(a.category) - parseSortPrefix(b.category);
+      })
+    : [];
   return (
     <Box maxHeight={maxHeight} width="100%">
       {isLoading && (
@@ -442,7 +449,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
                       fontSize="md"
                       fontWeight="semibold"
                     >
-                      {group.category}
+                      {stripSortPrefix(group.category)}
                       <Accordion.ItemIndicator ml="auto">
                         <LuChevronUp />
                       </Accordion.ItemIndicator>
