@@ -1,5 +1,5 @@
 'use client';
-
+import { Suspense } from 'react';
 import { MapCoordsProvider } from '@/utils/context/map-coords';
 
 export default function ModelLayout({
@@ -7,5 +7,5 @@ export default function ModelLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <MapCoordsProvider>{children}</MapCoordsProvider>;
+  return <Suspense><MapCoordsProvider>{children}</MapCoordsProvider></Suspense>;
 }
