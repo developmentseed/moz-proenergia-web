@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { useCoordinates } from "../map/hooks/use-coordinates";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ModelProvider } from "@/utils/context/model";
 import { ContextualLayersProvider } from "@/utils/context/contextual-layers";
@@ -90,16 +89,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     };
   }, [modelCore, allFilterOptions]);
 
-  // Get rid of coordinates related query parameters when explorer is unmounted
-  const { removeCoordinates } = useCoordinates();
-  useEffect(() => {
-    return () => {
-      removeCoordinates();
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[]);
-
-  // @TODO: A very hacky way of telling users that the data doesn't have related scenarios
+// @TODO: A very hacky way of telling users that the data doesn't have related scenarios
   // Assuming /vectors endpoints succeeded
   if (modelCore && !defaultScenarioId && layers) {
     return (
