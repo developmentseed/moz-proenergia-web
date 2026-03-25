@@ -93,8 +93,8 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
                           <Box key={layer.id}>
                             <LayerEntry
                               id={layer.id}
-                              label={layer.label}
-                              description={layer.description}
+                              label={t(`layer.${layer.id}.label`, { defaultValue: layer.label })}
+                              description={layer.description ? t(`layer.${layer.id}.description`, { defaultValue: layer.description }) : undefined}
                               color={layer.color ?? '#888888'}
                               switchLayer={(id) => toggleLayer({ [id]: false })}
                               setOpacity={(id, opacity) => setLayerOpacity(id, opacity)}

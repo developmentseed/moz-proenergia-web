@@ -19,8 +19,8 @@ const MainPanel = ({ isOpen }: { isOpen: boolean }) => {
   };
   const scenarioItems = model.scenarios.map((s) => ({
     id: s.id,
-    label: s.label,
-    description: s.description,
+    label: t(`scenario.${s.id}.name`, { defaultValue: s.label }),
+    description: s.description ? t(`scenario.${s.id}.description`, { defaultValue: s.description }) : undefined,
   }));
 
   return (
@@ -43,7 +43,7 @@ const MainPanel = ({ isOpen }: { isOpen: boolean }) => {
           <Text textStyle="subTitle">{t('explorer.model')}</Text>
           <Heading as={"h2"} textStyle="modelTitle">
             {" "}
-            {model.title}{" "}
+            {t(`model.${model.id}.name`, { defaultValue: model.title })}{" "}
           </Heading>
           <Select
             title={t('explorer.scenario')}
