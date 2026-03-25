@@ -14,6 +14,9 @@
     "viewModels": "Ver Modelos",
     "imageAlt": "Ilustração de infraestrutura de energia"
   },
+  "models": {
+    "exploreModel": "Explorar Modelo"
+  },
   "auth": {
     "login": {
       "title": "Entrar",
