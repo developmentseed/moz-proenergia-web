@@ -60,6 +60,37 @@ const geocoderApi: MaplibreGeocoderApi = {
     }
     return { type: 'FeatureCollection', features };
   },
+
+  reverseGeocode: async (config) => {
+    const features: CarmenGeojsonFeature[] = [];
+    try {
+      const [longitude, latitude] = config.query as [number, number];
+      const params = new URLSearchParams({
+        lat: String(latitude),
+        lon: String(longitude),
+        format: 'geojson',
+        addressdetails: '1',
+      });
+      const request = `https://nominatim.openstreetmap.org/reverse?${params}`;
+      const response = await fetch(request);
+      const geojson = await response.json();
+      // Nominatim reverse returns a single Feature, not a FeatureCollection
+      if (geojson?.type === 'Feature') {
+        features.push({
+          type: 'Feature',
+          geometry: geojson.geometry,
+          place_name: geojson.properties.display_name,
+          properties: geojson.properties,
+          text: geojson.properties.display_name,
+          place_type: ['place'],
+          center: [longitude, latitude],
+        } as CarmenGeojsonFeature);
+      }
+    } catch (e) {
+      console.error(`Failed to reverseGeocode with error: ${e}`);
+    }
+    return { type: 'FeatureCollection', features };
+  },
 };
 
 const noop = () => {};
