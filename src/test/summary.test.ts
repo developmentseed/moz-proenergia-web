@@ -286,7 +286,7 @@ describe("transformFieldSummary — method variants", () => {
 
 describe("transformFieldSummary — chart row output", () => {
   it("Input: single column, string, no group_by, chart=bar // Output: ChartRow", () => {
-    const field: Field = { columns: ["MGCapacityBins"], label: "Capacity Bins", chart: "bar" };
+    const field: Field = { columns: ["MGCapacityBins"], label: "Capacity Bins", chartType: "bar" };
     const result = transformFieldSummary(
       oneColumnString as BatchSummariesResponse,
       field,
@@ -307,7 +307,7 @@ describe("transformFieldSummary — chart row output", () => {
       label: "HH Connections",
       method: "sum",
       group_by: "MGCapacityBins",
-      chart: "bar",
+      chartType: "bar",
     };
     const result = transformFieldSummary(
       twoColumnsGroupby as BatchSummariesResponse,
@@ -321,7 +321,7 @@ describe("transformFieldSummary — chart row output", () => {
       columns: ["NewHHConnectionsTotal"],
       label: "HH Connections",
       method: "sum",
-      chart: "bar",
+      chartType: "bar",
     };
     const result = transformFieldSummary(
       twoColumnsNumeric as BatchSummariesResponse,
@@ -336,7 +336,7 @@ describe("transformFieldSummary — chart row output", () => {
       label: "LCOE",
       method: "sum",
       group_by: "Technology2030",
-      chart: "bar",
+      chartType: "bar",
     };
     const result = transformFieldSummary(
       groupByCountZero as BatchSummariesResponse,
@@ -353,7 +353,7 @@ describe("transformFieldSummary — chart row output", () => {
       columns: ["NewHHConnectionsTotal", "travel_time_cities_h"],
       label: "Stats",
       method: "sum",
-      chart: "bar",
+      chartType: "bar",
     };
     const result = transformFieldSummary(
       twoColumnsNumeric as BatchSummariesResponse,
@@ -440,7 +440,7 @@ describe("transformFieldSummary — multi group_by", () => {
       label: "Population 2030",
       method: "sum",
       group_by: ["Technology2030", "Admin_1"],
-      chart: "bar",
+      chartType: "bar",
     };
     const result = transformFieldSummary(
       multiGroupBy as BatchSummariesResponse,

@@ -10,7 +10,7 @@ function makeGroupOrChartRow(
   mainColumn?: string,
   methodTotal?: SummaryItem,
 ): GroupRow | ChartRow | HighlightRow {
-  if (field.chart === "highlight") {
+  if (field.chartType === "highlight") {
     return {
       type: "highlight",
       label: field.label,
@@ -20,7 +20,7 @@ function makeGroupOrChartRow(
       methodTotal,
     };
   }
-  if (field.chart) {
+  if (field.chartType) {
     const numericValues = items
       .map((item) => item.value)
       .filter((v): v is number => typeof v === "number");
@@ -32,7 +32,7 @@ function makeGroupOrChartRow(
       ?? (field.group_by && mainColumn && field.group_by.includes(mainColumn) && mainColorMap ? mainColorMap : undefined);
     return {
       type: "chart",
-      chartType: field.chart,
+      chartType: field.chartType,
       label: makeLabel(field.label),
       description: field.description,
       unit: field.unit,
@@ -57,7 +57,7 @@ function makeNestedGroupOrChartRow(
   groups: NestedGroupData[],
   methodTotal?: SummaryItem,
 ): NestedGroupRow | NestedChartRow {
-  if (field.chart) {
+  if (field.chartType) {
     return {
       type: "nested-chart",
       chartType: "pie",
@@ -175,7 +175,7 @@ export function transformFieldSummary(
       })), mainColorMap, mainColumn, methodTotal);
     }
 
-    if (field.chart === "highlight") {
+    if (field.chartType === "highlight") {
       return {
         type: "highlight",
         label: field.label,
