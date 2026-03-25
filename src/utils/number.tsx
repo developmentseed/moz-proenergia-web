@@ -18,7 +18,7 @@ export function formatDisplayNumber(value: number, column?: string): string {
   const num = isInteger ? Math.round(value) : value;
 
   // if more than million, return compact form of the number (1M, 1B, 1.23B...)
-  if (Math.abs(num) >= 1_000_000) {
+  if (Math.abs(num) >= 1_000) {
     return stringFormatter.format(num);
   }
 
