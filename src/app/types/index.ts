@@ -14,6 +14,8 @@ export interface Field {
   unit?: string;
   chart?: 'bar' | 'donut' | 'stacked' | 'highlight';
   colors?: Record<string, string>;
+  showChartValueRows?: boolean;
+  showBarChartAverage?: boolean;
 }
 export interface MapItemUnit extends ItemUnit {
   color?: string;

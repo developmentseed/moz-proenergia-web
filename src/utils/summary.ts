@@ -40,6 +40,8 @@ function makeGroupOrChartRow(
       average,
       colorMap,
       methodTotal,
+      showChartValueRows: field.showChartValueRows,
+      showBarChartAverage: field.showBarChartAverage,
     };
   }
   return {
