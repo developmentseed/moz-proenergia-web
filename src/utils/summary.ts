@@ -1,6 +1,6 @@
 import { type Field } from "@/app/types";
 import { makeLabel } from "./data-transformation";
-import { type SummaryItem, type GroupRow, type ChartRow, type HighlightRow, type NestedGroupRow, type NestedChartRow, type NestedGroupData, type BatchSummariesResponse, type SummaryRow, type NumericGroupStats } from "@/app/types/summary";
+import { type SummaryItem, type GroupRow, type ChartRow, type HighlightRow, type NestedGroupRow, type NestedGroupData, type BatchSummariesResponse, type SummaryRow, type NumericGroupStats } from "@/app/types/summary";
 const DEFAULT_METHOD = "sum";
 
 function makeGroupOrChartRow(
