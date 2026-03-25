@@ -10,7 +10,8 @@ function makeGroupOrChartRow(
   mainColumn?: string,
   methodTotal?: SummaryItem,
 ): GroupRow | ChartRow | HighlightRow {
-  if (field.chart === "highlight") {
+  // Return highlight first since it needs to be handled differently fropm other chartType
+  if (field.chartType === "highlight") {
     return {
       type: "highlight",
       label: field.label,
@@ -20,7 +21,8 @@ function makeGroupOrChartRow(
       methodTotal,
     };
   }
-  if (field.chart) {
+
+  if (field.chartType) {
     const numericValues = items
       .map((item) => item.value)
       .filter((v): v is number => typeof v === "number");
@@ -32,7 +34,7 @@ function makeGroupOrChartRow(
       ?? (field.group_by && mainColumn && field.group_by.includes(mainColumn) && mainColorMap ? mainColorMap : undefined);
     return {
       type: "chart",
-      chartType: field.chart,
+      chartType: field.chartType,
       label: makeLabel(field.label),
       description: field.description,
       unit: field.unit,
@@ -52,22 +54,12 @@ function makeGroupOrChartRow(
   };
 }
 
-function makeNestedGroupOrChartRow(
+function makeNestedGroup(
   field: Field,
   groups: NestedGroupData[],
   methodTotal?: SummaryItem,
-): NestedGroupRow | NestedChartRow {
-  if (field.chart) {
-    return {
-      type: "nested-chart",
-      chartType: "pie",
-      label: makeLabel(field.label),
-      description: field.description,
-      unit: field.unit,
-      value: groups,
-      methodTotal,
-    };
-  }
+): NestedGroupRow {
+
   return {
     type: "nested-group",
     label: makeLabel(field.label),
@@ -134,7 +126,7 @@ export function transformFieldSummary(
   // Single column
   const column = field.columns[0];
   const summary = response.summaries[column];
-
+  // When summary doesn't have any values
   if (!summary || summary.count === 0) {
     return {
       type: "flat",
@@ -162,7 +154,7 @@ export function transformFieldSummary(
           return { key: l1Key, label: makeLabel(l1Key), total, items };
         });
         const methodTotal: SummaryItem = { key: methodName, label: makeLabel(methodName), value: getNumericValue(summary, methodName) };
-        return makeNestedGroupOrChartRow(field, groups, methodTotal);
+        return makeNestedGroup(field, groups, methodTotal);
       }
 
       // Single-level grouping
@@ -175,7 +167,7 @@ export function transformFieldSummary(
       })), mainColorMap, mainColumn, methodTotal);
     }
 
-    if (field.chart === "highlight") {
+    if (field.chartType === "highlight") {
       return {
         type: "highlight",
         label: field.label,
@@ -212,7 +204,7 @@ export function transformFieldSummary(
         return { key: l1Key, label: makeLabel(l1Key), total, items };
       });
       const methodTotal: SummaryItem = { key: methodName, label: makeLabel(methodName), value: summary.count };
-      return makeNestedGroupOrChartRow(field, groups, methodTotal);
+      return makeNestedGroup(field, groups, methodTotal);
     }
 
     // Single-level grouping
