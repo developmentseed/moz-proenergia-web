@@ -1,27 +1,18 @@
-import i18next from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
-import en from './locales/en.json';
-import pt from './locales/pt.json';
+import i18next from './instance';
 
 i18next
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    resources: {
-      en: { translation: en },
-      pt: { translation: pt },
-    },
-    fallbackLng: 'en',
-    defaultNS: 'translation',
     detection: {
       order: ['localStorage'],
       lookupLocalStorage: 'language',
       caches: ['localStorage'],
     },
-    interpolation: {
-      // React already escapes values
-      escapeValue: false,
+    react: {
+      bindI18nStore: 'added',
     },
   });
 

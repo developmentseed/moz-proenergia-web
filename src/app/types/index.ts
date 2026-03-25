@@ -41,6 +41,8 @@ export type FilterOptionValues = [number, number] | string[] | ItemUnit[];
 
 export interface Scenario {
   id: string;
+  name: string;
+  name_pt?: string;
   label: string;
   description?: string;
   source: SourceProps,
@@ -74,5 +76,7 @@ export interface ModelMetadata {
 export interface ModelGroupMetadata {
   id: string;
   name: string;
+  name_pt?: string;
   description: string;
+  description_pt?: string;
 }
