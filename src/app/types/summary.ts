@@ -72,6 +72,8 @@ export interface ChartRow {
   unit?: string;
   value: SummaryItem[];
   average?: number;
+  showChartValueRows?: boolean;
+  showBarChartAverage?: boolean;
   colorMap?: Record<string, string>;
   methodTotal?: SummaryItem;
 }
