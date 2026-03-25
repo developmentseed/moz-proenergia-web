@@ -186,8 +186,8 @@ const ControlsPanel = () => {
 
   return (
     // To give space for scrollable area
-    <Box p={4} pt={0} pr={0} h="full">
-      <ScrollArea.Root h="calc(100% - 3.5rem - 1px)">
+    <Box p={4} pt={0} pr={0} h={{ base: "auto", md: "full"}}>
+      <ScrollArea.Root h={{ base: "auto", md: "calc(100% - 3.5rem - 1px)" }}>
         <ScrollArea.Viewport>
           <ScrollArea.Content spaceY="4" pr={4}>
             {/* put collapsible groups first */}
@@ -249,8 +249,18 @@ const tabItems = [
   },
 ];
 
-const Control = () => {
-  return <Tab items={tabItems} />;
+const Control = ({
+  activeTab,
+  onTabChange,
+  onTabClick,
+}: {
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
+  onTabClick?: () => void;
+}) => {
+  return (
+    <Tab items={tabItems} value={activeTab} onValueChange={onTabChange} onTabClick={onTabClick} />
+  );
 };
 
 export { Control };

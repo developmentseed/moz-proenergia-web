@@ -3,12 +3,24 @@ import { type TabItem } from "@/app/types/ui";
 
 interface TabProps {
   items: TabItem[];
+  value?: string;
+  onValueChange?: (value: string) => void;
+  onTabClick?: () => void;
 }
 
-const Tab = ({ items }: TabProps) => {
+const Tab = ({ items, value, onValueChange, onTabClick }: TabProps) => {
+  const controlledProps =
+    value !== undefined
+      ? {
+          value,
+          onValueChange: ({ value: v }: { value: string }) =>
+            onValueChange?.(v),
+        }
+      : { defaultValue: items[0].id };
+
   return (
     <Tabs.Root
-      defaultValue={items[0].id}
+      {...controlledProps}
       fitted
       variant="line"
       flex="1"
@@ -18,7 +30,7 @@ const Tab = ({ items }: TabProps) => {
     >
       <Tabs.List>
         {items.map((item) => (
-          <Tabs.Trigger key={item.id} value={item.id} colorPalette="yellow">
+          <Tabs.Trigger key={item.id} value={item.id} colorPalette="yellow" onClick={onTabClick}>
             {item.label}
           </Tabs.Trigger>
         ))}

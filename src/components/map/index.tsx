@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useCallback, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Map,
   ViewStateChangeEvent,
   NavigationControl,
   ScaleControl,
+  type MapLayerMouseEvent,
 } from "react-map-gl/maplibre";
 import { Box, Flex } from "@chakra-ui/react";
 import * as pmtiles from "pmtiles";
@@ -23,17 +24,12 @@ import {
 } from "./hooks/use-coordinates";
 import { CenterMapControl } from './recenter-button';
 import GeocoderControl from './geocoder-control';
-import { useMouseEvent } from "./hooks/use-mouse-event";
 import { type Main } from "@/app/types";
 import { buildExpressionWithFilter } from "@/utils/map/filter";
-import SummaryPanel from "./summary-panel";
 import { Legend } from "./legend";
 import { ContextualLayer } from "./contextual-layer";
 import { MainLayer } from "./main-layer";
 import { BasemapSelector, BASEMAP_OPTIONS } from "./basemap-selector";
-import { AnimationTime, ControlPanelWidth } from "../ui/main-panel";
-import { useToggle } from "@/hooks/use-toggle";
-import { PanelToggleButton } from "../ui/panel-toggle-button";
 
 const transformRequest: RequestTransformFunction = (url, resourceType) => {
   if (isMapboxURL(url)) {
@@ -48,13 +44,13 @@ const transformRequest: RequestTransformFunction = (url, resourceType) => {
 
 interface MainMapProps {
   main: Main;
+  onClick: (event: MapLayerMouseEvent) => void;
+  clusterId: string | null;
 }
 
-const MainMap = ({ main }: MainMapProps) => {
+const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
   const { coords, setCoords } = useCoordinates();
   const { lat, lng, zoom } = coords;
-  const { selected, setSelected, onClick } = useMouseEvent();
-  const { isOpen, toggle, open } = useToggle(true);
 
   // Attach pmtile protocol to MapLibre
   useEffect(() => {
@@ -79,50 +75,40 @@ const MainMap = ({ main }: MainMapProps) => {
   const selectedBasemap =
     BASEMAP_OPTIONS.find((o) => o.id === currentBasemapId) ?? BASEMAP_OPTIONS[0];
 
-  const resetCluster = useCallback(() => {
-    setSelected(null);
-  }, [setSelected]);
-
-  useEffect(() => {
-    if (selected !== null) {
-      open();
-    }
-  }, [selected, open]);
-
   return (
     <Flex w="100%" h="100%" className="map-container" position="relative">
       {/* Map takes all remaining width */}
       <Box flex={1} h="full" position="relative">
         <Map
           initialViewState={{
-          longitude: lng,
-          latitude: lat,
-          zoom: zoom,
-          padding: { top: 20, bottom: 20, left: 20, right: 20 },
-        }}
+            longitude: lng,
+            latitude: lat,
+            zoom: zoom,
+            padding: { top: 20, bottom: 20, left: 20, right: 20 },
+          }}
           dragRotate={false}
           touchZoomRotate={false}
           minZoom={mapConfig.minZoom}
           style={{ width: "100%", height: "100%" }}
           onClick={onClick}
           onMoveEnd={(e: ViewStateChangeEvent) => {
-          setCoords({
-            lng: e.viewState.longitude,
-            lat: e.viewState.latitude,
-            zoom: e.viewState.zoom,
-          });
-        }}
+            setCoords({
+              lng: e.viewState.longitude,
+              lat: e.viewState.latitude,
+              zoom: e.viewState.zoom,
+            });
+          }}
           mapStyle={selectedBasemap.styleUrl}
           transformRequest={transformRequest}
           interactiveLayerIds={zoom > 9 ? [main.id, main.id + '-line', main.id + '-circle'] : []}
-      >
+        >
           <MainLayer
             scenario={scenario}
             main={main}
             mapFilter={mapFilter}
-            clusterId={selected}
+            clusterId={clusterId}
             opacity={mainLayerOpacity / 100}
-        />
+          />
           <ContextualLayer />
           <ScaleControl position="bottom-left" />
           <NavigationControl showCompass={false} position="bottom-left" />
@@ -140,32 +126,10 @@ const MainMap = ({ main }: MainMapProps) => {
           <BasemapSelector
             currentBasemapId={currentBasemapId}
             onBasemapChange={setCurrentBasemapId}
-        />
+          />
         </Map>
         <Legend items={main.options} main={main} onMainOpacityChange={setMainLayerOpacity} />
       </Box>
-
-      <PanelToggleButton
-        isOpen={isOpen}
-        onToggle={toggle}
-        side="right"
-        label="analysis panel"
-        panelWidth={ControlPanelWidth}
-        animationTime={AnimationTime}
-      />
-
-      {/* Summary panel slides in/out from the right */}
-      <SummaryPanel
-        clusterId={selected}
-        scenarioId={scenarioId}
-        popupFields={model.popupFields}
-        summaryFields={model.summaryFields}
-        filters={updatedFilters}
-        filterDefs={model.filters}
-        resetCluster={resetCluster}
-        main={main}
-        isOpen={isOpen}
-      />
     </Flex>
   );
 };

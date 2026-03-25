@@ -13,16 +13,6 @@ export const textStyles = defineTextStyles({
         textTransform: 'uppercase'
     }
   },
-  modelTitle: {
-    description: 'big text for model title, analysis title',
-    value: {
-      color: 'fg',
-      fontFamily: "body",
-      fontSize: "xl",
-      fontWeight: 600,
-      lineHeight: '2rem'
-    }
-  },
   collapsibleGroupTitle: {
     description: "Title for collapsible area",
     value: {

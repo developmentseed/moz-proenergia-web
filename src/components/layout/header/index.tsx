@@ -1,10 +1,12 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Box, Heading, Flex, HStack, Text, Link, Separator } from "@chakra-ui/react";
+import { Box, Heading, Flex, HStack, Text, Link, Separator, MenuRoot, MenuTrigger, Menu, MenuContent, MenuItem, IconButton } from "@chakra-ui/react";
 import NextLink from "next/link";
 import Image from "next/image";
+import { LuMenu } from "react-icons/lu";
 import DropdownMenu from "./dropdown-menu";
+import { controlZIndex } from "@/components/map/control-constant";
 
 export interface NavigationItem {
   label: string;
@@ -76,24 +78,59 @@ export const Header = ({
 
         {/* Navigation Items - Right */}
         <HStack fontFamily="body" gap={6}>
-          {navigationItems.map((item) => {
-            const active = isActive(item.href);
-            return (
-              <Box key={item.href}>
-                <Link
-                  fontSize="sm"
-                  fontWeight={active ? "bold" : "medium"}
-                  color={active ? "fg" : "fg.muted"}
-                  transition="color 0.2s"
-                  asChild
-                  _hover={{ textDecoration: "none", outline: "none" }}
+          <HStack gap={6} display={{ base: 'none', md: 'flex' }}>
+            {navigationItems.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <Box key={item.href}>
+                  <Link
+                    fontSize="sm"
+                    fontWeight={active ? "bold" : "medium"}
+                    color={active ? "fg" : "fg.muted"}
+                    transition="color 0.2s"
+                    asChild
+                    _hover={{ textDecoration: "none", outline: "none" }}
+                  >
+                    <NextLink href={item.href}>{item.label}</NextLink>
+                  </Link>
+                </Box>
+              );
+            })}
+            <Separator orientation="vertical" height="4" />
+          </HStack>
+
+          {/* Mobile hamburger menu */}
+          <Box display={{ base: 'block', md: 'none' }}>
+            <MenuRoot>
+              <MenuTrigger asChild>
+                <IconButton
+                  aria-label="Open navigation menu"
+                  variant="plain"
+                  size="sm"
+                  color="fg.muted"
                 >
-                  <NextLink href={item.href}>{item.label}</NextLink>
-                </Link>
-              </Box>
-            );
-          })}
-          <Separator orientation="vertical" height="4" />
+                  <LuMenu />
+                </IconButton>
+              </MenuTrigger>
+              <Menu.Positioner>
+                <MenuContent zIndex={controlZIndex + 2}>
+                  {navigationItems.map((item) => (
+                    <MenuItem key={item.href} value={item.href} cursor="pointer" asChild>
+                      <NextLink href={item.href}>
+                        <Text
+                          fontSize="sm"
+                          fontWeight={isActive(item.href) ? "bold" : "normal"}
+                        >
+                          {item.label}
+                        </Text>
+                      </NextLink>
+                    </MenuItem>
+                  ))}
+                </MenuContent>
+              </Menu.Positioner>
+            </MenuRoot>
+          </Box>
+
           <DropdownMenu />
         </HStack>
       </Flex>

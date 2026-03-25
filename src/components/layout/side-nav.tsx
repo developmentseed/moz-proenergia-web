@@ -3,9 +3,9 @@
 import { Box, VStack } from '@chakra-ui/react';
 import Link from 'next/link';
 import Image from 'next/image';
-import modelConfig from '@/config/model.json';
 import { ModelGroupMetadata } from '@/app/types';
 import { slugify } from '@/utils/data-transformation';
+import { getIconPath } from '@/utils/model-icon';
 import { Tooltip } from '../ui/tooltip';
 
 interface SideNavProps {
@@ -14,13 +14,10 @@ interface SideNavProps {
 }
 
 export const SideNav = ({ models, currentSlug }: SideNavProps) => {
-  const getIconPath = (modelId: string) => {
-    const config = modelConfig.find((c) => String(c.model) === String(modelId));
-    return config ? `/model-icon/${config.icon}` : `/model-icon/default.svg`;
-  };
-
   return (
     <Box
+      display={{ base: 'none', md: 'flex' }}
+      flexDirection="column"
       height="full"
       bg="navBg"
       borderRight="1px solid"
