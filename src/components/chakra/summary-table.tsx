@@ -179,6 +179,7 @@ function ChartValueRows({ row }: { row: ChartRow }) {
 }
 
 function ChartRowView({ row }: { row: ChartRow }) {
+  if (!Array.isArray(row.value)) return null;
   if (row.chartType === "bar") {
     return (
       <>
