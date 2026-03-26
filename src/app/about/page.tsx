@@ -34,11 +34,11 @@ const overrideComponents = {
 };
 
 export default function Page() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const Content = i18n.language?.startsWith("pt") ? AboutContentPt : AboutContentEn;
 
   return (
-    <Shell breadcrumb={[{ label: "About" }]}>
+    <Shell breadcrumb={[{ label: t("breadcrumbs.about") }]}>
       <Content components={overrideComponents} />
     </Shell>
   );
