@@ -199,10 +199,10 @@ function ChartRowView({ row }: { row: ChartRow }) {
         </Table.Row>
         <Table.Row _last={lastRowStyleProps}>
           <Table.Cell colSpan={2} border="none">
-            <SummaryBarChart data={row.value} average={row.average} colorMap={row.colorMap} unit={row.unit} />
+            <SummaryBarChart data={row.value} average={row.showBarChartAverage ? row.average : undefined} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
-        <ChartValueRows row={row} />
+        {row.showChartValueRows !== false && <ChartValueRows row={row} />}
       </>
     );
   }
@@ -229,7 +229,7 @@ function ChartRowView({ row }: { row: ChartRow }) {
             <SummaryDonutChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
-        <ChartValueRows row={row} />
+        {row.showChartValueRows !== false && <ChartValueRows row={row} />}
       </>
     );
   }
@@ -256,7 +256,7 @@ function ChartRowView({ row }: { row: ChartRow }) {
             <SummaryStackedBarChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
-        <ChartValueRows row={row} />
+        {row.showChartValueRows !== false && <ChartValueRows row={row} />}
       </>
     );
   }
