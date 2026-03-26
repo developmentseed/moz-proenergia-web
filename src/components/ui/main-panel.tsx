@@ -5,20 +5,22 @@ import { Text, Box, Heading } from "@chakra-ui/react";
 import { Select } from "@/components/chakra";
 import { Control as ControlPanel } from "./control";
 import { useModel } from "@/utils/context/model";
+import { useTranslation } from "react-i18next";
 
 export const ControlPanelWidth = 350;
 export const AnimationTime = "0.32s";
 
 const MainPanel = ({ isOpen }: { isOpen: boolean }) => {
   const { model, scenarioId, setScenarioId } = useModel();
+  const { t } = useTranslation();
 
   const onChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setScenarioId(e.target.value);
   };
   const scenarioItems = model.scenarios.map((s) => ({
     id: s.id,
-    label: s.label,
-    description: s.description,
+    label: t(`scenario.${s.id}.name`, { defaultValue: s.label }),
+    description: s.description ? t(`scenario.${s.id}.description`, { defaultValue: s.description }) : undefined,
   }));
 
   return (
@@ -38,13 +40,13 @@ const MainPanel = ({ isOpen }: { isOpen: boolean }) => {
         height="100%"
       >
         <Box p={4}>
-          <Text textStyle="subTitle">Model</Text>
+          <Text textStyle="subTitle">{t('explorer.model')}</Text>
           <Heading as={"h2"} textStyle="modelTitle">
             {" "}
-            {model.title}{" "}
+            {t(`model.${model.id}.name`, { defaultValue: model.title })}{" "}
           </Heading>
           <Select
-            title={"Scenario"}
+            title={t('explorer.scenario')}
             items={scenarioItems}
             value={scenarioId}
             onChange={onChange}

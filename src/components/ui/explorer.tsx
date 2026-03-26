@@ -27,6 +27,7 @@ import {
 import { type ModelMetadata } from "@/app/types";
 import MainPanel from "./main-panel";
 import { Tooltip } from "./tooltip";
+import { useTranslation } from "react-i18next";
 
 const ControlPanelWidth = 350;
 const AnimationTime = "0.3s";
@@ -34,6 +35,7 @@ const AnimationTime = "0.3s";
 const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const [isOpen, setIsOpen] = useState(true);
   const { token } = useAuth();
+  const { t } = useTranslation();
 
   // Query 1: Model metadata
   const { data: modelCore } = useQuery({
@@ -102,11 +104,10 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
         flexDirection="column"
       >
         <Box>
-          This data doesnt look like it is ready. Make sure there are scenarios
-          related to this model.
+          {t('explorer.errorNotReady')}
         </Box>
         <Box mt={4} textDecoration="underline">
-          <NextLink href="/models">Return to models</NextLink>
+          <NextLink href="/models">{t('explorer.returnToModels')}</NextLink>
         </Box>
       </Box>
     );
@@ -131,7 +132,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
           <Flex id="container" width="full" height="full" position="relative">
             <MainPanel isOpen={isOpen} />
             {/* Toggle Button Tab */}
-            <Tooltip content={isOpen ? "Collapse control panel" : "Expand control panel"}>
+            <Tooltip content={isOpen ? t('explorer.collapsePanel') : t('explorer.expandPanel')}>
               <Box
                 position="absolute"
                 left={isOpen ? `calc(${ControlPanelWidth}px - 1px)` : 0}
@@ -141,7 +142,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
                 transition={`left ${AnimationTime} ease`}
               >
                 <IconButton
-                  aria-label={isOpen ? "Collapse control panel" : "Expand control panel"}
+                  aria-label={isOpen ? t('explorer.collapsePanel') : t('explorer.expandPanel')}
                   onClick={() => setIsOpen(!isOpen)}
                   variant="solid"
                   size="sm"

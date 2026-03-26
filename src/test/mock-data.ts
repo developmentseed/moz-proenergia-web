@@ -7,6 +7,7 @@ export const mockModel: ModelMetadata = {
   scenarios: [
     {
       id: "baseline",
+      name: "Baseline",
       label: "Baseline",
       source: { type: "vector", url: "test.pmtiles" },
       layer: { source: "test", "source-layer": "data", type: "fill" },

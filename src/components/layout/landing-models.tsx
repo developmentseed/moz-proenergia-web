@@ -11,11 +11,13 @@ import {
   useQuery
 } from '@tanstack/react-query';
 import { slugify, fetchModels } from '@/utils/data-transformation';
+import { useTranslation } from 'react-i18next';
 import { SimpleGrid, Text, Box } from '@chakra-ui/react';
 import { DrawerSummaryTable } from './drawer-summary-table';
 import { LuArrowRight } from 'react-icons/lu';
 
 export default function ModelCards() {
+  const { t } = useTranslation();
   const [selectedModel, setSelectedModel] = useState<{ id: string; name: string; description: string; slug: string } | null>(null);
 
   const { data: models } = useQuery({
@@ -28,8 +30,8 @@ export default function ModelCards() {
       <Heading size="3xl">Models</Heading>
       <SimpleGrid columns={2} py={6} gap={6} minChildWidth="md">
         {models?.map(e => (
-          <div key={e.id} onClick={() => setSelectedModel({ id: String(e.id), name: e.name, description: e.description, slug: slugify(e.name) })} style={{ cursor: 'pointer' }}>
-            <Card title={e.name} description={e.description} />
+          <div key={e.id} onClick={() => setSelectedModel({ id: String(e.id), name: t(`model.${e.id}.name`, { defaultValue: e.name }), description: t(`model.${e.id}.description`, { defaultValue: e.description }), slug: slugify(e.name) })} style={{ cursor: 'pointer' }}>
+            <Card title={t(`model.${e.id}.name`, { defaultValue: e.name })} description={t(`model.${e.id}.description`, { defaultValue: e.description })} />
           </div>
         ))}
         {!models && <Center py={10}>
@@ -60,7 +62,7 @@ export default function ModelCards() {
           drawerFooterContent={
             <Button asChild variant="solid" colorPalette="yellow">
               <NextLink href={`/model/${selectedModel.slug}`}>
-                Explore Model
+                {t('models.exploreModel')}
                 <LuArrowRight />
               </NextLink>
             </Button>
