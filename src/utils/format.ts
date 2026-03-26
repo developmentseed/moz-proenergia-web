@@ -1,4 +1,5 @@
-export function truncatedClean(str: string, maxLength: number) {
+export function truncatedClean(str: string | null, maxLength: number) {
+  if (!str) return '';
   // Check if the string is already shorter than or equal to the max length
   if (str.length <= maxLength) {
     return str;
