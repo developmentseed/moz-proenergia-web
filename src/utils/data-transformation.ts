@@ -4,7 +4,7 @@ import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, Field, MapItemUn
 import { api, MEDIA_URL_PREFIX, DEFAULT_COL } from '@/utils/api';
 import { sortFilterOptions } from '@/config/filters';
 import mapConfig from '@/config/map.json';
-import i18n from '@/i18n/instance';
+import { registerI18nResource } from '@/utils/i18n';
 const ADMIN_COLUMNS = [
   "Admin_1",
   "Admin_2",
@@ -197,12 +197,11 @@ export async function fetchModels(signal?: AbortSignal): Promise<ModelGroupMetad
     // @TODO return models as it is. Returning lcoe and mini grids until data getting ingested.
     const models = data.results as ModelGroupMetadata[];
 
-    // Register dynamic i18n resources for model names and descriptions
     models.forEach((m) => {
-      i18n.addResource('en', 'translation', `model.${m.id}.name`, m.name);
-      if (m.name_pt) i18n.addResource('pt', 'translation', `model.${m.id}.name`, m.name_pt);
-      i18n.addResource('en', 'translation', `model.${m.id}.description`, m.description);
-      if (m.description_pt) i18n.addResource('pt', 'translation', `model.${m.id}.description`, m.description_pt);
+      registerI18nResource(`model.${m.id}`, {
+        name: { en: m.name, pt: m.name_pt },
+        description: { en: m.description, pt: m.description_pt },
+      });
     });
 
     return models;
@@ -303,22 +302,20 @@ export function replaceSummaryIdColumn(fields: Field[], metricField: Record<stri
 export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetadata, 'filters' | 'layers'> & { filterFields: ApiFilterField[]; colorCoding: ColorCoding[] } {
   const modelId = String(apiModel.id);
 
-  // Register dynamic i18n resources for model name and description
-  i18n.addResource('en', 'translation', `model.${modelId}.name`, apiModel.name);
-  if (apiModel.name_pt) i18n.addResource('pt', 'translation', `model.${modelId}.name`, apiModel.name_pt);
-  i18n.addResource('en', 'translation', `model.${modelId}.description`, apiModel.description);
-  if (apiModel.description_pt) i18n.addResource('pt', 'translation', `model.${modelId}.description`, apiModel.description_pt);
+  registerI18nResource(`model.${modelId}`, {
+    name: { en: apiModel.name, pt: apiModel.name_pt },
+    description: { en: apiModel.description, pt: apiModel.description_pt },
+  });
 
   const scenarios: Scenario[] = apiModel.scenarios
     // @TODO: Filtering LCOE model until performance improvement
     // .filter(s => s.id !== 1)
     .filter(s => s.model_file !== null)
     .map(s => {
-      // Register dynamic i18n resources for scenario names and descriptions
-      i18n.addResource('en', 'translation', `scenario.${s.id}.name`, s.name);
-      if (s.name_pt) i18n.addResource('pt', 'translation', `scenario.${s.id}.name`, s.name_pt);
-      if (s.description) i18n.addResource('en', 'translation', `scenario.${s.id}.description`, s.description);
-      if (s.description_pt) i18n.addResource('pt', 'translation', `scenario.${s.id}.description`, s.description_pt);
+      registerI18nResource(`scenario.${s.id}`, {
+        name: { en: s.name, pt: s.name_pt },
+        ...(s.description && { description: { en: s.description, pt: s.description_pt } }),
+      });
 
       return {
         id: String(s.id),
@@ -371,11 +368,10 @@ export function transformVectorsToLayers(apiVectors: ApiVectorResult[]): Layer[]
   return apiVectors.map(v => {
     const sourceId = String(v.id) + 'vector-source';
 
-    // Register dynamic i18n resources for layer names and descriptions
-    i18n.addResource('en', 'translation', `layer.${sourceId}.label`, v.name);
-    if (v.name_pt) i18n.addResource('pt', 'translation', `layer.${sourceId}.label`, v.name_pt);
-    i18n.addResource('en', 'translation', `layer.${sourceId}.description`, v.description);
-    if (v.description_pt) i18n.addResource('pt', 'translation', `layer.${sourceId}.description`, v.description_pt);
+    registerI18nResource(`layer.${sourceId}`, {
+      label: { en: v.name, pt: v.name_pt },
+      description: { en: v.description, pt: v.description_pt },
+    });
 
     return {
       id: sourceId,
