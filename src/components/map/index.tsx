@@ -19,9 +19,7 @@ import "@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css";
 import mapConfig from "@/config/map.json";
 import { useModel } from "@/utils/context/model";
 import { useFilters } from "@/utils/context/filters";
-import {
-  useCoordinates,
-} from "./hooks/use-coordinates";
+import { useMapCoords } from "@/utils/context/map-coords";
 import { CenterMapControl } from './recenter-button';
 import GeocoderControl from './geocoder-control';
 import { type Main } from "@/app/types";
@@ -49,7 +47,7 @@ interface MainMapProps {
 }
 
 const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
-  const { coords, setCoords } = useCoordinates();
+  const { coords, setCoords } = useMapCoords();
   const { lat, lng, zoom } = coords;
 
   // Attach pmtile protocol to MapLibre

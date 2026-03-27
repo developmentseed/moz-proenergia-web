@@ -9,6 +9,7 @@ import { type SummaryData } from "@/app/types/summary";
 import { SummaryTable } from "@/components/chakra/summary-table";
 import { useSummaryQuery } from "@/hooks/use-summary-query";
 import { AnimationTime, ControlPanelWidth } from "../ui/main-panel";
+import { useTranslation } from "react-i18next";
 
 interface SummaryPanelProps {
   clusterId: string | null;
@@ -109,6 +110,8 @@ const SummaryPanel = ({
   isOpen,
   onToggle = () => {},
 }: SummaryPanelProps) => {
+  const { t } = useTranslation();
+
   const {
     data: clusterData,
     isLoading: clusterIsLoading,
@@ -145,12 +148,14 @@ const SummaryPanel = ({
     ? clusterIsLoading || clusterIsFetching
     : summaryIsLoading;
 
-  const title = showingCluster ? `Cluster - ${clusterId}` : "Summary";
+  const title = showingCluster
+    ? t('explorer.cluster', { clusterId })
+    : t('explorer.summary');
 
   const summaryContent = (
     <>
       <PanelHeader
-        subtitle="analysis"
+        subtitle={t('explorer.analysis')}
         title={title}
         onBack={showingCluster ? resetCluster : undefined}
       />

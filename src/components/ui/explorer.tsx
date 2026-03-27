@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
-import { useCoordinates } from "../map/hooks/use-coordinates";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ModelProvider } from "@/utils/context/model";
 import { ContextualLayersProvider } from "@/utils/context/contextual-layers";
@@ -26,14 +25,17 @@ import { type ModelMetadata } from "@/app/types";
 import MainPanel from "./main-panel";
 import SummaryPanel from "@/components/map/summary-panel";
 import { Tooltip } from "./tooltip";
+import { useTranslation } from "react-i18next";
 import { useToggle } from "@/hooks/use-toggle";
 import { useMouseEvent } from "@/components/map/hooks/use-mouse-event";
 import { ControlPanelWidth, AnimationTime } from "./main-panel";
+import { useMapCoords } from "@/utils/context/map-coords";
 
 const ExplorerInner = () => {
   const { model, scenarioId } = useModel();
   const { updatedFilters } = useFilters();
   const { selected, onClick, setSelected } = useMouseEvent();
+  const { t } = useTranslation();
 
   const [isControlsOpen, setIsControlsOpen] = useState(true);
   const { isOpen: isSummaryOpen, toggle: toggleSummary, open: openSummary, close: closeSummary } = useToggle(true);
@@ -72,7 +74,7 @@ const ExplorerInner = () => {
 
       {/* Desktop-only toggle button */}
       <Tooltip
-        content={isControlsOpen ? "Collapse control panel" : "Expand control panel"}
+        content={isControlsOpen ? t('explorer.collapsePanel') : t('explorer.expandPanel')}
       >
         <Box
           display={{ base: "none", md: "block" }}
@@ -171,6 +173,7 @@ const ExplorerInner = () => {
 
 const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const { token } = useAuth();
+  const { t } = useTranslation();
 
   // Query 1: Model metadata
   const { data: modelCore } = useQuery({
@@ -226,7 +229,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   }, [modelCore, allFilterOptions]);
 
   // Get rid of coordinates related query parameters when explorer is unmounted
-  const { removeCoordinates } = useCoordinates();
+  const { removeCoordinates } = useMapCoords();
   useEffect(() => {
     return () => {
       removeCoordinates();
@@ -247,11 +250,10 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
         flexDirection="column"
       >
         <Box>
-          This data doesnt look like it is ready. Make sure there are scenarios
-          related to this model.
+          {t('explorer.errorNotReady')}
         </Box>
         <Box mt={4} textDecoration="underline">
-          <NextLink href="/models">Return to models</NextLink>
+          <NextLink href="/models">{t('explorer.returnToModels')}</NextLink>
         </Box>
       </Box>
     );

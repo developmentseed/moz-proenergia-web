@@ -7,6 +7,7 @@ import { MEDIA_URL_PREFIX } from "@/utils/api";
 import { DownloadButton } from "@/components/chakra/download-button";
 import { ModalDialog } from "@/components/chakra/modal";
 import { type Layer } from "@/app/types";
+import { useTranslation } from "react-i18next";
 
 interface LayerControlProps {
   layer: Layer;
@@ -15,7 +16,10 @@ interface LayerControlProps {
 }
 
 export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) => {
+  const { t } = useTranslation();
   const [infoOpen, setInfoOpen] = useState(false);
+  const layerLabel = t(`layer.${layer.id}.label`, { defaultValue: layer.label });
+  const layerDescription = layer.description ? t(`layer.${layer.id}.description`, { defaultValue: layer.description }) : undefined;
 
   const onCheckedChange = (details: CheckboxCheckedChangeDetails) => {
     onChange({ [layer.id]: details.checked as boolean });
@@ -25,8 +29,8 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
     <>
       <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" py="0.5" px='4'>
         <Box display="flex" alignItems="center" gap="1">
-          <Text fontSize="sm" fontFamily="body">{layer.label}</Text>
-          {layer.description && (
+          <Text fontSize="sm" fontFamily="body">{layerLabel}</Text>
+          {layerDescription && (
             <IconButton
               aria-label="Layer info"
               size="2xs"
@@ -39,7 +43,7 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
           )}
         </Box>
         <Box display="flex" alignItems="center" gap="2">
-          {layer.filePath && <DownloadButton url={`${MEDIA_URL_PREFIX}${layer.filePath}`} label={`Download ${layer.label}`} />}
+          {layer.filePath && <DownloadButton url={`${MEDIA_URL_PREFIX}${layer.filePath}`} label={`Download ${layerLabel}`} />}
           <Switch.Root value={layer.id} onCheckedChange={onCheckedChange} checked={selected}>
             <Switch.HiddenInput />
             <Switch.Control>
@@ -50,9 +54,9 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
       </Box>
 
       <ModalDialog
-        modalTitle={layer.label}
-        modalContent={layer.description ? (
-          <Text fontSize="sm">{layer.description}</Text>
+        modalTitle={layerLabel}
+        modalContent={layerDescription ? (
+          <Text fontSize="sm">{layerDescription}</Text>
         ) : (
           <Text fontSize="sm" color="fg.muted" fontStyle="italic">
             No description available.

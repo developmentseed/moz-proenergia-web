@@ -72,6 +72,8 @@ export interface ChartRow {
   unit?: string;
   value: SummaryItem[];
   average?: number;
+  showChartValueRows?: boolean;
+  showBarChartAverage?: boolean;
   colorMap?: Record<string, string>;
   methodTotal?: SummaryItem;
 }
@@ -100,17 +102,6 @@ export interface NestedGroupRow {
   methodTotal?: SummaryItem;
 }
 
-export interface NestedChartRow {
-  type: "nested-chart";
-  chartType: "pie";
-  label: string;
-  description?: string;
-  category?: string;
-  unit?: string;
-  value: NestedGroupData[];
-  methodTotal?: SummaryItem;
-}
-
 export interface HighlightRow {
   type: "highlight";
   label: string;
@@ -121,5 +112,5 @@ export interface HighlightRow {
   methodTotal?: SummaryItem;
 }
 
-export type SummaryRow = FlatRow | GroupRow | ChartRow | ErrorRow | NestedGroupRow | NestedChartRow | HighlightRow;
+export type SummaryRow = FlatRow | GroupRow | ChartRow | ErrorRow | NestedGroupRow | HighlightRow;
 export type SummaryData = SummaryRow[];

@@ -8,6 +8,7 @@ import {
 import { LuChevronUp } from "react-icons/lu";
 import { InfoTip } from "./toggle-tip";
 import { formatDisplayNumber } from "@/utils/number";
+import { parseSortPrefix, stripSortPrefix } from "@/utils/string";
 import { SummaryBarChart } from "@/components/chakra/chart/bar";
 import { SummaryDonutChart } from "@/components/chakra/chart/pie";
 import { SummaryStackedBarChart } from "@/components/chakra/chart/stacked";
@@ -178,6 +179,7 @@ function ChartValueRows({ row }: { row: ChartRow }) {
 }
 
 function ChartRowView({ row }: { row: ChartRow }) {
+  if (!Array.isArray(row.value)) return null;
   if (row.chartType === "bar") {
     return (
       <>
@@ -198,10 +200,10 @@ function ChartRowView({ row }: { row: ChartRow }) {
         </Table.Row>
         <Table.Row _last={lastRowStyleProps}>
           <Table.Cell colSpan={2} border="none">
-            <SummaryBarChart data={row.value} average={row.average} colorMap={row.colorMap} unit={row.unit} />
+            <SummaryBarChart data={row.value} average={row.showBarChartAverage ? row.average : undefined} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
-        <ChartValueRows row={row} />
+        {row.showChartValueRows !== false && <ChartValueRows row={row} />}
       </>
     );
   }
@@ -228,7 +230,7 @@ function ChartRowView({ row }: { row: ChartRow }) {
             <SummaryDonutChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
-        <ChartValueRows row={row} />
+        {row.showChartValueRows !== false && <ChartValueRows row={row} />}
       </>
     );
   }
@@ -255,7 +257,7 @@ function ChartRowView({ row }: { row: ChartRow }) {
             <SummaryStackedBarChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
-        <ChartValueRows row={row} />
+        {row.showChartValueRows !== false && <ChartValueRows row={row} />}
       </>
     );
   }
@@ -391,7 +393,13 @@ function SummaryRowView({ row }: { row: SummaryRow }) {
 }
 
 export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible = true }: SummaryTableProps) => {
-  const groups = data ? groupByCategory(data) : [];
+  const groups = data
+    ? groupByCategory(data).sort((a, b) => {
+        if (a.category === null) return -1;
+        if (b.category === null) return 1;
+        return parseSortPrefix(a.category) - parseSortPrefix(b.category);
+      })
+    : [];
   return (
     <Box maxHeight={maxHeight} width="100%">
       {isLoading && (
@@ -442,7 +450,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
                       fontSize="md"
                       fontWeight="semibold"
                     >
-                      {group.category}
+                      {stripSortPrefix(group.category)}
                       <Accordion.ItemIndicator ml="auto">
                         <LuChevronUp />
                       </Accordion.ItemIndicator>

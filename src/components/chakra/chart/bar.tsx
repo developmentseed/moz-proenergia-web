@@ -73,7 +73,7 @@ export const SummaryBarChart = ({ data, color = "orange", average, colorMap, uni
             dataKey={chart.key(item.name)}
             fill={chart.color(item.color)}
             stackId={colorMap ? "a" : undefined}
-            barSize={Math.min(40, 200 / data.length)}
+            barSize={Math.min(40, 200 / (data?.length || 1))}
           />
         ))}
       </BarChart>

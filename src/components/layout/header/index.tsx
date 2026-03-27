@@ -7,6 +7,8 @@ import Image from "next/image";
 import { LuMenu } from "react-icons/lu";
 import DropdownMenu from "./dropdown-menu";
 import { controlZIndex } from "@/components/map/control-constant";
+import { LanguageSwitcher } from "./language-switcher";
+import { useTranslation } from "react-i18next";
 
 export interface NavigationItem {
   label: string;
@@ -15,20 +17,19 @@ export interface NavigationItem {
 
 interface HeaderProps {
   logoSrc?: string;
-  navigationItems?: NavigationItem[];
 }
-
-const defaultNavigationItems: NavigationItem[] = [
-  { label: "Explorer", href: "/models" },
-  { label: "About", href: "/about" },
-  { label: "Downloads", href: "/downloads" },
-];
 
 export const Header = ({
   logoSrc = "/Logo.svg",
-  navigationItems = defaultNavigationItems,
 }: HeaderProps) => {
   const pathname = usePathname();
+  const { t } = useTranslation();
+
+  const navigationItems: NavigationItem[] = [
+    { label: t('nav.explorer'), href: "/models" },
+    { label: t('nav.about'), href: "/about" },
+    { label: t('nav.downloads'), href: "/downloads" },
+  ];
 
   const isActive = (href: string) => {
     // For /model/* paths, match any model page to Explorer
@@ -97,6 +98,8 @@ export const Header = ({
               );
             })}
             <Separator orientation="vertical" height="4" />
+          <LanguageSwitcher />
+          <Separator orientation="vertical" height="4" />
           </HStack>
 
           {/* Mobile hamburger menu */}

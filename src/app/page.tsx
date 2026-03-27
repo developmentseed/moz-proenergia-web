@@ -1,7 +1,12 @@
+'use client';
+
 import { Box, Heading, Text, Button, Image, VStack } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { useTranslation } from "react-i18next";
 
 export default function Home() {
+  const { t } = useTranslation();
+
   return (
     <Box h="calc(100vh - 57px)" display="flex">
       <Box
@@ -18,10 +23,7 @@ export default function Home() {
             Proenergia+ IEP
           </Heading>
           <Text fontSize="lg" color="gray.600">
-            A web platform for integrated energy planning and analysis in
-            Mozambique. Proenergia+ IEP aims to increase access to energy and
-            broadband services in project areas and strengthen the operational
-            performance of the electric utility.
+            {t('home.description')}
           </Text>
           <Box
             pt={4}
@@ -31,10 +33,10 @@ export default function Home() {
             width="full"
           >
             <Button asChild size="lg" variant="outline">
-              <NextLink href="/about">Learn More</NextLink>
+              <NextLink href="/about">{t('home.learnMore')}</NextLink>
             </Button>
             <Button asChild size="lg" variant="solid" colorPalette="yellow">
-              <NextLink href="/models">View Models</NextLink>
+              <NextLink href="/models">{t('home.viewModels')}</NextLink>
             </Button>
           </Box>
         </VStack>
@@ -47,7 +49,7 @@ export default function Home() {
       >
         <Image
           src="/landing-image1.png"
-          alt="Energy infrastructure illustration"
+          alt={t('home.imageAlt')}
           style={{ height: "100%", width: "100%", objectFit: "cover" }}
         />
       </Box>
