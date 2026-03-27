@@ -43,6 +43,7 @@ const MainPanel = ({
       borderRightStyle="solid"
       borderRightColor="panelBorder"
       transition={{ base: "none", md: `width ${AnimationTime} ease` }}
+      zIndex={1650}
     >
       {/* Mobile: handle bar */}
       <Box

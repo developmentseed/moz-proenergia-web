@@ -76,7 +76,7 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
   return (
     <Flex w="100%" h="100%" className="map-container" position="relative">
       {/* Map takes all remaining width */}
-      <Box flex={1} h="full" position="relative">
+      <Box flex={1} h="full" position="relative" pb={{base: 10, md: 0}}>
         <Map
           initialViewState={{
             longitude: lng,

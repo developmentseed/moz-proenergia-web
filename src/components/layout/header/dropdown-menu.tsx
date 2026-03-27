@@ -1,6 +1,6 @@
 "use client";
 
-import { Text, Button, MenuRoot, Menu, MenuTrigger, MenuContent, MenuItem, Box } from "@chakra-ui/react";
+import { Text, Button, Link, MenuRoot, Menu, MenuTrigger, MenuContent, MenuItem, Box } from "@chakra-ui/react";
 import Modal from "../../chakra/modal";
 import LoginForm from "../login-form";
 import { useAuth } from "@/utils/context/auth";
@@ -63,6 +63,69 @@ const DropdownMenu = () => {
           </MenuContent>
         </Menu.Positioner>
       </MenuRoot>
+    </>
+  );
+};
+
+export const DropdownMenuItems = () => {
+  const { login, logout, isAuthenticated, username } = useAuth();
+  const { t } = useTranslation();
+
+  const openLoginModal = () => {
+    requestAnimationFrame(() => {
+      Modal.open("login-modal", {
+        modalTitle: t('auth.login.title'),
+        modalContent: <LoginForm onSubmit={login} onClose={() => Modal.close("login-modal")} />,
+      });
+    });
+  };
+
+  return (
+    <>
+      {isAuthenticated ? (
+        <Button
+          variant="plain"
+          padding={0}
+          fontSize="sm"
+          fontWeight="medium"
+          color="fg.muted"
+          justifyContent="flex-start"
+          onClick={() => logout()}
+        >
+          {t('nav.logout')}
+        </Button>
+      ) : (
+        <Button
+          variant="plain"
+          padding={0}
+          fontSize="sm"
+          fontWeight="medium"
+          color="fg.muted"
+          justifyContent="flex-start"
+          onClick={openLoginModal}
+        >
+          {username ? (
+            <Box display="flex" gap="1" alignItems="center">
+              <LuCircleUser />
+              <Text maxW="80px" truncate>{username}</Text>
+            </Box>
+          ) : t('nav.login')}
+        </Button>
+      )}
+      <Link
+        fontSize="sm"
+        fontWeight="medium"
+        color="fg.muted"
+        href={SDI_PORTAL_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        display="flex"
+        alignItems="center"
+        gap={1.5}
+        _hover={{ textDecoration: "none", color: "fg" }}
+      >
+        <LuExternalLink /> {t('nav.sdiPortal')}
+      </Link>
     </>
   );
 };

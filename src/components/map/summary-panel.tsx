@@ -154,11 +154,13 @@ const SummaryPanel = ({
 
   const summaryContent = (
     <>
-      <PanelHeader
-        subtitle={t('explorer.analysis')}
-        title={title}
-        onBack={showingCluster ? resetCluster : undefined}
-      />
+      <Box display={{ base: "none", md: "block" }}>
+        <PanelHeader
+          subtitle={t('explorer.analysis')}
+          title={title}
+          onBack={showingCluster ? resetCluster : undefined}
+        />
+      </Box>
       <Box p={4} pt={0} flex={1} minHeight={0} overflowY="auto">
         <SummaryTable
           data={dataToDisplay}

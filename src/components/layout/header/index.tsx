@@ -1,12 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { Box, Heading, Flex, HStack, Text, Link, Separator, MenuRoot, MenuTrigger, Menu, MenuContent, MenuItem, IconButton } from "@chakra-ui/react";
+import { Box, Heading, Flex, HStack, Text, Link, Separator, Drawer, CloseButton, IconButton, Portal, VStack } from "@chakra-ui/react";
 import NextLink from "next/link";
 import Image from "next/image";
 import { LuMenu } from "react-icons/lu";
-import DropdownMenu from "./dropdown-menu";
-import { controlZIndex } from "@/components/map/control-constant";
+import DropdownMenu, { DropdownMenuItems } from "./dropdown-menu";
 import { LanguageSwitcher } from "./language-switcher";
 import { useTranslation } from "react-i18next";
 
@@ -24,6 +24,7 @@ export const Header = ({
 }: HeaderProps) => {
   const pathname = usePathname();
   const { t } = useTranslation();
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const navigationItems: NavigationItem[] = [
     { label: t('nav.explorer'), href: "/models" },
@@ -104,8 +105,13 @@ export const Header = ({
 
           {/* Mobile hamburger menu */}
           <Box display={{ base: 'block', md: 'none' }}>
-            <MenuRoot>
-              <MenuTrigger asChild>
+            <Drawer.Root
+              open={drawerOpen}
+              onOpenChange={(details) => setDrawerOpen(details.open)}
+              placement="end"
+              size="xs"
+            >
+              <Drawer.Trigger asChild>
                 <IconButton
                   aria-label="Open navigation menu"
                   variant="plain"
@@ -114,27 +120,47 @@ export const Header = ({
                 >
                   <LuMenu />
                 </IconButton>
-              </MenuTrigger>
-              <Menu.Positioner>
-                <MenuContent zIndex={controlZIndex + 2}>
-                  {navigationItems.map((item) => (
-                    <MenuItem key={item.href} value={item.href} cursor="pointer" asChild>
-                      <NextLink href={item.href}>
-                        <Text
-                          fontSize="sm"
-                          fontWeight={isActive(item.href) ? "bold" : "normal"}
-                        >
-                          {item.label}
-                        </Text>
-                      </NextLink>
-                    </MenuItem>
-                  ))}
-                </MenuContent>
-              </Menu.Positioner>
-            </MenuRoot>
+              </Drawer.Trigger>
+              <Portal>
+                <Drawer.Backdrop zIndex={1700} />
+                <Drawer.Positioner zIndex={1800}>
+                  <Drawer.Content>
+                    <Drawer.Header>
+                      <Drawer.Title>{t('nav.menu')}</Drawer.Title>
+                    </Drawer.Header>
+                    <Drawer.Body>
+                      <VStack align="stretch" gap={4} h="full">
+                        {navigationItems.map((item) => (
+                          <Link
+                            key={item.href}
+                            fontSize="sm"
+                            fontWeight={isActive(item.href) ? "bold" : "medium"}
+                            color={isActive(item.href) ? "fg" : "fg.muted"}
+                            asChild
+                            _hover={{ textDecoration: "none", color: "fg" }}
+                            onClick={() => setDrawerOpen(false)}
+                          >
+                            <NextLink href={item.href}>{item.label}</NextLink>
+                          </Link>
+                        ))}
+                        <Separator mt="auto" />
+                        <LanguageSwitcher />
+                        <Separator />
+                        <DropdownMenuItems />
+                      </VStack>
+                    </Drawer.Body>
+                    <Drawer.CloseTrigger asChild>
+                      <CloseButton size="sm" />
+                    </Drawer.CloseTrigger>
+                  </Drawer.Content>
+                </Drawer.Positioner>
+              </Portal>
+            </Drawer.Root>
           </Box>
 
-          <DropdownMenu />
+          <Box display={{ base: "none", md: "block"}}>
+            <DropdownMenu />
+          </Box>
         </HStack>
       </Flex>
     </Box>
