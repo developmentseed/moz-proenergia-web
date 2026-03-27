@@ -1,7 +1,7 @@
 import { memo, useState, useEffect } from "react";
 import { Box, Flex, Text, IconButton } from "@chakra-ui/react";
 import { api } from "@/utils/api";
-import { LuChevronLeft, LuChevronUp } from "react-icons/lu";
+import { LuChevronLeft, LuChevronsUpDown, LuChevronsDownUp } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter, type Main } from "@/app/types";
@@ -203,11 +203,8 @@ const SummaryPanel = ({
           onClick={onToggle}
         >
           <Text fontWeight="semibold" fontSize="sm">{title}</Text>
-          <Box
-            transform={isOpen ? "rotate(180deg)" : "rotate(0deg)"}
-            transition="transform 0.2s"
-          >
-            <LuChevronUp />
+          <Box>
+            {isOpen ? <LuChevronsDownUp /> : <LuChevronsUpDown />}
           </Box>
         </Flex>
         {/* Content below trigger */}

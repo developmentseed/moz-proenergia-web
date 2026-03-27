@@ -2,7 +2,7 @@
 
 import { type ChangeEvent } from "react";
 import { Text, Box, Heading, Flex } from "@chakra-ui/react";
-import { LuChevronDown } from "react-icons/lu";
+import { LuChevronsUpDown, LuChevronsDownUp } from "react-icons/lu";
 import { Select } from "@/components/chakra";
 import { Control as ControlPanel } from "./control";
 import { useModel } from "@/utils/context/model";
@@ -54,7 +54,7 @@ const MainPanel = ({
         <Flex h="44px" px={4} align="center" gap={2}>
           <ModelSwitcherMenu />
 
-          {/* Chevron — only this opens/closes the drawer */}
+          {/* Expand/contract toggle — only this opens/closes the drawer */}
           <Box
             display="flex"
             alignItems="center"
@@ -64,12 +64,10 @@ const MainPanel = ({
             cursor="pointer"
             rounded="sm"
             flexShrink={0}
-            transform={isOpen ? "rotate(180deg)" : "rotate(0deg)"}
-            transition="transform 0.2s"
             onClick={onToggle}
             _hover={{ bg: "gray.100" }}
           >
-            <LuChevronDown />
+            {isOpen ? <LuChevronsDownUp /> : <LuChevronsUpDown />}
           </Box>
         </Flex>
 
