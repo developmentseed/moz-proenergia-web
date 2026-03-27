@@ -91,8 +91,8 @@ const MainPanel = ({
         borderColor="panelBorder"
         boxShadow="md"
       >
-        <Box overflowY="auto" maxH="80dvh" display="flex" flexDirection="column">
-          <Box p={4} display={isOpen ? "block" : "none"}>
+        <Box h="80dvh" display="flex" flexDirection="column">
+          <Box p={4} display={isOpen ? "block" : "none"} flexShrink={0}>
             <Select
               title="Scenario"
               items={scenarioItems}

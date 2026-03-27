@@ -193,8 +193,8 @@ const ControlsPanel = () => {
 
   return (
     // To give space for scrollable area
-    <Box p={4} pt={0} pr={0} h={{ base: "auto", md: "full"}}>
-      <ScrollArea.Root h={{ base: "100%", md: "calc(100% - 3.5rem - 1px)" }}>
+    <Box p={4} pt={0} pr={0} h="full" display="flex" flexDirection="column">
+      <ScrollArea.Root flex="1" minH="0">
         <ScrollArea.Viewport>
           <ScrollArea.Content spaceY="4" pr={4}>
             {/* put collapsible groups first */}
