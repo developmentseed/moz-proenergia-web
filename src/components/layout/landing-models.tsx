@@ -60,7 +60,7 @@ export default function ModelCards() {
             </Box>
           }
           drawerFooterContent={
-            <Button asChild variant="solid" colorPalette="yellow">
+            <Button asChild variant="solid" colorPalette="orange">
               <NextLink href={`/model/${selectedModel.slug}`}>
                 {t('models.exploreModel')}
                 <LuArrowRight />

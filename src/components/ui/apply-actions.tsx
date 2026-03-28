@@ -24,7 +24,7 @@ export const ApplyActions = () => {
       </Button>
       <Button
         flex="1"
-        colorPalette="yellow"
+        colorPalette="orange"
         onClick={applyPendingChanges}
         loading={isLoading}
         loadingText={t('explorer.loadingSummary')}

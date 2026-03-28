@@ -27,7 +27,7 @@ const HighlightText = ({
     <>
       {parts.map((part, index) =>
         regex.test(part) ? (
-          <Box as="span" key={index} bg="yellow.muted">
+          <Box as="span" key={index} bg="orange.muted">
             {part}
           </Box>
         ) : (
@@ -51,7 +51,7 @@ export const ModelCard = ({
       size="md"
       height="full"
       bg="bg.muted"
-      _hover={{ bg: "yellow.subtle" }}
+      _hover={{ bg: "orange.subtle" }}
     >
       <Card.Header>
         <Heading size="lg">{title}</Heading>

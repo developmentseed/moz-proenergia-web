@@ -18,7 +18,7 @@ interface HeaderProps {
 }
 
 export const Header = ({
-  logoSrc = "/Logo.svg",
+  logoSrc = "/Emblem_of_Mozambique.svg",
 }: HeaderProps) => {
   const pathname = usePathname();
   const { t } = useTranslation();
@@ -67,9 +67,12 @@ export const Header = ({
               letterSpacing="0.5px"
               color="fg.muted"
             >
-              Mozambique <br />
-              <Text as="span" color="fg" fontWeight="900">
-                Proenergia+ IEP
+              {t('nav.countryName')} <br />
+              <Text display={{base: "inline", md: "none"}} as="span" color="fg" fontWeight="900">
+                {t('nav.shortName')}
+              </Text>
+              <Text display={{base: "none", md: "inline"}} as="span" color="fg" fontWeight="900">
+                {t('nav.longName')}
               </Text>
             </Heading>
           </Flex>
