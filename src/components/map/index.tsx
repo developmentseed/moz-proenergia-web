@@ -28,6 +28,10 @@ import { Legend } from "./legend";
 import { ContextualLayer } from "./contextual-layer";
 import { MainLayer } from "./main-layer";
 import { BasemapSelector, BASEMAP_OPTIONS } from "./basemap-selector";
+import { AnimationTime, ControlPanelWidth } from "../ui/main-panel";
+import { useToggle } from "@/hooks/use-toggle";
+import { PanelToggleButton } from "../ui/panel-toggle-button";
+import ShareButton from "./share-button";
 
 const transformRequest: RequestTransformFunction = (url, resourceType) => {
   if (isMapboxURL(url)) {
@@ -127,6 +131,7 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
           />
         </Map>
         <Legend items={main.options} main={main} onMainOpacityChange={setMainLayerOpacity} />
+        <ShareButton />
       </Box>
     </Flex>
   );

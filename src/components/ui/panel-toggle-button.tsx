@@ -40,9 +40,10 @@ export const PanelToggleButton = ({
   return (
     <Box
       position="absolute"
-      {...positionProps}
-      top="8"
-      transform="translateY(-50%)"
+      {...(side === "left"
+        ? { left: isOpen ? `calc(${panelWidth}px - 1px)` : 0 }
+        : { right: isOpen ? `calc(${panelWidth}px - 1px)` : 0 })}
+      top={4}
       zIndex={1000}
       transition={`left ${animationTime} ease, right ${animationTime} ease`}
     >
