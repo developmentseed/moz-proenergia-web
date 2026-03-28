@@ -35,8 +35,7 @@ export const PanelToggleButton = ({
       {...(side === "left"
         ? { left: isOpen ? `calc(${panelWidth}px - 1px)` : 0 }
         : { right: isOpen ? `calc(${panelWidth}px - 1px)` : 0 })}
-      top="8"
-      transform="translateY(-50%)"
+      top={4}
       zIndex={1000}
       transition={`${side} ${animationTime} ease`}
     >
