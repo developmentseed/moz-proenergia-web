@@ -17,7 +17,7 @@ export const LanguageSwitcher = () => {
       fontSize="sm"
       fontWeight="medium"
       fontFamily="body"
-      color="fg.muted"
+      color="orange.contrast"
       minW="auto"
       onClick={() => i18n.changeLanguage(nextLang)}
       aria-label={`Switch to ${nextLang.toUpperCase()}`}
