@@ -404,7 +404,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
     <Box maxHeight={maxHeight} width="100%">
       {isLoading && (
         <Box display="flex" alignItems="center" justifyContent="center" py={8}>
-          <Spinner size="xl" />
+          <Spinner colorPalette="orange" color="colorPalette.600" size="xl" />
         </Box>
       )}
 

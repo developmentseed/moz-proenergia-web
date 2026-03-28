@@ -27,7 +27,7 @@ export const DownloadList = () => {
   if (isLoading) {
     return (
       <Center py={10}>
-        <Spinner size="lg" />
+        <Spinner colorPalette="orange" color="colorPalette.600" size="lg" />
       </Center>
     );
   }

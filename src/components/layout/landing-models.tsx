@@ -35,7 +35,7 @@ export default function ModelCards() {
           </div>
         ))}
         {!models && <Center py={10}>
-          <Spinner size="xl" />
+          <Spinner colorPalette="orange" color="colorPalette.600" size="xl" />
         </Center>}
       </SimpleGrid>
 
