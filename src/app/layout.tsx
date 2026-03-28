@@ -14,9 +14,9 @@ export const metadata: Metadata = {
   title: WEBSITE_TITLE,
   description: WEBSITE_DESC,
   icons: {
-    icon: ["/Logo.svg"],
-    apple: ["/Logo.svg"],
-    shortcut: ["/Logo.svg"],
+    icon: ["/Emblem_of_Mozambique.svg"],
+    apple: ["/Emblem_of_Mozambique.svg"],
+    shortcut: ["/Emblem_of_Mozambique.svg"],
   },
 };
 

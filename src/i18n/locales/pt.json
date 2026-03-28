@@ -1,5 +1,8 @@
 {
   "nav": {
+    "countryName": "Moçambique",
+    "longName": "Plataforma Integrada de Electrificação",
+    "shortName": "PIE",
     "explorer": "Explorador",
     "about": "Sobre",
     "downloads": "Downloads",
@@ -8,7 +11,8 @@
     "sdiPortal": "Portal SDI"
   },
   "home": {
-    "title": "Moçambique Proenergia+ IEP",
+    "title": "Plataforma Integrada de Electrificação",
+    "countryName": "Moçambique",
     "description": "Uma plataforma web para planejamento e análise integrada de energia em Moçambique. O Proenergia+ IEP visa aumentar o acesso à energia e serviços de banda larga nas áreas do projeto e fortalecer o desempenho operacional da concessionária elétrica.",
     "learnMore": "Saiba Mais",
     "viewModels": "Ver Modelos",

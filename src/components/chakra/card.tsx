@@ -27,7 +27,7 @@ const HighlightText = ({
     <>
       {parts.map((part, index) =>
         regex.test(part) ? (
-          <Box as="span" key={index} bg="yellow.muted">
+          <Box as="span" key={index} bg="orange.muted">
             {part}
           </Box>
         ) : (
@@ -50,13 +50,14 @@ export const ModelCard = ({
     <Card.Root
       size="md"
       height="full"
-      bg="bg.muted"
-      _hover={{ bg: "yellow.subtle" }}
+      bg="orange.subtle"
+      overflow="hidden"
+      _hover={{ bg: "orange.muted", borderColor: "orange.solid" }}
     >
       <Card.Header>
-        <Heading size="lg">{title}</Heading>
+        <Heading color="orange.solid" size={{base: "md", md: "2xl"}}>{title}</Heading>
       </Card.Header>
-      <Card.Body color="fg.muted">
+      <Card.Body color="fg">
         <ReactMarkdown
         >
           {`${truncatedDescription}...`}

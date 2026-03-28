@@ -116,6 +116,19 @@ export const system = createSystem(defaultConfig, {
         navBg: { value: "{colors.bg.subtle}" },
         panelBg: { value: "{colors.bg}" },
         panelBorder: { value: "{colors.border.emphasized}" },
+        orange: {
+          50:  { value: "#FEF6EE" },
+          100: { value: "#FDEBD8" },
+          200: { value: "#FAD5B0" },
+          300: { value: "#F6B07B" },
+          400: { value: "#F08040" },
+          500: { value: "#E06618" },
+          600: { value: "#CC5500" },
+          700: { value: "#A34300" },
+          800: { value: "#7A3300" },
+          900: { value: "#522200" },
+          950: { value: "#2E1300" },
+        },
       }
     },
     textStyles

@@ -62,11 +62,11 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
                   rounded="sm"
                   width={12}
                   height={12}
-                  bg={isActive ? "yellow.muted" : "transparent"}
+                  bg={isActive ? "orange.muted" : "transparent"}
                   cursor="pointer"
                   transition="all 0.2s"
                   _hover={{
-                    bg: isActive ? 'blue.600' : 'gray.200',
+                    bg: isActive ? 'orange.600' : 'orange.subtle',
                   }}
                 >
                   {iconPath ? (
