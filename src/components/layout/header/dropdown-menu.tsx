@@ -67,11 +67,12 @@ const DropdownMenu = () => {
   );
 };
 
-export const DropdownMenuItems = () => {
+export const DropdownMenuItems = ({ onAction }: { onAction?: () => void }) => {
   const { login, logout, isAuthenticated, username } = useAuth();
   const { t } = useTranslation();
 
   const openLoginModal = () => {
+    onAction?.();
     requestAnimationFrame(() => {
       Modal.open("login-modal", {
         modalTitle: t('auth.login.title'),

@@ -47,8 +47,8 @@ export const Header = ({
       borderBottom="1px solid"
       borderBottomColor="panelBorder"
       px={3}
-      pr={6}
       py={2}
+      pr={{base: 3, md: 6}}
     >
       <Flex mx="auto" justify="space-between" align="center">
         {/* Logo Section - Left */}
@@ -146,7 +146,7 @@ export const Header = ({
                         <Separator mt="auto" />
                         <LanguageSwitcher />
                         <Separator />
-                        <DropdownMenuItems />
+                        <DropdownMenuItems onAction={() => setDrawerOpen(false)} />
                       </VStack>
                     </Drawer.Body>
                     <Drawer.CloseTrigger asChild>

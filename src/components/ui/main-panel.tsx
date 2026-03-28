@@ -8,6 +8,7 @@ import { Control as ControlPanel } from "./control";
 import { useModel } from "@/utils/context/model";
 import { ModelSwitcherMenu } from "./model-switcher-menu";
 import { useTranslation } from "react-i18next";
+import { controlZIndex } from "../map/control-constant";
 
 export const ControlPanelWidth = 350;
 export const AnimationTime = "0.32s";
@@ -43,7 +44,7 @@ const MainPanel = ({
       borderRightStyle="solid"
       borderRightColor="panelBorder"
       transition={{ base: "none", md: `width ${AnimationTime} ease` }}
-      zIndex={1650}
+      zIndex={controlZIndex + 100}
     >
       {/* Mobile: handle bar */}
       <Box
@@ -80,7 +81,6 @@ const MainPanel = ({
         top="44px"
         left={0}
         right={0}
-        zIndex={500}
         overflow="hidden"
         maxHeight={isOpen ? "80dvh" : "42px"}
         transition={`max-height ${AnimationTime} ease`}
