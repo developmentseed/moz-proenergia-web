@@ -88,7 +88,7 @@ export const Header = ({
                 <Link
                   fontSize="sm"
                   fontWeight={active ? "bold" : "medium"}
-                  color={active ? "orange.contrast" : "orange.contrast"}
+                  color="orange.contrast"
                   transition="color 0.2s"
                   asChild
                   _hover={{ textDecoration: "none", outline: "none" }}
