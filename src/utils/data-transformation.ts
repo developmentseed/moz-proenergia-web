@@ -418,6 +418,7 @@ export function transformVectorsToLayers(apiVectors: ApiVectorResult[]): Layer[]
       description: v.description,
       filePath: v.raw_file,
       color: v.color,
+      layerType: 'vector' as const,
     };
   });
 }
