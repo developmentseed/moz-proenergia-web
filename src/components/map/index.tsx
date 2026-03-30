@@ -14,6 +14,7 @@ import {
   isMapboxURL,
   transformMapboxUrl,
 } from "maplibregl-mapbox-request-transformer";
+import * as COGProtocol from '@geomatico/maplibre-cog-protocol';
 import "maplibre-gl/dist/maplibre-gl.css";
 import "@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css";
 import mapConfig from "@/config/map.json";
@@ -55,12 +56,14 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
 
   const { open } = useToggle(true);
 
-  // Attach pmtile protocol to MapLibre
+  // Attach pmtile + cog protocol to MapLibre
   useEffect(() => {
     const protocol = new pmtiles.Protocol();
     maplibregl.addProtocol("pmtiles", protocol.tile);
+    maplibregl.addProtocol('cog', COGProtocol.cogProtocol);
     return () => {
       maplibregl.removeProtocol("pmtiles");
+      maplibregl.removeProtocol("cog");
     };
   }, []);
 

@@ -14,6 +14,7 @@
     "@chakra-ui/charts": "^3.33.0",
     "@chakra-ui/react": "^3.30.0",
     "@emotion/react": "^11.14.0",
+    "@geomatico/maplibre-cog-protocol": "^0.8.0",
     "@maplibre/maplibre-gl-geocoder": "^1.9.4",
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
