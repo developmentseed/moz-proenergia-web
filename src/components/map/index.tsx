@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useCallback, useState } from "react";
 import {
   Map,
   ViewStateChangeEvent,
@@ -24,13 +24,12 @@ import { CenterMapControl } from './recenter-button';
 import GeocoderControl from './geocoder-control';
 import { type Main } from "@/app/types";
 import { buildExpressionWithFilter } from "@/utils/map/filter";
+import { useMouseEvent } from "./hooks/use-mouse-event";
 import { Legend } from "./legend";
 import { ContextualLayer } from "./contextual-layer";
 import { MainLayer } from "./main-layer";
 import { BasemapSelector, BASEMAP_OPTIONS } from "./basemap-selector";
-import { AnimationTime, ControlPanelWidth } from "../ui/main-panel";
 import { useToggle } from "@/hooks/use-toggle";
-import { PanelToggleButton } from "../ui/panel-toggle-button";
 import ShareButton from "./share-button";
 
 const transformRequest: RequestTransformFunction = (url, resourceType) => {
@@ -53,6 +52,8 @@ interface MainMapProps {
 const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
   const { coords, setCoords } = useMapCoords();
   const { lat, lng, zoom } = coords;
+
+  const { open } = useToggle(true);
 
   // Attach pmtile protocol to MapLibre
   useEffect(() => {
@@ -77,10 +78,16 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
   const selectedBasemap =
     BASEMAP_OPTIONS.find((o) => o.id === currentBasemapId) ?? BASEMAP_OPTIONS[0];
 
+  useEffect(() => {
+    if (clusterId !== null) {
+      open();
+    }
+  }, [clusterId, open]);
+
   return (
     <Flex w="100%" h="100%" className="map-container" position="relative">
       {/* Map takes all remaining width */}
-      <Box flex={1} h="full" position="relative" pb={{base: 10, md: 0}}>
+      <Box flex={1} h="full" position="relative" pb={{ base: 10, md: 0 }}>
         <Map
           initialViewState={{
             longitude: lng,
