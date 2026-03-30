@@ -95,7 +95,9 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
                               id={layer.id}
                               label={t(`layer.${layer.id}.label`, { defaultValue: layer.label })}
                               description={layer.description ? t(`layer.${layer.id}.description`, { defaultValue: layer.description }) : undefined}
-                              color={layer.color ?? '#888888'}
+                              color={layer.layerType === 'raster'
+                                ? 'linear-gradient(135deg, #4a90d9, #7bc67e, #f5c542)'
+                                : (layer.color ?? '#888888')}
                               switchLayer={(id) => toggleLayer({ [id]: false })}
                               setOpacity={(id, opacity) => setLayerOpacity(id, opacity)}
                             />

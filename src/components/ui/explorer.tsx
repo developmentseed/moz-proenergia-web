@@ -15,9 +15,11 @@ import { useAuth } from "@/utils/context/auth";
 import {
   fetchModelMetadata,
   fetchVectors,
+  fetchRasters,
   fetchAllFilterOptions,
   transformModelCore,
   transformVectorsToLayers,
+  transformRastersToLayers,
   transformFilterField,
   transformMainOptions,
 } from "@/utils/data-transformation";
@@ -185,13 +187,26 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     },
   });
   // contextual layers : separate context
-  const { data: layers } = useQuery({
+  const { data: vectorLayers } = useQuery({
     queryKey: ["vectors", modelId, token],
     queryFn: async ({ signal }) => {
       const apiVectors = await fetchVectors({ modelId, token, signal });
       return transformVectorsToLayers(apiVectors);
     },
   });
+
+  const { data: rasterLayers = [] } = useQuery({
+    queryKey: ["rasters", modelId, token],
+    queryFn: async ({ signal }) => {
+      const apiRasters = await fetchRasters({ modelId, token, signal });
+      return transformRastersToLayers(apiRasters);
+    },
+  });
+
+  const layers = useMemo(() => {
+    if (!vectorLayers) return undefined;
+    return [...rasterLayers, ...vectorLayers];
+  }, [vectorLayers, rasterLayers]);
 
   const defaultScenarioId = modelCore?.scenarios[0]?.id;
 

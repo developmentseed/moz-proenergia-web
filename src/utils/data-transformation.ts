@@ -148,6 +148,16 @@ export function deriveSource(id: string, filePath: string) {
   };
 }
 
+export function deriveRasterSource(id: string, filePath: string) {
+  return {
+    id,
+    type: 'raster' as const,
+    // s@TODO: replace min and max with dynamic values
+    url: `cog://${MEDIA_URL_PREFIX}${filePath}#color:BrewerYlGn4,1,2001,c`,
+    tileSize: 256,
+  };
+}
+
 export function deriveLayerStyles(sourceId: string, color: string, opacity: number = 1): { circleLayer: LayerProps; lineLayer: LayerProps, polygonLayer:LayerProps } {
   return {
     circleLayer: {
@@ -188,6 +198,15 @@ export function deriveLayerStyles(sourceId: string, color: string, opacity: numb
       },
       filter: ["==", ["geometry-type"], "Polygon"]
     },
+  };
+}
+
+export function deriveRasterLayerStyle(sourceId: string, opacity: number = 1): LayerProps {
+  return {
+    id: `${sourceId}-raster-layer`,
+    source: sourceId,
+    type: 'raster',
+    paint: { 'raster-opacity': opacity },
   };
 }
 
@@ -243,6 +262,26 @@ export async function fetchVectors({ modelId, token, signal }: { modelId?: strin
   } catch(e) {
     console.error(e);
     throw new Error('Failed to fetch vectors');
+  }
+}
+
+export async function fetchRasters({ modelId, token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiVectorResult[]> {
+  try {
+    const endpoint = `raster/`;
+    const { data } = await api.get(endpoint, {
+      signal,
+      ...(token && {
+        headers: { 'Authorization': `Token ${token}` }
+      }),
+      ...(modelId && {
+        params: { 'model': modelId }
+      })
+    });
+    const results: ApiVectorResult[] = data.results;
+    return results;
+  } catch(e) {
+    console.error(e);
+    throw new Error('Failed to fetch rasters');
   }
 }
 
@@ -379,6 +418,26 @@ export function transformVectorsToLayers(apiVectors: ApiVectorResult[]): Layer[]
       description: v.description,
       filePath: v.raw_file,
       color: v.color,
+    };
+  });
+}
+
+// Transform rasters to layers
+export function transformRastersToLayers(apiRasters: ApiVectorResult[]): Layer[] {
+  return apiRasters.map(v => {
+    const sourceId = String(v.id) + 'raster-source';
+
+    registerI18nResource(`layer.${sourceId}`, {
+      label: { en: v.name, pt: v.name_pt },
+      description: { en: v.description, pt: v.description_pt },
+    });
+
+    return {
+      id: sourceId,
+      label: v.name,
+      description: v.description,
+      filePath: v.raw_file,
+      layerType: 'raster' as const,
     };
   });
 }
