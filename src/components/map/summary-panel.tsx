@@ -259,12 +259,11 @@ const SummaryPanel = ({
           overflowY="auto"
         >
           {summaryContent}
-        </Box>
-        {!showingCluster && (
           <Box p={4} borderTop="1px solid" borderColor="border">
             <ClusterSearch onSelectCluster={onSelectCluster} />
           </Box>
-        )}
+        </Box>
+
       </Box>
 
       {/* Desktop: right panel with width animation */}
@@ -284,7 +283,11 @@ const SummaryPanel = ({
         zIndex={controlZIndex}
       >
         {summaryContent}
+              <Box p={4} borderTop="1px solid" borderColor="border">
+        <ClusterSearch onSelectCluster={onSelectCluster} />
       </Box>
+      </Box>
+
     </>
   );
 };
