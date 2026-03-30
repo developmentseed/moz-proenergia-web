@@ -49,12 +49,11 @@ interface MainMapProps {
   clusterId: string | null;
 }
 
-const MainMap = ({ main }: MainMapProps) => {
-  const { coords, setCoords, removeCoordinates } = useMapCoords();
+const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
+  const { coords, setCoords } = useMapCoords();
   const { lat, lng, zoom } = coords;
-  const { selected, setSelected, onClick } = useMouseEvent();
 
-  const { isOpen, toggle, open } = useToggle(true);
+  const { open } = useToggle(true);
 
   // Attach pmtile protocol to MapLibre
   useEffect(() => {
@@ -79,22 +78,11 @@ const MainMap = ({ main }: MainMapProps) => {
   const selectedBasemap =
     BASEMAP_OPTIONS.find((o) => o.id === currentBasemapId) ?? BASEMAP_OPTIONS[0];
 
-  const resetCluster = useCallback(() => {
-    setSelected(null);
-  }, [setSelected]);
-
-  // Clear viewport coords before navigating so stale lat/lng/zoom don't
-  // persist alongside the cluster ID in the URL.
-  const selectClusterFromSearch = useCallback((id: string) => {
-    removeCoordinates();
-    setSelected(id);
-  }, [removeCoordinates, setSelected]);
-
   useEffect(() => {
-    if (selected !== null) {
+    if (clusterId !== null) {
       open();
     }
-  }, [selected, open]);
+  }, [clusterId, open]);
 
   return (
     <Flex w="100%" h="100%" className="map-container" position="relative">
@@ -127,7 +115,7 @@ const MainMap = ({ main }: MainMapProps) => {
             scenario={scenario}
             main={main}
             mapFilter={mapFilter}
-            clusterId={selected}
+            clusterId={clusterId}
             opacity={mainLayerOpacity / 100}
           />
           <ContextualLayer />
