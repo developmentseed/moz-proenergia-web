@@ -1,5 +1,8 @@
 {
   "nav": {
+    "countryName": "Mozambique",
+    "longName": "Integrated Energy Planning Platform",
+    "shortName": "PIE",
     "explorer": "Explorer",
     "about": "About",
     "downloads": "Downloads",
@@ -9,7 +12,8 @@
     "menu": "Menu"
   },
   "home": {
-    "title": "Mozambique Proenergia+ IEP",
+    "title": "Integrated Energy Planning Platform",
+    "countryName": "Mozambique",
     "description": "A web platform for integrated energy planning and analysis in Mozambique. Proenergia+ IEP aims to increase access to energy and broadband services in project areas and strengthen the operational performance of the electric utility.",
     "learnMore": "Learn More",
     "viewModels": "View Models",

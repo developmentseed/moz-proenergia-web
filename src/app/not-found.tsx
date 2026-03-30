@@ -38,7 +38,7 @@ export default function NotFound() {
   if (isLoading) {
     return (
       <Center h="calc(100vh - 3.5rem - 1px)">
-        <Spinner size="xl" />
+        <Spinner colorPalette="orange" color="colorPalette.600" size="xl" />
       </Center>
     );
   }

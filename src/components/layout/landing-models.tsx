@@ -35,7 +35,7 @@ export default function ModelCards() {
           </div>
         ))}
         {!models && <Center py={10}>
-          <Spinner size="xl" />
+          <Spinner colorPalette="orange" color="colorPalette.600" size="xl" />
         </Center>}
       </SimpleGrid>
 
@@ -60,7 +60,7 @@ export default function ModelCards() {
             </Box>
           }
           drawerFooterContent={
-            <Button asChild variant="solid" colorPalette="yellow">
+            <Button asChild variant="solid" colorPalette="orange">
               <NextLink href={`/model/${selectedModel.slug}`}>
                 {t('models.exploreModel')}
                 <LuArrowRight />

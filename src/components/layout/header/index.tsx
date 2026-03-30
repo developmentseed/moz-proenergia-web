@@ -20,7 +20,7 @@ interface HeaderProps {
 }
 
 export const Header = ({
-  logoSrc = "/Logo.svg",
+  logoSrc = "/Emblem_of_Mozambique.svg",
 }: HeaderProps) => {
   const pathname = usePathname();
   const { t } = useTranslation();
@@ -43,12 +43,13 @@ export const Header = ({
     <Box
       as="header"
       width="full"
-      bg="navBg"
+      bg="orange.600"
+      color="orange.contrast"
       borderBottom="1px solid"
       borderBottomColor="panelBorder"
       px={3}
       py={2}
-      pr={{base: 3, md: 6}}
+      pr={{ base: 3, md: 6 }}
     >
       <Flex mx="auto" justify="space-between" align="center">
         {/* Logo Section - Left */}
@@ -68,11 +69,14 @@ export const Header = ({
               lineHeight="1rem"
               textTransform="uppercase"
               letterSpacing="0.5px"
-              color="fg.muted"
+              color="orange.contrast"
             >
-              Mozambique <br />
-              <Text as="span" color="fg" fontWeight="900">
-                Proenergia+ IEP
+              {t('nav.countryName')} <br />
+              <Text display={{ base: "inline", md: "none" }} as="span" color="orange.contrast" fontWeight="900">
+                {t('nav.shortName')}
+              </Text>
+              <Text display={{ base: "none", md: "inline" }} as="span" color="orange.contrast" fontWeight="900">
+                {t('nav.longName')}
               </Text>
             </Heading>
           </Flex>
@@ -88,7 +92,7 @@ export const Header = ({
                   <Link
                     fontSize="sm"
                     fontWeight={active ? "bold" : "medium"}
-                    color={active ? "fg" : "fg.muted"}
+                    color="orange.contrast"
                     transition="color 0.2s"
                     asChild
                     _hover={{ textDecoration: "none", outline: "none" }}
@@ -99,8 +103,8 @@ export const Header = ({
               );
             })}
             <Separator orientation="vertical" height="4" />
-          <LanguageSwitcher />
-          <Separator orientation="vertical" height="4" />
+            <LanguageSwitcher />
+            <Separator orientation="vertical" height="4" />
           </HStack>
 
           {/* Mobile hamburger menu */}
@@ -158,7 +162,7 @@ export const Header = ({
             </Drawer.Root>
           </Box>
 
-          <Box display={{ base: "none", md: "block"}}>
+          <Box display={{ base: "none", md: "block" }}>
             <DropdownMenu />
           </Box>
         </HStack>

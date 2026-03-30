@@ -30,7 +30,7 @@ const Tab = ({ items, value, onValueChange, onTabClick }: TabProps) => {
     >
       <Tabs.List>
         {items.map((item) => (
-          <Tabs.Trigger key={item.id} value={item.id} colorPalette="yellow" onClick={onTabClick}>
+          <Tabs.Trigger key={item.id} value={item.id} colorPalette="orange" onClick={onTabClick}>
             {item.label}
           </Tabs.Trigger>
         ))}

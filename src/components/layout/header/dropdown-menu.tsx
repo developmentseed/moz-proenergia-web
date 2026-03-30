@@ -25,7 +25,7 @@ const DropdownMenu = () => {
             pr={1}
             fontSize="sm"
             fontWeight="medium"
-            color="fg.muted"
+            color="orange.contrast"
             gap={1.5}
           >
             {isAuthenticated && username ? (

@@ -17,10 +17,10 @@ export default function Home() {
         px={{ base: 4, md: 8 }}
         py={8}
       >
-        <VStack gap={6} maxW="lg" align="start">
-          <Heading as="h1" size="5xl" textTransform="uppercase" fontWeight="900" lineHeight="1" letterSpacing="0.8px">
-            <span style={{ fontWeight: "300" }}>Mozambique</span> <br />
-            Proenergia+ IEP
+        <VStack gap={6} maxW="4xl" align="start">
+          <Heading as="h1" size={{base: "3xl", md: "4xl"}} textTransform="uppercase" fontWeight="900" lineHeight="1" letterSpacing="0.8px">
+            <span style={{ fontWeight: "300" }}>{t('home.countryName')}</span> <br />
+            {t('home.title')}
           </Heading>
           <Text fontSize="lg" color="gray.600">
             {t('home.description')}
@@ -35,7 +35,7 @@ export default function Home() {
             <Button asChild size="lg" variant="outline">
               <NextLink href="/about">{t('home.learnMore')}</NextLink>
             </Button>
-            <Button asChild size="lg" variant="solid" colorPalette="yellow">
+            <Button asChild size="lg" variant="solid" colorPalette="orange">
               <NextLink href="/models">{t('home.viewModels')}</NextLink>
             </Button>
           </Box>
