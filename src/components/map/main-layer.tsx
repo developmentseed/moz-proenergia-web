@@ -141,8 +141,16 @@ export const MainLayer = ({
           : queryFeatureById(Number(clusterId));
 
       if (features.length === 0) return false;
-      const { geometry } = features[0];
-      if (geometry) flyToGeometry(geometry);
+      const combined = new LngLatBounds();
+      for (const f of features) {
+        if (f.geometry) {
+          const b = geometryBounds(f.geometry);
+          if (b) combined.extend(b);
+        }
+      }
+      if (!combined.isEmpty()) {
+        map.fitBounds(combined, { padding: 80, maxZoom: 14 });
+      }
       return true;
     };
 

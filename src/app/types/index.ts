@@ -12,8 +12,10 @@ export interface Field {
   group_by?: string[];
   method?: 'count' | 'min' | 'max' | 'sum' | 'average';
   unit?: string;
-  chart?: 'bar' | 'donut' | 'stacked' | 'highlight';
+  chartType?: 'bar' | 'donut' | 'stacked' | 'highlight';
   colors?: Record<string, string>;
+  showChartValueRows?: boolean;
+  showBarChartAverage?: boolean;
 }
 export interface MapItemUnit extends ItemUnit {
   color?: string;
@@ -41,6 +43,8 @@ export type FilterOptionValues = [number, number] | string[] | ItemUnit[];
 
 export interface Scenario {
   id: string;
+  name: string;
+  name_pt?: string;
   label: string;
   description?: string;
   source: SourceProps,
@@ -74,6 +78,8 @@ export interface ModelMetadata {
 export interface ModelGroupMetadata {
   id: string;
   name: string;
+  name_pt?: string;
   description: string;
   scenarios: Array<{ vector_dataset: { id: number } | null }>;
+  description_pt?: string;
 }

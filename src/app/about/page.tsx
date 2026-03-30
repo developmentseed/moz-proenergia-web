@@ -1,7 +1,11 @@
+"use client";
+
 import { type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { Shell } from "@/components/layout/shell";
 import { Text, Heading } from "@chakra-ui/react";
-import AboutContent from "./about.mdx";
+import AboutContentEn from "./about.mdx";
+import AboutContentPt from "./about.pt.mdx";
 
 interface ChildrenType {
   children: ReactNode
@@ -30,9 +34,12 @@ const overrideComponents = {
 };
 
 export default function Page() {
+  const { t, i18n } = useTranslation();
+  const Content = i18n.language?.startsWith("pt") ? AboutContentPt : AboutContentEn;
+
   return (
-    <Shell breadcrumb={[{ label: "About" }]}>
-      <AboutContent components={overrideComponents} />
+    <Shell breadcrumb={[{ label: t("breadcrumbs.about") }]}>
+      <Content components={overrideComponents} />
     </Shell>
   );
 }

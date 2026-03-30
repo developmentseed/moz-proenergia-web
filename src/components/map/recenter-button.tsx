@@ -8,13 +8,13 @@ import { LuScan } from "react-icons/lu";
 import {
   DEFAULT_COORDS,
   DEFAULT_ZOOM,
-  useCoordinates
-} from "./hooks/use-coordinates";
+} from "@/utils/context/map-coords";
+import { useMapCoords } from "@/utils/context/map-coords";
 import { controlZIndex } from "./control-constant";
 
 export function CenterMapControl() {
   const { current: map } = useMap();
-  const { coords } = useCoordinates();
+  const { coords } = useMapCoords();
   const { lat: viewLat, lng: viewLng, zoom: viewZoom } = coords;
 
   const resetCenter = useCallback(() => {
@@ -35,8 +35,8 @@ export function CenterMapControl() {
       aria-label="Center map"
       bg="bg"
       position="absolute"
-      bottom={28}
-      left={2}
+      bottom="12.5rem"
+      left="10px"
       size="xs"
       variant="surface"
       zIndex={controlZIndex}
