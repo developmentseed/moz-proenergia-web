@@ -148,12 +148,14 @@ export function deriveSource(id: string, filePath: string) {
   };
 }
 
-export function deriveRasterSource(id: string, filePath: string) {
+export function deriveRasterSource(id: string, filePath: string, stats?: { min: number; max: number }) {
+  const colorFragment = stats
+    ? `#color:BrewerSpectral11,${stats.min},${stats.max}`
+    : '';
   return {
     id,
     type: 'raster' as const,
-    // s@TODO: replace min and max with dynamic values
-    url: `cog://${MEDIA_URL_PREFIX}${filePath}#color:BrewerYlGn4,1,2001,c`,
+    url: `cog://${MEDIA_URL_PREFIX}${filePath}${colorFragment}`,
     tileSize: 256,
   };
 }
@@ -424,7 +426,10 @@ export function transformVectorsToLayers(apiVectors: ApiVectorResult[]): Layer[]
 }
 
 // Transform rasters to layers
-export function transformRastersToLayers(apiRasters: ApiVectorResult[]): Layer[] {
+export function transformRastersToLayers(
+  apiRasters: ApiVectorResult[],
+  statsMap: Map<number, { min: number; max: number } | null>,
+): Layer[] {
   return apiRasters.map(v => {
     const sourceId = String(v.id) + 'raster-source';
 
@@ -439,6 +444,7 @@ export function transformRastersToLayers(apiRasters: ApiVectorResult[]): Layer[]
       description: v.description,
       filePath: v.raw_file,
       layerType: 'raster' as const,
+      rasterStats: statsMap.get(v.id) ?? undefined,
     };
   });
 }

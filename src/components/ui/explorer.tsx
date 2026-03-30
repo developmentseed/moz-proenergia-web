@@ -23,6 +23,7 @@ import {
   transformFilterField,
   transformMainOptions,
 } from "@/utils/data-transformation";
+import { fetchCogStats } from "@/utils/map/cog";
 import { type ModelMetadata } from "@/app/types";
 import MainPanel from "./main-panel";
 import SummaryPanel from "@/components/map/summary-panel";
@@ -199,7 +200,18 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     queryKey: ["rasters", modelId, token],
     queryFn: async ({ signal }) => {
       const apiRasters = await fetchRasters({ modelId, token, signal });
-      return transformRastersToLayers(apiRasters);
+      const statsEntries = await Promise.all(
+        apiRasters.map(async (r) => {
+          try {
+            const stats = await fetchCogStats(r.raw_file);
+            return [r.id, stats] as const;
+          } catch {
+            return [r.id, null] as const;
+          }
+        })
+      );
+      const statsMap = new Map(statsEntries);
+      return transformRastersToLayers(apiRasters, statsMap);
     },
   });
 

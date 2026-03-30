@@ -10,7 +10,7 @@ export const RasterContextualLayer = () => {
     {contextualLayers.map((layer:Layer) => {
     const opacity = (layerOpacities[layer.id] ?? 100) / 100;
 
-      const source = deriveRasterSource(layer.id, layer.filePath);
+      const source = deriveRasterSource(layer.id, layer.filePath, layer.rasterStats);
       const rasterStyle = deriveRasterLayerStyle(layer.id, opacity);
       return <Source key={layer.id} {...source} >
         <MapLayer {...rasterStyle} />

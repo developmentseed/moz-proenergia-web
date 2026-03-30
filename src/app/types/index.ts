@@ -60,6 +60,7 @@ export interface Layer extends ItemUnit {
   downloadLink?: string;
   color?: string;
   layerType?: 'vector' | 'raster';
+  rasterStats?: { min: number; max: number };
 }
 
 export interface Main extends BaseScenarioFilter {
