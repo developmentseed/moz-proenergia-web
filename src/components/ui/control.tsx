@@ -1,3 +1,5 @@
+"use client";
+
 import { memo, useCallback } from "react";
 import { Tab } from "@/components/chakra";
 import {
@@ -20,6 +22,7 @@ import { ApplyActions } from "./apply-actions";
 // FilterType as enum
 import { FilterType, type Filter, type ItemUnit } from "@/app/types";
 import { Tooltip } from "./tooltip";
+import { useTranslation } from "react-i18next";
 
 interface ColGroup {
   title: string;
@@ -68,7 +71,9 @@ const FilterControlWrapper = memo(function FilterControlWrapper({
 
 const LayersPanel = () => {
   const { layers, toggleLayer, activeLayers } = useContextualLayers();
-  if (!activeLayers) return <div>Please wait</div>;
+  const { t } = useTranslation();
+
+  if (!activeLayers) return <div>{t('explorer.pleaseWait')}</div>;
 
   const setLayerOnChange = useCallback(
     (param: { [x: string]: boolean }) => {
@@ -154,7 +159,9 @@ const ControlsPanel = () => {
   const { model } = useModel();
   const { displayFilters, setPendingFilters, getFilterPendingStatus } =
     useFilters();
-  if (!displayFilters) return <div>Please wait</div>;
+  const { t } = useTranslation();
+
+  if (!displayFilters) return <div>{t('explorer.pleaseWait')}</div>;
 
   const adminFilterExists = model.filters.filter(
     (f) => f.type === FilterType.admin,
@@ -162,7 +169,7 @@ const ControlsPanel = () => {
   const adminFilter = !!adminFilterExists.length
     ? [
         {
-          title: "Area Selection",
+          title: t('explorer.areaSelection'),
           items: model.filters.filter((f) => f.type === FilterType.admin),
         },
       ]
@@ -186,8 +193,8 @@ const ControlsPanel = () => {
 
   return (
     // To give space for scrollable area
-    <Box p={4} pt={0} pr={0} h="full">
-      <ScrollArea.Root h="calc(100% - 3.5rem - 1px)">
+    <Box p={4} pt={0} pr={0} h="full" display="flex" flexDirection="column">
+      <ScrollArea.Root flex="1" minH="0">
         <ScrollArea.Viewport>
           <ScrollArea.Content spaceY="4" pr={4}>
             {/* put collapsible groups first */}
@@ -226,31 +233,42 @@ const ControlsPanel = () => {
   );
 };
 
-const tabItems = [
-  {
-    id: "controls",
-    label: (
-      <>
-        <LuSettings2 />
-        <Text textStyle="subTitle">Controls</Text>
-      </>
-    ),
-    Component: ControlsPanel,
-  },
-  {
-    id: "layers",
-    label: (
-      <>
-        <LuLayers />
-        <Text textStyle="subTitle">Layers</Text>
-      </>
-    ),
-    Component: LayersPanel,
-  },
-];
+const Control = ({
+  activeTab,
+  onTabChange,
+  onTabClick,
+}: {
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
+  onTabClick?: () => void;
+}) => {
+  const { t } = useTranslation();
 
-const Control = () => {
-  return <Tab items={tabItems} />;
+  const tabItems = [
+    {
+      id: "controls",
+      label: (
+        <>
+          <LuSettings2 />
+          <Text textStyle="subTitle">{t('explorer.controls')}</Text>
+        </>
+      ),
+      Component: ControlsPanel,
+    },
+    {
+      id: "layers",
+      label: (
+        <>
+          <LuLayers />
+          <Text textStyle="subTitle">{t('explorer.layers')}</Text>
+        </>
+      ),
+      Component: LayersPanel,
+    },
+  ];
+  return (
+    <Tab items={tabItems} value={activeTab} onValueChange={onTabChange} onTabClick={onTabClick} />
+  );
 };
 
 export { Control };

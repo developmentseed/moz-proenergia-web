@@ -1,15 +1,17 @@
 "use client";
 
-import { Text, Button, MenuRoot, Menu, MenuTrigger, MenuContent, MenuItem, Box } from "@chakra-ui/react";
+import { Text, Button, Link, MenuRoot, Menu, MenuTrigger, MenuContent, MenuItem, Box } from "@chakra-ui/react";
 import Modal from "../../chakra/modal";
 import LoginForm from "../login-form";
 import { useAuth } from "@/utils/context/auth";
 import { LuExternalLink, LuCircleUser } from "react-icons/lu";
 import { controlZIndex } from "@/components/map/control-constant";
 import { SDI_PORTAL_URL } from "@/config/website";
+import { useTranslation } from "react-i18next";
 
 const DropdownMenu = () => {
   const { login, logout, isAuthenticated, username } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -23,7 +25,7 @@ const DropdownMenu = () => {
             pr={1}
             fontSize="sm"
             fontWeight="medium"
-            color="fg.muted"
+            color="orange.contrast"
             gap={1.5}
           >
             {isAuthenticated && username ? (
@@ -31,7 +33,7 @@ const DropdownMenu = () => {
                 <LuCircleUser />
                 <Text maxW="80px" truncate>{username}</Text>
               </Box>
-            ) : "Login"}
+            ) : t('nav.login')}
           </Button>
         </MenuTrigger>
 
@@ -39,28 +41,92 @@ const DropdownMenu = () => {
           <MenuContent zIndex={controlZIndex + 2}>
             {isAuthenticated ? (
               <MenuItem value="logout" onClick={() => logout()} cursor={"pointer"}>
-                Log out
+                {t('nav.logout')}
               </MenuItem>
             ) : (
               <MenuItem value="login" cursor={"pointer"} onClick={() => {
                 requestAnimationFrame(() => {
                   Modal.open("login-modal", {
-                    modalTitle: "Log in",
+                    modalTitle: t('auth.login.title'),
                     modalContent: <LoginForm onSubmit={login} onClose={() => Modal.close("login-modal")} />
                   });
                 });
               }}>
-                Log in
+                {t('nav.login')}
               </MenuItem>
             )}
             <MenuItem value="sdi-portal" cursor={"pointer"} asChild>
               <a href={SDI_PORTAL_URL} target="_blank" rel="noopener noreferrer">
-                <LuExternalLink /> SDI Portal 
+                <LuExternalLink /> {t('nav.sdiPortal')}
               </a>
             </MenuItem>
           </MenuContent>
         </Menu.Positioner>
       </MenuRoot>
+    </>
+  );
+};
+
+export const DropdownMenuItems = ({ onAction }: { onAction?: () => void }) => {
+  const { login, logout, isAuthenticated, username } = useAuth();
+  const { t } = useTranslation();
+
+  const openLoginModal = () => {
+    onAction?.();
+    requestAnimationFrame(() => {
+      Modal.open("login-modal", {
+        modalTitle: t('auth.login.title'),
+        modalContent: <LoginForm onSubmit={login} onClose={() => Modal.close("login-modal")} />,
+      });
+    });
+  };
+
+  return (
+    <>
+      {isAuthenticated ? (
+        <Button
+          variant="plain"
+          padding={0}
+          fontSize="sm"
+          fontWeight="medium"
+          color="fg.muted"
+          justifyContent="flex-start"
+          onClick={() => logout()}
+        >
+          {t('nav.logout')}
+        </Button>
+      ) : (
+        <Button
+          variant="plain"
+          padding={0}
+          fontSize="sm"
+          fontWeight="medium"
+          color="fg.muted"
+          justifyContent="flex-start"
+          onClick={openLoginModal}
+        >
+          {username ? (
+            <Box display="flex" gap="1" alignItems="center">
+              <LuCircleUser />
+              <Text maxW="80px" truncate>{username}</Text>
+            </Box>
+          ) : t('nav.login')}
+        </Button>
+      )}
+      <Link
+        fontSize="sm"
+        fontWeight="medium"
+        color="fg.muted"
+        href={SDI_PORTAL_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        display="flex"
+        alignItems="center"
+        gap={1.5}
+        _hover={{ textDecoration: "none", color: "fg" }}
+      >
+        <LuExternalLink /> {t('nav.sdiPortal')}
+      </Link>
     </>
   );
 };

@@ -1,6 +1,10 @@
+'use client';
+
 import { truncatedClean } from "@/utils/format";
 import { Card, Heading, Box } from "@chakra-ui/react";
 import { LuDownload } from "react-icons/lu";
+import ReactMarkdown from "react-markdown";
+import { useTranslation } from "react-i18next";
 
 const HighlightText = ({
   text,
@@ -23,7 +27,7 @@ const HighlightText = ({
     <>
       {parts.map((part, index) =>
         regex.test(part) ? (
-          <Box as="span" key={index} bg="yellow.muted">
+          <Box as="span" key={index} bg="orange.muted">
             {part}
           </Box>
         ) : (
@@ -41,17 +45,24 @@ export const ModelCard = ({
   title: string;
   description: string;
 }) => {
+  const truncatedDescription = truncatedClean(description, 250);
   return (
     <Card.Root
       size="md"
       height="full"
-      bg="bg.muted"
-      _hover={{ bg: "yellow.subtle" }}
+      bg="orange.subtle"
+      overflow="hidden"
+      _hover={{ bg: "orange.muted", borderColor: "orange.solid" }}
     >
       <Card.Header>
-        <Heading size="lg">{title}</Heading>
+        <Heading color="orange.solid" size={{base: "md", md: "lg"}}>{title}</Heading>
       </Card.Header>
-      <Card.Body color="fg.muted">{truncatedClean(description, 250)}...</Card.Body>
+      <Card.Body color="fg" fontSize={{ base: "sm", md: "initial"}}>
+        <ReactMarkdown
+        >
+          {`${truncatedDescription}...`}
+        </ReactMarkdown>
+      </Card.Body>
     </Card.Root>
   );
 };
@@ -71,6 +82,8 @@ export const DownloadDataCard = ({
   downloadUrl: string;
   highlight?: string;
 }) => {
+  const { t } = useTranslation();
+
   return (
     <Card.Root size="md" borderRadius={0}>
       <Card.Header>
@@ -84,10 +97,10 @@ export const DownloadDataCard = ({
           <HighlightText text={description} highlight={highlight} />
         </p>
         <p style={{ marginTop: "0.5rem", fontSize: "0.875rem" }}>
-          Source: {source}
+          {t('downloads.source')} {source}
         </p>
         <p style={{ fontSize: "0.875rem" }}>
-          Updated: {new Date(updated).toLocaleDateString()}
+          {t('downloads.updated')} {new Date(updated).toLocaleDateString()}
         </p>
       </Card.Body>
       <Card.Footer>
@@ -98,7 +111,7 @@ export const DownloadDataCard = ({
             alignItems="center"
             textDecoration={"underline"}
           >
-            Download
+            {t('downloads.download')}
             <Box pl={2}>
               <LuDownload />
             </Box>

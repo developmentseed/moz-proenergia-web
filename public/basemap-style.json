@@ -4,6 +4,7 @@
   "metadata": {
     "mapbox:type": "default",
     "mapbox:variation": "monochrome-light-v1",
+    "mapbox:trackposition": false,
     "mapbox:autocomposite": true,
     "mapbox:sdk-support": {
       "js": "3.0.0",
@@ -18,11 +19,11 @@
       },
       "Administrative boundaries, admin": {
         "name": "Administrative boundaries, admin",
-        "collapsed": false
+        "collapsed": true
       },
       "Land & water, built": {
         "name": "Land & water, built",
-        "collapsed": false
+        "collapsed": true
       },
       "Transit, bridges": {
         "name": "Transit, bridges",
@@ -50,7 +51,7 @@
       },
       "Buildings, built": {
         "name": "Buildings, built",
-        "collapsed": false
+        "collapsed": true
       },
       "Natural features, natural-labels": {
         "name": "Natural features, natural-labels",
@@ -66,7 +67,7 @@
       },
       "Place labels, place-labels": {
         "name": "Place labels, place-labels",
-        "collapsed": false
+        "collapsed": true
       },
       "Point of interest labels, poi-labels": {
         "name": "Point of interest labels, poi-labels",
@@ -91,19 +92,19 @@
     }
   },
   "center": [
-    -74,
-    40.73
+    33.12885580502484,
+    -18.633775102539502
   ],
-  "zoom": 11,
+  "zoom": 5.070162018603945,
   "bearing": 0,
   "pitch": 0,
   "sources": {
     "composite": {
-      "url": "mapbox://mapbox.mapbox-streets-v8,mapbox.mapbox-terrain-v2,mapbox.country-boundaries-v1",
+      "url": "mapbox://mapbox.mapbox-streets-v8,mapbox.mapbox-terrain-v2,mapbox.country-boundaries-v1,mapbox.mapbox-bathymetry-v2",
       "type": "vector"
     }
   },
-  "sprite": "mapbox://sprites/devseed/cmlseytt4003c01p7dp3f7j61/2ib17wiz4ylgqck64czms6f5s",
+  "sprite": "mapbox://sprites/devseed/cmlseytt4003c01p7dp3f7j61/aakoau9jzfdnw0a2h7u0obc6c",
   "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
   "layers": [
     {
@@ -120,9 +121,9 @@
             "zoom"
           ],
           9,
-          "hsl(220, 0%, 97%)",
+          "hsl(60, 9%, 98%)",
           11,
-          "hsl(220, 0%, 94%)"
+          "hsl(57, 5%, 98%)"
         ]
       },
       "metadata": {
@@ -149,7 +150,7 @@
       "source": "composite",
       "id": "national-park",
       "paint": {
-        "fill-color": "hsla(96, 54%, 30%, 0.12)",
+        "fill-color": "hsla(86, 43%, 50%, 0.25)",
         "fill-opacity": [
           "interpolate",
           [
@@ -159,9 +160,9 @@
             "zoom"
           ],
           5,
-          0,
+          0.26,
           6,
-          0.6,
+          0.78,
           12,
           0.2
         ]
@@ -284,7 +285,16 @@
       "source": "composite",
       "id": "landuse",
       "paint": {
-        "fill-color": "hsl(220, 0%, 90%)",
+        "fill-color": [
+          "match",
+          [
+            "get",
+            "class"
+          ],
+          "glacier",
+          "hsl(220, 63%, 100%)",
+          "hsl(220, 0%, 90%)"
+        ],
         "fill-opacity": [
           "interpolate",
           [
@@ -418,7 +428,7 @@
           [
             "zoom"
           ],
-          14,
+          5,
           [
             "match",
             [
@@ -426,7 +436,7 @@
               "class"
             ],
             "shadow",
-            "hsla(220, 0%, 87%, 0.06)",
+            "hsla(45, 0%, 81%, 0.21)",
             "hsla(220, 0%, 100%, 0.04)"
           ],
           16,
@@ -537,7 +547,7 @@
       "source-layer": "water",
       "layout": {},
       "paint": {
-        "fill-color": "hsl(220, 0%, 74%)"
+        "fill-color": "hsl(204, 50%, 85%)"
       },
       "metadata": {
         "mapbox:featureComponent": "land-and-water",
@@ -3840,7 +3850,7 @@
       "source": "composite",
       "id": "waterway-label",
       "paint": {
-        "text-color": "hsl(220, 0%, 55%)",
+        "text-color": "hsl(220, 61%, 90%)",
         "text-halo-color": "hsla(220, 0%, 100%, 0.5)"
       },
       "source-layer": "natural_label"
@@ -4231,7 +4241,20 @@
       "source": "composite",
       "id": "water-line-label",
       "paint": {
-        "text-color": "hsl(220, 0%, 55%)",
+        "text-color": [
+          "match",
+          [
+            "get",
+            "class"
+          ],
+          [
+            "bay",
+            "ocean",
+            "sea"
+          ],
+          "hsl(220, 89%, 98%)",
+          "hsl(220, 61%, 90%)"
+        ],
         "text-halo-color": "hsla(220, 0%, 100%, 0.5)"
       },
       "source-layer": "natural_label"
@@ -4381,7 +4404,20 @@
       "source": "composite",
       "id": "water-point-label",
       "paint": {
-        "text-color": "hsl(220, 0%, 55%)",
+        "text-color": [
+          "match",
+          [
+            "get",
+            "class"
+          ],
+          [
+            "bay",
+            "ocean",
+            "sea"
+          ],
+          "hsl(220, 89%, 98%)",
+          "hsl(220, 61%, 90%)"
+        ],
         "text-halo-color": "hsla(220, 0%, 100%, 0.5)"
       },
       "source-layer": "natural_label"
@@ -5031,7 +5067,7 @@
             "symbolrank"
           ],
           "hsl(220, 0%, 47%)",
-          11,
+          10,
           "hsl(220, 0%, 59%)",
           16,
           "hsl(220, 0%, 68%)"
@@ -5343,7 +5379,7 @@
             "symbolrank"
           ],
           "hsl(220, 0%, 47%)",
-          11,
+          10,
           "hsl(220, 0%, 59%)",
           16,
           "hsl(220, 0%, 68%)"
@@ -5485,7 +5521,7 @@
       "source": "composite",
       "id": "state-label",
       "paint": {
-        "text-color": "hsl(220, 0%, 47%)",
+        "text-color": "hsl(220, 2%, 38%)",
         "text-halo-color": "hsl(220, 0%, 100%)",
         "text-halo-width": 1,
         "text-opacity": 0.5
@@ -5629,7 +5665,7 @@
           7,
           0
         ],
-        "text-color": "hsl(220, 0%, 47%)",
+        "text-color": "hsl(212, 3%, 33%)",
         "text-halo-color": "hsl(220, 0%, 100%)",
         "text-halo-width": 1.25
       },
@@ -5724,12 +5760,36 @@
             "MZ"
           ],
           "hsla(0, 0%, 0%, 0)",
-          "hsla(0, 0%, 70%, 0.55)"
+          "hsla(35, 18%, 20%, 0.2)"
+        ]
+      },
+      "source": "composite",
+      "source-layer": "country_boundaries"
+    },
+    {
+      "id": "depth",
+      "type": "fill",
+      "paint": {
+        "fill-color": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "get",
+            "min_depth"
+          ],
+          0,
+          "hsla(212, 67%, 100%, 0.14)",
+          3500,
+          "hsla(208, 82%, 56%, 0.04)",
+          7000,
+          "hsla(208, 100%, 12%, 0.07)"
         ]
       },
       "layout": {},
       "source": "composite",
-      "source-layer": "country_boundaries"
+      "source-layer": "depth"
     }
   ]
 }

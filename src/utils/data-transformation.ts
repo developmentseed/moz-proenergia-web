@@ -4,6 +4,7 @@ import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, Field, MapItemUn
 import { api, MEDIA_URL_PREFIX, DEFAULT_COL } from '@/utils/api';
 import { sortFilterOptions } from '@/config/filters';
 import mapConfig from '@/config/map.json';
+import { registerI18nResource } from '@/utils/i18n';
 const ADMIN_COLUMNS = [
   "Admin_1",
   "Admin_2",
@@ -37,6 +38,9 @@ export interface ApiFilterField {
 export interface ApiScenario {
   id: number;
   name: string;
+  name_pt?: string;
+  description?: string;
+  description_pt?: string;
   model_file: string | null;
 }
 export interface ColorCoding {
@@ -47,7 +51,9 @@ export interface ColorCoding {
 export interface ApiModelResponse {
   id: number;
   name: string;
+  name_pt: string;
   description: string;
+  description_pt?: string;
   filter_fields: ApiFilterField[];
   popup_fields: ApiFilterField[];
   summary_fields: Field[];
@@ -60,7 +66,9 @@ export interface ApiModelResponse {
 export interface ApiVectorResult {
   id: number;
   name: string;
+  name_pt: string;
   description: string;
+  description_pt?: string;
   source: string;
   created: string;
   updated: string;
@@ -187,7 +195,16 @@ export async function fetchModels(signal?: AbortSignal): Promise<ModelGroupMetad
   try {
     const { data } = await api.get('model/', { signal });
     // @TODO return models as it is. Returning lcoe and mini grids until data getting ingested.
-    return data.results;
+    const models = data.results as ModelGroupMetadata[];
+
+    models.forEach((m) => {
+      registerI18nResource(`model.${m.id}`, {
+        name: { en: m.name, pt: m.name_pt },
+        description: { en: m.description, pt: m.description_pt },
+      });
+    });
+
+    return models;
   } catch(e) {
     console.error(e);
     throw new Error('failed to fetch models');
@@ -246,13 +263,17 @@ export async function fetchAllFilterOptions(
     }
     const result: Record<string, string[] | number[] | null> = {};
     for (const column of columns) {
-      const summary = data.summaries?.[column];
-      if (!summary) {
+      try {
+        const summary = data.summaries?.[column];
+        if (!summary) {
+          result[column] = [];
+        } else if (summary.type === 'numeric') {
+          result[column] = [Math.floor(summary.min), Math.ceil(summary.max)];
+        } else {
+          result[column] = sortFilterOptions(Object.keys(summary.values));
+        }
+      } catch {
         result[column] = [];
-      } else if (summary.type === 'numeric') {
-        result[column] = [Math.floor(summary.min), Math.ceil(summary.max)];
-      } else {
-        result[column] = sortFilterOptions(Object.keys(summary.values));
       }
     }
     return result;
@@ -281,21 +302,36 @@ export function replaceSummaryIdColumn(fields: Field[], metricField: Record<stri
 export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetadata, 'filters' | 'layers'> & { filterFields: ApiFilterField[]; colorCoding: ColorCoding[] } {
   const modelId = String(apiModel.id);
 
+  registerI18nResource(`model.${modelId}`, {
+    name: { en: apiModel.name, pt: apiModel.name_pt },
+    description: { en: apiModel.description, pt: apiModel.description_pt },
+  });
+
   const scenarios: Scenario[] = apiModel.scenarios
     // @TODO: Filtering LCOE model until performance improvement
     // .filter(s => s.id !== 1)
     .filter(s => s.model_file !== null)
-    .map(s => ({
-      id: String(s.id),
-      label: s.name,
-      source: deriveSource(String(s.id), s.model_file!),
-      layer: {
-        id: `${s.id}-main`,
-        source: String(s.id),
-        'source-layer': mapConfig.sourceLayerName,
-        type: 'fill' as const,
-      },
-    }));
+    .map(s => {
+      registerI18nResource(`scenario.${s.id}`, {
+        name: { en: s.name, pt: s.name_pt },
+        ...(s.description && { description: { en: s.description, pt: s.description_pt } }),
+      });
+
+      return {
+        id: String(s.id),
+        name: s.name,
+        name_pt: s.name_pt,
+        label: s.name,
+        description: s.description,
+        source: deriveSource(String(s.id), s.model_file!),
+        layer: {
+          id: `${s.id}-main`,
+          source: String(s.id),
+          'source-layer': mapConfig.sourceLayerName,
+          type: 'fill' as const,
+        },
+      };
+    });
   // whwen visuaslization column is empty or null
   const mainColumn = (!apiModel.visualization_column || apiModel.visualization_column === '')? DEFAULT_COL: apiModel.visualization_column;
   const mainField = apiModel.filter_fields.find(f => f.column === mainColumn);
@@ -331,6 +367,12 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
 export function transformVectorsToLayers(apiVectors: ApiVectorResult[]): Layer[] {
   return apiVectors.map(v => {
     const sourceId = String(v.id) + 'vector-source';
+
+    registerI18nResource(`layer.${sourceId}`, {
+      label: { en: v.name, pt: v.name_pt },
+      description: { en: v.description, pt: v.description_pt },
+    });
+
     return {
       id: sourceId,
       label: v.name,

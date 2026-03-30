@@ -28,6 +28,31 @@ main {
   min-height: calc(100vh - 3.5rem - 1px);
 }
 
+/* MapLibre geocoder control overrides */
+.maplibregl-ctrl-geocoder.maplibregl-ctrl-geocoder--collapsed {
+  width: 32px;
+  min-width: 32px;
+  font-size: 12px;
+}
+.maplibregl-ctrl-bottom-left {
+  z-index: 1001 !important;
+}
+
+.maplibregl-ctrl-geocoder--collapsed {
+  width: 32px !important;
+  min-width: 32px !important;
+}
+.maplibregl-ctrl-geocoder--input  {
+  height: 32px !important; 
+  font-size: 13px !important;
+}
+.maplibregl-ctrl-geocoder--icon-search {
+  left: 6px !important;
+}
+.maplibregl-ctrl-geocoder--icon {
+  top: 6px !important;
+}
+
 /* Sentry Feebdack Button */
 #sentry-feedback {
   --actor-inset: auto 44.25vw 0 44.25vw;
