@@ -1,6 +1,9 @@
 import { memo, useState, useEffect } from "react";
-import { Box, Flex, Text, IconButton, Input, Field as ChakraField } from "@chakra-ui/react";
+import { Box, Flex, Text, IconButton, Input, Field as ChakraField, Link } from "@chakra-ui/react";
+import NextLink from "next/link";
 import { api } from "@/utils/api";
+import { fetchModels, slugify } from "@/utils/data-transformation";
+import { useModel } from "@/utils/context/model";
 import { LuChevronLeft, LuSearch, LuChevronsUpDown, LuChevronsDownUp } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
@@ -100,6 +103,50 @@ const ClusterSearch = ({ onSelectCluster }: ClusterSearchProps) => {
           </IconButton>
         </Flex>
       </ChakraField.Root>
+    </Box>
+  );
+};
+
+interface RelatedModelsProps {
+  clusterId: string;
+}
+
+const RelatedModels = ({ clusterId }: RelatedModelsProps) => {
+  const { model } = useModel();
+  const { data: models } = useQuery({
+    queryKey: ["models"],
+    queryFn: ({ signal }) => fetchModels(signal),
+  });
+
+  const currentModelData = models?.find((m) => String(m.id) === model.id);
+  const currentVectorDatasetId = currentModelData?.scenarios[0]?.vector_dataset?.id;
+
+  const related = models?.filter((m) => {
+    if (String(m.id) === model.id) return false;
+    if (!currentVectorDatasetId) return false;
+    return m.scenarios[0]?.vector_dataset?.id === currentVectorDatasetId;
+  }) ?? [];
+
+  if (related.length === 0) return null;
+
+  return (
+    <Box display="flex" flexDirection="column" gap={1}>
+      <Text fontSize="xs" color="fg.muted">
+        View cluster in other models
+      </Text>
+      {related.map((m) => (
+        <Link
+          key={m.id}
+          asChild
+          fontSize="sm"
+          color="blue.500"
+          _hover={{ textDecoration: "underline" }}
+        >
+          <NextLink href={`/model/${slugify(m.name)}?cluster=${clusterId}`}>
+            {m.name}
+          </NextLink>
+        </Link>
+      ))}
     </Box>
   );
 };
@@ -259,9 +306,15 @@ const SummaryPanel = ({
           overflowY="auto"
         >
           {summaryContent}
-          <Box p={4} borderTop="1px solid" borderColor="border">
-            <ClusterSearch onSelectCluster={onSelectCluster} />
-          </Box>
+          {showingCluster ? (
+            <Box p={4} borderTop="1px solid" borderColor="border">
+              <RelatedModels clusterId={clusterId!} />
+            </Box>
+        ) :
+            <Box p={4} borderTop="1px solid" borderColor="border">
+              <ClusterSearch onSelectCluster={onSelectCluster} />
+            </Box>
+          }
         </Box>
 
       </Box>
@@ -283,9 +336,9 @@ const SummaryPanel = ({
         zIndex={controlZIndex}
       >
         {summaryContent}
-              <Box p={4} borderTop="1px solid" borderColor="border">
-        <ClusterSearch onSelectCluster={onSelectCluster} />
-      </Box>
+        <Box p={4} borderTop="1px solid" borderColor="border">
+          <ClusterSearch onSelectCluster={onSelectCluster} />
+        </Box>
       </Box>
 
     </>

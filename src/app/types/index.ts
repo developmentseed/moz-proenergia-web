@@ -80,5 +80,6 @@ export interface ModelGroupMetadata {
   name: string;
   name_pt?: string;
   description: string;
+  scenarios: Array<{ vector_dataset: { id: number } | null }>;
   description_pt?: string;
 }
