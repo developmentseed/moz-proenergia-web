@@ -26,8 +26,8 @@ const ShareButton = () => {
           variant="surface"
           position="absolute"
           h="2.125rem"
-          top="calc(1rem + 1px)"
-          right={12}
+          top={{base: 12, md: 4}}
+          right={{base: 2, md: 12}}
           fontFamily="body"
         >
           Share

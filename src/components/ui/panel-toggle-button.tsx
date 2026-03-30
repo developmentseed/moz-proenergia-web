@@ -29,6 +29,14 @@ export const PanelToggleButton = ({
   const OpenIcon = side === "left" ? LuPanelLeftOpen : LuPanelRightOpen;
   const CloseIcon = side === "left" ? LuPanelLeftClose : LuPanelRightClose;
 
+  const positionProps = side === "left" ? {
+    left: isOpen ? { base: 'auto' as const, md: `calc(${panelWidth}px - 1px)` } : 0,
+    right: isOpen ? { base: 0 as const, md: 'auto' as const } : 'auto' as const,
+  } : {
+    right: isOpen ? { base: 'auto' as const, md: `calc(${panelWidth}px - 1px)` } : 0,
+    left: isOpen ? { base: 0 as const, md: 'auto' as const } : 'auto' as const,
+  };
+
   return (
     <Box
       position="absolute"
@@ -37,7 +45,7 @@ export const PanelToggleButton = ({
         : { right: isOpen ? `calc(${panelWidth}px - 1px)` : 0 })}
       top={4}
       zIndex={1000}
-      transition={`${side} ${animationTime} ease`}
+      transition={`left ${animationTime} ease, right ${animationTime} ease`}
     >
       <Tooltip content={tooltipText}>
         <IconButton

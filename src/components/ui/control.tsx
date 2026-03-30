@@ -193,8 +193,8 @@ const ControlsPanel = () => {
 
   return (
     // To give space for scrollable area
-    <Box p={4} pt={0} pr={0} h="full">
-      <ScrollArea.Root h="calc(100% - 3.5rem - 1px)">
+    <Box p={4} pt={0} pr={0} h="full" display="flex" flexDirection="column">
+      <ScrollArea.Root flex="1" minH="0">
         <ScrollArea.Viewport>
           <ScrollArea.Content spaceY="4" pr={4}>
             {/* put collapsible groups first */}
@@ -233,7 +233,15 @@ const ControlsPanel = () => {
   );
 };
 
-const Control = () => {
+const Control = ({
+  activeTab,
+  onTabChange,
+  onTabClick,
+}: {
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
+  onTabClick?: () => void;
+}) => {
   const { t } = useTranslation();
 
   const tabItems = [
@@ -258,8 +266,9 @@ const Control = () => {
       Component: LayersPanel,
     },
   ];
-
-  return <Tab items={tabItems} />;
+  return (
+    <Tab items={tabItems} value={activeTab} onValueChange={onTabChange} onTabClick={onTabClick} />
+  );
 };
 
 export { Control };

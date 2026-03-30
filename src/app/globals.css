@@ -37,21 +37,20 @@ main {
 .maplibregl-ctrl-bottom-left {
   z-index: 1001 !important;
 }
-@media screen and (min-width: 640px) {
-  .maplibregl-ctrl-geocoder--collapsed {
-    width: 32px !important;
-    min-width: 32px !important;
-  }
-  .maplibregl-ctrl-geocoder--input  {
-    height: 32px !important; 
-    font-size: 13px !important;
-  }
-  .maplibregl-ctrl-geocoder--icon-search {
-    left: 6px !important;
-  }
-  .maplibregl-ctrl-geocoder--icon {
-    top: 6px !important;
-  }
+
+.maplibregl-ctrl-geocoder--collapsed {
+  width: 32px !important;
+  min-width: 32px !important;
+}
+.maplibregl-ctrl-geocoder--input  {
+  height: 32px !important; 
+  font-size: 13px !important;
+}
+.maplibregl-ctrl-geocoder--icon-search {
+  left: 6px !important;
+}
+.maplibregl-ctrl-geocoder--icon {
+  top: 6px !important;
 }
 
 /* Sentry Feebdack Button */

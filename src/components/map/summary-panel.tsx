@@ -1,7 +1,7 @@
 import { memo, useState, useEffect } from "react";
 import { Box, Flex, Text, IconButton } from "@chakra-ui/react";
 import { api } from "@/utils/api";
-import { LuChevronLeft } from "react-icons/lu";
+import { LuChevronLeft, LuChevronsUpDown, LuChevronsDownUp } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter, type Main } from "@/app/types";
@@ -21,6 +21,7 @@ interface SummaryPanelProps {
   resetCluster: () => void;
   main?: Main;
   isOpen: boolean;
+  onToggle?: () => void;
 }
 
 interface PanelHeaderProps {
@@ -107,6 +108,7 @@ const SummaryPanel = ({
   resetCluster,
   main,
   isOpen,
+  onToggle = () => {},
 }: SummaryPanelProps) => {
   const { t } = useTranslation();
 
@@ -150,39 +152,91 @@ const SummaryPanel = ({
     ? t('explorer.cluster', { clusterId })
     : t('explorer.summary');
 
-  return (
-    <Box
-      position="relative"
-      bg="panelBg"
-      borderLeftWidth={isOpen ? "1px" : 0}
-      borderLeftStyle={"solid"}
-      borderLeftColor="panelBorder"
-      transition={`width ${AnimationTime} ease`}
-      width={isOpen ? ControlPanelWidth : 0}
-    >
-      <Box
-        {...mapControlCommonStyleProps}
-        width={ControlPanelWidth}
-        height="100%"
-        display="flex"
-        flexDirection="column"
-        zIndex={controlZIndex}
-      >
+  const summaryContent = (
+    <>
+      <Box display={{ base: "none", md: "block" }}>
         <PanelHeader
           subtitle={t('explorer.analysis')}
           title={title}
           onBack={showingCluster ? resetCluster : undefined}
         />
-        <Box p={4} pt={0} flex={1} minHeight={0} overflowY="auto">
-          <SummaryTable
-            data={dataToDisplay}
-            isLoading={isLoading}
-            isError={showingCluster && clusterIsError}
-            collapsible={!showingCluster}
-          />
+      </Box>
+      <Box p={4} pt={0} flex={1} minHeight={0} overflowY="auto">
+        <SummaryTable
+          data={dataToDisplay}
+          isLoading={isLoading}
+          isError={showingCluster && clusterIsError}
+          collapsible={!showingCluster}
+        />
+      </Box>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile: single sliding container anchored at bottom, trigger at top.
+          bottom: 0 anchors the element; increasing max-height grows upward.
+          The trigger (first child, 44px) is always visible; content reveals
+          below it as the drawer expands. */}
+      <Box
+        display={{ base: "block", md: "none" }}
+        position="absolute"
+        bottom={0}
+        left={0}
+        right={0}
+        zIndex={controlZIndex + 100}
+        overflow="hidden"
+        maxHeight={isOpen ? "80dvh" : "44px"}
+        transition={`max-height ${AnimationTime} ease`}
+        bg="panelBg"
+        borderTop="1px solid"
+        borderColor="panelBorder"
+        boxShadow="lg"
+      >
+        {/* Trigger — always visible, moves up with drawer when expanded */}
+        <Flex
+          h="44px"
+          px={4}
+          align="center"
+          justify="space-between"
+          cursor="pointer"
+          onClick={onToggle}
+        >
+          <Text fontWeight="semibold" fontSize="sm">{title}</Text>
+          <Box>
+            {isOpen ? <LuChevronsDownUp /> : <LuChevronsUpDown />}
+          </Box>
+        </Flex>
+        {/* Content below trigger */}
+        <Box
+          display="flex"
+          flexDirection="column"
+          maxH="calc(80dvh - 44px)"
+          overflowY="auto"
+        >
+          {summaryContent}
         </Box>
       </Box>
-    </Box>
+
+      {/* Desktop: right panel with width animation */}
+      <Box
+        display={{ base: "none", md: "flex" }}
+        {...mapControlCommonStyleProps}
+        position="relative"
+        bg="panelBg"
+        overflow="hidden"
+        width={isOpen ? ControlPanelWidth : 0}
+        height="100%"
+        borderLeftWidth={isOpen ? "1px" : 0}
+        borderLeftStyle="solid"
+        borderLeftColor="panelBorder"
+        transition={`width ${AnimationTime} ease`}
+        flexDirection="column"
+        zIndex={controlZIndex}
+      >
+        {summaryContent}
+      </Box>
+    </>
   );
 };
 

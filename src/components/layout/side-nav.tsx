@@ -8,6 +8,7 @@ import { createSerializer } from 'nuqs/server';
 import modelConfig from '@/config/model.json';
 import { ModelGroupMetadata } from '@/app/types';
 import { slugify } from '@/utils/data-transformation';
+import { getIconPath } from '@/utils/model-icon';
 import { coordinateParsers } from '@/utils/context/map-coords';
 import { Tooltip } from '../ui/tooltip';
 import { useTranslation } from 'react-i18next';
@@ -29,13 +30,11 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
       lng: searchParams.get('lng') ? parseFloat(searchParams.get('lng')!) : null,
       zoom: searchParams.get('zoom') ? parseFloat(searchParams.get('zoom')!) : null,
       });
-  const getIconPath = (modelId: string) => {
-    const config = modelConfig.find((c) => String(c.model) === String(modelId));
-    return config ? `/model-icon/${config.icon}` : `/model-icon/default.svg`;
-  };
 
   return (
     <Box
+      display={{ base: 'none', md: 'flex' }}
+      flexDirection="column"
       height="full"
       bg="navBg"
       borderRight="1px solid"

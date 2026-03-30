@@ -8,7 +8,8 @@
     "downloads": "Downloads",
     "login": "Login",
     "logout": "Log out",
-    "sdiPortal": "SDI Portal"
+    "sdiPortal": "SDI Portal",
+    "menu": "Menu"
   },
   "home": {
     "title": "Integrated Energy Planning Platform",

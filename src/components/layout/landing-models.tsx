@@ -28,7 +28,7 @@ export default function ModelCards() {
   return (
     <>
       <Heading size="3xl">Models</Heading>
-      <SimpleGrid columns={2} py={6} gap={6} minChildWidth="md">
+      <SimpleGrid columns={{ base: 1, md: 2 }} py={6} gap={6} minChildWidth={{base: "none",md: "md"}}>
         {models?.map(e => (
           <div key={e.id} onClick={() => setSelectedModel({ id: String(e.id), name: t(`model.${e.id}.name`, { defaultValue: e.name }), description: t(`model.${e.id}.description`, { defaultValue: e.description }), slug: slugify(e.name) })} style={{ cursor: 'pointer' }}>
             <Card title={t(`model.${e.id}.name`, { defaultValue: e.name })} description={t(`model.${e.id}.description`, { defaultValue: e.description })} />

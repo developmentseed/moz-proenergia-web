@@ -1,7 +1,7 @@
 'use client';
 
 import { truncatedClean } from "@/utils/format";
-import { Card, Heading, Box, Text } from "@chakra-ui/react";
+import { Card, Heading, Box } from "@chakra-ui/react";
 import { LuDownload } from "react-icons/lu";
 import ReactMarkdown from "react-markdown";
 import { useTranslation } from "react-i18next";
@@ -55,9 +55,9 @@ export const ModelCard = ({
       _hover={{ bg: "orange.muted", borderColor: "orange.solid" }}
     >
       <Card.Header>
-        <Heading color="orange.solid" size={{base: "md", md: "2xl"}}>{title}</Heading>
+        <Heading color="orange.solid" size={{base: "md", md: "lg"}}>{title}</Heading>
       </Card.Header>
-      <Card.Body color="fg">
+      <Card.Body color="fg" fontSize={{ base: "sm", md: "initial"}}>
         <ReactMarkdown
         >
           {`${truncatedDescription}...`}

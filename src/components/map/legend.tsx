@@ -34,7 +34,7 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
     <>
       <Box
         position="absolute"
-        bottom={10}
+        bottom={{ base: "4.75rem", md: 10 }}
         right={3}
         p={2}
         {...mapControlCommonStyleProps}
