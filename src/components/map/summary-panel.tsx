@@ -336,9 +336,15 @@ const SummaryPanel = ({
         zIndex={controlZIndex}
       >
         {summaryContent}
-        <Box p={4} borderTop="1px solid" borderColor="border">
-          <ClusterSearch onSelectCluster={onSelectCluster} />
-        </Box>
+        {showingCluster ? (
+          <Box p={4} borderTop="1px solid" borderColor="border">
+            <RelatedModels clusterId={clusterId!} />
+          </Box>
+        ) :
+          <Box p={4} borderTop="1px solid" borderColor="border">
+            <ClusterSearch onSelectCluster={onSelectCluster} />
+          </Box>
+          }
       </Box>
 
     </>
