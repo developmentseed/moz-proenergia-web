@@ -148,8 +148,8 @@ export function deriveSource(id: string, filePath: string) {
   };
 }
 
-export function deriveRasterSource(id: string, filePath: string, stats?: { min: number; max: number }) {
-  const colorFragment = stats
+export function deriveRasterSource(id: string, filePath: string, stats?: { min: number; max: number }, isRgb?: boolean) {
+  const colorFragment = !isRgb && stats
     ? `#color:BrewerSpectral11,${stats.min},${stats.max}`
     : '';
   return {
@@ -428,10 +428,11 @@ export function transformVectorsToLayers(apiVectors: ApiVectorResult[]): Layer[]
 // Transform rasters to layers
 export function transformRastersToLayers(
   apiRasters: ApiVectorResult[],
-  statsMap: Map<number, { min: number; max: number } | null>,
+  statsMap: Map<number, { min: number; max: number; isRgb: boolean } | null>,
 ): Layer[] {
   return apiRasters.map(v => {
     const sourceId = String(v.id) + 'raster-source';
+    const meta = statsMap.get(v.id);
 
     registerI18nResource(`layer.${sourceId}`, {
       label: { en: v.name, pt: v.name_pt },
@@ -444,7 +445,8 @@ export function transformRastersToLayers(
       description: v.description,
       filePath: v.raw_file,
       layerType: 'raster' as const,
-      rasterStats: statsMap.get(v.id) ?? undefined,
+      rasterStats: meta ?? undefined,
+      isRgb: meta?.isRgb ?? false,
     };
   });
 }

@@ -61,6 +61,7 @@ export interface Layer extends ItemUnit {
   color?: string;
   layerType?: 'vector' | 'raster';
   rasterStats?: { min: number; max: number };
+  isRgb?: boolean;
 }
 
 export interface Main extends BaseScenarioFilter {
