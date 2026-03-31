@@ -59,6 +59,9 @@ export interface Layer extends ItemUnit {
   filePath: string;
   downloadLink?: string;
   color?: string;
+  layerType?: 'vector' | 'raster';
+  rasterStats?: { min: number; max: number };
+  isRgb?: boolean;
 }
 
 export interface Main extends BaseScenarioFilter {

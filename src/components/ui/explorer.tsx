@@ -21,6 +21,7 @@ import {
   transformFilterField,
   transformMainOptions,
 } from "@/utils/data-transformation";
+import { fetchRasters, fetchCogMetadata, transformRastersToLayers } from "@/utils/map/cog";
 import { type ModelMetadata } from "@/app/types";
 import MainPanel from "./main-panel";
 import SummaryPanel from "@/components/map/summary-panel";
@@ -185,13 +186,37 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     },
   });
   // contextual layers : separate context
-  const { data: layers } = useQuery({
+  const { data: vectorLayers } = useQuery({
     queryKey: ["vectors", modelId, token],
     queryFn: async ({ signal }) => {
       const apiVectors = await fetchVectors({ modelId, token, signal });
       return transformVectorsToLayers(apiVectors);
     },
   });
+
+  const { data: rasterLayers = [] } = useQuery({
+    queryKey: ["rasters", modelId, token],
+    queryFn: async ({ signal }) => {
+      const apiRasters = await fetchRasters({ modelId, token, signal });
+      const statsEntries = await Promise.all(
+        apiRasters.map(async (r) => {
+          try {
+            const stats = await fetchCogMetadata(r.raw_file);
+            return [r.id, stats] as const;
+          } catch {
+            return [r.id, null] as const;
+          }
+        })
+      );
+      const statsMap = new Map(statsEntries);
+      return transformRastersToLayers(apiRasters, statsMap);
+    },
+  });
+
+  const layers = useMemo(() => {
+    if (!vectorLayers) return undefined;
+    return [...rasterLayers, ...vectorLayers];
+  }, [vectorLayers, rasterLayers]);
 
   const defaultScenarioId = modelCore?.scenarios[0]?.id;
 

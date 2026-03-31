@@ -14,6 +14,7 @@ import {
   isMapboxURL,
   transformMapboxUrl,
 } from "maplibregl-mapbox-request-transformer";
+import * as COGProtocol from '@geomatico/maplibre-cog-protocol';
 import "maplibre-gl/dist/maplibre-gl.css";
 import "@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css";
 import mapConfig from "@/config/map.json";
@@ -24,9 +25,8 @@ import { CenterMapControl } from './recenter-button';
 import GeocoderControl from './geocoder-control';
 import { type Main } from "@/app/types";
 import { buildExpressionWithFilter } from "@/utils/map/filter";
-import { useMouseEvent } from "./hooks/use-mouse-event";
 import { Legend } from "./legend";
-import { ContextualLayer } from "./contextual-layer";
+import { RasterContextualLayer, VectorContextualLayer } from "./contextual-layer";
 import { MainLayer } from "./main-layer";
 import { BasemapSelector, BASEMAP_OPTIONS } from "./basemap-selector";
 import { useToggle } from "@/hooks/use-toggle";
@@ -55,12 +55,28 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
 
   const { open } = useToggle(true);
 
-  // Attach pmtile protocol to MapLibre
+  // Attach pmtile + cog protocol to MapLibre
   useEffect(() => {
     const protocol = new pmtiles.Protocol();
     maplibregl.addProtocol("pmtiles", protocol.tile);
+    maplibregl.addProtocol('cog', COGProtocol.cogProtocol);
+    //   COGProtocol.setColorFunction(cogUrl, (pixel, color) => {
+    //     if (!Number.isFinite(pixel[0])) color.set([0, 0, 0, 0]);
+    //     // else if (pixel[0] < 0.00001) color.set([0, 0, 0, 0]);
+    //     // else {
+    //     //   const value = interpolateCividis(Math.log1p(pixel[0]) / logMax);
+    //     //   const rgbValue = d3color.rgb(value);
+    //     //   color.set([rgbValue.r, rgbValue.g, rgbValue.b, 255]);
+    //     // }
+    //     // else if (pixel[0] < 0.0001)color.set([0, 0, 0, 0]);
+    //     // else if (pixel[0] < 10)color.set([255, 0, 0, 255]); // Red
+    //     // else if (pixel[0] < 300) color.set([255, 255, 0, 255]);
+    //     // else  color.set([0, 255, 0, 255]);
+
+    // });
     return () => {
       maplibregl.removeProtocol("pmtiles");
+      maplibregl.removeProtocol("cog");
     };
   }, []);
 
@@ -110,15 +126,16 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
           mapStyle={selectedBasemap.styleUrl}
           transformRequest={transformRequest}
           interactiveLayerIds={zoom > 9 ? [main.id, main.id + '-line', main.id + '-circle'] : []}
-        >
+      >
+          <RasterContextualLayer beforeId={main.id + '-bg'} />
           <MainLayer
             scenario={scenario}
             main={main}
             mapFilter={mapFilter}
             clusterId={clusterId}
             opacity={mainLayerOpacity / 100}
-          />
-          <ContextualLayer />
+        />
+          <VectorContextualLayer />
           <ScaleControl position="bottom-left" />
           <NavigationControl showCompass={false} position="bottom-left" />
           <GeocoderControl
