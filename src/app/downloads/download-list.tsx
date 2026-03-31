@@ -20,8 +20,8 @@ export const DownloadList = () => {
   });
 
   const filteredData = data?.filter((item) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.description.toLowerCase().includes(searchQuery.toLowerCase())
+    item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (isLoading) {

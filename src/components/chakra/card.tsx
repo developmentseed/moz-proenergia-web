@@ -55,9 +55,9 @@ export const ModelCard = ({
       _hover={{ bg: "orange.muted", borderColor: "orange.solid" }}
     >
       <Card.Header>
-        <Heading color="orange.solid" size={{base: "md", md: "lg"}}>{title}</Heading>
+        <Heading color="orange.solid" size={{ base: "md", md: "lg" }}>{title}</Heading>
       </Card.Header>
-      <Card.Body color="fg" fontSize={{ base: "sm", md: "initial"}}>
+      <Card.Body color="fg" fontSize={{ base: "sm", md: "initial" }}>
         <ReactMarkdown
         >
           {`${truncatedDescription}...`}
@@ -88,13 +88,13 @@ export const DownloadDataCard = ({
     <Card.Root size="md" borderRadius={0}>
       <Card.Header>
         <Heading size="md">
-          <HighlightText text={title} highlight={highlight} />
+          {title && <HighlightText text={title} highlight={highlight} />}
         </Heading>
       </Card.Header>
 
       <Card.Body color="fg.muted">
         <p>
-          <HighlightText text={description} highlight={highlight} />
+          {description && <HighlightText text={description} highlight={highlight} />}
         </p>
         <p style={{ marginTop: "0.5rem", fontSize: "0.875rem" }}>
           {t('downloads.source')} {source}
