@@ -7,6 +7,7 @@ import Explorer from '@/components/ui/explorer';
 import { SideNav } from '@/components/layout/side-nav';
 import { fetchModels, slugify } from '@/utils/data-transformation';
 import { useAuth } from '@/utils/context/auth';
+import { MapCoordsProvider } from '@/utils/context/map-coords';
 
 export default function NotFound() {
   const [slug, setSlug] = useState<string | null>(null);
@@ -62,11 +63,13 @@ export default function NotFound() {
   }
   // Finally, return explorer page if model was found
   return (
-    <Flex h="calc(100vh - 3.5rem - 1px)" maxH="calc(100vh - 3.5rem - 1px)" overflow="hidden" width="100%">
-      <SideNav models={models!} currentSlug={slug} />
-      <Box id='main-panel' width='full' height="100%">
-        <Explorer modelId={model.id} />
-      </Box>
-    </Flex>
+    <MapCoordsProvider>
+      <Flex h="calc(100vh - 3.5rem - 1px)" maxH="calc(100vh - 3.5rem - 1px)" overflow="hidden" width="100%">
+        <SideNav models={models!} currentSlug={slug} />
+        <Box id='main-panel' width='full' height="100%">
+          <Explorer modelId={model.id} />
+        </Box>
+      </Flex>
+    </MapCoordsProvider>
   );
 }
