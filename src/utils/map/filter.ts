@@ -13,8 +13,8 @@ export function buildExpressionWithFilter(filterRef: Filter[], filters: Record<s
           const [min, max] = filterValue as [number, number];
           conditions.push(
             ["all",
-              [">=", ["get", filterDef.column], min],
-              ["<=", ["get", filterDef.column], max]
+              [">=", ["to-number",["get", filterDef.column]], min],
+              ["<=", ["to-number",["get", filterDef.column]], max]
             ]
           );
           break;
