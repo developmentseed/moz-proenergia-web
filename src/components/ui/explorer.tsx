@@ -178,9 +178,9 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
 
   // Query 1: Model metadata
   const { data: modelCore } = useQuery({
-    queryKey: ["modelMetadata", modelId],
+    queryKey: ["modelMetadata", modelId, token],
     queryFn: async ({ signal }) => {
-      const apiModel = await fetchModelMetadata(modelId, signal);
+      const apiModel = await fetchModelMetadata(modelId, signal, token);
       return transformModelCore(apiModel);
     },
   });
