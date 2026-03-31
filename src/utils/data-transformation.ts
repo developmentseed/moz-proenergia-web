@@ -148,18 +148,6 @@ export function deriveSource(id: string, filePath: string) {
   };
 }
 
-export function deriveRasterSource(id: string, filePath: string, stats?: { min: number; max: number }, isRgb?: boolean) {
-  const colorFragment = !isRgb && stats
-    ? `#color:BrewerSpectral11,${stats.min},${stats.max}`
-    : '';
-  return {
-    id,
-    type: 'raster' as const,
-    url: `cog://${MEDIA_URL_PREFIX}${filePath}${colorFragment}`,
-    tileSize: 256,
-  };
-}
-
 export function deriveLayerStyles(sourceId: string, color: string, opacity: number = 1): { circleLayer: LayerProps; lineLayer: LayerProps, polygonLayer:LayerProps } {
   return {
     circleLayer: {
@@ -200,15 +188,6 @@ export function deriveLayerStyles(sourceId: string, color: string, opacity: numb
       },
       filter: ["==", ["geometry-type"], "Polygon"]
     },
-  };
-}
-
-export function deriveRasterLayerStyle(sourceId: string, opacity: number = 1): LayerProps {
-  return {
-    id: `${sourceId}-raster-layer`,
-    source: sourceId,
-    type: 'raster',
-    paint: { 'raster-opacity': opacity },
   };
 }
 
@@ -268,26 +247,6 @@ export async function fetchVectors({ modelId, token, signal }: { modelId?: strin
   } catch(e) {
     console.error(e);
     throw new Error('Failed to fetch vectors');
-  }
-}
-
-export async function fetchRasters({ modelId, token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiVectorResult[]> {
-  try {
-    const endpoint = `raster/`;
-    const { data } = await api.get(endpoint, {
-      signal,
-      ...(token && {
-        headers: { 'Authorization': `Token ${token}` }
-      }),
-      ...(modelId && {
-        params: { 'model': modelId }
-      })
-    });
-    const results: ApiVectorResult[] = data.results;
-    return results;
-  } catch(e) {
-    console.error(e);
-    throw new Error('Failed to fetch rasters');
   }
 }
 
@@ -425,32 +384,6 @@ export function transformVectorsToLayers(apiVectors: ApiVectorResult[]): Layer[]
       filePath: v.raw_file,
       color: v.color,
       layerType: 'vector' as const,
-    };
-  });
-}
-
-// Transform rasters to layers
-export function transformRastersToLayers(
-  apiRasters: ApiVectorResult[],
-  statsMap: Map<number, { min: number; max: number; isRgb: boolean } | null>,
-): Layer[] {
-  return apiRasters.map(v => {
-    const sourceId = String(v.id) + 'raster-source';
-    const meta = statsMap.get(v.id);
-
-    registerI18nResource(`layer.${sourceId}`, {
-      label: { en: v.name, pt: v.name_pt },
-      description: { en: v.description, pt: v.description_pt },
-    });
-
-    return {
-      id: sourceId,
-      label: v.name,
-      description: v.description,
-      filePath: v.raw_file,
-      layerType: 'raster' as const,
-      rasterStats: meta ?? undefined,
-      isRgb: meta?.isRgb ?? false,
     };
   });
 }

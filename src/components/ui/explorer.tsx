@@ -15,15 +15,13 @@ import { useAuth } from "@/utils/context/auth";
 import {
   fetchModelMetadata,
   fetchVectors,
-  fetchRasters,
   fetchAllFilterOptions,
   transformModelCore,
   transformVectorsToLayers,
-  transformRastersToLayers,
   transformFilterField,
   transformMainOptions,
 } from "@/utils/data-transformation";
-import { fetchCogMetadata } from "@/utils/map/cog";
+import { fetchRasters, fetchCogMetadata, transformRastersToLayers } from "@/utils/map/cog";
 import { type ModelMetadata } from "@/app/types";
 import MainPanel from "./main-panel";
 import SummaryPanel from "@/components/map/summary-panel";

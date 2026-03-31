@@ -127,7 +127,7 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
           transformRequest={transformRequest}
           interactiveLayerIds={zoom > 9 ? [main.id, main.id + '-line', main.id + '-circle'] : []}
       >
-          <RasterContextualLayer />
+          <RasterContextualLayer beforeId={main.id + '-bg'} />
           <MainLayer
             scenario={scenario}
             main={main}
