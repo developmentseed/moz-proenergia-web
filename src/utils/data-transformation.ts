@@ -213,9 +213,11 @@ export async function fetchModels(signal?: AbortSignal, token?: string| null): P
   }
 }
 
-export async function fetchModelMetadata(slug: string, signal?: AbortSignal): Promise<ApiModelResponse> {
+export async function fetchModelMetadata(slug: string, signal?: AbortSignal, token?: string | null): Promise<ApiModelResponse> {
   try {
-    const { data } = await api.get(`model/${slug}/`, { signal });
+    const { data } = await api.get(`model/${slug}/`, { signal, ...(token && {
+        headers: { 'Authorization': `Token ${token}` }
+      }), });
     return data;
   } catch(e) {
     console.error(e);
