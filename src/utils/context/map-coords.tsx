@@ -46,14 +46,6 @@ export function MapCoordsProvider({ children }: { children: ReactNode }) {
     setOriginCoords({ lat: null, lng: null, zoom: null });
   }, [setOriginCoords]);
 
-  // Clean up URL params when leaving model pages (provider unmounts)
-  useEffect(() => {
-    return () => {
-      removeCoordinates();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const value = useMemo(
     () => ({ coords, setCoords, removeCoordinates }),
     [coords, setCoords, removeCoordinates],
