@@ -6,9 +6,11 @@ import { useQuery } from '@tanstack/react-query';
 import Explorer from '@/components/ui/explorer';
 import { SideNav } from '@/components/layout/side-nav';
 import { fetchModels, slugify } from '@/utils/data-transformation';
+import { useAuth } from '@/utils/context/auth';
 
 export default function NotFound() {
   const [slug, setSlug] = useState<string | null>(null);
+  const { token } = useAuth();
 
   useEffect(() => {
     const match = window.location.pathname.match(/^\/model\/([^/]+)\/?$/);
@@ -18,8 +20,8 @@ export default function NotFound() {
   }, []);
 
   const { data: models, isLoading } = useQuery({
-    queryKey: ['models'],
-    queryFn: () => fetchModels(),
+    queryKey: ['models', token],
+    queryFn: () => fetchModels(undefined, token),
     enabled: slug !== null,
   });
 

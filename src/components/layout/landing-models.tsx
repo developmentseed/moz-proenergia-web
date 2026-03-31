@@ -11,6 +11,7 @@ import {
   useQuery
 } from '@tanstack/react-query';
 import { slugify, fetchModels } from '@/utils/data-transformation';
+import { useAuth } from '@/utils/context/auth';
 import { useTranslation } from 'react-i18next';
 import { SimpleGrid, Text, Box } from '@chakra-ui/react';
 import { DrawerSummaryTable } from './drawer-summary-table';
@@ -18,11 +19,12 @@ import { LuArrowRight } from 'react-icons/lu';
 
 export default function ModelCards() {
   const { t } = useTranslation();
+  const { token } = useAuth();
   const [selectedModel, setSelectedModel] = useState<{ id: string; name: string; description: string; slug: string } | null>(null);
 
   const { data: models } = useQuery({
-    queryKey: ['models'],
-    queryFn: ({ signal }) => fetchModels(signal),
+    queryKey: ['models', token],
+    queryFn: ({ signal }) => fetchModels(signal, token),
   });
 
   return (

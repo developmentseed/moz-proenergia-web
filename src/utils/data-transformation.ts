@@ -191,9 +191,11 @@ export function deriveLayerStyles(sourceId: string, color: string, opacity: numb
   };
 }
 
-export async function fetchModels(signal?: AbortSignal): Promise<ModelGroupMetadata[]> {
+export async function fetchModels(signal?: AbortSignal, token?: string): Promise<ModelGroupMetadata[]> {
   try {
-    const { data } = await api.get('model/', { signal });
+    const { data } = await api.get('model/', { signal, ...(token && {
+        headers: { 'Authorization': `Token ${token}` }
+      }), });
     // @TODO return models as it is. Returning lcoe and mini grids until data getting ingested.
     const models = data.results as ModelGroupMetadata[];
 
