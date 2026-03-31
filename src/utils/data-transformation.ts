@@ -212,9 +212,11 @@ export function deriveRasterLayerStyle(sourceId: string, opacity: number = 1): L
   };
 }
 
-export async function fetchModels(signal?: AbortSignal): Promise<ModelGroupMetadata[]> {
+export async function fetchModels(signal?: AbortSignal, token?: string| null): Promise<ModelGroupMetadata[]> {
   try {
-    const { data } = await api.get('model/', { signal });
+    const { data } = await api.get('model/', { signal, ...(token && {
+        headers: { 'Authorization': `Token ${token}` }
+      }), });
     // @TODO return models as it is. Returning lcoe and mini grids until data getting ingested.
     const models = data.results as ModelGroupMetadata[];
 
@@ -232,9 +234,11 @@ export async function fetchModels(signal?: AbortSignal): Promise<ModelGroupMetad
   }
 }
 
-export async function fetchModelMetadata(slug: string, signal?: AbortSignal): Promise<ApiModelResponse> {
+export async function fetchModelMetadata(slug: string, signal?: AbortSignal, token?: string | null): Promise<ApiModelResponse> {
   try {
-    const { data } = await api.get(`model/${slug}/`, { signal });
+    const { data } = await api.get(`model/${slug}/`, { signal, ...(token && {
+        headers: { 'Authorization': `Token ${token}` }
+      }), });
     return data;
   } catch(e) {
     console.error(e);

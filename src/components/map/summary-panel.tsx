@@ -3,6 +3,7 @@ import { Box, Flex, Text, IconButton, Input, Field as ChakraField, Link } from "
 import NextLink from "next/link";
 import { api } from "@/utils/api";
 import { fetchModels, slugify } from "@/utils/data-transformation";
+import { useAuth } from "@/utils/context/auth";
 import { useModel } from "@/utils/context/model";
 import { LuChevronLeft, LuSearch, LuChevronsUpDown, LuChevronsDownUp } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
@@ -113,9 +114,10 @@ interface RelatedModelsProps {
 
 const RelatedModels = ({ clusterId }: RelatedModelsProps) => {
   const { model } = useModel();
+  const { token } = useAuth();
   const { data: models } = useQuery({
-    queryKey: ["models"],
-    queryFn: ({ signal }) => fetchModels(signal),
+    queryKey: ["models", token],
+    queryFn: ({ signal }) => fetchModels(signal, token),
   });
 
   const currentModelData = models?.find((m) => String(m.id) === model.id);

@@ -8,6 +8,7 @@ import {
   transformModelCore,
 } from "@/utils/data-transformation";
 import { useSummaryQuery } from "@/hooks/use-summary-query";
+import { useAuth } from "@/utils/context/auth";
 import type { Main } from "@/app/types";
 
 interface DrawerSummaryTableProps {
@@ -15,11 +16,12 @@ interface DrawerSummaryTableProps {
 }
 
 export function DrawerSummaryTable({ modelId }: DrawerSummaryTableProps) {
+  const { token } = useAuth();
   // Step 1: Fetch model metadata (reuses same query key as Explorer)
   const { data: modelCore, isLoading: metaLoading } = useQuery({
-    queryKey: ["modelMetadata", modelId],
+    queryKey: ["modelMetadata", modelId, token],
     queryFn: async ({ signal }) => {
-      const apiModel = await fetchModelMetadata(modelId, signal);
+      const apiModel = await fetchModelMetadata(modelId, signal, token);
       return transformModelCore(apiModel);
     },
   });

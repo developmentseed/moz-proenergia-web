@@ -6,15 +6,17 @@ import NextLink from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useModel } from "@/utils/context/model";
 import { fetchModels, slugify } from "@/utils/data-transformation";
+import { useAuth } from "@/utils/context/auth";
 import { getIconPath } from "@/utils/model-icon";
 import { controlZIndex } from "@/components/map/control-constant";
 
 const ModelSwitcherMenu = () => {
   const { model } = useModel();
+  const { token } = useAuth();
 
   const { data: models } = useQuery({
-    queryKey: ["models"],
-    queryFn: ({ signal }) => fetchModels(signal),
+    queryKey: ["models", token],
+    queryFn: ({ signal }) => fetchModels(signal, token),
   });
 
   const iconPath = getIconPath(model.id);
