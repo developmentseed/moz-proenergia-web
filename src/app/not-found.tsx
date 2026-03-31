@@ -21,7 +21,7 @@ export default function NotFound() {
 
   const { data: models, isLoading } = useQuery({
     queryKey: ['models', token],
-    queryFn: () => fetchModels(undefined, token),
+    queryFn: ({ signal }) => fetchModels(signal, token),
     enabled: slug !== null,
   });
 

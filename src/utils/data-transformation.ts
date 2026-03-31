@@ -191,7 +191,7 @@ export function deriveLayerStyles(sourceId: string, color: string, opacity: numb
   };
 }
 
-export async function fetchModels(signal?: AbortSignal, token?: string): Promise<ModelGroupMetadata[]> {
+export async function fetchModels(signal?: AbortSignal, token?: string| null): Promise<ModelGroupMetadata[]> {
   try {
     const { data } = await api.get('model/', { signal, ...(token && {
         headers: { 'Authorization': `Token ${token}` }
