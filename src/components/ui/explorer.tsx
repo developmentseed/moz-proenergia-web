@@ -22,6 +22,7 @@ import {
   transformFilterField,
   transformMainOptions,
 } from "@/utils/data-transformation";
+import { useMapCoords } from "@/utils/context/map-coords";
 import { fetchRasters, fetchCogMetadata, transformRastersToLayers } from "@/utils/map/cog";
 import { type ModelMetadata } from "@/app/types";
 import MainPanel from "./main-panel";
@@ -31,7 +32,6 @@ import { useTranslation } from "react-i18next";
 import { useToggle } from "@/hooks/use-toggle";
 import { useMouseEvent } from "@/components/map/hooks/use-mouse-event";
 import { ControlPanelWidth, AnimationTime } from "./main-panel";
-
 
 const ExplorerInner = () => {
   const { model, scenarioId } = useModel();
@@ -260,14 +260,13 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   }, [modelCore, allFilterOptions]);
 
   // Get rid of coordinates related query parameters when explorer is unmounted
-  // const { removeCoordinates } = useMapCoords();
-  // useEffect(() => {
-  //   return () => {
-  //     removeCoordinates();
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
+  const { removeCoordinates } = useMapCoords();
+  useEffect(() => {
+    return () => {
+      removeCoordinates();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // @TODO: A very hacky way of telling users that the data doesn't have related scenarios
   // Assuming /vectors endpoints succeeded
   if (modelCore && !activeScenarioId && layers) {
