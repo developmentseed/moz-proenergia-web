@@ -2,7 +2,7 @@ import { fromUrl } from 'geotiff';
 import { LayerProps } from "react-map-gl/maplibre";
 import { type Layer } from '@/app/types';
 import { api, MEDIA_URL_PREFIX } from '@/utils/api';
-import { type ApiVectorResult } from '@/utils/data-transformation';
+import { type ApiFileResult } from '@/utils/data-transformation';
 import { registerI18nResource } from '@/utils/i18n';
 
 const COLOR_SCHEME = 'BrewerGreens6'; // This should be one of https://labs.geomatico.es/maplibre-cog-protocol/color-cheatsheet.html
@@ -54,7 +54,7 @@ export function deriveRasterLayerStyle(sourceId: string, opacity: number = 1): L
   };
 }
 
-export async function fetchRasters({ modelId, token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiVectorResult[]> {
+export async function fetchRasters({ modelId, token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiFileResult[]> {
   try {
     const endpoint = `raster/`;
     const { data } = await api.get(endpoint, {
@@ -66,7 +66,7 @@ export async function fetchRasters({ modelId, token, signal }: { modelId?: strin
         params: { 'model': modelId }
       })
     });
-    const results: ApiVectorResult[] = data.results;
+    const results: ApiFileResult[] = data.results;
     return results;
   } catch(e) {
     console.error(e);
@@ -76,7 +76,7 @@ export async function fetchRasters({ modelId, token, signal }: { modelId?: strin
 
 // Transform rasters to layers
 export function transformRastersToLayers(
-  apiRasters: ApiVectorResult[],
+  apiRasters: ApiFileResult[],
   statsMap: Map<number, { min: number; max: number; isRgb: boolean } | null>,
 ): Layer[] {
   return apiRasters.map(v => {
@@ -85,7 +85,7 @@ export function transformRastersToLayers(
 
     registerI18nResource(`layer.${sourceId}`, {
       label: { en: v.name, pt: v.name_pt },
-      description: { en: v.description, pt: v.description_pt },
+      description: { en: v.description?? '', pt: v.description_pt },
     });
 
     return {
