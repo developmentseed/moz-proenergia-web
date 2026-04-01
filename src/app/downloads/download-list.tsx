@@ -8,7 +8,7 @@ import { MEDIA_URL_PREFIX } from "@/utils/api";
 import { useAuth } from "@/utils/context/auth";
 import { DownloadDataCard } from "@/components/chakra/card";
 import { Search } from "@/components/ui/search";
-import { fetchVectors } from "@/utils/data-transformation";
+import { fetchVectors, fetchReferences } from "@/utils/data-transformation";
 import { fetchRasters } from "@/utils/map/cog";
 
 export const DownloadList = () => {
@@ -26,14 +26,18 @@ export const DownloadList = () => {
     queryFn: ({ signal }) => fetchRasters({ token, signal })
   });
 
-  const allData = [...(data ?? []), ...(rasterData ?? [])];
+    const { data: referenceData, isLoading: isLoadingReference } = useQuery({
+    queryKey: ['reference', token],
+    queryFn: ({ signal }) => fetchReferences({ token, signal })
+  });
+  const allData = [...(data ?? []), ...(rasterData ?? []), ...(referenceData ?? [])];
 
   const filteredData = allData.filter((item) =>
     item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (isLoading || isLoadingRasters) {
+  if (isLoading || isLoadingRasters || isLoadingReference) {
     return (
       <Center py={10}>
         <Spinner colorPalette="orange" color="colorPalette.600" size="lg" />
