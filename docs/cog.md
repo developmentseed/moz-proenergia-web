@@ -1,6 +1,6 @@
 ### COG Generation tips
 
-Proenergia front-end app uses [MaplibreGL COG Protocol](https://github.com/geomatico/maplibre-cog-protocol) for COG rendering. This plug-in requires specific configuration for rendering and better performance. 
+Proenergia front-end app uses [MaplibreGL COG Protocol](https://github.com/geomatico/maplibre-cog-protocol) for COG rendering. This plug-in requires specific configuration for rendering and better performance. COG should be in EPSG:3857, and use the Google Maps tiling scheme with 256x256 block size.
 
 The example GDAL command below was used to generate a working COG.
 
