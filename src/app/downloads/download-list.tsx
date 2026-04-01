@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { SimpleGrid, Box, Spinner, Center } from "@chakra-ui/react";
+import { useTranslation } from "react-i18next";
+import { MEDIA_URL_PREFIX } from "@/utils/api";
 import { useAuth } from "@/utils/context/auth";
 import { DownloadDataCard } from "@/components/chakra/card";
 import { Search } from "@/components/ui/search";
 import { fetchVectors } from "@/utils/data-transformation";
-import { useTranslation } from "react-i18next";
+import { fetchRasters } from "@/utils/map/cog";
 
 export const DownloadList = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -19,12 +21,19 @@ export const DownloadList = () => {
     queryFn: ({ signal }) => fetchVectors({ token, signal })
   });
 
-  const filteredData = data?.filter((item) =>
+  const { data: rasterData, isLoading: isLoadingRasters } = useQuery({
+    queryKey: ['raster', token],
+    queryFn: ({ signal }) => fetchRasters({ token, signal })
+  });
+
+  const allData = [...(data ?? []), ...(rasterData ?? [])];
+
+  const filteredData = allData.filter((item) =>
     item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (isLoading) {
+  if (isLoading || isLoadingRasters) {
     return (
       <Center py={10}>
         <Spinner colorPalette="orange" color="colorPalette.600" size="lg" />
@@ -49,7 +58,7 @@ export const DownloadList = () => {
           description={item.description}
           source={item.source}
           updated={item.updated}
-          downloadUrl={item.raw_file}
+          downloadUrl={`${MEDIA_URL_PREFIX}${item.raw_file}`}
           highlight={searchQuery}
         />
       ))}
