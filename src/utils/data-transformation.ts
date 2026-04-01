@@ -63,13 +63,13 @@ export interface ApiModelResponse {
   metric_field_types: Record<string, string>
 }
 
-export interface ApiVectorResult {
+export interface ApiFileResult {
   id: number;
   name: string;
   name_pt: string;
-  description: string;
+  description?: string;
   description_pt?: string;
-  source: string;
+  source?: string;
   created: string;
   updated: string;
   created_by: string;
@@ -82,7 +82,7 @@ export interface ApiVectorResult {
 
 export interface ApiVectorsResponse {
   count: number;
-  results: ApiVectorResult[];
+  results: ApiFileResult[];
 }
 
 export interface ApiModelsResponse {
@@ -225,7 +225,7 @@ export async function fetchModelMetadata(slug: string, signal?: AbortSignal, tok
   }
 }
 
-export async function fetchVectors({ modelId, token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiVectorResult[]> {
+export async function fetchVectors({ modelId, token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiFileResult[]> {
   try {
     const endpoint = `vector/`;
     const { data } = await api.get(endpoint, {
@@ -237,7 +237,7 @@ export async function fetchVectors({ modelId, token, signal }: { modelId?: strin
         params: { 'model': modelId }
       })
     });
-    const results: ApiVectorResult[] = data.results;
+    const results: ApiFileResult[] = data.results;
 
     return results.map((v, idx) => ({
       ...v,
@@ -250,7 +250,7 @@ export async function fetchVectors({ modelId, token, signal }: { modelId?: strin
   }
 }
 
-export async function fetchReferences({ token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiVectorResult[]> {
+export async function fetchReferences({ token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiFileResult[]> {
   try {
     const endpoint = `reference/`;
     const { data } = await api.get(endpoint, {
@@ -259,7 +259,7 @@ export async function fetchReferences({ token, signal }: { modelId?: string, tok
         headers: { 'Authorization': `Token ${token}` }
       })
     });
-    const results: ApiVectorResult[] = data.results;
+    const results: ApiFileResult[] = data.results;
 
     return results;
   } catch(e) {
@@ -386,13 +386,13 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
 }
 
 // Transform vectors to layers
-export function transformVectorsToLayers(apiVectors: ApiVectorResult[]): Layer[] {
+export function transformVectorsToLayers(apiVectors: ApiFileResult[]): Layer[] {
   return apiVectors.map(v => {
     const sourceId = String(v.id) + 'vector-source';
 
     registerI18nResource(`layer.${sourceId}`, {
       label: { en: v.name, pt: v.name_pt },
-      description: { en: v.description, pt: v.description_pt },
+      description: { en: v.description?? '', pt: v.description_pt },
     });
 
     return {

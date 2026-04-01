@@ -76,8 +76,8 @@ export const DownloadDataCard = ({
   highlight,
 }: {
   title: string;
-  description: string;
-  source: string;
+  description: string | undefined;
+  source: string | undefined;
   updated: string;
   downloadUrl: string;
   highlight?: string;
