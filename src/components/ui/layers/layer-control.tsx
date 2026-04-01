@@ -6,6 +6,7 @@ import { LuInfo } from "react-icons/lu";
 import { MEDIA_URL_PREFIX } from "@/utils/api";
 import { DownloadButton } from "@/components/chakra/download-button";
 import { ModalDialog } from "@/components/chakra/modal";
+import { RasterStatsInfo } from "@/components/map/raster-stats";
 import { type Layer } from "@/app/types";
 import { useTranslation } from "react-i18next";
 
@@ -30,7 +31,7 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
       <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" py="0.5" px='4'>
         <Box display="flex" alignItems="center" gap="1">
           <Text fontSize="sm" fontFamily="body">{layerLabel}</Text>
-          {layerDescription && (
+          {(layerDescription || (layer.rasterStats && !layer.isRgb)) && (
             <IconButton
               aria-label="Layer info"
               size="2xs"
@@ -55,13 +56,16 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
 
       <ModalDialog
         modalTitle={layerLabel}
-        modalContent={layerDescription ? (
-          <Text fontSize="sm">{layerDescription}</Text>
-        ) : (
-          <Text fontSize="sm" color="fg.muted" fontStyle="italic">
-            No description available.
-          </Text>
-        )}
+        modalContent={<>
+          <RasterStatsInfo rasterStats={layer.rasterStats} isRgb={layer.isRgb} />
+          {layerDescription ? (
+            <Text fontSize="sm">{layerDescription}</Text>
+          ) : (
+            <Text fontSize="sm" color="fg.muted" fontStyle="italic">
+              No description available.
+            </Text>
+          )}
+        </>}
         open={infoOpen}
         onOpenChange={({ open }) => setInfoOpen(open)}
       />

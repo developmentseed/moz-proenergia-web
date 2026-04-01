@@ -6,15 +6,18 @@ import { Tooltip } from '@/components/ui/tooltip';
 import { LuX, LuInfo, LuDroplet } from 'react-icons/lu';
 import { OpacityControl } from './opacity-control';
 import { ModalDialog } from '@/components/chakra/modal';
+import { RasterStatsInfo } from './raster-stats';
 import type { ItemUnit } from '@/app/types';
 
 type LayerEntryProps = ItemUnit & {
   color: string;
+  rasterStats?: { min: number; max: number };
+  isRgb?: boolean;
   switchLayer: (layerId: string) => void;
   setOpacity: (layerId: string, opacity: number) => void;
 };
 
-export function LayerEntry({ id, label, description, color, switchLayer, setOpacity: setOpacityStore }: LayerEntryProps) {
+export function LayerEntry({ id, label, description, color, rasterStats, isRgb, switchLayer, setOpacity: setOpacityStore }: LayerEntryProps) {
   const [infoOpen, setInfoOpen] = useState(false);
   const [opacity, setOpacity] = useState(100);
 
@@ -65,13 +68,16 @@ export function LayerEntry({ id, label, description, color, switchLayer, setOpac
 
       <ModalDialog
         modalTitle={label}
-        modalContent={description ? (
-          <Text fontSize="sm">{description}</Text>
-        ) : (
-          <Text fontSize="sm" color="fg.muted" fontStyle="italic">
-            No description available.
-          </Text>
-        )}
+        modalContent={<>
+          {description ? (
+            <Text fontSize="sm">{description}</Text>
+          ) : (
+            <Text fontSize="sm" color="fg.muted" fontStyle="italic">
+              No description available.
+            </Text>
+          )}
+          <RasterStatsInfo rasterStats={rasterStats} isRgb={isRgb} />
+        </>}
         open={infoOpen}
         onOpenChange={({ open }) => setInfoOpen(open)}
       />

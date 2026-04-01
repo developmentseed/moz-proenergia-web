@@ -98,6 +98,8 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
                               color={layer.layerType === 'raster'
                                 ? (layer.isRgb ? '#2563eb' : 'linear-gradient(135deg, #4a90d9, #7bc67e, #f5c542)')
                                 : (layer.color ?? '#888888')}
+                              rasterStats={layer.rasterStats}
+                              isRgb={layer.isRgb}
                               switchLayer={(id) => toggleLayer({ [id]: false })}
                               setOpacity={(id, opacity) => setLayerOpacity(id, opacity)}
                             />
