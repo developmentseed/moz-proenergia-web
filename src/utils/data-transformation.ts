@@ -250,6 +250,24 @@ export async function fetchVectors({ modelId, token, signal }: { modelId?: strin
   }
 }
 
+export async function fetchReferences({ token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiVectorResult[]> {
+  try {
+    const endpoint = `reference/`;
+    const { data } = await api.get(endpoint, {
+      signal,
+      ...(token && {
+        headers: { 'Authorization': `Token ${token}` }
+      })
+    });
+    const results: ApiVectorResult[] = data.results;
+
+    return results;
+  } catch(e) {
+    console.error(e);
+    throw new Error('Failed to fetch vectors');
+  }
+}
+
 export async function fetchAllFilterOptions(
   scenarioId: string | number,
   columns: string[],
