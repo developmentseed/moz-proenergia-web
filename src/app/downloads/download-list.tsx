@@ -57,7 +57,7 @@ export const DownloadList = () => {
 
       {filteredData?.map((item) => (
         <DownloadDataCard
-          key={item.id}
+          key={item.id + item.name}
           title={item.name}
           description={item.description}
           source={item.source}
