@@ -66,7 +66,14 @@
     "noData": "Nenhum dado encontrado",
     "source": "Fonte:",
     "updated": "Atualizado:",
-    "download": "Baixar"
+    "download": "Baixar",
+    "filterModels": "Filtrar por Modelo",
+    "reset": "Redefinir",
+    "dataType": {
+      "vector": "Vetorial",
+      "raster": "Raster",
+      "reference": "Referência"
+    }
   },
   "filters": {
     "typeToSearch": "Digite para pesquisar",

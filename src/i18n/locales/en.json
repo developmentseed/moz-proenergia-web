@@ -66,7 +66,14 @@
     "noData": "No data found",
     "source": "Source:",
     "updated": "Updated:",
-    "download": "Download"
+    "download": "Download",
+    "filterModels": "Filter by Model",
+    "reset": "Reset",
+    "dataType": {
+      "vector": "Vector",
+      "raster": "Raster",
+      "reference": "Reference"
+    }
   },
   "filters": {
     "typeToSearch": "Type to search",

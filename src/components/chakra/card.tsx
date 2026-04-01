@@ -1,7 +1,16 @@
-'use client';
+"use client";
 
-import { truncatedClean } from "@/utils/format";
-import { Card, Heading, Box } from "@chakra-ui/react";
+import { formatIfDate, truncatedClean } from "@/utils/format";
+import {
+  Card,
+  Heading,
+  Box,
+  Button,
+  Tag,
+  Flex,
+  Text,
+  DataList,
+} from "@chakra-ui/react";
 import { LuDownload } from "react-icons/lu";
 import ReactMarkdown from "react-markdown";
 import { useTranslation } from "react-i18next";
@@ -55,13 +64,16 @@ export const ModelCard = ({
       _hover={{ bg: "orange.muted", borderColor: "orange.solid" }}
     >
       <Card.Header>
-        <Heading color="orange.solid" size={{ base: "md", md: "lg" }}>{title}</Heading>
+        <Heading color="orange.solid" size={{ base: "md", md: "lg" }}>
+          {title}
+        </Heading>
       </Card.Header>
-      <Card.Body color="fg" fontSize={{ base: "sm", md: "initial" }} textAlign="justify">
-        <ReactMarkdown
-        >
-          {`${truncatedDescription}...`}
-        </ReactMarkdown>
+      <Card.Body
+        color="fg"
+        fontSize={{ base: "sm", md: "initial" }}
+        textAlign="justify"
+      >
+        <ReactMarkdown>{`${truncatedDescription}...`}</ReactMarkdown>
       </Card.Body>
     </Card.Root>
   );
@@ -74,6 +86,9 @@ export const DownloadDataCard = ({
   updated,
   downloadUrl,
   highlight,
+  models,
+  dataType,
+  item,
 }: {
   title: string;
   description: string | undefined;
@@ -81,42 +96,115 @@ export const DownloadDataCard = ({
   updated: string;
   downloadUrl: string;
   highlight?: string;
+  models?: string[];
+  dataType?: "vector" | "raster" | "reference";
+  item: object;
 }) => {
   const { t } = useTranslation();
 
   return (
     <Card.Root size="md" borderRadius={0}>
       <Card.Header>
-        <Heading size="md">
+        <Heading size={{ base: "lg", md: "xl" }}>
           {title && <HighlightText text={title} highlight={highlight} />}
         </Heading>
+        {source && (
+          <Heading size="xs" color="fg.muted" mt={1}>
+            {source}
+          </Heading>
+        )}
+        {models && models.length > 0 && (
+          <Flex gap={1} flexWrap="wrap" mt={2}>
+            <Text
+              color="fg.muted"
+              fontSize="xs"
+              letterSpacing="wider"
+              textTransform="uppercase"
+            >
+              Models:
+            </Text>
+            {models.map((m) => (
+              <Tag.Root
+                key={m}
+                size="sm"
+                colorPalette="orange"
+                variant="surface"
+              >
+                <Tag.Label>{m}</Tag.Label>
+              </Tag.Root>
+            ))}
+          </Flex>
+        )}
       </Card.Header>
 
       <Card.Body color="fg.muted">
-        <p>
-          {description && <HighlightText text={description} highlight={highlight} />}
-        </p>
-        <p style={{ marginTop: "0.5rem", fontSize: "0.875rem" }}>
-          {t('downloads.source')} {source}
-        </p>
-        <p style={{ fontSize: "0.875rem" }}>
-          {t('downloads.updated')} {new Date(updated).toLocaleDateString()}
-        </p>
+        <Text fontSize="sm" mb={2}>
+          {description && (
+            <HighlightText text={description} highlight={highlight} />
+          )}
+        </Text>
+        <DataList.Root
+          orientation="horizontal"
+          display="grid"
+          gap={{ base: 2, md: 4 }}
+          size="sm"
+          gridTemplateColumns="repeat(auto-fill, minmax(10rem, 314px))"
+        >
+          {item &&
+            Object.entries(item).map(
+              ([key, value]: [string, string | number]) => {
+                console.log(key, value);
+                if (
+                  key === "id" ||
+                  key === "name" ||
+                  key === "source" ||
+                  key === "description" ||
+                  key === "name_pt" ||
+                  key === "description_pt" ||
+                  key === "raw_file" ||
+                  key === "is_public" ||
+                  key === "is_approved" ||
+                  key === "dataType" ||
+                  key === "color"
+                ) {
+                  return null;
+                }
+                if (value === null || value === undefined || value === "") {
+                  return null;
+                }
+                return (
+                  <DataList.Item key={key}>
+                    <DataList.ItemLabel
+                      color="fg.muted"
+                      fontSize="xs"
+                      letterSpacing="wider"
+                      textTransform="uppercase"
+                    >
+                      {t(key)}:
+                    </DataList.ItemLabel>
+                    <DataList.ItemValue fontSize="sm">
+                      {String(formatIfDate(value))}
+                    </DataList.ItemValue>
+                  </DataList.Item>
+                );
+              },
+            )}
+        </DataList.Root>
+        {dataType && (
+          <Box mt={2}>
+            <Tag.Root size="sm" variant="outline">
+              <Tag.Label>{t(`downloads.dataType.${dataType}`)}</Tag.Label>
+            </Tag.Root>
+          </Box>
+        )}
       </Card.Body>
       <Card.Footer>
-        <a href={downloadUrl} download>
-          <Box
-            fontFamily="heading"
-            display="flex"
-            alignItems="center"
-            textDecoration={"underline"}
-          >
-            {t('downloads.download')}
-            <Box pl={2}>
-              <LuDownload />
-            </Box>
-          </Box>
-        </a>
+        <Button asChild variant="outline" colorPalette="orange" size="xs">
+          <a href={downloadUrl} download>
+            {t("downloads.download")}
+            <LuDownload />
+          </a>
+        </Button>
       </Card.Footer>
     </Card.Root>
   );
