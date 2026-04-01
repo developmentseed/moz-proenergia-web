@@ -57,7 +57,7 @@ export const ModelCard = ({
       <Card.Header>
         <Heading color="orange.solid" size={{ base: "md", md: "lg" }}>{title}</Heading>
       </Card.Header>
-      <Card.Body color="fg" fontSize={{ base: "sm", md: "initial" }}>
+      <Card.Body color="fg" fontSize={{ base: "sm", md: "initial" }} textAlign="justify">
         <ReactMarkdown
         >
           {`${truncatedDescription}...`}
