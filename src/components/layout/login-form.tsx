@@ -10,6 +10,7 @@ import {
   Field,
 } from '@chakra-ui/react';
 import { LoginResponse } from '@/utils/context/auth';
+import { useTranslation } from 'react-i18next';
 
 interface LoginModalProps {
   onSubmit?: (username: string, password: string) => void | Promise<LoginResponse>;
@@ -22,6 +23,7 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!success) return;
@@ -36,7 +38,7 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
     setError('');
 
     if (!username || !password) {
-      setError('Please fill in all fields');
+      setError(t('auth.login.validationError'));
       return;
     }
     setIsLoading(true);
@@ -46,7 +48,7 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
       }
       setSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
+      setError(err instanceof Error ? err.message : t('auth.login.error', 'Login failed. Please try again.'));
     } finally {
       setIsLoading(false);
     }
@@ -56,7 +58,7 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
     return (
       <Box p={4} fontFamily={'body'} textAlign="center">
         <Box bg="green.50" color="green.700" p={4} borderRadius="md">
-          <Text fontWeight="bold" fontSize="md">Login successful!</Text>
+          <Text fontWeight="bold" fontSize="md">{t('auth.login.success')}</Text>
         </Box>
       </Box>
     );
@@ -67,7 +69,7 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
       <form onSubmit={handleSubmit}>
         <Stack gap={4}>
           <Text fontSize="sm" color="gray.600" mb={2}>
-            Sign in to access your account
+            {t('auth.login.description')}
           </Text>
 
           {error && (
@@ -83,10 +85,10 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
           )}
 
           <Field.Root>
-            <Field.Label>Username</Field.Label>
+            <Field.Label>{t('auth.login.username')}</Field.Label>
             <Input
               type="text"
-              placeholder="Enter your username"
+              placeholder={t('auth.login.usernamePlaceholder')}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -94,10 +96,10 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>Password</Field.Label>
+            <Field.Label>{t('auth.login.password')}</Field.Label>
             <Input
               type="password"
-              placeholder="Enter your password"
+              placeholder={t('auth.login.passwordPlaceholder')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -122,7 +124,7 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
             loading={isLoading}
             disabled={isLoading}
           >
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? t('auth.login.submitting') : t('auth.login.submit')}
           </Button>
 
         </Stack>

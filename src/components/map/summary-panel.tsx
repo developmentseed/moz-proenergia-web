@@ -1,7 +1,11 @@
 import { memo, useState, useEffect } from "react";
-import { Box, Flex, Text, IconButton } from "@chakra-ui/react";
+import { Box, Flex, Text, IconButton, Input, Field as ChakraField, Link } from "@chakra-ui/react";
+import NextLink from "next/link";
 import { api } from "@/utils/api";
-import { LuChevronLeft } from "react-icons/lu";
+import { fetchModels, slugify } from "@/utils/data-transformation";
+import { useAuth } from "@/utils/context/auth";
+import { useModel } from "@/utils/context/model";
+import { LuChevronLeft, LuSearch, LuChevronsUpDown, LuChevronsDownUp } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter, type Main } from "@/app/types";
@@ -9,6 +13,7 @@ import { type SummaryData } from "@/app/types/summary";
 import { SummaryTable } from "@/components/chakra/summary-table";
 import { useSummaryQuery } from "@/hooks/use-summary-query";
 import { AnimationTime, ControlPanelWidth } from "../ui/main-panel";
+import { useTranslation } from "react-i18next";
 
 interface SummaryPanelProps {
   clusterId: string | null;
@@ -18,8 +23,10 @@ interface SummaryPanelProps {
   filters: Record<string, [number, number] | string[] | null>;
   filterDefs: Filter[];
   resetCluster: () => void;
+  onSelectCluster: (id: string) => void;
   main?: Main;
   isOpen: boolean;
+  onToggle?: () => void;
 }
 
 interface PanelHeaderProps {
@@ -58,6 +65,93 @@ const PanelHeader = ({ title, subtitle, onBack }: PanelHeaderProps) => (
     </Flex>
   </Box>
 );
+
+interface ClusterSearchProps {
+  onSelectCluster: (id: string) => void;
+}
+
+const ClusterSearch = ({ onSelectCluster }: ClusterSearchProps) => {
+  const [value, setValue] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = value.trim();
+    if (trimmed) onSelectCluster(trimmed);
+  };
+
+  return (
+    <Box as="form" onSubmit={handleSubmit}>
+      <ChakraField.Root>
+        <ChakraField.Label fontSize="xs" color="fg.muted">
+          Navigate to cluster or site
+        </ChakraField.Label>
+        <Flex gap={1} width="full">
+          <Input
+            size="sm"
+            placeholder="Enter cluster ID…"
+            flexBasis="100%"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+          />
+          <IconButton
+            type="submit"
+            size="sm"
+            variant="surface"
+            aria-label="Navigate to cluster"
+            disabled={!value.trim()}
+          >
+            <LuSearch />
+          </IconButton>
+        </Flex>
+      </ChakraField.Root>
+    </Box>
+  );
+};
+
+interface RelatedModelsProps {
+  clusterId: string;
+}
+
+const RelatedModels = ({ clusterId }: RelatedModelsProps) => {
+  const { model } = useModel();
+  const { token } = useAuth();
+  const { data: models } = useQuery({
+    queryKey: ["models", token],
+    queryFn: ({ signal }) => fetchModels(signal, token),
+  });
+
+  const currentModelData = models?.find((m) => String(m.id) === model.id);
+  const currentVectorDatasetId = currentModelData?.scenarios[0]?.vector_dataset?.id;
+
+  const related = models?.filter((m) => {
+    if (String(m.id) === model.id) return false;
+    if (!currentVectorDatasetId) return false;
+    return m.scenarios[0]?.vector_dataset?.id === currentVectorDatasetId;
+  }) ?? [];
+
+  if (related.length === 0) return null;
+
+  return (
+    <Box display="flex" flexDirection="column" gap={1}>
+      <Text fontSize="xs" color="fg.muted">
+        View cluster in other models
+      </Text>
+      {related.map((m) => (
+        <Link
+          key={m.id}
+          asChild
+          fontSize="sm"
+          color="blue.500"
+          _hover={{ textDecoration: "underline" }}
+        >
+          <NextLink href={`/model/${slugify(m.name)}?cluster=${clusterId}`}>
+            {m.name}
+          </NextLink>
+        </Link>
+      ))}
+    </Box>
+  );
+};
 
 function transformClusterData(
   data: Record<string, string | number>,
@@ -104,9 +198,13 @@ const SummaryPanel = ({
   filters,
   filterDefs,
   resetCluster,
+  onSelectCluster,
   main,
   isOpen,
+  onToggle = () => {},
 }: SummaryPanelProps) => {
+  const { t } = useTranslation();
+
   const {
     data: clusterData,
     isLoading: clusterIsLoading,
@@ -143,41 +241,115 @@ const SummaryPanel = ({
     ? clusterIsLoading || clusterIsFetching
     : summaryIsLoading;
 
-  const title = showingCluster ? `Cluster - ${clusterId}` : "Summary";
+  const title = showingCluster
+    ? t('explorer.cluster', { clusterId })
+    : t('explorer.summary');
 
-  return (
-    <Box
-      position="relative"
-      bg="panelBg"
-      borderLeftWidth={isOpen ? "1px" : 0}
-      borderLeftStyle={"solid"}
-      borderLeftColor="panelBorder"
-      transition={`width ${AnimationTime} ease`}
-      width={isOpen ? ControlPanelWidth : 0}
-    >
-      <Box
-        {...mapControlCommonStyleProps}
-        width={ControlPanelWidth}
-        height="100%"
-        display="flex"
-        flexDirection="column"
-        zIndex={controlZIndex}
-      >
+  const summaryContent = (
+    <>
+      <Box display={{ base: "none", md: "block" }}>
         <PanelHeader
-          subtitle="analysis"
+          subtitle={t('explorer.analysis')}
           title={title}
           onBack={showingCluster ? resetCluster : undefined}
         />
-        <Box p={4} pt={0} flex={1} minHeight={0} overflowY="auto">
-          <SummaryTable
-            data={dataToDisplay}
-            isLoading={isLoading}
-            isError={showingCluster && clusterIsError}
-            collapsible={!showingCluster}
-          />
-        </Box>
       </Box>
-    </Box>
+      <Box p={4} pt={0} flex={1} minHeight={0} overflowY="auto">
+        <SummaryTable
+          data={dataToDisplay}
+          isLoading={isLoading}
+          isError={showingCluster && clusterIsError}
+          collapsible={!showingCluster}
+        />
+      </Box>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile: single sliding container anchored at bottom, trigger at top.
+          bottom: 0 anchors the element; increasing max-height grows upward.
+          The trigger (first child, 44px) is always visible; content reveals
+          below it as the drawer expands. */}
+      <Box
+        display={{ base: "block", md: "none" }}
+        position="absolute"
+        bottom={0}
+        left={0}
+        right={0}
+        zIndex={controlZIndex + 100}
+        overflow="hidden"
+        maxHeight={isOpen ? "80dvh" : "44px"}
+        transition={`max-height ${AnimationTime} ease`}
+        bg="panelBg"
+        borderTop="1px solid"
+        borderColor="panelBorder"
+        boxShadow="lg"
+      >
+        {/* Trigger — always visible, moves up with drawer when expanded */}
+        <Flex
+          h="44px"
+          px={4}
+          align="center"
+          justify="space-between"
+          cursor="pointer"
+          onClick={onToggle}
+        >
+          <Text fontWeight="semibold" fontSize="sm">{title}</Text>
+          <Box>
+            {isOpen ? <LuChevronsDownUp /> : <LuChevronsUpDown />}
+          </Box>
+        </Flex>
+        {/* Content below trigger */}
+        <Box
+          display="flex"
+          flexDirection="column"
+          maxH="calc(80dvh - 44px)"
+          overflowY="auto"
+        >
+          {summaryContent}
+          {showingCluster ? (
+            <Box p={4} borderTop="1px solid" borderColor="border">
+              <RelatedModels clusterId={clusterId!} />
+            </Box>
+        ) :
+            <Box p={4} borderTop="1px solid" borderColor="border">
+              <ClusterSearch onSelectCluster={onSelectCluster} />
+            </Box>
+          }
+        </Box>
+
+      </Box>
+
+      {/* Desktop: right panel with width animation */}
+      <Box
+        display={{ base: "none", md: "flex" }}
+        {...mapControlCommonStyleProps}
+        position="relative"
+        bg="panelBg"
+        overflow="hidden"
+        width={isOpen ? ControlPanelWidth : 0}
+        height="100%"
+        borderLeftWidth={isOpen ? "1px" : 0}
+        borderLeftStyle="solid"
+        borderLeftColor="panelBorder"
+        transition={`width ${AnimationTime} ease`}
+        flexDirection="column"
+        zIndex={controlZIndex}
+      >
+        {summaryContent}
+        {showingCluster ? (
+          <Box p={4} borderTop="1px solid" borderColor="border">
+            <RelatedModels clusterId={clusterId!} />
+          </Box>
+        ) :
+          <Box p={4} borderTop="1px solid" borderColor="border">
+            <ClusterSearch onSelectCluster={onSelectCluster} />
+          </Box>
+          }
+      </Box>
+
+    </>
   );
 };
 

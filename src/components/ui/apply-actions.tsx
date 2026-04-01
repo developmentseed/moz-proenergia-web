@@ -3,9 +3,11 @@
 import { Box, Button } from '@chakra-ui/react';
 import { useFilters } from '@/utils/context/filters';
 import { useIsFetching } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 export const ApplyActions = () => {
   const { hasPendingChanges, filters, resetAllFilters, applyPendingChanges } = useFilters();
+  const { t } = useTranslation();
 
   const isLoading = !!useIsFetching({ queryKey: ['filter', filters] });
   return (
@@ -18,18 +20,18 @@ export const ApplyActions = () => {
         flex="1"
         onClick={resetAllFilters}
         >
-        Reset
+        {t('explorer.reset')}
       </Button>
       <Button
         flex="1"
-        colorPalette="yellow"
+        colorPalette="orange"
         onClick={applyPendingChanges}
         loading={isLoading}
-        loadingText={'Loading Summary data'}
+        loadingText={t('explorer.loadingSummary')}
         disabled={!hasPendingChanges}
         fontFamily={'body'}
       >
-        Apply
+        {t('explorer.apply')}
       </Button>
     </Box>
   );

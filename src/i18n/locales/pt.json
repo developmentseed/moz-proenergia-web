@@ -1,0 +1,121 @@
+{
+  "nav": {
+    "countryName": "Moçambique",
+    "longName": "Plataforma Integrada de Electrificação",
+    "shortName": "PIE",
+    "explorer": "Explorador",
+    "about": "Sobre",
+    "downloads": "Downloads",
+    "login": "Entrar",
+    "logout": "Sair",
+    "sdiPortal": "Portal SDI",
+    "menu": "Menu"
+  },
+  "home": {
+    "title": "Plataforma Integrada de Electrificação",
+    "countryName": "Moçambique",
+    "description": "Uma plataforma web para planejamento e análise integrada de energia em Moçambique. O Proenergia+ IEP visa aumentar o acesso à energia e serviços de banda larga nas áreas do projeto e fortalecer o desempenho operacional da concessionária elétrica.",
+    "learnMore": "Saiba Mais",
+    "viewModels": "Ver Modelos",
+    "imageAlt": "Ilustração de infraestrutura de energia"
+  },
+  "models": {
+    "exploreModel": "Explorar Modelo"
+  },
+  "auth": {
+    "login": {
+      "title": "Entrar",
+      "description": "Faça login para acessar sua conta",
+      "username": "Utilizador",
+      "usernamePlaceholder": "Digite o seu utilizador",
+      "password": "Senha",
+      "passwordPlaceholder": "Digite a sua senha",
+      "submit": "Entrar",
+      "submitting": "Entrando...",
+      "validationError": "Por favor preencha todos os campos",
+      "success": "Login realizado com sucesso!"
+    },
+    "logout": {
+      "success": "Logout realizado com sucesso",
+      "button": "Sair"
+    }
+  },
+  "explorer": {
+    "model": "Modelo",
+    "scenario": "Cenário",
+    "collapsePanel": "Recolher painel",
+    "expandPanel": "Expandir painel",
+    "controls": "Controles",
+    "layers": "Camadas",
+    "areaSelection": "Seleção de Área",
+    "pleaseWait": "Por favor aguarde",
+    "reset": "Redefinir",
+    "apply": "Aplicar",
+    "loadingSummary": "Carregando dados de resumo",
+    "analysis": "análise",
+    "summary": "Resumo",
+    "cluster": "Cluster - {{clusterId}}",
+    "failedClusterData": "Falha ao carregar dados do cluster.",
+    "onlyBarChart": "Apenas Gráfico de Barras está disponível.",
+    "errorNotReady": "Estes dados não parecem estar prontos. Certifique-se de que existem cenários relacionados a este modelo.",
+    "returnToModels": "Voltar para modelos"
+  },
+  "downloads": {
+    "title": "Downloads",
+    "searchPlaceholder": "Pesquisar conjuntos de dados...",
+    "noData": "Nenhum dado encontrado",
+    "source": "Fonte:",
+    "updated": "Atualizado:",
+    "download": "Baixar"
+  },
+  "filters": {
+    "typeToSearch": "Digite para pesquisar",
+    "selected": "{{count}} selecionado(s)",
+    "noItemsFound": "Nenhum item encontrado"
+  },
+  "map": {
+    "legend": "Legenda",
+    "additionalLayers": "Camadas adicionais"
+  },
+  "breadcrumbs": {
+    "about": "Sobre",
+    "downloads": "Downloads"
+  },
+  "labels": {
+    "Admin_1": { "label": "Província", "description": "Nível administrativo 1" },
+    "District": { "label": "Distrito", "description": "Nível administrativo 2" },
+    "Posto": { "label": "Posto", "description": "Nível administrativo 3" },
+    "Localidade": { "label": "Localidade", "description": "Nível administrativo 4" },
+    "PopStartYear": { "label": "População", "description": "População no assentamento" },
+    "NewHHConnectionsTotal": { "label": "Conexões", "description": "Novas conexões no assentamento" },
+    "Technology2030": { "label": "Tecnologia", "description": "Tecnologia de menor custo escolhida" },
+    "CurrentMVLineDist": { "label": "Distância MT", "description": "Distância às linhas de MT" },
+    "ElecStart": { "label": "Status de Eletrificação", "description": "0 se não eletrificado, 1 se eletrificado" },
+    "Region": { "label": "Província", "description": "Nível administrativo 1" },
+    "Postos": { "label": "Posto", "description": "Nível administrativo 3" },
+    "Population 2025": { "label": "População", "description": "População no assentamento" },
+    "Distance from MV power lines": { "label": "Distância MT", "description": "Distância às linhas MT (EDM)" },
+    "Electrification status (IEP study)": { "label": "Status de Eletrificação", "description": "Status de eletrificação no ano base" },
+    "Least-cost electrification mode (IEP results)": { "label": "Tec. Elec. Menor Custo", "description": "Tecnologia de eletrificação de menor custo (da análise LC)" },
+    "Ground_Survey": { "label": "Verificação de Campo", "description": "Levantado → Não/Sim" },
+    "Fresh Markets Accessibility - class": { "label": "Local", "description": "Acessibilidade a mercados locais" },
+    "National Market Accessibility - class": { "label": "Nacional", "description": "Acessibilidade a mercados de alcance nacional (cidades principais)" },
+    "Export Market Accessibility - class": { "label": "Exportação", "description": "Acessibilidade a mercados de exportação (aeroportos, portos)" },
+    "PUE_potential": { "label": "Potencial UPE", "description": "Classificação do potencial como [Nenhum | Baixo | Médio | Alto | Muito Alto]" },
+    "ExistingMG": { "label": "Mini-rede Existente", "description": "Sim/Não (1=Sim, 0=Não)" },
+    "ProdUseIndexClassified": { "label": "Potencial Produtivo (AgCAP)", "description": "Potencial para demanda produtiva do modelo AgCAP (Nenhum/Baixo/Médio/Alto/Muito Alto)" },
+    "GroundSurvey": { "label": "Verificação de Campo", "description": "Levantado → Não/Sim" },
+    "Status": { "label": "Status Operacional", "description": "Nenhum/Pré-viabilidade/Viabilidade/Licitação/Alocado" },
+    "Schools": { "label": "Estabelecimento de Ensino", "description": "Assentamento contém escola(s): Sim - Não" },
+    "HealthFacilities": { "label": "Saúde", "description": "Assentamento contém unidade(s) de saúde: Sim - Não" },
+    "MGCapacityBins": { "label": "Capacidade", "description": "Capacidade da mini-rede, classificada em 3-4 categorias" },
+    "TravelTimeClassified": { "label": "Acessibilidade", "description": "Acessibilidade por tempo de viagem das cidades" },
+    "travel_time_cities_h": { "label": "Acessibilidade", "description": "Acessibilidade por tempo de viagem das cidades, pode ser contínua ou classificada" },
+    "CategoryFull": { "label": "Tipo de Instalação Social", "description": "Saúde | Educação (com classificação adicional)?" },
+    "ElecAccess": { "label": "Status de Eletrificação", "description": "Eletrificado | Não eletrificado" },
+    "CurrentElecTech": { "label": "Tecnologia de Elec. Atual", "description": "Nenhum/Rede/Off-grid" },
+    "LeastCostTech": { "label": "Tecnologia de Elec. de Menor Custo", "description": "Rede/Mini-rede/Solar individual" },
+    "Calibrated_pop": { "label": "População", "description": "População no assentamento" },
+    "max_benefit_tech": { "label": "Tecnologia", "description": "Tecnologia de menor custo escolhida" }
+  }
+}

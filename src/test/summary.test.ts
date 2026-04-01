@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { transformFieldSummary, isNestedGrouped } from "../utils/summary";
-import type { BatchSummariesResponse, FlatRow, GroupRow, ChartRow, NestedGroupRow, NestedChartRow } from "@/app/types/summary";
+import type { BatchSummariesResponse, FlatRow, GroupRow, ChartRow, NestedGroupRow } from "@/app/types/summary";
 import type { Field } from "@/app/types";
 
 import oneColumnString from "./example-responses/one-column-string.json";
@@ -45,12 +45,12 @@ describe("transformFieldSummary — response shapes", () => {
     expect(group.value).toHaveLength(2);
     expect(group.value[0]).toEqual({
       key: "NewHHConnectionsTotal",
-      label: "NewHHConnectionsTotal",
+      label: "New HHConnections Total",
       value: 439089.7747,
     });
     expect(group.value[1]).toEqual({
       key: "travel_time_cities_h",
-      label: "travel_time_cities_h",
+      label: "travel time cities h",
       value: 10741.6,
     });
   });
@@ -97,7 +97,7 @@ describe("transformFieldSummary — response shapes", () => {
       columns: ["MGInvestmentDistTotal", "MGCapacityBins"],
       label: "Mixed",
       method: "sum",
-      group_by: "MGCapacityBins",
+      group_by: ["MGCapacityBins"],
     };
     const result = transformFieldSummary(
       twoColumnsNumericStringGroupby as BatchSummariesResponse,
@@ -114,7 +114,7 @@ describe("transformFieldSummary — response shapes", () => {
       columns: ["LCOETotal"],
       label: "LCOE",
       method: "sum",
-      group_by: "Technology2030",
+      group_by: ["Technology2030"],
     };
     const result = transformFieldSummary(
       groupByCountZero as BatchSummariesResponse,
@@ -157,7 +157,7 @@ describe("transformFieldSummary — response shapes", () => {
       columns: ["NewHHConnectionsTotal"],
       label: "HH Connections",
       method: "sum",
-      group_by: "MGCapacityBins",
+      group_by: ["MGCapacityBins"],
     };
     const result = transformFieldSummary(
       twoColumnsGroupby as BatchSummariesResponse,
@@ -174,7 +174,7 @@ describe("transformFieldSummary — response shapes", () => {
     const field: Field = {
       columns: ["MGCapacityBins"],
       label: "Capacity Bins",
-      group_by: "MGCapacityBins",
+      group_by: ["MGCapacityBins"],
     };
     const result = transformFieldSummary(
       twoColumnsNumericStringGroupby as BatchSummariesResponse,
@@ -248,7 +248,7 @@ describe("transformFieldSummary — method variants", () => {
       columns: ["NewHHConnectionsTotal"],
       label: "HH",
       method: "average",
-      group_by: "MGCapacityBins",
+      group_by: ["MGCapacityBins"],
     };
     const result = transformFieldSummary(
       twoColumnsGroupby as BatchSummariesResponse,
@@ -267,7 +267,7 @@ describe("transformFieldSummary — method variants", () => {
       columns: ["LCOETotal"],
       label: "LCOE",
       method: "average",
-      group_by: "Technology2030",
+      group_by: ["Technology2030"],
     };
     const result = transformFieldSummary(
       groupByCountZero as BatchSummariesResponse,
@@ -286,7 +286,7 @@ describe("transformFieldSummary — method variants", () => {
 
 describe("transformFieldSummary — chart row output", () => {
   it("Input: single column, string, no group_by, chart=bar // Output: ChartRow", () => {
-    const field: Field = { columns: ["MGCapacityBins"], label: "Capacity Bins", chart: "bar" };
+    const field: Field = { columns: ["MGCapacityBins"], label: "Capacity Bins", chartType: "bar" };
     const result = transformFieldSummary(
       oneColumnString as BatchSummariesResponse,
       field,
@@ -306,8 +306,8 @@ describe("transformFieldSummary — chart row output", () => {
       columns: ["NewHHConnectionsTotal"],
       label: "HH Connections",
       method: "sum",
-      group_by: "MGCapacityBins",
-      chart: "bar",
+      group_by: ["MGCapacityBins"],
+      chartType: "bar",
     };
     const result = transformFieldSummary(
       twoColumnsGroupby as BatchSummariesResponse,
@@ -321,7 +321,7 @@ describe("transformFieldSummary — chart row output", () => {
       columns: ["NewHHConnectionsTotal"],
       label: "HH Connections",
       method: "sum",
-      chart: "bar",
+      chartType: "bar",
     };
     const result = transformFieldSummary(
       twoColumnsNumeric as BatchSummariesResponse,
@@ -335,8 +335,8 @@ describe("transformFieldSummary — chart row output", () => {
       columns: ["LCOETotal"],
       label: "LCOE",
       method: "sum",
-      group_by: "Technology2030",
-      chart: "bar",
+      group_by: ["Technology2030"],
+      chartType: "bar",
     };
     const result = transformFieldSummary(
       groupByCountZero as BatchSummariesResponse,
@@ -353,7 +353,7 @@ describe("transformFieldSummary — chart row output", () => {
       columns: ["NewHHConnectionsTotal", "travel_time_cities_h"],
       label: "Stats",
       method: "sum",
-      chart: "bar",
+      chartType: "bar",
     };
     const result = transformFieldSummary(
       twoColumnsNumeric as BatchSummariesResponse,
@@ -361,8 +361,8 @@ describe("transformFieldSummary — chart row output", () => {
     );
     expect(result.type).toBe("chart");
     const chart = result as ChartRow;
-    expect(chart.value[0].label).toBe("NewHHConnectionsTotal");
-    expect(chart.value[1].label).toBe("travel_time_cities_h");
+    expect(chart.value[0].label).toBe("New HHConnections Total");
+    expect(chart.value[1].label).toBe("travel time cities h");
     expect(chart.value[0].value).toBe(439089.7747); //sum of NewHHConnectionsTotal
     expect(chart.value[1].value).toBe(10741.6); // sum of travel_time_cities_h
   });
@@ -434,21 +434,20 @@ describe("transformFieldSummary — multi group_by", () => {
     expect(existingGrid.total).toBeCloseTo(24554622.6654, 1);
   });
 
-  it("single column, numeric, multi group_by, chart=bar → NestedChartRow (pie)", () => {
+  it("single column, numeric, multi group_by, chartType=bar → NestedGroupRow", () => {
     const field: Field = {
       columns: ["Pop2030"],
       label: "Population 2030",
       method: "sum",
       group_by: ["Technology2030", "Admin_1"],
-      chart: "bar",
+      chartType: "bar",
     };
     const result = transformFieldSummary(
       multiGroupBy as BatchSummariesResponse,
       field,
     );
-    expect(result.type).toBe("nested-chart");
-    const nested = result as NestedChartRow;
-    expect(nested.chartType).toBe("pie");
+    expect(result.type).toBe("nested-group");
+    const nested = result as NestedGroupRow;
     expect(nested.value).toHaveLength(4);
   });
 

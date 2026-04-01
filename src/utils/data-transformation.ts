@@ -4,6 +4,7 @@ import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, Field, MapItemUn
 import { api, MEDIA_URL_PREFIX, DEFAULT_COL } from '@/utils/api';
 import { sortFilterOptions } from '@/config/filters';
 import mapConfig from '@/config/map.json';
+import { registerI18nResource } from '@/utils/i18n';
 const ADMIN_COLUMNS = [
   "Admin_1",
   "Admin_2",
@@ -37,6 +38,9 @@ export interface ApiFilterField {
 export interface ApiScenario {
   id: number;
   name: string;
+  name_pt?: string;
+  description?: string;
+  description_pt?: string;
   model_file: string | null;
 }
 export interface ColorCoding {
@@ -47,7 +51,9 @@ export interface ColorCoding {
 export interface ApiModelResponse {
   id: number;
   name: string;
+  name_pt: string;
   description: string;
+  description_pt?: string;
   filter_fields: ApiFilterField[];
   popup_fields: ApiFilterField[];
   summary_fields: Field[];
@@ -57,11 +63,13 @@ export interface ApiModelResponse {
   metric_field_types: Record<string, string>
 }
 
-export interface ApiVectorResult {
+export interface ApiFileResult {
   id: number;
   name: string;
-  description: string;
-  source: string;
+  name_pt: string;
+  description?: string;
+  description_pt?: string;
+  source?: string;
   created: string;
   updated: string;
   created_by: string;
@@ -74,7 +82,7 @@ export interface ApiVectorResult {
 
 export interface ApiVectorsResponse {
   count: number;
-  results: ApiVectorResult[];
+  results: ApiFileResult[];
 }
 
 export interface ApiModelsResponse {
@@ -183,20 +191,33 @@ export function deriveLayerStyles(sourceId: string, color: string, opacity: numb
   };
 }
 
-export async function fetchModels(signal?: AbortSignal): Promise<ModelGroupMetadata[]> {
+export async function fetchModels(signal?: AbortSignal, token?: string| null): Promise<ModelGroupMetadata[]> {
   try {
-    const { data } = await api.get('model/', { signal });
+    const { data } = await api.get('model/', { signal, ...(token && {
+        headers: { 'Authorization': `Token ${token}` }
+      }), });
     // @TODO return models as it is. Returning lcoe and mini grids until data getting ingested.
-    return data.results;
+    const models = data.results as ModelGroupMetadata[];
+
+    models.forEach((m) => {
+      registerI18nResource(`model.${m.id}`, {
+        name: { en: m.name, pt: m.name_pt },
+        description: { en: m.description, pt: m.description_pt },
+      });
+    });
+
+    return models;
   } catch(e) {
     console.error(e);
     throw new Error('failed to fetch models');
   }
 }
 
-export async function fetchModelMetadata(slug: string, signal?: AbortSignal): Promise<ApiModelResponse> {
+export async function fetchModelMetadata(slug: string, signal?: AbortSignal, token?: string | null): Promise<ApiModelResponse> {
   try {
-    const { data } = await api.get(`model/${slug}/`, { signal });
+    const { data } = await api.get(`model/${slug}/`, { signal, ...(token && {
+        headers: { 'Authorization': `Token ${token}` }
+      }), });
     return data;
   } catch(e) {
     console.error(e);
@@ -204,7 +225,7 @@ export async function fetchModelMetadata(slug: string, signal?: AbortSignal): Pr
   }
 }
 
-export async function fetchVectors({ modelId, token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiVectorResult[]> {
+export async function fetchVectors({ modelId, token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiFileResult[]> {
   try {
     const endpoint = `vector/`;
     const { data } = await api.get(endpoint, {
@@ -216,13 +237,31 @@ export async function fetchVectors({ modelId, token, signal }: { modelId?: strin
         params: { 'model': modelId }
       })
     });
-    const results: ApiVectorResult[] = data.results;
+    const results: ApiFileResult[] = data.results;
 
     return results.map((v, idx) => ({
       ...v,
       // @TODO would this come from endpoint at some point?
       color: interpolateWarm(idx / results.length),
     }));
+  } catch(e) {
+    console.error(e);
+    throw new Error('Failed to fetch vectors');
+  }
+}
+
+export async function fetchReferences({ token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiFileResult[]> {
+  try {
+    const endpoint = `reference/`;
+    const { data } = await api.get(endpoint, {
+      signal,
+      ...(token && {
+        headers: { 'Authorization': `Token ${token}` }
+      })
+    });
+    const results: ApiFileResult[] = data.results;
+
+    return results;
   } catch(e) {
     console.error(e);
     throw new Error('Failed to fetch vectors');
@@ -285,21 +324,36 @@ export function replaceSummaryIdColumn(fields: Field[], metricField: Record<stri
 export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetadata, 'filters' | 'layers'> & { filterFields: ApiFilterField[]; colorCoding: ColorCoding[] } {
   const modelId = String(apiModel.id);
 
+  registerI18nResource(`model.${modelId}`, {
+    name: { en: apiModel.name, pt: apiModel.name_pt },
+    description: { en: apiModel.description, pt: apiModel.description_pt },
+  });
+
   const scenarios: Scenario[] = apiModel.scenarios
     // @TODO: Filtering LCOE model until performance improvement
     // .filter(s => s.id !== 1)
     .filter(s => s.model_file !== null)
-    .map(s => ({
-      id: String(s.id),
-      label: s.name,
-      source: deriveSource(String(s.id), s.model_file!),
-      layer: {
-        id: `${s.id}-main`,
-        source: String(s.id),
-        'source-layer': mapConfig.sourceLayerName,
-        type: 'fill' as const,
-      },
-    }));
+    .map(s => {
+      registerI18nResource(`scenario.${s.id}`, {
+        name: { en: s.name, pt: s.name_pt },
+        ...(s.description && { description: { en: s.description, pt: s.description_pt } }),
+      });
+
+      return {
+        id: String(s.id),
+        name: s.name,
+        name_pt: s.name_pt,
+        label: s.name,
+        description: s.description,
+        source: deriveSource(String(s.id), s.model_file!),
+        layer: {
+          id: `${s.id}-main`,
+          source: String(s.id),
+          'source-layer': mapConfig.sourceLayerName,
+          type: 'fill' as const,
+        },
+      };
+    });
   // whwen visuaslization column is empty or null
   const mainColumn = (!apiModel.visualization_column || apiModel.visualization_column === '')? DEFAULT_COL: apiModel.visualization_column;
   const mainField = apiModel.filter_fields.find(f => f.column === mainColumn);
@@ -332,15 +386,22 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
 }
 
 // Transform vectors to layers
-export function transformVectorsToLayers(apiVectors: ApiVectorResult[]): Layer[] {
+export function transformVectorsToLayers(apiVectors: ApiFileResult[]): Layer[] {
   return apiVectors.map(v => {
     const sourceId = String(v.id) + 'vector-source';
+
+    registerI18nResource(`layer.${sourceId}`, {
+      label: { en: v.name, pt: v.name_pt },
+      description: { en: v.description?? '', pt: v.description_pt },
+    });
+
     return {
       id: sourceId,
       label: v.name,
       description: v.description,
       filePath: v.raw_file,
       color: v.color,
+      layerType: 'vector' as const,
     };
   });
 }

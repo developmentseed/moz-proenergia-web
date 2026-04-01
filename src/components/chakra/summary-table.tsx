@@ -179,6 +179,7 @@ function ChartValueRows({ row }: { row: ChartRow }) {
 }
 
 function ChartRowView({ row }: { row: ChartRow }) {
+  if (!Array.isArray(row.value)) return null;
   if (row.chartType === "bar") {
     return (
       <>
@@ -199,10 +200,10 @@ function ChartRowView({ row }: { row: ChartRow }) {
         </Table.Row>
         <Table.Row _last={lastRowStyleProps}>
           <Table.Cell colSpan={2} border="none">
-            <SummaryBarChart data={row.value} average={row.average} colorMap={row.colorMap} unit={row.unit} />
+            <SummaryBarChart data={row.value} average={row.showBarChartAverage ? row.average : undefined} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
-        <ChartValueRows row={row} />
+        {row.showChartValueRows !== false && <ChartValueRows row={row} />}
       </>
     );
   }
@@ -229,7 +230,7 @@ function ChartRowView({ row }: { row: ChartRow }) {
             <SummaryDonutChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
-        <ChartValueRows row={row} />
+        {row.showChartValueRows !== false && <ChartValueRows row={row} />}
       </>
     );
   }
@@ -256,7 +257,7 @@ function ChartRowView({ row }: { row: ChartRow }) {
             <SummaryStackedBarChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
           </Table.Cell>
         </Table.Row>
-        <ChartValueRows row={row} />
+        {row.showChartValueRows !== false && <ChartValueRows row={row} />}
       </>
     );
   }
@@ -403,7 +404,7 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
     <Box maxHeight={maxHeight} width="100%">
       {isLoading && (
         <Box display="flex" alignItems="center" justifyContent="center" py={8}>
-          <Spinner size="xl" />
+          <Spinner colorPalette="orange" color="colorPalette.600" size="xl" />
         </Box>
       )}
 
