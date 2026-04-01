@@ -1,8 +1,10 @@
 ### COG Generation tips
 
-Proenergia front-end app uses MaplibreGL COG Proptocol for COG rendering. This plug-in requires specific configuration for rendering and better performance. 
+Proenergia front-end app uses [MaplibreGL COG Protocol](https://github.com/geomatico/maplibre-cog-protocol) for COG rendering. This plug-in requires specific configuration for rendering and better performance. 
 
-The example GDAL command below was used to generate a working COG.(Docker was used but it is not necessary)
+The example GDAL command below was used to generate a working COG.
+
+#### Single band data 
 
 ```
 docker run --rm -v .:/srv ghcr.io/osgeo/gdal:alpine-small-3.9.1 gdalwarp /srv/${source}.tif /srv/${dest}.tif -of COG -t_srs EPSG:3857 -co BLOCKSIZE=256 -co TILING_SCHEME=GoogleMapsCompatible
