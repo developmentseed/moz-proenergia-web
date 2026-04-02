@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { SimpleGrid, Box, Spinner, Center } from "@chakra-ui/react";
+import { SimpleGrid, Box, Spinner, Center, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { MEDIA_URL_PREFIX } from "@/utils/api";
 import { useAuth } from "@/utils/context/auth";
@@ -13,7 +13,7 @@ import { fetchRasters } from "@/utils/map/cog";
 
 export const DownloadList = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { token } = useAuth();
+  const { token, isAuthenticated } = useAuth();
   const { t } = useTranslation();
 
   const { data, isLoading } = useQuery({
@@ -36,6 +36,13 @@ export const DownloadList = () => {
     item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  if (!isAuthenticated) {
+        return (
+          <Center py={10}>
+            <Text>Access not allowed</Text>
+          </Center>
+    );
+  }
 
   if (isLoading || isLoadingRasters || isLoadingReference) {
     return (

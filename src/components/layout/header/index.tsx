@@ -10,6 +10,8 @@ import DropdownMenu, { DropdownMenuItems } from "./dropdown-menu";
 import { LanguageSwitcher } from "./language-switcher";
 import { ColorModeButton } from "@/components/chakra/color-mode";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/utils/context/auth";
+import { zIndex } from "@/components/ui/constant";
 
 export interface NavigationItem {
   label: string;
@@ -26,6 +28,7 @@ export const Header = ({
   const pathname = usePathname();
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   const navigationItems: NavigationItem[] = [
     { label: t('nav.explorer'), href: "/models" },
@@ -87,6 +90,7 @@ export const Header = ({
         <HStack fontFamily="body" gap={6}>
           <HStack gap={6} display={{ base: 'none', md: 'flex' }}>
             {navigationItems.map((item) => {
+              if (item.href === "/downloads" && !isAuthenticated) return null;
               const active = isActive(item.href);
               return (
                 <Box key={item.href}>
@@ -128,15 +132,17 @@ export const Header = ({
                 </IconButton>
               </Drawer.Trigger>
               <Portal>
-                <Drawer.Backdrop zIndex={1700} />
-                <Drawer.Positioner zIndex={1800}>
+                <Drawer.Backdrop zIndex={zIndex.drawerBackdrop} />
+                <Drawer.Positioner zIndex={zIndex.drawer}>
                   <Drawer.Content>
                     <Drawer.Header>
                       <Drawer.Title>{t('nav.menu')}</Drawer.Title>
                     </Drawer.Header>
                     <Drawer.Body>
                       <VStack align="stretch" gap={4} h="full">
-                        {navigationItems.map((item) => (
+                        {navigationItems.map((item) => {
+                          if (item.href === "/downloads" && !isAuthenticated) return null;
+                          return (
                           <Link
                             key={item.href}
                             fontSize="sm"
@@ -148,7 +154,7 @@ export const Header = ({
                           >
                             <NextLink href={item.href}>{item.label}</NextLink>
                           </Link>
-                        ))}
+                        )})}
                         <Separator mt="auto" />
                         <LanguageSwitcher />
                         <ColorModeButton alignSelf="flex-start" colorPalette="orange" />

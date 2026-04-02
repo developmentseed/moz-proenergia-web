@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useQueryState, parseAsString } from 'nuqs';
 import { ModelProvider } from "@/utils/context/model";
 import { ContextualLayersProvider } from "@/utils/context/contextual-layers";
 import { FiltersProvider } from "@/utils/context/filters";
@@ -12,6 +13,7 @@ import NextLink from "next/link";
 import MainMap from "@/components/map";
 import { LuPanelLeftOpen, LuPanelLeftClose, LuPanelRightOpen, LuPanelRightClose } from "react-icons/lu";
 import { useAuth } from "@/utils/context/auth";
+import { zIndex } from "./constant";
 import {
   fetchModelMetadata,
   fetchVectors,
@@ -21,6 +23,7 @@ import {
   transformFilterField,
   transformMainOptions,
 } from "@/utils/data-transformation";
+import { useMapCoords } from "@/utils/context/map-coords";
 import { fetchRasters, fetchCogMetadata, transformRastersToLayers } from "@/utils/map/cog";
 import { type ModelMetadata } from "@/app/types";
 import MainPanel from "./main-panel";
@@ -30,7 +33,6 @@ import { useTranslation } from "react-i18next";
 import { useToggle } from "@/hooks/use-toggle";
 import { useMouseEvent } from "@/components/map/hooks/use-mouse-event";
 import { ControlPanelWidth, AnimationTime } from "./main-panel";
-import { useMapCoords } from "@/utils/context/map-coords";
 
 const ExplorerInner = () => {
   const { model, scenarioId } = useModel();
@@ -87,7 +89,7 @@ const ExplorerInner = () => {
           }
           top="8"
           transform="translateY(-50%)"
-          zIndex={1000}
+          zIndex={zIndex.mapControl}
           transition={`left ${AnimationTime} ease`}
         >
           <IconButton
@@ -133,7 +135,7 @@ const ExplorerInner = () => {
           }
           top="8"
           transform="translateY(-50%)"
-          zIndex={1000}
+          zIndex={zIndex.mapControl}
           transition={`right ${AnimationTime} ease`}
         >
           <IconButton
@@ -220,14 +222,18 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
 
   const defaultScenarioId = modelCore?.scenarios[0]?.id;
 
-  // Filter options (single batch fetch, cached per scenario)
+  // Scenario state (lifted from ModelProvider so filter query can react to changes)
+  const [scenarioId, setScenarioId] = useQueryState('scenario', parseAsString);
+  const activeScenarioId = scenarioId ?? defaultScenarioId;
+
+  // Filter options (single batch fetch, refetches per scenario)
   const filterColumns = (modelCore?.filterFields ?? []).map((f) => f.column);
 
   const { data: allFilterOptions } = useQuery({
-    queryKey: ["filterOptions", modelCore?.id, filterColumns],
+    queryKey: ["filterOptions", modelCore?.id, activeScenarioId, filterColumns],
     queryFn: ({ signal }) =>
-      fetchAllFilterOptions(defaultScenarioId!, filterColumns, signal),
-    enabled: !!modelCore?.id && !!defaultScenarioId && filterColumns.length > 0,
+      fetchAllFilterOptions(activeScenarioId!, filterColumns, signal),
+    enabled: !!modelCore?.id && !!activeScenarioId && filterColumns.length > 0,
   });
 
   // Combine filter options to main model
@@ -262,10 +268,9 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   // @TODO: A very hacky way of telling users that the data doesn't have related scenarios
   // Assuming /vectors endpoints succeeded
-  if (modelCore && !defaultScenarioId && layers) {
+  if (modelCore && !activeScenarioId && layers) {
     return (
       <Box
         h="full"
@@ -299,8 +304,8 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
 
   return (
     <ContextualLayersProvider layers={layers}>
-      <FiltersProvider filterDefs={modelData.filters}>
-        <ModelProvider model={modelData}>
+      <FiltersProvider filterDefs={modelData.filters} resetKey={activeScenarioId}>
+        <ModelProvider model={modelData} scenarioId={activeScenarioId!} setScenarioId={setScenarioId}>
           <ExplorerInner />
         </ModelProvider>
       </FiltersProvider>

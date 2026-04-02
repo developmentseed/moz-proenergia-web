@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, ReactNode, useMemo, useState, useCallback } from 'react';
+import { createContext, useContext, ReactNode, useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { useQueryStates, parseAsArrayOf, parseAsString, parseAsInteger, type UseQueryStatesKeysMap, type SetValues } from 'nuqs';
 import { type Filter, FilterType } from '@/app/types';
 
@@ -50,9 +50,11 @@ const FiltersContext = createContext<FiltersContextType | null>(null);
 
 export function FiltersProvider({
   filterDefs,
+  resetKey,
   children
 }: {
   filterDefs: Filter[];
+  resetKey?: string;
   children: ReactNode;
 }) {
   // Create parsers from filter definitions
@@ -163,6 +165,15 @@ export function FiltersProvider({
     setFilters(resetState);
     setPendingFiltersState(null);
   }, [filterParsers, setFilters]);
+
+  // Reset filters when resetKey changes (e.g. scenario switch)
+  const prevResetKey = useRef(resetKey);
+  useEffect(() => {
+    if (prevResetKey.current !== resetKey) {
+      prevResetKey.current = resetKey;
+      resetAllFilters();
+    }
+  }, [resetKey, resetAllFilters]);
 
   const value = useMemo(() => ({
     filters,

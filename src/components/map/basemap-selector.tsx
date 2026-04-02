@@ -9,7 +9,7 @@ import {
   Portal,
 } from "@chakra-ui/react";
 import { LuCheck, LuMap } from "react-icons/lu";
-import { controlZIndex } from "./control-constant";
+import { zIndex } from "@/components/ui/constant";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -69,7 +69,7 @@ export const BasemapSelector = ({
           left="10px"
           size="xs"
           variant="surface"
-          zIndex={controlZIndex}
+          zIndex={zIndex.mapControl}
           bg={`url(${current.thumbnailUrl})`}
           bgSize="cover"
           borderWidth="0"
@@ -81,7 +81,7 @@ export const BasemapSelector = ({
       </Popover.Trigger>
       <Portal>
         <Popover.Positioner>
-          <Popover.Content maxW="10rem" zIndex={controlZIndex + 1}>
+          <Popover.Content maxW="10rem" zIndex={zIndex.mapPopover}>
             <Popover.Body p={3}>
               <Text textStyle="allCapLabel" mb={3}>
                 Basemap

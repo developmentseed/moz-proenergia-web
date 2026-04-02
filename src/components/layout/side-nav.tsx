@@ -8,6 +8,7 @@ import { createSerializer } from 'nuqs/server';
 import modelConfig from '@/config/model.json';
 import { ModelGroupMetadata } from '@/app/types';
 import { slugify } from '@/utils/data-transformation';
+import { zIndex } from '@/components/ui/constant';
 import { getIconPath } from '@/utils/model-icon';
 import { coordinateParsers } from '@/utils/context/map-coords';
 import { Tooltip } from '../ui/tooltip';
@@ -39,7 +40,7 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
       bg="orange.muted"
       borderRight="1px solid"
       borderColor="border"
-      zIndex={100}
+      zIndex={zIndex.sideNav}
     >
       <VStack p={2} gap={2} align="center">
         {models.map((model) => {
