@@ -6,10 +6,10 @@ import {
   Combobox,
   Portal,
   Tag,
-  Text,
   useFilter,
   useListCollection
 } from "@chakra-ui/react";
+import { useTranslation } from "react-i18next";
 
 interface ChakraComboboxProps {
   title: string;
@@ -20,9 +20,12 @@ interface ChakraComboboxProps {
 
 export const ChakraCombobox = ({ title, items, value, onChange }: ChakraComboboxProps) => {
   const { contains } = useFilter({ sensitivity: "base" });
+  const { t } = useTranslation();
 
   const { collection, filter } = useListCollection({
     initialItems: items,
+    itemToValue: (item) => item.id,
+    itemToString: (item) => item.label,
     filter: contains,
   });
 
@@ -40,11 +43,11 @@ export const ChakraCombobox = ({ title, items, value, onChange }: ChakraCombobox
       <Combobox.Label textStyle='allCapLabel'>{title}</Combobox.Label>
       <Combobox.Control>
         {value && value.length > 0 && (
-          <Tag.Root size="md" ml={1} position={'absolute'} top={1} p ={2} bg={"navBg"}>
-            <Tag.Label>{value.length} selected</Tag.Label>
+          <Tag.Root size="sm" ml={1} position={'absolute'} top={1} p={1.5} bg={"navBg"}>
+            <Tag.Label>{t('filters.selected', { count: value.length })}</Tag.Label>
           </Tag.Root>
         )}
-        <Combobox.Input placeholder={value?.length ? "" : "Type to search"} />
+        <Combobox.Input placeholder={value?.length ? "" : t('filters.typeToSearch')} />
         <Combobox.IndicatorGroup>
           <Combobox.ClearTrigger />
           <Combobox.Trigger />
@@ -53,10 +56,10 @@ export const ChakraCombobox = ({ title, items, value, onChange }: ChakraCombobox
       <Portal>
         <Combobox.Positioner>
           <Combobox.Content>
-            <Combobox.Empty>No items found</Combobox.Empty>
+            <Combobox.Empty>{t('filters.noItemsFound')}</Combobox.Empty>
             {collection.items.map((item) => (
-              <Combobox.Item item={item} key={item.value}>
-                <Checkbox.Root checked={value?.includes(item.value)} pointerEvents="none">
+              <Combobox.Item item={item} key={item.id}>
+                <Checkbox.Root checked={value?.includes(item.id)} pointerEvents="none">
                   <Checkbox.HiddenInput />
                   <Checkbox.Control width={4} height={4} mr={1} />
                 </Checkbox.Root>

@@ -1,46 +1,20 @@
-import { memo, useEffect } from "react";
-import {
-  Box,
-  Table,
-  Spinner,
-  Text,
-  Alert,
-  Collapsible,
-} from "@chakra-ui/react";
+import { memo, useState, useEffect } from "react";
+import { Box, Flex, Text, IconButton, Input, Field as ChakraField, Link } from "@chakra-ui/react";
+import NextLink from "next/link";
 import { api } from "@/utils/api";
-import { InfoTip } from "../chakra/toggle-tip";
-import { LuChevronUp } from "react-icons/lu";
-import { useQuery, useQueries, useQueryClient } from "@tanstack/react-query";
+import { fetchModels, slugify } from "@/utils/data-transformation";
+import { useAuth } from "@/utils/context/auth";
+import { useModel } from "@/utils/context/model";
+import { LuChevronLeft, LuSearch, LuChevronsUpDown, LuChevronsDownUp } from "react-icons/lu";
+import { useQuery } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
-import { type Field, type Filter } from "@/app/types";
-import { formatNumber } from "@/utils/numer";
+import { type Field, type Filter, type Main } from "@/app/types";
+import { type SummaryData } from "@/app/types/summary";
+import { SummaryTable } from "@/components/chakra/summary-table";
+import { useSummaryQuery } from "@/hooks/use-summary-query";
+import { AnimationTime, ControlPanelWidth } from "../ui/main-panel";
+import { useTranslation } from "react-i18next";
 
-interface SummaryItem {
-  key: string;
-  label: string;
-  value: number | string;
-}
-
-interface FlatRow {
-  type: "flat";
-  label: string;
-  key: string;
-  description?: string;
-  unit?: string;
-  value: number | string;
-}
-
-interface GroupRow {
-  type: "group";
-  label: string;
-  description?: string;
-  unit?: string;
-  value: SummaryItem[];
-}
-
-type SummaryRow = FlatRow | GroupRow;
-
-type SummaryData = SummaryRow[];
 interface SummaryPanelProps {
   clusterId: string | null;
   scenarioId: string;
@@ -49,146 +23,132 @@ interface SummaryPanelProps {
   filters: Record<string, [number, number] | string[] | null>;
   filterDefs: Filter[];
   resetCluster: () => void;
+  onSelectCluster: (id: string) => void;
+  main?: Main;
+  isOpen: boolean;
+  onToggle?: () => void;
 }
-
-interface FieldSummaryNumeric {
-  key: string;
-  type: "numeric";
-  count: number;
-  min: number;
-  max: number;
-  sum: number;
-}
-
-interface FieldSummaryString {
-  key: string;
-  type: "string";
-  count: number;
-  values: Record<string, number>;
-}
-
-type FieldSummary = FieldSummaryNumeric | FieldSummaryString;
 
 interface PanelHeaderProps {
   subtitle: string;
   title: string;
+  onBack?: () => void;
 }
 
-const PanelHeader = ({ title, subtitle }: PanelHeaderProps) => (
-  <Collapsible.Trigger
+const PanelHeader = ({ title, subtitle, onBack }: PanelHeaderProps) => (
+  <Box
     display="flex"
     flexDirection="column"
     alignItems="start"
     justifyContent="space-between"
     width="100%"
-    px={4}
-    py={2}
-    _open={{ borderBottom: "1px solid", borderColor: "panelBorder" }}
+    p={4}
+    borderBottom="1px solid"
+    borderColor="border"
   >
     <Text textStyle="subTitle">{subtitle}</Text>
-    <Text textStyle="modelTitle">{title}</Text>
-    <Collapsible.Indicator
-      transition="transform 0.2s"
-      _open={{ transform: "rotate(180deg)" }}
-      position="absolute"
-      right={2}
-      top={2}
-    >
-      <LuChevronUp />
-    </Collapsible.Indicator>
-  </Collapsible.Trigger>
+    <Flex gap={1} align="center">
+      {onBack && (
+        <IconButton
+          aria-label="Back to national summary"
+          variant="ghost"
+          size="2xs"
+          onClick={(e) => {
+            e.stopPropagation();
+            onBack();
+          }}
+        >
+          <LuChevronLeft />
+        </IconButton>
+      )}
+      <Text textStyle="modelTitle">{title}</Text>
+    </Flex>
+  </Box>
 );
 
-interface PanelBodyProps {
-  data: SummaryData | undefined;
-  isLoading: boolean;
-  isError: boolean;
+interface ClusterSearchProps {
+  onSelectCluster: (id: string) => void;
 }
 
-const formatValue = (value: string | number) => {
-  //@ts-expect-error @TODO
-  if (!isNaN(value)) return formatNumber(value as number);
-  else return value;
-};
+const ClusterSearch = ({ onSelectCluster }: ClusterSearchProps) => {
+  const [value, setValue] = useState("");
 
-const tableCellStyleProps = {
-  py: 1,
-  px: 4,
-};
-const PanelBody = ({ data, isLoading, isError }: PanelBodyProps) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = value.trim();
+    if (trimmed) onSelectCluster(trimmed);
+  };
+
   return (
-    <Box maxHeight={400} width="100%" overflowY="auto" pb={4}>
-      {isLoading && (
-        <Box display="flex" alignItems="center" justifyContent="center" py={8}>
-          <Spinner size="xl" />
-        </Box>
-      )}
+    <Box as="form" onSubmit={handleSubmit}>
+      <ChakraField.Root>
+        <ChakraField.Label fontSize="xs" color="fg.muted">
+          Navigate to cluster or site
+        </ChakraField.Label>
+        <Flex gap={1} width="full">
+          <Input
+            size="sm"
+            placeholder="Enter cluster ID…"
+            flexBasis="100%"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+          />
+          <IconButton
+            type="submit"
+            size="sm"
+            variant="surface"
+            aria-label="Navigate to cluster"
+            disabled={!value.trim()}
+          >
+            <LuSearch />
+          </IconButton>
+        </Flex>
+      </ChakraField.Root>
+    </Box>
+  );
+};
 
-      {isError && (
-        <Alert.Root status="error">
-          <Alert.Indicator />
-          <Alert.Content>
-            <Alert.Title>Failed to load the data</Alert.Title>
-            <Alert.Description>Please try it again later.</Alert.Description>
-          </Alert.Content>
-        </Alert.Root>
-      )}
+interface RelatedModelsProps {
+  clusterId: string;
+}
 
-      {!isLoading && !isError && data && (
-        <Table.Root size="sm">
-          <Table.Body>
-            {data.map((row) => {
-              if (row.type === "flat") {
-                return (
-                  <Table.Row key={row.key} bg="panelBg">
-                    <Table.Cell {...tableCellStyleProps}>
-                      {" "}
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <Text textStyle="tableAttr">{row.label}</Text>
-                        {row.description && (
-                          <InfoTip content={row.description} />
-                        )}
-                      </Box>
-                    </Table.Cell>
-                    <Table.Cell {...tableCellStyleProps}>
-                      <Text textStyle="tableValue" textAlign="right">
-                        {formatValue(row.value)} {row.unit}
-                      </Text>
-                    </Table.Cell>
-                  </Table.Row>
-                );
-              }
+const RelatedModels = ({ clusterId }: RelatedModelsProps) => {
+  const { model } = useModel();
+  const { token } = useAuth();
+  const { data: models } = useQuery({
+    queryKey: ["models", token],
+    queryFn: ({ signal }) => fetchModels(signal, token),
+  });
 
-              // Group type
-              return [
-                <Table.Row key={row.label} bg="gray.200">
-                  <Table.Cell px={2} py={2} colSpan={2} fontWeight="bold">
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <Text textStyle="tableAttr"> {row.label}</Text>
-                      <InfoTip content={row.description} />
-                    </Box>
-                  </Table.Cell>
-                </Table.Row>,
-                ...row.value.map((item) => (
-                  <Table.Row key={item.key} bg="panelBg">
-                    <Table.Cell {...tableCellStyleProps} pl={6}>
-                      <Text textStyle="tableAttr" pt={1} pb={1}>
-                        {" "}
-                        {item.label}
-                      </Text>
-                    </Table.Cell>
-                    <Table.Cell {...tableCellStyleProps}>
-                      <Text textStyle="tableValue" textAlign="right">
-                        {formatValue(item.value)} {row.unit}
-                      </Text>
-                    </Table.Cell>
-                  </Table.Row>
-                )),
-              ];
-            })}
-          </Table.Body>
-        </Table.Root>
-      )}
+  const currentModelData = models?.find((m) => String(m.id) === model.id);
+  const currentVectorDatasetId = currentModelData?.scenarios[0]?.vector_dataset?.id;
+
+  const related = models?.filter((m) => {
+    if (String(m.id) === model.id) return false;
+    if (!currentVectorDatasetId) return false;
+    return m.scenarios[0]?.vector_dataset?.id === currentVectorDatasetId;
+  }) ?? [];
+
+  if (related.length === 0) return null;
+
+  return (
+    <Box display="flex" flexDirection="column" gap={1}>
+      <Text fontSize="xs" color="fg.muted">
+        View cluster in other models
+      </Text>
+      {related.map((m) => (
+        <Link
+          key={m.id}
+          asChild
+          fontSize="sm"
+          color="blue.500"
+          _hover={{ textDecoration: "underline" }}
+        >
+          <NextLink href={`/model/${slugify(m.name)}?cluster=${clusterId}`}>
+            {m.name}
+          </NextLink>
+        </Link>
+      ))}
     </Box>
   );
 };
@@ -198,13 +158,13 @@ function transformClusterData(
   popupFields: Field[],
 ): SummaryData {
   return popupFields
-    .filter((field) => field.column in data)
+    .filter((field) => field.columns[0] in data)
     .map((field) => ({
       type: "flat" as const,
-      key: field.column,
+      key: field.columns[0],
       label: field.label,
       description: field.description,
-      value: data[field.column],
+      value: data[field.columns[0]],
     }));
 }
 
@@ -230,94 +190,6 @@ async function fetchClusterData(
   }
 }
 
-function buildFilterQueryString(
-  filters: Record<string, [number, number] | string[] | null>,
-  filterDefs: Filter[],
-): string {
-  const queryParts: string[] = [];
-
-  // Build ID to column lookup
-  const idToColumn = new Map(filterDefs.map((f) => [f.id, f.column]));
-
-  for (const [filterId, value] of Object.entries(filters)) {
-    if (value === null) continue;
-
-    // Map filter ID to column name
-    const column = idToColumn.get(filterId) ?? filterId;
-
-    if (
-      Array.isArray(value) &&
-      value.length === 2 &&
-      typeof value[0] === "number" &&
-      typeof value[1] === "number"
-    ) {
-      // Numeric filter: [min, max]
-      queryParts.push(`${column}__min=${value[0]}`);
-      queryParts.push(`${column}__max=${value[1]}`);
-    } else if (Array.isArray(value) && value.length > 0) {
-      // String array filter: join with semicolon when length is > 1
-      if (value.length === 1) queryParts.push(`${column}=${value}`);
-      else queryParts.push(`${column}__in=${value.join(";")}`);
-    }
-  }
-
-  return queryParts.length > 0 ? `?q=${queryParts.join(",")}` : "";
-}
-
-async function fetchFieldSummary(
-  scenarioId: string,
-  column: string,
-  filters: Record<string, [number, number] | string[] | null>,
-  filterDefs: Filter[],
-  signal: AbortSignal,
-): Promise<FieldSummary> {
-  try {
-    const queryString = buildFilterQueryString(filters, filterDefs);
-    const { data } = await api.get(
-      `scenario/${scenarioId}/summary/${column}/${queryString}`,
-      { signal },
-    );
-    return data;
-  } catch (e) {
-    console.error(e);
-    throw new Error("Failed to fetch summary data");
-  }
-}
-
-function transformFieldSummary(result: FieldSummary, field: Field): SummaryRow {
-  console.log(result);
-  if (result.count === 0) return {
-      type: "flat" as const,
-      key: field.column,
-      label: `${field.label} (Total)`,
-      description: field.description,
-      value: 0,
-      unit: field.unit,
-  };
-  if (result.type === "numeric") {
-    return {
-      type: "flat" as const,
-      key: field.column,
-      label: `${field.label} (Total)`,
-      description: field.description,
-      value: result.sum,
-      unit: field.unit,
-    };
-  }
-  // String type - show value distribution
-  return {
-    type: "group" as const,
-    label: field.label,
-    description: field.description,
-    unit: field.unit,
-    value: Object.entries(result.values).map(([key, count]) => ({
-      key,
-      label: key,
-      value: count,
-    })),
-  };
-}
-
 const SummaryPanel = ({
   clusterId,
   scenarioId,
@@ -326,7 +198,13 @@ const SummaryPanel = ({
   filters,
   filterDefs,
   resetCluster,
+  onSelectCluster,
+  main,
+  isOpen,
+  onToggle = () => {},
 }: SummaryPanelProps) => {
+  const { t } = useTranslation();
+
   const {
     data: clusterData,
     isLoading: clusterIsLoading,
@@ -336,48 +214,25 @@ const SummaryPanel = ({
     queryKey: ["cluster", scenarioId, clusterId],
     queryFn: ({ signal }) =>
       fetchClusterData(scenarioId, clusterId!, popupFields, signal),
+    retry: false,
     enabled: !!clusterId,
   });
 
-  const queryClient = useQueryClient();
-
-  const summaryQueries = useQueries({
-    queries: summaryFields.map((field) => ({
-      queryKey: ["summary", scenarioId, field.column, filters],
-      queryFn: ({ signal }) =>
-        fetchFieldSummary(
-          scenarioId,
-          field.column,
-          filters,
-          filterDefs,
-          signal,
-        ),
-    })),
-  });
-
-  const noMatchingData = summaryQueries.some(
-    (q) => q.data && q.data.count === 0,
-  );
-
+  // Defer summary fetches so map tiles get network priority
+  const [summaryEnabled, setSummaryEnabled] = useState(false);
   useEffect(() => {
-    if (!noMatchingData) return;
-    // Cancel remaining queries when any result has count === 0
-    for (const field of summaryFields) {
-      queryClient.cancelQueries({
-        queryKey: ["summary", scenarioId, field.column, filters],
-      });
-    }
-  }, [noMatchingData, scenarioId, summaryFields, filters, queryClient]);
+    const id = setTimeout(() => setSummaryEnabled(true), 150);
+    return () => clearTimeout(id);
+  }, []);
 
-  const summaryIsLoading = summaryQueries.some((q) => q.isLoading);
-  const summaryIsError = !noMatchingData && summaryQueries.some((q) => q.isError);
-  const summaryData: SummaryData | undefined = noMatchingData
-    ? undefined
-    : summaryQueries.every((q) => q.data)
-      ? summaryQueries.map((q, i) =>
-          transformFieldSummary(q.data!, summaryFields[i]),
-        )
-      : undefined;
+  const { data: summaryData, isLoading: summaryIsLoading } = useSummaryQuery({
+    scenarioId,
+    summaryFields,
+    filters,
+    filterDefs,
+    enabled: true,
+    main,
+  });
 
   // Views are mutually exclusive - cluster view never falls through to summary
   const showingCluster = !!clusterId;
@@ -385,37 +240,116 @@ const SummaryPanel = ({
   const isLoading = showingCluster
     ? clusterIsLoading || clusterIsFetching
     : summaryIsLoading;
-  const isError = showingCluster ? clusterIsError : summaryIsError;
 
-  const title = showingCluster ? `Cluster - ${clusterId}` : "Summary";
+  const title = showingCluster
+    ? t('explorer.cluster', { clusterId })
+    : t('explorer.summary');
+
+  const summaryContent = (
+    <>
+      <Box display={{ base: "none", md: "block" }}>
+        <PanelHeader
+          subtitle={t('explorer.analysis')}
+          title={title}
+          onBack={showingCluster ? resetCluster : undefined}
+        />
+      </Box>
+      <Box p={4} pt={0} flex={1} minHeight={0} overflowY="auto">
+        <SummaryTable
+          data={dataToDisplay}
+          isLoading={isLoading}
+          isError={showingCluster && clusterIsError}
+          collapsible={!showingCluster}
+        />
+      </Box>
+    </>
+  );
 
   return (
-    <Box
-      position="absolute"
-      top="4"
-      minWidth={"350px"}
-      {...mapControlCommonStyleProps}
-      zIndex={controlZIndex}
-    >
-      <Collapsible.Root defaultOpen>
-        <PanelHeader subtitle="analysis" title={title} />
-        <Collapsible.Content>
-          {!showingCluster && noMatchingData ? (
-            <Box px={4} py={8} textAlign="center">
-              <Text textStyle="tableAttr" color="fg.muted">
-                No matching data for the current filters.
-              </Text>
+    <>
+      {/* Mobile: single sliding container anchored at bottom, trigger at top.
+          bottom: 0 anchors the element; increasing max-height grows upward.
+          The trigger (first child, 44px) is always visible; content reveals
+          below it as the drawer expands. */}
+      <Box
+        display={{ base: "block", md: "none" }}
+        position="absolute"
+        bottom={0}
+        left={0}
+        right={0}
+        zIndex={controlZIndex + 100}
+        overflow="hidden"
+        maxHeight={isOpen ? "80dvh" : "44px"}
+        transition={`max-height ${AnimationTime} ease`}
+        bg="panelBg"
+        borderTop="1px solid"
+        borderColor="panelBorder"
+        boxShadow="lg"
+      >
+        {/* Trigger — always visible, moves up with drawer when expanded */}
+        <Flex
+          h="44px"
+          px={4}
+          align="center"
+          justify="space-between"
+          cursor="pointer"
+          onClick={onToggle}
+        >
+          <Text fontWeight="semibold" fontSize="sm">{title}</Text>
+          <Box>
+            {isOpen ? <LuChevronsDownUp /> : <LuChevronsUpDown />}
+          </Box>
+        </Flex>
+        {/* Content below trigger */}
+        <Box
+          display="flex"
+          flexDirection="column"
+          maxH="calc(80dvh - 44px)"
+          overflowY="auto"
+        >
+          {summaryContent}
+          {showingCluster ? (
+            <Box p={4} borderTop="1px solid" borderColor="border">
+              <RelatedModels clusterId={clusterId!} />
             </Box>
-          ) : (
-            <PanelBody
-              data={dataToDisplay}
-              isLoading={isLoading}
-              isError={isError}
-            />
-          )}
-        </Collapsible.Content>
-      </Collapsible.Root>
-    </Box>
+        ) :
+            <Box p={4} borderTop="1px solid" borderColor="border">
+              <ClusterSearch onSelectCluster={onSelectCluster} />
+            </Box>
+          }
+        </Box>
+
+      </Box>
+
+      {/* Desktop: right panel with width animation */}
+      <Box
+        display={{ base: "none", md: "flex" }}
+        {...mapControlCommonStyleProps}
+        position="relative"
+        bg="panelBg"
+        overflow="hidden"
+        width={isOpen ? ControlPanelWidth : 0}
+        height="100%"
+        borderLeftWidth={isOpen ? "1px" : 0}
+        borderLeftStyle="solid"
+        borderLeftColor="panelBorder"
+        transition={`width ${AnimationTime} ease`}
+        flexDirection="column"
+        zIndex={controlZIndex}
+      >
+        {summaryContent}
+        {showingCluster ? (
+          <Box p={4} borderTop="1px solid" borderColor="border">
+            <RelatedModels clusterId={clusterId!} />
+          </Box>
+        ) :
+          <Box p={4} borderTop="1px solid" borderColor="border">
+            <ClusterSearch onSelectCluster={onSelectCluster} />
+          </Box>
+          }
+      </Box>
+
+    </>
   );
 };
 

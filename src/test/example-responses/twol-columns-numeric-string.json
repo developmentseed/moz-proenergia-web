@@ -1,0 +1,23 @@
+{
+    "scenario_id": 4,
+    "filters_applied": "",
+    "summaries": {
+        "MGInvestmentDistTotal": {
+            "type": "numeric",
+            "count": 2197,
+            "min": 11272.96247,
+            "max": 2356466.886,
+            "sum": 370762788.28038
+        },
+        "MGCapacityBins": {
+            "type": "string",
+            "count": 2197,
+            "values": {
+                "0-50": 1597,
+                "100-200": 120,
+                "50-100": 454,
+                ">200": 26
+            }
+        }
+    }
+}

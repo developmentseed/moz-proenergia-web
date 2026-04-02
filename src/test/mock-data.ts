@@ -7,6 +7,7 @@ export const mockModel: ModelMetadata = {
   scenarios: [
     {
       id: "baseline",
+      name: "Baseline",
       label: "Baseline",
       source: { type: "vector", url: "test.pmtiles" },
       layer: { source: "test", "source-layer": "data", type: "fill" },
@@ -16,7 +17,7 @@ export const mockModel: ModelMetadata = {
     id: "main",
     column: "main_col",
     label: "Main",
-    options: [{ value: "a", label: "A", color: "#000" }],
+    options: [{ id: "a", label: "A", color: "#000" }],
   },
   filters: [
     {
@@ -32,9 +33,9 @@ export const mockModel: ModelMetadata = {
       label: "Energy Type",
       type: FilterType.checkbox,
       options: [
-        { value: "1", label: "Solar" },
-        { value: "2", label: "Wind" },
-        { value: "3", label: "Hydro" },
+        { id: "1", label: "Solar" },
+        { id: "2", label: "Wind" },
+        { id: "3", label: "Hydro" },
       ],
     },
     {

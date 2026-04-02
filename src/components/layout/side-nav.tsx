@@ -3,8 +3,18 @@
 import { Box, VStack } from '@chakra-ui/react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
+import { createSerializer } from 'nuqs/server';
 import modelConfig from '@/config/model.json';
 import { ModelGroupMetadata } from '@/app/types';
+import { slugify } from '@/utils/data-transformation';
+import { getIconPath } from '@/utils/model-icon';
+import { coordinateParsers } from '@/utils/context/map-coords';
+import { Tooltip } from '../ui/tooltip';
+import { useTranslation } from 'react-i18next';
+
+//Generate URL with coordinates
+const serialize = createSerializer(coordinateParsers);
 
 interface SideNavProps {
   models: ModelGroupMetadata[];
@@ -12,13 +22,19 @@ interface SideNavProps {
 }
 
 export const SideNav = ({ models, currentSlug }: SideNavProps) => {
-  const getIconPath = (modelId: string) => {
-    const config = modelConfig.find((c) => String(c.model) === String(modelId));
-    return config ? `/model-icon/${config.icon}` : null;
-  };
+  const searchParams = useSearchParams();
+  const { t } = useTranslation();
+  // Only carry coordinate params (lat, lng, zoom) to model links
+      const coordQuery = serialize({
+      lat: searchParams.get('lat') ? parseFloat(searchParams.get('lat')!) : null,
+      lng: searchParams.get('lng') ? parseFloat(searchParams.get('lng')!) : null,
+      zoom: searchParams.get('zoom') ? parseFloat(searchParams.get('zoom')!) : null,
+      });
 
   return (
     <Box
+      display={{ base: 'none', md: 'flex' }}
+      flexDirection="column"
       height="full"
       bg="navBg"
       borderRight="1px solid"
@@ -27,40 +43,43 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
     >
       <VStack p={2} gap={2} align="center">
         {models.map((model) => {
-          const isActive = String(model.id) === currentSlug;
+          const modelSlug = slugify(model.name);
+          const isActive = modelSlug === currentSlug;
           const iconPath = getIconPath(model.id);
 
           return (
             <Link
               key={model.id}
-              href={`/model/${model.id}`}
+              href={`/model/${modelSlug}/` + coordQuery}
               style={{ textDecoration: 'none' }}
             >
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                rounded="sm"
-                width={12}
-                height={12}
-                bg={isActive ? "yellow.muted" : "transparent"}
-                cursor="pointer"
-                transition="all 0.2s"
-                _hover={{
-                  bg: isActive ? 'blue.600' : 'gray.200',
-                }}
-              >
-                {iconPath ? (
-                  <Image
-                    src={iconPath}
-                    alt={model.name}
-                    width={20}
-                    height={20}
-                  />
-                ) : (
-                  model.name
-                )}
-              </Box>
+              <Tooltip content={t(`model.${model.id}.name`, { defaultValue: model.name })}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  rounded="sm"
+                  width={12}
+                  height={12}
+                  bg={isActive ? "orange.muted" : "transparent"}
+                  cursor="pointer"
+                  transition="all 0.2s"
+                  _hover={{
+                    bg: isActive ? 'orange.600' : 'orange.subtle',
+                  }}
+                >
+                  {iconPath ? (
+                    <Image
+                      src={iconPath}
+                      alt={t(`model.${model.id}.name`, { defaultValue: model.name })}
+                      width={20}
+                      height={20}
+                    />
+                  ) : (
+                    t(`model.${model.id}.name`, { defaultValue: model.name })
+                  )}
+                </Box>
+              </Tooltip>
             </Link>
           );
         })}

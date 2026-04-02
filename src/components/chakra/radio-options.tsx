@@ -11,11 +11,11 @@ interface RadioOptionsProps {
 
 const RadioOptions = ({ title, items, onChange, value }: RadioOptionsProps) => {
   return (
-    <RadioCard.Root defaultValue={items[0].value} gap="4" maxW="sm" onChange={onChange} value={value}>
+    <RadioCard.Root defaultValue={items[0].id} gap="4" maxW="sm" onChange={onChange} value={value}>
       <RadioCard.Label>{title}</RadioCard.Label>
       <Group attached orientation="vertical">
         {items.map((item) => (
-          <RadioCard.Item key={item.value} value={item.value} width="full">
+          <RadioCard.Item key={item.id} value={item.id} width="full">
             <RadioCard.ItemHiddenInput />
             <RadioCard.ItemControl>
               <RadioCard.ItemIndicator />

@@ -3,18 +3,20 @@ import { Box } from "@chakra-ui/react";
 import { Provider } from "@/components/chakra/provider";
 import ReactQueryProvider from "@/utils/context/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import Header from "@/components/layout/header";
+import { WEBSITE_DESC, WEBSITE_TITLE } from "@/config/website";
+import Header from "@/components/layout/header/";
 import { AuthProvider } from "@/utils/context/auth";
+import { I18nProvider } from "@/i18n/provider";
 import { DM_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Proenergia + IEP",
-  description: "Proenergia",
+  title: WEBSITE_TITLE,
+  description: WEBSITE_DESC,
   icons: {
-    icon: ["/Logo.svg"],
-    apple: ["/Logo.svg"],
-    shortcut: ["/Logo.svg"],
+    icon: ["/Emblem_of_Mozambique.svg"],
+    apple: ["/Emblem_of_Mozambique.svg"],
+    shortcut: ["/Emblem_of_Mozambique.svg"],
   },
 };
 
@@ -35,24 +37,26 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="pt"
       className={`${dmSans.variable} ${dmMono.variable}`}
       suppressHydrationWarning
     >
       <body>
-        <ReactQueryProvider>
-          <NuqsAdapter>
-            <Provider>
-              <AuthProvider>
-                <Header />
-                <Box as="main" bg="bg">
-                  {children}
-                </Box>
-                {/* <footer> Footer</footer> */}
-              </AuthProvider>
-            </Provider>
-          </NuqsAdapter>
-        </ReactQueryProvider>
+        <I18nProvider>
+          <ReactQueryProvider>
+            <NuqsAdapter>
+              <Provider>
+                <AuthProvider>
+                  <Header />
+                  <Box as="main" bg="bg">
+                    {children}
+                  </Box>
+                  {/* <footer> Footer</footer> */}
+                </AuthProvider>
+              </Provider>
+            </NuqsAdapter>
+          </ReactQueryProvider>
+        </I18nProvider>
       </body>
     </html>
   );

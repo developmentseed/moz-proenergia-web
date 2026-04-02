@@ -1,0 +1,42 @@
+{
+    "scenario_id": 5,
+    "filters_applied": "PopStartYear__min=3,PopStartYear__max=447581,Technology2030=MiniGrid_PV",
+    "summaries": {
+        "LCOETotal": {
+            "type": "numeric",
+            "count": 1391,
+            "min": 0.01,
+            "max": 979.0,
+            "sum": 36701.0758,
+            "grouped": {
+                "MiniGrid_PV": {
+                    "count": 7,
+                    "min": 0.8165,
+                    "max": 9.6102,
+                    "sum": 21.4107
+                },
+                "ExistingGrid": {
+                    "count": 0,
+                    "min": null,
+                    "max": null,
+                    "sum": null
+                },
+                "GridExtension": {
+                    "count": 0,
+                    "min": null,
+                    "max": null,
+                    "sum": null
+                },
+                "SHS": {
+                    "count": 0,
+                    "min": null,
+                    "max": null,
+                    "sum": null
+                }
+            }
+        }
+    },
+    "group_by": [
+        "Technology2030"
+    ]
+}

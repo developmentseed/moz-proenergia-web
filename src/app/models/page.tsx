@@ -8,18 +8,20 @@ import { fetchModels } from '@/utils/data-transformation';
 import ModelCards from '@/components/layout/landing-models';
 
 export default async function ModelsPage() {
-  const queryClient = new QueryClient();
+  // Disable prefetching for now so models can reflect the names right away
+  // const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: ['models'],
-    queryFn: fetchModels,
-  });
+  // await queryClient.prefetchQuery({
+  //   queryKey: ['models'],
+  //   queryFn: ({ signal }) => fetchModels(signal),
+  // });
+
+  // const models = await fetchModels();
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <Shell>
-        <ModelCards />
-      </Shell>
-    </HydrationBoundary>
+    <Shell>
+      <ModelCards />
+    </Shell>
+
   );
 }

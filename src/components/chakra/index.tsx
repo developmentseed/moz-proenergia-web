@@ -10,3 +10,4 @@ export { CheckboxGroupUI as CheckboxGroup } from "./checkbox-group";
 export { ToggleTip } from "./toggle-tip";
 export { ModelCard as Card } from "./card";
 export { BreadcrumbNav, type BreadcrumbItem } from "./breadcrumb";
+export { ChakraDrawer as Drawer } from "./drawer";

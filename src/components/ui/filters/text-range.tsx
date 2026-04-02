@@ -1,29 +1,35 @@
 import { useState, useEffect } from 'react';
-import { Box, Stack, Input, Flex, Text, Slider } from '@chakra-ui/react';
+import { Box, Stack, Input, Flex, Slider } from '@chakra-ui/react';
 import { type SliderValueChangeDetails } from '@chakra-ui/react';
-import { formatNumber } from '@/utils/numer';
+import { formatNumber } from '@/utils/number';
+import { FilterLabel } from './filter-label';
+import { InfoTip } from '@/components/chakra/toggle-tip';
 
 interface TextRangeProps {
   title: string;
+  description?: string;
   min: number;
   max: number;
   value: number[];
+  hasPending?: boolean;
   onChange: (details: SliderValueChangeDetails) => void;
   step?: number;
 }
 
 export const TextRange = ({
   title,
+  description,
   min,
   max,
   value,
+  hasPending,
   onChange
 }: TextRangeProps) => {
   const [localValue, setLocalValue] = useState<number[]>(value);
   const [minText, setMinText] = useState<number>(value[0] || min);
   const [maxText, setMaxText] = useState<number>(value[1] || max);
   //@TODO: better logic
-  const step = (max - min > 100)? 10 :1;
+  const step = 1;
 
   // Reset values when page navigates to new model
   useEffect(() => {
@@ -115,9 +121,12 @@ export const TextRange = ({
 
   return (
     <Stack gap={2} width="full">
-      <Text textStyle='sliderLabel'>
-        {title}
-      </Text>
+      <Flex align="center" gap={1}>
+        <FilterLabel title={title} hasPending={hasPending} />
+        {description && title !== description && (
+          <InfoTip content={description} />
+        )}
+      </Flex>
 
       <Box width="full">
         <Slider.Root

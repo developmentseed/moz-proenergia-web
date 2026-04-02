@@ -6,16 +6,18 @@ import TextRange from "./text-range";
 type FilterControlProps = {
   config: Filter;
   value: string[] | [number, number] | undefined | null;
+  hasPending?: boolean;
   onChange: (param:unknown) => void;
 };
 
-export const FilterControl = memo(function FilterControl({ config, value, onChange }: FilterControlProps) {
+export const FilterControl = memo(function FilterControl({ config, value, hasPending, onChange }: FilterControlProps) {
   switch (config.type) {
     case 'numeric':
       return (
         <TextRange
           title={config.label}
-          // description={config.description}
+          hasPending={hasPending}
+          description={config.description}
           min={config.options[0]}
           max={config.options[1]}
           value={value as number[]}
@@ -28,7 +30,6 @@ export const FilterControl = memo(function FilterControl({ config, value, onChan
         <CheckboxGroup
           title={config.label}
           label={config.label}
-          // description={config.description}
           items={config.options}
           value={value as string[]}
           onChange={onChange}
@@ -36,11 +37,10 @@ export const FilterControl = memo(function FilterControl({ config, value, onChan
       );
 
     case 'admin':
-      const items = config.options.map(s => ({ label: s, value: s }));
+      const items = config.options.map(s => ({ label: s, id: s }));
       return (
         <Combobox
           title={config.label}
-          // description={config.description}
           items={items}
           value={value as (string[] | undefined)}
           onChange={onChange}

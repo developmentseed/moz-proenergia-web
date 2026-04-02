@@ -1,52 +1,49 @@
 import { type ReactNode } from 'react';
-import { CloseButton, Button, Dialog, Portal } from '@chakra-ui/react';
-import { type NavigationItem } from '../layout/header';
+import { CloseButton, Dialog, Portal, createOverlay } from '@chakra-ui/react';
 
-type ModalProps = {
-  item: NavigationItem;
+type ModalDialogProps = {
   modalTitle: string;
-  isOpen: boolean;
-  setIsModalOpen: (open:boolean)=> void;
-  modalContent?: ReactNode
+  modalContent?: ReactNode;
+  open?: boolean;
+  onOpenChange?: (details: { open: boolean }) => void;
+  onExitComplete?: () => void;
 }
 
-const Modal = ({ item, modalTitle, isOpen, setIsModalOpen, modalContent }: ModalProps) => {
+export function ModalDialog({ modalTitle, modalContent, open, onOpenChange, onExitComplete }: ModalDialogProps) {
+  return (
+    <Dialog.Root open={open} onOpenChange={onOpenChange} onExitComplete={onExitComplete}>
+      <Portal>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Header>
+              <Dialog.Title>{modalTitle}</Dialog.Title>
+            </Dialog.Header>
+            <Dialog.Body>
+              {modalContent}
+            </Dialog.Body>
+            <Dialog.CloseTrigger asChild>
+              <CloseButton size="sm" />
+            </Dialog.CloseTrigger>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Portal>
+    </Dialog.Root>
+  );
+}
 
-  return <Dialog.Root open={isOpen} onOpenChange={(e) => setIsModalOpen(e.open)}>
-    <Dialog.Trigger asChild>
-      <Button
-        padding={0}
-        variant="plain"
-        fontSize="sm"
-        fontWeight="medium"
-        color="fg.muted"
-      >
-        {item.label}
-      </Button>
-    </Dialog.Trigger>
-    <Portal>
-      <Dialog.Backdrop />
-      <Dialog.Positioner>
-        <Dialog.Content>
-          <Dialog.Header>
-            <Dialog.Title>{modalTitle} </Dialog.Title>
-          </Dialog.Header>
-          <Dialog.Body>
-            {modalContent}
-          </Dialog.Body>
-          <Dialog.Footer>
-            {/* <Dialog.ActionTrigger asChild>
-              <Button variant="outline">Cancel</Button>
-            </Dialog.ActionTrigger>
-            <Button>Save</Button> */}
-          </Dialog.Footer>
-          <Dialog.CloseTrigger asChild>
-            <CloseButton size="sm" />
-          </Dialog.CloseTrigger>
-        </Dialog.Content>
-      </Dialog.Positioner>
-    </Portal>
-  </Dialog.Root>;
-};
+type ModalProps = {
+  modalTitle: string;
+  modalContent?: ReactNode;
+  open?: boolean; // not needed when used imperatively (Modal.open)
+  onOpenChange?: (details: { open: boolean }) => void;
+  onExitComplete?: () => void;
+}
+
+const Modal = createOverlay<ModalProps>((props) => {
+  return (
+    <ModalDialog {...props} />
+  );
+});
 
 export default Modal;

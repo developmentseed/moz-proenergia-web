@@ -1,10 +1,32 @@
 import { LayerProps } from "react-map-gl/maplibre";
 import { interpolateWarm } from 'd3-scale-chromatic';
-import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
+import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, Field, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
 import { api, MEDIA_URL_PREFIX, DEFAULT_COL } from '@/utils/api';
 import { sortFilterOptions } from '@/config/filters';
 import mapConfig from '@/config/map.json';
-const ADMIN_COLUMNS = ['Admin_1', 'District', 'Posto', 'Localidade'];
+import { registerI18nResource } from '@/utils/i18n';
+const ADMIN_COLUMNS = [
+  "Admin_1",
+  "Admin_2",
+  "Admin_3",
+  "Admin_4",
+  "Region",
+  "Regions",
+  "Região",
+  "Regiões",
+  "Province",
+  "Provinces",
+  "Província",
+  "Províncias",
+  "District",
+  "Districts",
+  "Distrito",
+  "Distritos",
+  "Posto",
+  "Postos",
+  "Localidade",
+  "Localidades",
+];
 
 // ----- API Response Types -----
 export interface ApiFilterField {
@@ -16,28 +38,38 @@ export interface ApiFilterField {
 export interface ApiScenario {
   id: number;
   name: string;
+  name_pt?: string;
+  description?: string;
+  description_pt?: string;
   model_file: string | null;
 }
 export interface ColorCoding {
   color: string;
   value: string;
 }
+
 export interface ApiModelResponse {
   id: number;
   name: string;
+  name_pt: string;
+  description: string;
+  description_pt?: string;
   filter_fields: ApiFilterField[];
   popup_fields: ApiFilterField[];
-  summary_fields: ApiFilterField[];
+  summary_fields: Field[];
   scenarios: ApiScenario[];
   visualization_column: string | null; // for main column
   color_coding: ColorCoding[]
+  metric_field_types: Record<string, string>
 }
 
-export interface ApiVectorResult {
+export interface ApiFileResult {
   id: number;
   name: string;
-  description: string;
-  source: string;
+  name_pt: string;
+  description?: string;
+  description_pt?: string;
+  source?: string;
   created: string;
   updated: string;
   created_by: string;
@@ -50,7 +82,7 @@ export interface ApiVectorResult {
 
 export interface ApiVectorsResponse {
   count: number;
-  results: ApiVectorResult[];
+  results: ApiFileResult[];
 }
 
 export interface ApiModelsResponse {
@@ -98,7 +130,7 @@ export function transformOptions(
 
   return options.map(opt => {
       return {
-        value: String(opt),
+        id: String(opt),
         label: makeLabel(String(opt)),
         color: colorLookup?.get(opt) ?? undefined
       };
@@ -116,17 +148,19 @@ export function deriveSource(id: string, filePath: string) {
   };
 }
 
-export function deriveLayerStyles(sourceId: string, color: string): { circleLayer: LayerProps; lineLayer: LayerProps, polygonLayer:LayerProps } {
+export function deriveLayerStyles(sourceId: string, color: string, opacity: number = 1): { circleLayer: LayerProps; lineLayer: LayerProps, polygonLayer:LayerProps } {
   return {
     circleLayer: {
       id:`${sourceId}-circle-layer`,
       source: sourceId,
       'source-layer': mapConfig.sourceLayerName,
       type: 'circle',
-      //@TODO: style
-      "paint": {
+      paint: {
         "circle-color": color,
-        "circle-radius": 2
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 2, 10, 5, 15, 6],
+        "circle-opacity": 0.8 * opacity,
+        "circle-stroke-color": "#fff",
+        "circle-stroke-width": ["interpolate", ["linear"], ["zoom"], 5, 0, 10, 0.5, 15, 1],
       },
       filter: ["==", ["geometry-type"], "Point"],
     },
@@ -135,9 +169,10 @@ export function deriveLayerStyles(sourceId: string, color: string): { circleLaye
       source: sourceId,
       'source-layer': mapConfig.sourceLayerName,
       type: 'line',
-      //@TODO: style
-      "paint": {
-        "line-color":  color
+      paint: {
+        "line-color": color,
+        "line-width": ["interpolate", ["linear"], ["zoom"], 5, 0.5, 10, 1.5, 15, 3],
+        "line-opacity": 0.8 * opacity,
       },
       filter: ["==", ["geometry-type"], "LineString"],
     },
@@ -146,29 +181,43 @@ export function deriveLayerStyles(sourceId: string, color: string): { circleLaye
       source: sourceId,
       'source-layer': mapConfig.sourceLayerName,
       type: 'fill',
-      //@TODO: style
-      "paint": {
-        "fill-color": color
+      paint: {
+        "fill-color": color,
+        "fill-opacity": 0.5 * opacity,
+        "fill-outline-color": color,
       },
       filter: ["==", ["geometry-type"], "Polygon"]
     },
   };
 }
 
-export async function fetchModels(): Promise<ModelGroupMetadata[]> {
+export async function fetchModels(signal?: AbortSignal, token?: string| null): Promise<ModelGroupMetadata[]> {
   try {
-    const { data } = await api.get('model/');
+    const { data } = await api.get('model/', { signal, ...(token && {
+        headers: { 'Authorization': `Token ${token}` }
+      }), });
     // @TODO return models as it is. Returning lcoe and mini grids until data getting ingested.
-    return data.results;
+    const models = data.results as ModelGroupMetadata[];
+
+    models.forEach((m) => {
+      registerI18nResource(`model.${m.id}`, {
+        name: { en: m.name, pt: m.name_pt },
+        description: { en: m.description, pt: m.description_pt },
+      });
+    });
+
+    return models;
   } catch(e) {
     console.error(e);
     throw new Error('failed to fetch models');
   }
 }
 
-export async function fetchModelMetadata(slug: string): Promise<ApiModelResponse> {
+export async function fetchModelMetadata(slug: string, signal?: AbortSignal, token?: string | null): Promise<ApiModelResponse> {
   try {
-    const { data } = await api.get(`model/${slug}/`);
+    const { data } = await api.get(`model/${slug}/`, { signal, ...(token && {
+        headers: { 'Authorization': `Token ${token}` }
+      }), });
     return data;
   } catch(e) {
     console.error(e);
@@ -176,10 +225,11 @@ export async function fetchModelMetadata(slug: string): Promise<ApiModelResponse
   }
 }
 
-export async function fetchVectors({ modelId, token }: { modelId?: string, token?: string | null} = {}): Promise<ApiVectorResult[]> {
+export async function fetchVectors({ modelId, token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiFileResult[]> {
   try {
-    const endpoint = modelId? `vector/?model=${modelId}`: 'vector/';
+    const endpoint = `vector/`;
     const { data } = await api.get(endpoint, {
+      signal,
       ...(token && {
         headers: { 'Authorization': `Token ${token}` }
       }),
@@ -187,7 +237,7 @@ export async function fetchVectors({ modelId, token }: { modelId?: string, token
         params: { 'model': modelId }
       })
     });
-    const results: ApiVectorResult[] = data.results;
+    const results: ApiFileResult[] = data.results;
 
     return results.map((v, idx) => ({
       ...v,
@@ -200,66 +250,121 @@ export async function fetchVectors({ modelId, token }: { modelId?: string, token
   }
 }
 
-interface FilterOptionsResponseString {
-  key: string;
-  type: 'string';
-  count: number;
-  values: Record<string, number>;
-}
-
-interface FilterOptionsResponseNumeric {
-  key: string;
-  type: 'numeric';
-  count: number;
-  min: number;
-  max: number;
-  sum: number;
-}
-
-export async function fetchFilterOptions(scenarioId: string | number, column: string): Promise<string[] | number[] | null> {
+export async function fetchReferences({ token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiFileResult[]> {
   try {
-    const { data, status } = await api.get(`scenario/${scenarioId}/summary/${column}/`);
-    if (status !== 200) {
-      console.warn(`fetchFilterOptions: ${column} returned status ${status}, using fallback`);
-      return [];
-    }
-    if (data.type === 'numeric') {
-      return [Math.floor(data.min), Math.ceil(data.max)];
-    }
-    return sortFilterOptions(Object.keys(data.values));
+    const endpoint = `reference/`;
+    const { data } = await api.get(endpoint, {
+      signal,
+      ...(token && {
+        headers: { 'Authorization': `Token ${token}` }
+      })
+    });
+    const results: ApiFileResult[] = data.results;
+
+    return results;
   } catch(e) {
-    console.warn(`fetchFilterOptions: ${column} failed, using fallback`, e);
-    return [];
+    console.error(e);
+    throw new Error('Failed to fetch vectors');
   }
+}
+
+export async function fetchAllFilterOptions(
+  scenarioId: string | number,
+  columns: string[],
+  signal?: AbortSignal,
+): Promise<Record<string, string[] | number[] | null>> {
+  try {
+    const fields = columns.join(',');
+    const { data, status } = await api.get(
+      `scenario/${scenarioId}/summaries/`,
+      { signal, params: { fields } },
+    );
+    if (status !== 200) {
+      console.warn(`fetchAllFilterOptions: returned status ${status}, using fallback`);
+      return Object.fromEntries(columns.map(c => [c, []]));
+    }
+    const result: Record<string, string[] | number[] | null> = {};
+    for (const column of columns) {
+      try {
+        const summary = data.summaries?.[column];
+        if (!summary) {
+          result[column] = [];
+        } else if (summary.type === 'numeric') {
+          result[column] = [Math.floor(summary.min), Math.ceil(summary.max)];
+        } else {
+          result[column] = sortFilterOptions(Object.keys(summary.values));
+        }
+      } catch {
+        result[column] = [];
+      }
+    }
+    return result;
+  } catch(e) {
+    console.warn(`fetchAllFilterOptions failed, using fallback`, e);
+    return Object.fromEntries(columns.map(c => [c, []]));
+  }
+}
+
+export function replaceSummaryIdColumn(fields: Field[], metricField: Record<string,string>): Field[] {
+  return fields.map(f => {
+    const groupBy = typeof f.group_by === 'string' ? [f.group_by] : f.group_by;
+    const idField = f.columns.includes('id');
+    if (idField) {
+      // Replace 'id' in summary field columns with the main visualization column
+      // @TODO: Falling back to Posto should not happen
+      const filedNameToReplace = Object.keys(metricField).find(value => value !=='id') || 'Posto';
+      const newFields = [...f.columns.filter(c => c !== 'id'), filedNameToReplace];
+      return { ...f, columns: newFields, group_by: groupBy };
+    }
+    return groupBy !== f.group_by ? { ...f, group_by: groupBy } : f;
+  });
 }
 
 // Transform model metadata - give source definition to scenario
 export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetadata, 'filters' | 'layers'> & { filterFields: ApiFilterField[]; colorCoding: ColorCoding[] } {
   const modelId = String(apiModel.id);
 
+  registerI18nResource(`model.${modelId}`, {
+    name: { en: apiModel.name, pt: apiModel.name_pt },
+    description: { en: apiModel.description, pt: apiModel.description_pt },
+  });
+
   const scenarios: Scenario[] = apiModel.scenarios
     // @TODO: Filtering LCOE model until performance improvement
-    .filter(s => s.id !== 1)
+    // .filter(s => s.id !== 1)
     .filter(s => s.model_file !== null)
-    .map(s => ({
-      id: String(s.id),
-      label: s.name,
-      source: deriveSource(String(s.id), s.model_file!),
-      layer: {
-        id: `${s.id}-main`,
-        source: String(s.id),
-        'source-layer': mapConfig.sourceLayerName,
-        type: 'fill' as const,
-      },
-    }));
+    .map(s => {
+      registerI18nResource(`scenario.${s.id}`, {
+        name: { en: s.name, pt: s.name_pt },
+        ...(s.description && { description: { en: s.description, pt: s.description_pt } }),
+      });
+
+      return {
+        id: String(s.id),
+        name: s.name,
+        name_pt: s.name_pt,
+        label: s.name,
+        description: s.description,
+        source: deriveSource(String(s.id), s.model_file!),
+        layer: {
+          id: `${s.id}-main`,
+          source: String(s.id),
+          'source-layer': mapConfig.sourceLayerName,
+          type: 'fill' as const,
+        },
+      };
+    });
   // whwen visuaslization column is empty or null
   const mainColumn = (!apiModel.visualization_column || apiModel.visualization_column === '')? DEFAULT_COL: apiModel.visualization_column;
   const mainField = apiModel.filter_fields.find(f => f.column === mainColumn);
 
+  //@NOTE: ID column should be replaced to something else to make summary work
+  const summaryFields = replaceSummaryIdColumn(apiModel.summary_fields, apiModel.metric_field_types);
+
   const main: Main = {
     id: slugify(mainColumn) + 'main-ids',
     column: mainColumn,
-    label: mainField?.label || mainColumn,
+    label: mainField?.label || makeLabel(mainColumn),
     description: mainField?.description,
     options: [], // Options fetched separately
   };
@@ -269,23 +374,34 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
     title: apiModel.name,
     scenarios,
     main,
-    popupFields: apiModel.popup_fields,
-    summaryFields: apiModel.summary_fields,
+    popupFields: apiModel.popup_fields.map(f => ({
+      columns: [f.column],
+      label: f.label,
+      description: f.description,
+    })),
+    summaryFields: summaryFields,
     filterFields: apiModel.filter_fields,
     colorCoding: apiModel.color_coding ?? [],
   };
 }
 
 // Transform vectors to layers
-export function transformVectorsToLayers(apiVectors: ApiVectorResult[]): Layer[] {
+export function transformVectorsToLayers(apiVectors: ApiFileResult[]): Layer[] {
   return apiVectors.map(v => {
     const sourceId = String(v.id) + 'vector-source';
+
+    registerI18nResource(`layer.${sourceId}`, {
+      label: { en: v.name, pt: v.name_pt },
+      description: { en: v.description?? '', pt: v.description_pt },
+    });
+
     return {
       id: sourceId,
       label: v.name,
       description: v.description,
       filePath: v.raw_file,
       color: v.color,
+      layerType: 'vector' as const,
     };
   });
 }
@@ -309,37 +425,27 @@ export function transformFilterField(
 
 // Transform main options using color_coding from backend
 export function transformMainOptions(
-  rawOptions: MapItemUnit[] | null,
   colorCoding: ColorCoding[]
 ): MapItemUnit[] {
-  if (!Array.isArray(rawOptions)) return [];
-
   // Find default color (value: "any")
   const defaultColor = colorCoding.find(c => c.value === DEFAULT_COL)?.color;
+
+  const options = colorCoding
+    .filter(c => c.value && c.value !== DEFAULT_COL && c.color)
+    .map(c => ({
+      id: c.value,
+      label: makeLabel(c.value),
+      color: c.color,
+    }));
+
   // When options are missing (ex. no column to visualize)
-  if (rawOptions.length === 0) {
+  if (options.length === 0) {
     return [{
-      value: DEFAULT_COL,
+      id: DEFAULT_COL,
       label: DEFAULT_COL,
       color: defaultColor,
     }];
   }
-  // Build color lookup map
-  const colorLookup = new Map(
-    colorCoding
-      .filter(c => c.value && c.color)
-      .map(c => [c.value, c.color])
-  );
 
-  return rawOptions.map(opt => ({
-    value: String(opt.value),
-    label: opt.label,
-    color: colorLookup.get(String(opt.value)) ?? defaultColor,
-  }));
-}
-
-// @TODO: this will need to be filtered by scenario id
-export async function getVectorData() {
-  const apiVectors = await fetchVectors();
-  return apiVectors;
+  return options;
 }

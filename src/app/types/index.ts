@@ -1,14 +1,21 @@
 import type { SourceProps } from "react-map-gl/maplibre";
 export interface ItemUnit {
-  value: string;
+  id: string;
   label: string;
   description?: string;
 }
 export interface Field {
-  column: string;
+  columns: string[];
   label: string;
   description?: string;
+  category?: string;
+  group_by?: string[];
+  method?: 'count' | 'min' | 'max' | 'sum' | 'average';
   unit?: string;
+  chartType?: 'bar' | 'donut' | 'stacked' | 'highlight';
+  colors?: Record<string, string>;
+  showChartValueRows?: boolean;
+  showBarChartAverage?: boolean;
 }
 export interface MapItemUnit extends ItemUnit {
   color?: string;
@@ -16,12 +23,7 @@ export interface MapItemUnit extends ItemUnit {
 
 export enum FilterType { numeric = 'numeric', checkbox = 'checkbox', admin='admin'};
 
-interface BaseScenarioFilter {
-  id: string;
-  column: string;
-  label: string;
-  description?: string;
-}
+type BaseScenarioFilter = ItemUnit & { column: string };
 interface NumericScenarioFilter extends BaseScenarioFilter {
   type: FilterType.numeric;
   options: [number, number]
@@ -41,6 +43,8 @@ export type FilterOptionValues = [number, number] | string[] | ItemUnit[];
 
 export interface Scenario {
   id: string;
+  name: string;
+  name_pt?: string;
   label: string;
   description?: string;
   source: SourceProps,
@@ -51,13 +55,13 @@ export interface Scenario {
   }
 }
 
-export interface Layer {
-  id: string;
-  label: string;
-  description?: string;
+export interface Layer extends ItemUnit {
   filePath: string;
   downloadLink?: string;
   color?: string;
+  layerType?: 'vector' | 'raster';
+  rasterStats?: { min: number; max: number };
+  isRgb?: boolean;
 }
 
 export interface Main extends BaseScenarioFilter {
@@ -77,5 +81,8 @@ export interface ModelMetadata {
 export interface ModelGroupMetadata {
   id: string;
   name: string;
+  name_pt?: string;
   description: string;
+  scenarios: Array<{ vector_dataset: { id: number } | null }>;
+  description_pt?: string;
 }

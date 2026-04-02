@@ -1,7 +1,12 @@
+'use client';
+
 import { Box, Heading, Text, Button, Image, VStack } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { useTranslation } from "react-i18next";
 
 export default function Home() {
+  const { t } = useTranslation();
+
   return (
     <Box h="calc(100vh - 57px)" display="flex">
       <Box
@@ -12,16 +17,13 @@ export default function Home() {
         px={{ base: 4, md: 8 }}
         py={8}
       >
-        <VStack gap={6} maxW="lg" align="start">
-          <Heading as="h1" size="5xl" textTransform="uppercase" fontWeight="900" lineHeight="1" letterSpacing="0.8px">
-            <span style={{ fontWeight: "300" }}>Mozambique</span> <br />
-            Proenergia+ IEP
+        <VStack gap={6} maxW="4xl" align="start">
+          <Heading as="h1" size={{base: "3xl", md: "4xl"}} textTransform="uppercase" fontWeight="900" lineHeight="1" letterSpacing="0.8px">
+            <span style={{ fontWeight: "300" }}>{t('home.countryName')}</span> <br />
+            {t('home.title')}
           </Heading>
           <Text fontSize="lg" color="gray.600">
-            A web platform for integrated energy planning and analysis in
-            Mozambique. Proenergia+ IEP aims to increase access to energy and
-            broadband services in project areas and strengthen the operational
-            performance of the electric utility.
+            {t('home.description')}
           </Text>
           <Box
             pt={4}
@@ -31,10 +33,10 @@ export default function Home() {
             width="full"
           >
             <Button asChild size="lg" variant="outline">
-              <NextLink href="/about">Learn More</NextLink>
+              <NextLink href="/about">{t('home.learnMore')}</NextLink>
             </Button>
-            <Button asChild size="lg" variant="solid" colorPalette="yellow">
-              <NextLink href="/models">View Models</NextLink>
+            <Button asChild size="lg" variant="solid" colorPalette="orange">
+              <NextLink href="/models">{t('home.viewModels')}</NextLink>
             </Button>
           </Box>
         </VStack>
@@ -47,8 +49,8 @@ export default function Home() {
       >
         <Image
           src="/landing-image1.png"
-          alt="Energy infrastructure illustration"
-          style={{ height: "100%", objectFit: "cover" }}
+          alt={t('home.imageAlt')}
+          style={{ height: "100%", width: "100%", objectFit: "cover" }}
         />
       </Box>
     </Box>

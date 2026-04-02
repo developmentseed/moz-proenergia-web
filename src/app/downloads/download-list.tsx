@@ -3,23 +3,38 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { SimpleGrid, Box, Spinner, Center, Text } from "@chakra-ui/react";
+import { useTranslation } from "react-i18next";
+import { MEDIA_URL_PREFIX } from "@/utils/api";
 import { useAuth } from "@/utils/context/auth";
 import { DownloadDataCard } from "@/components/chakra/card";
 import { Search } from "@/components/ui/search";
-import { fetchVectors } from "@/utils/data-transformation";
+import { fetchVectors, fetchReferences } from "@/utils/data-transformation";
+import { fetchRasters } from "@/utils/map/cog";
 
 export const DownloadList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { token, isAuthenticated } = useAuth();
+  const { t } = useTranslation();
 
   const { data, isLoading } = useQuery({
     queryKey: ['vector', token],
-    queryFn: () => fetchVectors({ token })
+    queryFn: ({ signal }) => fetchVectors({ token, signal })
   });
 
-  const filteredData = data?.filter((item) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.description.toLowerCase().includes(searchQuery.toLowerCase())
+  const { data: rasterData, isLoading: isLoadingRasters } = useQuery({
+    queryKey: ['raster', token],
+    queryFn: ({ signal }) => fetchRasters({ token, signal })
+  });
+
+    const { data: referenceData, isLoading: isLoadingReference } = useQuery({
+    queryKey: ['reference', token],
+    queryFn: ({ signal }) => fetchReferences({ token, signal })
+  });
+  const allData = [...(data ?? []), ...(rasterData ?? []), ...(referenceData ?? [])];
+
+  const filteredData = allData.filter((item) =>
+    item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
   if (!isAuthenticated) {
         return (
@@ -29,10 +44,10 @@ export const DownloadList = () => {
     );
   }
 
-  if (isLoading) {
+  if (isLoading || isLoadingRasters || isLoadingReference) {
     return (
       <Center py={10}>
-        <Spinner size="lg" />
+        <Spinner colorPalette="orange" color="colorPalette.600" size="lg" />
       </Center>
     );
   }
@@ -43,22 +58,24 @@ export const DownloadList = () => {
         <Search
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search datasets..."
+          placeholder={t('downloads.searchPlaceholder')}
         />
       </Box>
 
       {filteredData?.map((item) => (
         <DownloadDataCard
-          key={item.id}
+          key={item.id + item.name}
           title={item.name}
           description={item.description}
           source={item.source}
           updated={item.updated}
-          downloadUrl={item.raw_file}
+          downloadUrl={`${MEDIA_URL_PREFIX}${item.raw_file}`}
           highlight={searchQuery}
         />
       ))}
-      {!filteredData || filteredData.length === 0 && <Center py={10}> No data found</Center>}
+      {(!filteredData || filteredData.length === 0) && (
+        <Center py={10}>{t('downloads.noData')}</Center>
+      )}
     </SimpleGrid>
   );
 };

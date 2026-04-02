@@ -1,6 +1,6 @@
 import {
   Popover as ChakraPopover,
-  Button,
+  IconButton,
   type IconButtonProps,
   Portal,
 } from "@chakra-ui/react";
@@ -66,7 +66,7 @@ export const InfoTip = (props: InfoTipProps) => {
     const { children, buttonProps, ...rest } = props;
     return (
       <ToggleTip content={children} {...rest} >
-        <Button
+        <IconButton
           variant="ghost"
           aria-label="info"
           size="2xs"
@@ -74,7 +74,7 @@ export const InfoTip = (props: InfoTipProps) => {
           {...buttonProps}
         >
           <LuInfo />
-        </Button>
+        </IconButton>
       </ToggleTip>
     );
   };

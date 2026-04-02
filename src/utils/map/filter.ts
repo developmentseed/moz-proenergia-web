@@ -1,5 +1,6 @@
-import { type FilterSpecification } from "maplibre-gl";
-import { type Filter } from "@/app/types";
+import { type FilterSpecification, type ExpressionSpecification } from "maplibre-gl";
+import { type Filter, type Main } from "@/app/types";
+import { DEFAULT_COL } from "@/utils/api";
 
 export function buildExpressionWithFilter(filterRef: Filter[], filters: Record<string,unknown>): (FilterSpecification | null) {
   const conditions: FilterSpecification[] = [];
@@ -12,8 +13,8 @@ export function buildExpressionWithFilter(filterRef: Filter[], filters: Record<s
           const [min, max] = filterValue as [number, number];
           conditions.push(
             ["all",
-              [">=", ["get", filterDef.column], min],
-              ["<=", ["get", filterDef.column], max]
+              [">=", ["to-number",["get", filterDef.column]], min],
+              ["<=", ["to-number",["get", filterDef.column]], max]
             ]
           );
           break;
@@ -34,4 +35,16 @@ export function buildExpressionWithFilter(filterRef: Filter[], filters: Record<s
 
     // Return combined filter or null if no conditions found.
     return conditions.length > 0 ? ["all", ...conditions] as FilterSpecification : null;
+}
+
+// For cases where visualization doesn't have any options, returns DEFAULT value (pue)
+export function buildMatchExpression(main: Main, fallback: string): ExpressionSpecification | string {
+  if (!main.options.length) return fallback;
+  return [
+    'match',
+    main.column === DEFAULT_COL ? ['literal', DEFAULT_COL] : ['get', main.column],
+    // Color should not be empty. Giving neon green color to bring awarness to user
+    ...main.options.flatMap((val) => val.color? [val.id, val.color]: [val.id, "#0f0"]),
+    '#CCCCCC',
+  ] as ExpressionSpecification;
 }
