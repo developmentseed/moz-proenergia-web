@@ -4,6 +4,7 @@ import { useState } from "react";
 import { type CheckboxCheckedChangeDetails, Text, Box, Switch, IconButton } from "@chakra-ui/react";
 import { LuInfo } from "react-icons/lu";
 import { MEDIA_URL_PREFIX } from "@/utils/api";
+import { useAuth } from "@/utils/context/auth";
 import { DownloadButton } from "@/components/chakra/download-button";
 import { ModalDialog } from "@/components/chakra/modal";
 import { type Layer } from "@/app/types";
@@ -24,6 +25,7 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
   const onCheckedChange = (details: CheckboxCheckedChangeDetails) => {
     onChange({ [layer.id]: details.checked as boolean });
   };
+  const { isAuthenticated } = useAuth();
 
   return (
     <>
@@ -43,7 +45,7 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
           )}
         </Box>
         <Box display="flex" alignItems="center" gap="2">
-          {layer.filePath && <DownloadButton url={`${MEDIA_URL_PREFIX}${layer.filePath}`} label={`Download ${layerLabel}`} />}
+          {layer.filePath && isAuthenticated && <DownloadButton url={`${MEDIA_URL_PREFIX}${layer.filePath}`} label={`Download ${layerLabel}`} />}
           <Switch.Root value={layer.id} onCheckedChange={onCheckedChange} checked={selected}>
             <Switch.HiddenInput />
             <Switch.Control>

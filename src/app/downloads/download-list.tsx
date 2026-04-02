@@ -36,7 +36,7 @@ function dedupeById<T extends { id: number }>(items: T[]): T[] {
 export const DownloadList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedModelIds, setSelectedModelIds] = useState<string[]>([]);
-  const { token } = useAuth();
+  const { token, isAuthenticated } = useAuth();
   const { t } = useTranslation();
 
   const hasFilter = selectedModelIds.length > 0;
@@ -107,6 +107,13 @@ export const DownloadList = () => {
       ),
     [allData, searchQuery],
   );
+  if (!isAuthenticated) {
+        return (
+          <Center py={10}>
+            <Text>Access not allowed</Text>
+          </Center>
+    );
+  }
 
   // ── Tag queries ───────────────────────────────────────────────────────────
   // Background per-model queries used only to build the model→dataset map for
@@ -160,7 +167,7 @@ export const DownloadList = () => {
       prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id],
     );
   };
-console.log(filteredData)
+
   return (
     <Flex gap={8} align="flex-start" direction={{ base: "column", md: "row" }}>
       {/* Filter sidebar */}
