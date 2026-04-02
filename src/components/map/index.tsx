@@ -142,11 +142,10 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
             position="bottom-left"
             collapsed={true}
             countries="mz"
-            reverseGeocode={true}
             marker={false}
             showResultsWhileTyping={true}
             clearAndBlurOnEsc={true}
-            zoom={12}
+            zoom={16}
           />
           <CenterMapControl />
           <BasemapSelector
