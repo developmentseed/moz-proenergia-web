@@ -9,6 +9,7 @@ import {
   useFilter,
   useListCollection
 } from "@chakra-ui/react";
+import { zIndex } from "@/components/ui/constant";
 import { useTranslation } from "react-i18next";
 
 interface ChakraComboboxProps {
@@ -55,7 +56,7 @@ export const ChakraCombobox = ({ title, items, value, onChange }: ChakraCombobox
       </Combobox.Control>
       <Portal>
         <Combobox.Positioner>
-          <Combobox.Content>
+          <Combobox.Content zIndex={zIndex.combobox}>
             <Combobox.Empty>{t('filters.noItemsFound')}</Combobox.Empty>
             {collection.items.map((item) => (
               <Combobox.Item item={item} key={item.id}>

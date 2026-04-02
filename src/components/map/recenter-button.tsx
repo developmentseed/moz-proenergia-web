@@ -10,7 +10,7 @@ import {
   DEFAULT_ZOOM,
 } from "@/utils/context/map-coords";
 import { useMapCoords } from "@/utils/context/map-coords";
-import { controlZIndex } from "./control-constant";
+import { zIndex } from "@/components/ui/constant";
 
 export function CenterMapControl() {
   const { current: map } = useMap();
@@ -39,7 +39,7 @@ export function CenterMapControl() {
       left="10px"
       size="xs"
       variant="surface"
-      zIndex={controlZIndex}
+      zIndex={zIndex.mapControl}
       onClick={resetCenter}
       _hover={{ bg: "bg.muted" }}
       disabled={isInitialViewState}

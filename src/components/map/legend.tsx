@@ -5,7 +5,8 @@ import { Box, VStack, HStack, Text, Separator, ScrollArea, IconButton } from '@c
 import { LuInfo, LuDroplet } from 'react-icons/lu';
 import { type MapItemUnit, type Main } from '@/app/types';
 import { useContextualLayers } from '@/utils/context/contextual-layers';
-import { controlZIndex, mapControlCommonStyleProps } from './control-constant';
+import { mapControlCommonStyleProps } from './control-constant';
+import { zIndex } from '@/components/ui/constant';
 import { LayerEntry } from './layer-entry';
 import { OpacityControl } from './opacity-control';
 import { ModalDialog } from '@/components/chakra/modal';
@@ -38,7 +39,7 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
         right={3}
         p={2}
         {...mapControlCommonStyleProps}
-        zIndex={controlZIndex}
+        zIndex={zIndex.mapControl}
         minW="150px"
       >
         <VStack align="stretch" gap={2}>

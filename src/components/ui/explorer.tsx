@@ -12,6 +12,7 @@ import NextLink from "next/link";
 import MainMap from "@/components/map";
 import { LuPanelLeftOpen, LuPanelLeftClose, LuPanelRightOpen, LuPanelRightClose } from "react-icons/lu";
 import { useAuth } from "@/utils/context/auth";
+import { zIndex } from "./constant";
 import {
   fetchModelMetadata,
   fetchVectors,
@@ -87,7 +88,7 @@ const ExplorerInner = () => {
           }
           top="8"
           transform="translateY(-50%)"
-          zIndex={1000}
+          zIndex={zIndex.mapControl}
           transition={`left ${AnimationTime} ease`}
         >
           <IconButton
@@ -133,7 +134,7 @@ const ExplorerInner = () => {
           }
           top="8"
           transform="translateY(-50%)"
-          zIndex={1000}
+          zIndex={zIndex.mapControl}
           transition={`right ${AnimationTime} ease`}
         >
           <IconButton
