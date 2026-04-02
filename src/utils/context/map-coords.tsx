@@ -1,7 +1,7 @@
 'use client';
 
-import { createContext, useContext, useEffect, useCallback, useMemo, type ReactNode } from 'react';
-import { useQueryStates, parseAsFloat, throttle } from 'nuqs';
+import { createContext, useContext, useCallback, useMemo, type ReactNode } from 'react';
+import { useQueryStates, parseAsFloat } from 'nuqs';
 
 export const DEFAULT_COORDS = [-18.76303, 36.78403];
 export const DEFAULT_ZOOM = 5;
@@ -27,9 +27,7 @@ type MapCoordsContextType = {
 const MapCoordsContext = createContext<MapCoordsContextType | null>(null);
 
 export function MapCoordsProvider({ children }: { children: ReactNode }) {
-  const [coords, setOriginCoords] = useQueryStates(coordinateParsers, {
-    limitUrlUpdates: throttle(500),
-  });
+  const [coords, setOriginCoords] = useQueryStates(coordinateParsers);
 
   const setCoords = useCallback(
     ({ lat, lng, zoom }: Coordinates) => {
@@ -45,14 +43,6 @@ export function MapCoordsProvider({ children }: { children: ReactNode }) {
   const removeCoordinates = useCallback(() => {
     setOriginCoords({ lat: null, lng: null, zoom: null });
   }, [setOriginCoords]);
-
-  // Clean up URL params when leaving model pages (provider unmounts)
-  useEffect(() => {
-    return () => {
-      removeCoordinates();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const value = useMemo(
     () => ({ coords, setCoords, removeCoordinates }),

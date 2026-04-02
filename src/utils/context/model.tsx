@@ -1,7 +1,6 @@
 'use client';
 
 import { createContext, useContext, ReactNode, useMemo } from 'react';
-import { useQueryState, parseAsString } from 'nuqs';
 import { ModelMetadata } from '@/app/types';
 
 type ModelContextType = {
@@ -14,14 +13,15 @@ const ModelContext = createContext<ModelContextType | null>(null);
 
 export function ModelProvider({
   model,
+  scenarioId,
+  setScenarioId,
   children
 }: {
   model: ModelMetadata;
+  scenarioId: string;
+  setScenarioId: (param: string) => void;
   children: ReactNode;
 }) {
-  const initialScenario = model.scenarios[0];
-  const [scenarioId, setScenarioId] = useQueryState('scenario', parseAsString.withDefault(initialScenario.id));
-
   const value = useMemo(() => ({
     model,
     scenarioId,
