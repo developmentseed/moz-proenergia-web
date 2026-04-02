@@ -15,5 +15,14 @@ When not using Docker
 gdalwarp /srv/${source}.tif /srv/${dest}.tif -of COG -t_srs EPSG:3857 -co BLOCKSIZE=256 -co TILING_SCHEME=GoogleMapsCompatible
 ```
 
-Read more from MaplibreGL COG Protocol repo: [https://github.com/geomatico/maplibre-cog-protocol?tab=readme-ov-file#cog-generation-tips](https://github.com/geomatico/maplibre-cog-protocol?tab=readme-ov-file#cog-generation-tips)
+#### RGB data (Satellite imagery)
 
+```
+docker run --rm -v .:/srv ghcr.io/osgeo/gdal:alpine-small-3.9.1 gdalwarp /srv/<source>.tif /srv/<target>.tif -of COG -t_srs EPSG:3857 -co BLOCKSIZE=256 -co TILING_SCHEME=GoogleMapsCompatible -co COMPRESS=JPEG -co OVERVIEWS=IGNORE_EXISTING -co ADD_ALPHA=NO -dstnodata NaN
+```
+When not using docker 
+```
+gdalwarp /srv/<source>.tif /srv/<target>.tif -of COG -t_srs EPSG:3857 -co BLOCKSIZE=256 -co TILING_SCHEME=GoogleMapsCompatible -co COMPRESS=JPEG -co OVERVIEWS=IGNORE_EXISTING -co ADD_ALPHA=NO -dstnodata NaN
+```
+
+Read more from MaplibreGL COG Protocol repo: [https://github.com/geomatico/maplibre-cog-protocol?tab=readme-ov-file#cog-generation-tips](https://github.com/geomatico/maplibre-cog-protocol?tab=readme-ov-file#cog-generation-tips)
