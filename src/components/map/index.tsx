@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useCallback, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Map,
+  useMap,
   ViewStateChangeEvent,
   NavigationControl,
   ScaleControl,
@@ -43,13 +44,25 @@ const transformRequest: RequestTransformFunction = (url, resourceType) => {
   return { url };
 };
 
+// Lives inside <Map> so it can call useMap(); exposes flyTo via a callback ref.
+const FlyToHandler = ({ onReady }: { onReady: (fn: (lng: number, lat: number) => void) => void }) => {
+  const { current: map } = useMap();
+  useEffect(() => {
+    if (map) onReady((lng, lat) => map.flyTo({ center: [lng, lat], zoom: 14 }));
+  }, [map, onReady]);
+  return null;
+};
+
+export type FlyToFn = (lng: number, lat: number) => void;
+
 interface MainMapProps {
   main: Main;
   onClick: (event: MapLayerMouseEvent) => void;
   clusterId: string | null;
+  onFlyToRef: React.RefObject<FlyToFn | null>;
 }
 
-const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
+const MainMap = ({ main, onClick, clusterId, onFlyToRef }: MainMapProps) => {
   const { coords, setCoords } = useMapCoords();
   const { lat, lng, zoom } = coords;
 
@@ -127,6 +140,7 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
           transformRequest={transformRequest}
           interactiveLayerIds={zoom > 9 ? [main.id, main.id + '-line', main.id + '-circle'] : []}
       >
+          <FlyToHandler onReady={(fn) => { onFlyToRef.current = fn; }} />
           <RasterContextualLayer beforeId={main.id + '-bg'} />
           <MainLayer
             scenario={scenario}
@@ -145,7 +159,7 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
             marker={false}
             showResultsWhileTyping={true}
             clearAndBlurOnEsc={true}
-            zoom={16}
+            zoom={12}
           />
           <CenterMapControl />
           <BasemapSelector

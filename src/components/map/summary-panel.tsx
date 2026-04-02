@@ -24,6 +24,7 @@ interface SummaryPanelProps {
   filterDefs: Filter[];
   resetCluster: () => void;
   onSelectCluster: (id: string) => void;
+  onFlyTo: (lng: number, lat: number) => void;
   main?: Main;
   isOpen: boolean;
   onToggle?: () => void;
@@ -66,29 +67,48 @@ const PanelHeader = ({ title, subtitle, onBack }: PanelHeaderProps) => (
   </Box>
 );
 
-interface ClusterSearchProps {
-  onSelectCluster: (id: string) => void;
+// Returns [lng, lat] if the value is "lat, lng" (comma required), otherwise null.
+// Auto-swaps if values appear reversed; rejects out-of-range values.
+function parseCoords(value: string): [number, number] | null {
+  const match = value.trim().match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
+  if (!match) return null;
+  let lat = parseFloat(match[1]);
+  let lng = parseFloat(match[2]);
+  if (Math.abs(lat) > 90 && Math.abs(lng) <= 90) [lat, lng] = [lng, lat];
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+  return [lng, lat];
 }
 
-const ClusterSearch = ({ onSelectCluster }: ClusterSearchProps) => {
+interface MapNavigatorProps {
+  onSelectCluster: (id: string) => void;
+  onFlyTo: (lng: number, lat: number) => void;
+}
+
+const MapNavigator = ({ onSelectCluster, onFlyTo }: MapNavigatorProps) => {
   const [value, setValue] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = value.trim();
-    if (trimmed) onSelectCluster(trimmed);
+    if (!trimmed) return;
+    const coords = parseCoords(trimmed);
+    if (coords) {
+      onFlyTo(coords[0], coords[1]);
+    } else {
+      onSelectCluster(trimmed);
+    }
   };
 
   return (
     <Box as="form" onSubmit={handleSubmit}>
       <ChakraField.Root>
         <ChakraField.Label fontSize="xs" color="fg.muted">
-          Navigate to cluster or site
+          Navigate to cluster, site, or coordinates
         </ChakraField.Label>
         <Flex gap={1} width="full">
           <Input
             size="sm"
-            placeholder="Enter cluster ID…"
+            placeholder="Enter cluster ID or lat, lng…"
             flexBasis="100%"
             value={value}
             onChange={(e) => setValue(e.target.value)}
@@ -97,12 +117,15 @@ const ClusterSearch = ({ onSelectCluster }: ClusterSearchProps) => {
             type="submit"
             size="sm"
             variant="surface"
-            aria-label="Navigate to cluster"
+            aria-label="Navigate to cluster or coordinates"
             disabled={!value.trim()}
           >
             <LuSearch />
           </IconButton>
         </Flex>
+        <ChakraField.HelperText fontSize="xs" color="fg.subtle">
+          Coordinates must be in <em>lat, lng</em> format
+        </ChakraField.HelperText>
       </ChakraField.Root>
     </Box>
   );
@@ -199,6 +222,7 @@ const SummaryPanel = ({
   filterDefs,
   resetCluster,
   onSelectCluster,
+  onFlyTo,
   main,
   isOpen,
   onToggle = () => {},
@@ -314,7 +338,7 @@ const SummaryPanel = ({
             </Box>
         ) :
             <Box p={4} borderTop="1px solid" borderColor="border">
-              <ClusterSearch onSelectCluster={onSelectCluster} />
+              <MapNavigator onSelectCluster={onSelectCluster} onFlyTo={onFlyTo} />
             </Box>
           }
         </Box>
@@ -344,7 +368,7 @@ const SummaryPanel = ({
           </Box>
         ) :
           <Box p={4} borderTop="1px solid" borderColor="border">
-            <ClusterSearch onSelectCluster={onSelectCluster} />
+            <MapNavigator onSelectCluster={onSelectCluster} onFlyTo={onFlyTo} />
           </Box>
           }
       </Box>
