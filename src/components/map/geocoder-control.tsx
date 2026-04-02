@@ -19,32 +19,35 @@ type GeocoderControlProps = Omit<MaplibreGeocoderOptions, 'maplibregl' | 'marker
   onError?: (e: object) => void;
 };
 
+// Zoom level used when navigating to entered coordinates.
+const COORD_ZOOM = 16;
+// Prefix used to identify synthetic coordinate features in results.
+const COORD_ID_PREFIX = 'coord-';
+
+// Returns [lng, lat] if the query is coordinate-shaped ("lat, lng" or "lat lng").
+// Auto-swaps if values appear reversed. Returns false (not null) when the shape
+// matches but values are out of range — caller should not fall back to geocoding.
+function parseCoords(query: string): [number, number] | false | null {
+  const match = String(query).trim().match(/^(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)$/);
+  if (!match) return null;
+  let lat = parseFloat(match[1]);
+  let lng = parseFloat(match[2]);
+  if (Math.abs(lat) > 90 && Math.abs(lng) <= 90) [lat, lng] = [lng, lat];
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return false;
+  return [lng, lat];
+}
+
 const geocoderApi: MaplibreGeocoderApi = {
   forwardGeocode: async (config) => {
-    const features: CarmenGeojsonFeature[] = [];
-
-    // Detect "lat, lng" or "lat lng" — e.g. "-25.123, 32.456" or "-25.123 32.456".
-    const rawQuery = String(config.query).trim();
-    const coordMatch = rawQuery.match(/^(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)$/);
-    if (coordMatch) {
-      let lat = parseFloat(coordMatch[1]);
-      let lng = parseFloat(coordMatch[2]);
-
-      // Auto-correct if the user entered lng, lat instead of lat, lng.
-      if (Math.abs(lat) > 90 && Math.abs(lng) <= 90) {
-        [lat, lng] = [lng, lat];
-      }
-
-      // Reject out-of-range values rather than flying to an invalid location.
-      if (Math.abs(lat) > 90 || Math.abs(lng) > 180) {
-        return { type: 'FeatureCollection', features: [] };
-      }
-
+    const coords = parseCoords(String(config.query));
+    if (coords === false) return { type: 'FeatureCollection', features: [] };
+    if (coords) {
+      const [lng, lat] = coords;
       const center: [number, number] = [lng, lat];
       return {
         type: 'FeatureCollection',
         features: [{
-          id: `coord-${lat}-${lng}`,
+          id: `${COORD_ID_PREFIX}${lat}-${lng}`,
           type: 'Feature',
           geometry: { type: 'Point', coordinates: center },
           place_name: `${lat}, ${lng}`,
@@ -56,6 +59,7 @@ const geocoderApi: MaplibreGeocoderApi = {
       };
     }
 
+    const features: CarmenGeojsonFeature[] = [];
     try {
       const params = new URLSearchParams({
         q: String(config.query),
@@ -68,11 +72,8 @@ const geocoderApi: MaplibreGeocoderApi = {
         params.set('viewbox', config.bbox.join(','));
         params.set('bounded', '1');
       }
-      if (config.countries) {
-        params.set('countrycodes', config.countries);
-      }
-      const request = `https://nominatim.openstreetmap.org/search?${params}`;
-      const response = await fetch(request);
+      if (config.countries) params.set('countrycodes', config.countries);
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?${params}`);
       const geojson = await response.json();
       for (const feature of geojson.features) {
         const center = [
@@ -93,7 +94,10 @@ const geocoderApi: MaplibreGeocoderApi = {
       console.error(`Failed to forwardGeocode with error: ${e}`);
     }
     return { type: 'FeatureCollection', features };
-  }
+  },
+
+  // Required by MaplibreGeocoderApi but unused — users don't click the map to reverse geocode.
+  reverseGeocode: async () => ({ type: 'FeatureCollection', features: [] }),
 };
 
 const noop = () => {};
@@ -143,7 +147,7 @@ export default function GeocoderControl(props: GeocoderControlProps) {
               // Prevent the geocoder from selecting a (potentially stale) place result.
               e.stopImmediatePropagation();
               const [lng, lat] = pendingCoordRef.current;
-              mapRef?.flyTo({ center: [lng, lat], zoom: 16 });
+              mapRef?.flyTo({ center: [lng, lat], zoom: COORD_ZOOM });
               pendingCoordRef.current = null;
             }
           }, { capture: true });
@@ -155,7 +159,7 @@ export default function GeocoderControl(props: GeocoderControlProps) {
         // If the geocoder selected a coord feature, re-fly at the correct zoom —
         // the geocoder's internal flyTo may use a different zoom.
         if (String(result?.id ?? '').startsWith('coord-') && result?.center) {
-          mapRef?.flyTo({ center: result.center as [number, number], zoom: 16 });
+          mapRef?.flyTo({ center: result.center as [number, number], zoom: COORD_ZOOM });
           return;
         }
         const location =
