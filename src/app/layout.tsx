@@ -51,7 +51,6 @@ export default function RootLayout({
                   <Box as="main" bg="bg">
                     {children}
                   </Box>
-                  {/* <footer> Footer</footer> */}
                 </AuthProvider>
               </Provider>
             </NuqsAdapter>

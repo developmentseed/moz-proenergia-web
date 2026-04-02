@@ -82,9 +82,7 @@ export default async function ModelPage({
       <Suspense>
         <SideNav models={models} currentSlug={slug} />
         <Box id='main-panel' width='full' height="100%">
-          {/* <HydrationBoundary state={dehydrate(queryClient)}> */}
           <Explorer modelId={model.id} />
-          {/* </HydrationBoundary> */}
         </Box>
       </Suspense>
     </Flex>
