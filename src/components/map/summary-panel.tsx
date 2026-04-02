@@ -7,7 +7,8 @@ import { useAuth } from "@/utils/context/auth";
 import { useModel } from "@/utils/context/model";
 import { LuChevronLeft, LuSearch, LuChevronsUpDown, LuChevronsDownUp } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
-import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
+import { mapControlCommonStyleProps } from "./control-constant";
+import { zIndex } from "@/components/ui/constant";
 import { type Field, type Filter, type Main } from "@/app/types";
 import { type SummaryData } from "@/app/types/summary";
 import { SummaryTable } from "@/components/chakra/summary-table";
@@ -277,7 +278,7 @@ const SummaryPanel = ({
         bottom={0}
         left={0}
         right={0}
-        zIndex={controlZIndex + 100}
+        zIndex={zIndex.mobileSummary}
         overflow="hidden"
         maxHeight={isOpen ? "80dvh" : "44px"}
         transition={`max-height ${AnimationTime} ease`}
@@ -335,7 +336,7 @@ const SummaryPanel = ({
         borderLeftColor="panelBorder"
         transition={`width ${AnimationTime} ease`}
         flexDirection="column"
-        zIndex={controlZIndex}
+        zIndex={zIndex.mapControl}
       >
         {summaryContent}
         {showingCluster ? (

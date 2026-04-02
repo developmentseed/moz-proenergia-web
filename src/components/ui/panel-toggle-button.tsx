@@ -1,4 +1,5 @@
 import { Box, IconButton } from "@chakra-ui/react";
+import { zIndex } from "./constant";
 import {
   LuPanelLeftOpen,
   LuPanelLeftClose,
@@ -44,7 +45,7 @@ export const PanelToggleButton = ({
         ? { left: isOpen ? `calc(${panelWidth}px - 1px)` : 0 }
         : { right: isOpen ? `calc(${panelWidth}px - 1px)` : 0 })}
       top={4}
-      zIndex={1000}
+      zIndex={zIndex.mapControl}
       transition={`left ${animationTime} ease, right ${animationTime} ease`}
     >
       <Tooltip content={tooltipText}>

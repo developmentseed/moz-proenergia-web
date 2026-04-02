@@ -8,7 +8,7 @@ import { useModel } from "@/utils/context/model";
 import { fetchModels, slugify } from "@/utils/data-transformation";
 import { useAuth } from "@/utils/context/auth";
 import { getIconPath } from "@/utils/model-icon";
-import { controlZIndex } from "@/components/map/control-constant";
+import { zIndex } from "@/components/ui/constant";
 
 const ModelSwitcherMenu = () => {
   const { model } = useModel();
@@ -50,7 +50,7 @@ const ModelSwitcherMenu = () => {
         </Flex>
       </MenuTrigger>
       <Menu.Positioner>
-        <MenuContent zIndex={controlZIndex + 2}>
+        <MenuContent zIndex={zIndex.menu}>
           {models?.map((m) => {
             const slug = slugify(m.name);
             const mIconPath = getIconPath(m.id);

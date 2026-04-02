@@ -10,6 +10,7 @@ import DropdownMenu, { DropdownMenuItems } from "./dropdown-menu";
 import { LanguageSwitcher } from "./language-switcher";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/utils/context/auth";
+import { zIndex } from "@/components/ui/constant";
 
 export interface NavigationItem {
   label: string;
@@ -129,8 +130,8 @@ export const Header = ({
                 </IconButton>
               </Drawer.Trigger>
               <Portal>
-                <Drawer.Backdrop zIndex={1700} />
-                <Drawer.Positioner zIndex={1800}>
+                <Drawer.Backdrop zIndex={zIndex.drawerBackdrop} />
+                <Drawer.Positioner zIndex={zIndex.drawer}>
                   <Drawer.Content>
                     <Drawer.Header>
                       <Drawer.Title>{t('nav.menu')}</Drawer.Title>

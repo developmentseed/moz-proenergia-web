@@ -4,6 +4,7 @@ import {
   type IconButtonProps,
   Portal,
 } from "@chakra-ui/react";
+import { zIndex } from "@/components/ui/constant";
 import * as React from "react";
 import { LuInfo } from "react-icons/lu";
 export interface ToggleTipProps extends ChakraPopover.RootProps {
@@ -40,7 +41,7 @@ export const ToggleTip = React.forwardRef<HTMLDivElement, ToggleTipProps>(
               py="1"
               textStyle="xs"
               rounded="sm"
-              zIndex={100000}
+              zIndex={zIndex.toggleTip}
               ref={ref}
               {...contentProps}
             >
