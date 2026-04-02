@@ -53,7 +53,6 @@ export const SummaryDonutChart = ({ data, colorMap, unit }: SummaryDonutChartPro
             <Chart.RadialText
               viewBox={viewBox}
               fontSize="14px"
-              // @TODO: what to show in the center?
               title={formatDisplayNumber(chart.getTotal("value"))}
               description={unit ? ` ${unit}` : ""}
               />

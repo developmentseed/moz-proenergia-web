@@ -60,20 +60,6 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
     const protocol = new pmtiles.Protocol();
     maplibregl.addProtocol("pmtiles", protocol.tile);
     maplibregl.addProtocol('cog', COGProtocol.cogProtocol);
-    //   COGProtocol.setColorFunction(cogUrl, (pixel, color) => {
-    //     if (!Number.isFinite(pixel[0])) color.set([0, 0, 0, 0]);
-    //     // else if (pixel[0] < 0.00001) color.set([0, 0, 0, 0]);
-    //     // else {
-    //     //   const value = interpolateCividis(Math.log1p(pixel[0]) / logMax);
-    //     //   const rgbValue = d3color.rgb(value);
-    //     //   color.set([rgbValue.r, rgbValue.g, rgbValue.b, 255]);
-    //     // }
-    //     // else if (pixel[0] < 0.0001)color.set([0, 0, 0, 0]);
-    //     // else if (pixel[0] < 10)color.set([255, 0, 0, 255]); // Red
-    //     // else if (pixel[0] < 300) color.set([255, 255, 0, 255]);
-    //     // else  color.set([0, 255, 0, 255]);
-
-    // });
     return () => {
       maplibregl.removeProtocol("pmtiles");
       maplibregl.removeProtocol("cog");
