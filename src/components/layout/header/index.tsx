@@ -8,6 +8,7 @@ import Image from "next/image";
 import { LuMenu } from "react-icons/lu";
 import DropdownMenu, { DropdownMenuItems } from "./dropdown-menu";
 import { LanguageSwitcher } from "./language-switcher";
+import { ColorModeButton } from "@/components/chakra/color-mode";
 import { useTranslation } from "react-i18next";
 
 export interface NavigationItem {
@@ -43,10 +44,10 @@ export const Header = ({
     <Box
       as="header"
       width="full"
-      bg="orange.600"
+      bg="orange.solid"
       color="orange.contrast"
       borderBottom="1px solid"
-      borderBottomColor="panelBorder"
+      borderBottomColor="border.subtle"
       px={3}
       py={2}
       pr={{ base: 3, md: 6 }}
@@ -104,6 +105,7 @@ export const Header = ({
             })}
             <Separator orientation="vertical" height="4" />
             <LanguageSwitcher />
+            <ColorModeButton color="orange.contrast" />
             <Separator orientation="vertical" height="4" />
           </HStack>
 
@@ -149,6 +151,7 @@ export const Header = ({
                         ))}
                         <Separator mt="auto" />
                         <LanguageSwitcher />
+                        <ColorModeButton alignSelf="flex-start" />
                         <Separator />
                         <DropdownMenuItems onAction={() => setDrawerOpen(false)} />
                       </VStack>

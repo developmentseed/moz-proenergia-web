@@ -13,7 +13,7 @@ export default function Home() {
         flex={1}
         display="flex"
         alignItems="center"
-        bg="gray.50"
+        bg="bg"
         px={{ base: 4, md: 8 }}
         py={8}
       >
@@ -22,7 +22,7 @@ export default function Home() {
             <span style={{ fontWeight: "300" }}>{t('home.countryName')}</span> <br />
             {t('home.title')}
           </Heading>
-          <Text fontSize="lg" color="gray.600">
+          <Text fontSize="lg" color="fg.muted">
             {t('home.description')}
           </Text>
           <Box
@@ -45,7 +45,7 @@ export default function Home() {
         flex={1}
         position="relative"
         display={{ base: "none", md: "block" }}
-        bg="gray.200"
+        bg="bg"
       >
         <Image
           src="/landing-image1.png"

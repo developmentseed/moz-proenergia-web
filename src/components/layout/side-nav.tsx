@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, VStack } from '@chakra-ui/react';
+import { Box, VStack, Image as ChakraImage } from '@chakra-ui/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
@@ -36,9 +36,9 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
       display={{ base: 'none', md: 'flex' }}
       flexDirection="column"
       height="full"
-      bg="navBg"
+      bg="orange.muted"
       borderRight="1px solid"
-      borderColor="panelBorder"
+      borderColor="border"
       zIndex={100}
     >
       <VStack p={2} gap={2} align="center">
@@ -61,20 +61,27 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
                   rounded="sm"
                   width={12}
                   height={12}
-                  bg={isActive ? "orange.muted" : "transparent"}
+                  bg={isActive ? "orange.solid" : "orange.subtle"}
                   cursor="pointer"
                   transition="all 0.2s"
                   _hover={{
-                    bg: isActive ? 'orange.600' : 'orange.subtle',
+                    bg: 'orange.emphasized',
                   }}
                 >
                   {iconPath ? (
+                    <ChakraImage
+                      _dark={{
+                        filter: 'invert(1) brightness(100%)',
+                      }}
+                      asChild
+                    >
                     <Image
                       src={iconPath}
                       alt={t(`model.${model.id}.name`, { defaultValue: model.name })}
                       width={20}
                       height={20}
-                    />
+                      />
+                    </ChakraImage>
                   ) : (
                     t(`model.${model.id}.name`, { defaultValue: model.name })
                   )}

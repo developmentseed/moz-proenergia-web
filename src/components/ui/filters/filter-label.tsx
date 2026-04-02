@@ -15,7 +15,7 @@ export const FilterLabel = ({ title, hasPending, pendingCount, textStyle = 'slid
         <Flex
           w="16px" h="16px"
           borderRadius="full"
-          bg="orange.400"
+          bg="orange.solid"
           flexShrink={0}
           align="center"
           justify="center"
@@ -26,7 +26,7 @@ export const FilterLabel = ({ title, hasPending, pendingCount, textStyle = 'slid
           {pendingCount}
         </Flex>
       ) : (
-        <Box w="8px" h="8px" borderRadius="full" bg="orange.400" flexShrink={0} />
+        <Box w="8px" h="8px" borderRadius="full" bg="orange.solid" flexShrink={0} />
       )
     )}
   </Flex>

@@ -66,7 +66,7 @@ const MainPanel = ({
             rounded="sm"
             flexShrink={0}
             onClick={onToggle}
-            _hover={{ bg: "gray.100" }}
+            _hover={{ bg: "bg.subtle" }}
           >
             {isOpen ? <LuChevronsDownUp /> : <LuChevronsUpDown />}
           </Box>

@@ -31,7 +31,7 @@ const ModelSwitcherMenu = () => {
           minW={0}
           cursor="pointer"
           rounded="sm"
-          _hover={{ bg: "gray.100" }}
+          _hover={{ bg: "bg.muted" }}
           onClick={(e) => e.stopPropagation()}
         >
           <Box

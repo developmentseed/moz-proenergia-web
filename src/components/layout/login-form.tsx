@@ -68,14 +68,14 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
     <Box p={4} fontFamily={'body'}>
       <form onSubmit={handleSubmit}>
         <Stack gap={4}>
-          <Text fontSize="sm" color="gray.600" mb={2}>
+          <Text fontSize="sm" color="fg" mb={2}>
             {t('auth.login.description')}
           </Text>
 
           {error && (
             <Box
               bg="red.50"
-              color="red.600"
+              color="red.solid"
               p={3}
               borderRadius="md"
               fontSize="sm"

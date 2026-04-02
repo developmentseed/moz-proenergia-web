@@ -29,6 +29,7 @@ import { Legend } from "./legend";
 import { RasterContextualLayer, VectorContextualLayer } from "./contextual-layer";
 import { MainLayer } from "./main-layer";
 import { BasemapSelector, BASEMAP_OPTIONS } from "./basemap-selector";
+import { useColorMode } from "@/components/chakra/color-mode";
 import { useToggle } from "@/hooks/use-toggle";
 import ShareButton from "./share-button";
 
@@ -93,6 +94,13 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
   const [currentBasemapId, setCurrentBasemapId] = useState("light");
   const selectedBasemap =
     BASEMAP_OPTIONS.find((o) => o.id === currentBasemapId) ?? BASEMAP_OPTIONS[0];
+
+  // Sync basemap to app color mode. User can still override via BasemapSelector,
+  // but switching the theme always resets to the appropriate default basemap.
+  const { colorMode } = useColorMode();
+  useEffect(() => {
+    setCurrentBasemapId(colorMode === "dark" ? "dark" : "light");
+  }, [colorMode]);
 
   useEffect(() => {
     if (clusterId !== null) {

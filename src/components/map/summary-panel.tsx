@@ -141,7 +141,7 @@ const RelatedModels = ({ clusterId }: RelatedModelsProps) => {
           key={m.id}
           asChild
           fontSize="sm"
-          color="blue.500"
+          color="blue.fg"
           _hover={{ textDecoration: "underline" }}
         >
           <NextLink href={`/model/${slugify(m.name)}?cluster=${clusterId}`}>
