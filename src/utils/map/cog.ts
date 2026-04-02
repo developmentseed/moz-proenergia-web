@@ -34,13 +34,15 @@ export async function fetchCogMetadata(filePath: string): Promise<{ min: number;
 }
 
 export function deriveRasterSource(id: string, filePath: string, stats?: { min: number; max: number }, isRgb?: boolean) {
+  console.log('is rgb?')
+  console.log(isRgb);
   const colorFragment = !isRgb && stats
-    ? `#color:${COLOR_SCHEME},${stats.min},${stats.max}`
+    ? `#color:${COLOR_SCHEME},${stats.min},${stats.max},c`
     : '';
   return {
     id,
     type: 'raster' as const,
-    url: `cog://${MEDIA_URL_PREFIX}${filePath}${colorFragment},c`,
+    url: `cog://${MEDIA_URL_PREFIX}${filePath}${colorFragment}`,
     tileSize: 256,
   };
 }
