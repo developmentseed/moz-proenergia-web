@@ -10,7 +10,6 @@ function makeGroupOrChartRow(
   mainColumn?: string,
   methodTotal?: SummaryItem,
 ): GroupRow | ChartRow | HighlightRow {
-  // Return highlight first since it needs to be handled differently fropm other chartType
   if (field.chartType === "highlight") {
     return {
       type: "highlight",
@@ -19,6 +18,7 @@ function makeGroupOrChartRow(
       unit: field.unit,
       value: items,
       methodTotal,
+      hasDecimal: field.hasDecimal,
     };
   }
 
@@ -44,6 +44,7 @@ function makeGroupOrChartRow(
       methodTotal,
       showChartValueRows: field.showChartValueRows,
       showBarChartAverage: field.showBarChartAverage,
+      hasDecimal: field.hasDecimal,
     };
   }
   return {
@@ -53,6 +54,7 @@ function makeGroupOrChartRow(
     unit: field.unit,
     value: items,
     methodTotal,
+    hasDecimal: field.hasDecimal,
   };
 }
 
@@ -61,7 +63,6 @@ function makeNestedGroup(
   groups: NestedGroupData[],
   methodTotal?: SummaryItem,
 ): NestedGroupRow {
-
   return {
     type: "nested-group",
     label: makeLabel(field.label),
@@ -69,6 +70,7 @@ function makeNestedGroup(
     unit: field.unit,
     value: groups,
     methodTotal,
+    hasDecimal: field.hasDecimal,
   };
 }
 
@@ -137,6 +139,7 @@ export function transformFieldSummary(
       description: field.description,
       value: 0,
       unit: field.unit,
+      hasDecimal: field.hasDecimal,
     };
   }
 
@@ -186,6 +189,7 @@ export function transformFieldSummary(
       description: field.description,
       value: getNumericValue(summary, methodName),
       unit: field.unit,
+      hasDecimal: field.hasDecimal,
     };
   }
 

@@ -16,6 +16,7 @@ export interface Field {
   colors?: Record<string, string>;
   showChartValueRows?: boolean;
   showBarChartAverage?: boolean;
+  hasDecimal?: boolean;
 }
 export interface MapItemUnit extends ItemUnit {
   color?: string;
