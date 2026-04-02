@@ -151,7 +151,7 @@ export const Header = ({
                         ))}
                         <Separator mt="auto" />
                         <LanguageSwitcher />
-                        <ColorModeButton alignSelf="flex-start" />
+                        <ColorModeButton alignSelf="flex-start" colorPalette="orange" />
                         <Separator />
                         <DropdownMenuItems onAction={() => setDrawerOpen(false)} />
                       </VStack>

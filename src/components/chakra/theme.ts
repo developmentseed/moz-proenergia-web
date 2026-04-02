@@ -126,18 +126,18 @@ export const system = createSystem(defaultConfig, {
       colors: {
         bg: {
           DEFAULT: {
-            value: { _light: "{colors.white}", _dark: "#201a15" }, // Custom dark background
+            value: { _light: "{colors.white}", _dark: "#292623" }, // Custom dark background
           },
           subtle: {
-            value: { _light: "{colors.gray.50}", _dark: "#1d1c1b" }, // Custom dark subtle background
+            value: { _light: "{colors.gray.50}", _dark: "#282523" }, // Custom dark subtle background
           },
           muted: {
-            value: { _light: "{colors.gray.100}", _dark: "#404040" }, // Custom dark muted background
+            value: { _light: "{colors.gray.100}", _dark: "#312c26" }, // Custom dark muted background
           },
         },
         fg: {
           DEFAULT: {
-            value: { _light: "{colors.black}", _dark: "#e4e4e4" }, // Custom dark text color
+            value: { _light: "{colors.gray.700}", _dark: "#e4e4e4" }, // Custom dark text color
           },
           muted: {
             value: { _light: "{colors.gray.600}", _dark: "#a3a3a3" }, // Custom dark muted text
