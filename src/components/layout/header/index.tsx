@@ -9,6 +9,7 @@ import { LuMenu } from "react-icons/lu";
 import DropdownMenu, { DropdownMenuItems } from "./dropdown-menu";
 import { LanguageSwitcher } from "./language-switcher";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/utils/context/auth";
 
 export interface NavigationItem {
   label: string;
@@ -25,6 +26,7 @@ export const Header = ({
   const pathname = usePathname();
   const { t } = useTranslation();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   const navigationItems: NavigationItem[] = [
     { label: t('nav.explorer'), href: "/models" },
@@ -86,6 +88,7 @@ export const Header = ({
         <HStack fontFamily="body" gap={6}>
           <HStack gap={6} display={{ base: 'none', md: 'flex' }}>
             {navigationItems.map((item) => {
+              if (item.href === "/downloads" && !isAuthenticated) return null;
               const active = isActive(item.href);
               return (
                 <Box key={item.href}>
@@ -134,7 +137,9 @@ export const Header = ({
                     </Drawer.Header>
                     <Drawer.Body>
                       <VStack align="stretch" gap={4} h="full">
-                        {navigationItems.map((item) => (
+                        {navigationItems.map((item) => {
+                          if (item.href === "/downloads" && !isAuthenticated) return null;
+                          return (
                           <Link
                             key={item.href}
                             fontSize="sm"
@@ -146,7 +151,7 @@ export const Header = ({
                           >
                             <NextLink href={item.href}>{item.label}</NextLink>
                           </Link>
-                        ))}
+                        )})}
                         <Separator mt="auto" />
                         <LanguageSwitcher />
                         <Separator />
