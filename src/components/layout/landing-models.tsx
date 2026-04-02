@@ -26,7 +26,6 @@ export default function ModelCards() {
     queryKey: ['models', token],
     queryFn: ({ signal }) => fetchModels(signal, token),
   });
-  console.log(models);
 
   return (
     <>
