@@ -85,19 +85,20 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
                 <ScrollArea.Viewport>
                   <ScrollArea.Content spaceY="3" textStyle="sm">
                     <Box>
-                      <Text textStyle='tableAttr' mb={2}>
+                      <Text fontSize="xs" lineHeight="1" fontWeight="600" mb={2}>
                         {t('map.additionalLayers')}
                       </Text>
                       <VStack align="stretch" gap={0.5}>
                         {contextualLayers.map((layer) => (
-                          <Box key={layer.id}>
+                          <Box key={layer.id} borderBottom="1px solid" borderColor="border.subtle" _last={{ borderBottom: "none" }}>
                             <LayerEntry
                               id={layer.id}
                               label={t(`layer.${layer.id}.label`, { defaultValue: layer.label })}
                               description={layer.description ? t(`layer.${layer.id}.description`, { defaultValue: layer.description }) : undefined}
-                              color={layer.layerType === 'raster'
-                                ? (layer.isRgb ? '#2563eb' : 'linear-gradient(135deg, #4a90d9, #7bc67e, #f5c542)')
-                                : (layer.color ?? '#888888')}
+                              rasterStats={layer.rasterStats}
+                              isRgb={layer.isRgb}
+                              layerType={layer.layerType}
+                              color={layer.color ?? '#1000be'}
                               switchLayer={(id) => toggleLayer({ [id]: false })}
                               setOpacity={(id, opacity) => setLayerOpacity(id, opacity)}
                             />

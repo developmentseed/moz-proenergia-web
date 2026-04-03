@@ -1,21 +1,46 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Box, Text, IconButton, HStack } from '@chakra-ui/react';
-import { Tooltip } from '@/components/ui/tooltip';
-import { LuX, LuInfo, LuDroplet } from 'react-icons/lu';
-import { OpacityControl } from './opacity-control';
-import { ModalDialog } from '@/components/chakra/modal';
-import type { ItemUnit } from '@/app/types';
+import { useState } from "react";
+import { Box, Text, IconButton, HStack, Flex, VStack } from "@chakra-ui/react";
+import { Tooltip } from "@/components/ui/tooltip";
+import { LuX, LuInfo, LuDroplet } from "react-icons/lu";
+import { OpacityControl } from "./opacity-control";
+import { ModalDialog } from "@/components/chakra/modal";
+import type { ItemUnit } from "@/app/types";
+import { formatNumber } from "@/utils/number";
+import { useTranslation } from "react-i18next";
+
+const BREWER_YLGNBU_6 = [
+  "#ffffcc",
+  "#c7e9b4",
+  "#7fcdbb",
+  "#41b6c4",
+  "#2c7fb8",
+  "#253494",
+];
 
 type LayerEntryProps = ItemUnit & {
   color: string;
+  layerType: string | undefined;
+  rasterStats?: { min: number; max: number };
+  isRgb?: boolean;
   switchLayer: (layerId: string) => void;
   setOpacity: (layerId: string, opacity: number) => void;
 };
 
-export function LayerEntry({ id, label, description, color, switchLayer, setOpacity: setOpacityStore }: LayerEntryProps) {
+export function LayerEntry({
+  id,
+  label,
+  description,
+  color,
+  layerType,
+  rasterStats,
+  isRgb,
+  switchLayer,
+  setOpacity: setOpacityStore,
+}: LayerEntryProps) {
   const [infoOpen, setInfoOpen] = useState(false);
+  const { t } = useTranslation();
   const [opacity, setOpacity] = useState(100);
 
   const handleOpacityChange = (newOpacity: number) => {
@@ -23,55 +48,88 @@ export function LayerEntry({ id, label, description, color, switchLayer, setOpac
     setOpacityStore(id, newOpacity);
   };
 
+  const isRaster = layerType === "raster";
+  const showGradient = isRaster && rasterStats && !isRgb;
+  const gradient = `linear-gradient(to right, ${BREWER_YLGNBU_6.join(", ")})`;
+
   return (
     <>
-      <HStack w="full">
-        <HStack mr="auto" minW={0} gap={1.5} align="center">
-          <Box w="10px" h="10px" rounded="xs" bg={color} flexShrink={0} />
-          <Text fontSize="xs" lineClamp={1}>
+      <Flex direction="column" w="full">
+        <Flex direction="row" w="full" align="center">
+          {!showGradient && (
+            <Box
+              w="10px"
+              h="10px"
+              rounded="xs"
+              bg={color}
+              flexShrink={0}
+              mr={1.5}
+            />
+          )}
+          <Text fontSize="xs" lineClamp={1} mr="auto" minW={0}>
             {label}
           </Text>
-        </HStack>
-        <HStack gap={0} flexShrink={0}>
-          <Tooltip content="Layer info" positioning={{ placement: 'top' }}>
-            <IconButton
-              aria-label="Layer info"
-              size="2xs"
-              variant="ghost"
-              onClick={() => setInfoOpen(true)}
-            >
-              <LuInfo />
-            </IconButton>
-          </Tooltip>
+          <HStack gap={0} flexShrink={0}>
+            <Tooltip content="Layer info" positioning={{ placement: "top" }}>
+              <IconButton
+                aria-label="Layer info"
+                size="2xs"
+                variant="ghost"
+                onClick={() => setInfoOpen(true)}
+              >
+                <LuInfo />
+              </IconButton>
+            </Tooltip>
 
-          <OpacityControl value={opacity} onValueChange={handleOpacityChange}>
-            <IconButton aria-label="Adjust opacity" size="2xs" variant="ghost">
-              <LuDroplet />
-            </IconButton>
-          </OpacityControl>
+            <OpacityControl value={opacity} onValueChange={handleOpacityChange}>
+              <IconButton
+                aria-label="Adjust opacity"
+                size="2xs"
+                variant="ghost"
+              >
+                <LuDroplet />
+              </IconButton>
+            </OpacityControl>
 
-          <Tooltip content="Remove layer" positioning={{ placement: 'top' }}>
-            <IconButton
-              aria-label="Remove layer"
-              size="2xs"
-              variant="ghost"
-              onClick={() => switchLayer(id)}
-            >
-              <LuX />
-            </IconButton>
-          </Tooltip>
-        </HStack>
-      </HStack>
+            <Tooltip content="Remove layer" positioning={{ placement: "top" }}>
+              <IconButton
+                aria-label="Remove layer"
+                size="2xs"
+                variant="ghost"
+                onClick={() => switchLayer(id)}
+              >
+                <LuX />
+              </IconButton>
+            </Tooltip>
+          </HStack>
+        </Flex>
+
+        {showGradient && (
+          <VStack align="stretch" gap={1} mt={1.5} mb={1}>
+            <Box h="10px" borderRadius="xs" bg={gradient} />
+            <HStack justify="space-between">
+              <Text fontSize="2xs" color="fg.muted">
+                {t("map.rasterMin", { value: formatNumber(rasterStats.min) })}
+              </Text>
+              <Text fontSize="2xs" color="fg.muted">
+                {t("map.rasterMax", { value: formatNumber(rasterStats.max) })}
+              </Text>
+            </HStack>
+          </VStack>
+        )}
+      </Flex>
 
       <ModalDialog
         modalTitle={label}
-        modalContent={description ? (
-          <Text fontSize="sm">{description}</Text>
-        ) : (
-          <Text fontSize="sm" color="fg.muted" fontStyle="italic">
-            No description available.
-          </Text>
-        )}
+        modalContent={
+          description ? (
+            <Text fontSize="sm">{description}</Text>
+          ) : (
+            <Text fontSize="sm" color="fg.muted" fontStyle="italic">
+              No description available.
+            </Text>
+          )
+        }
         open={infoOpen}
         onOpenChange={({ open }) => setInfoOpen(open)}
       />
