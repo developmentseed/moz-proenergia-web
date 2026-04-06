@@ -85,12 +85,57 @@ export const DownloadList = () => {
     })),
   });
 
+  // Unfiltered fetches capture datasets that have no model attached — these
+  // never appear in the per-model queries above. Items shared with a per-model
+  // query dedupe via the merge loop, preserving their modelIds.
+  const vectorAllResult = useQuery({
+    queryKey: ["vector", token, null],
+    queryFn: async ({ signal }) => {
+      const data = await fetchVectors({ token, signal });
+      return data.map<TaggedDataset>((item) => ({
+        ...item,
+        dataType: "vector",
+        modelIds: [],
+      }));
+    },
+    enabled: isAuthenticated,
+  });
+
+  const rasterAllResult = useQuery({
+    queryKey: ["raster", token, null],
+    queryFn: async ({ signal }) => {
+      const data = await fetchRasters({ token, signal });
+      return data.map<TaggedDataset>((item) => ({
+        ...item,
+        dataType: "raster",
+        modelIds: [],
+      }));
+    },
+    enabled: isAuthenticated,
+  });
+
+  const referenceAllResult = useQuery({
+    queryKey: ["reference", token, null],
+    queryFn: async ({ signal }) => {
+      const data = await fetchReferences({ token, signal });
+      return data.map<TaggedDataset>((item) => ({
+        ...item,
+        dataType: "reference",
+        modelIds: [],
+      }));
+    },
+    enabled: isAuthenticated,
+  });
+
   // Collapse entries that appear under multiple models into one row whose
   // modelIds is the union of all sources. Keyed by (dataType, id) since
   // vector/raster/reference IDs are independent and could collide.
   const allDatasets = useMemo<TaggedDataset[]>(() => {
     const byKey = new Map<string, TaggedDataset>();
     const tagged = [
+      ...(vectorAllResult.data ?? []),
+      ...(rasterAllResult.data ?? []),
+      ...(referenceAllResult.data ?? []),
       ...vectorResults.flatMap((r) => r.data ?? []),
       ...rasterResults.flatMap((r) => r.data ?? []),
       ...referenceResults.flatMap((r) => r.data ?? []),
@@ -107,7 +152,14 @@ export const DownloadList = () => {
       }
     }
     return Array.from(byKey.values());
-  }, [vectorResults, rasterResults, referenceResults]);
+  }, [
+    vectorAllResult.data,
+    rasterAllResult.data,
+    referenceAllResult.data,
+    vectorResults,
+    rasterResults,
+    referenceResults,
+  ]);
 
   const visibleDatasets = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -129,6 +181,9 @@ export const DownloadList = () => {
   const isInitialLoading =
     isAuthenticated &&
     (!models ||
+      vectorAllResult.isPending ||
+      rasterAllResult.isPending ||
+      referenceAllResult.isPending ||
       vectorResults.some((r) => r.isPending) ||
       rasterResults.some((r) => r.isPending) ||
       referenceResults.some((r) => r.isPending));

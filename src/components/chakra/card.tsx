@@ -154,7 +154,6 @@ export const DownloadDataCard = ({
           {item &&
             Object.entries(item).map(
               ([key, value]: [string, string | number]) => {
-                console.log(key, value);
                 if (
                   key === "id" ||
                   key === "name" ||
