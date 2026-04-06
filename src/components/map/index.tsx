@@ -8,7 +8,7 @@ import {
 } from "react-map-gl/maplibre";
 import { Box, Flex } from "@chakra-ui/react";
 import * as pmtiles from "pmtiles";
-import * as maplibregl from "maplibre-gl";
+import maplibregl from "maplibre-gl";
 import { type RequestTransformFunction } from "maplibre-gl";
 import {
   isMapboxURL,
