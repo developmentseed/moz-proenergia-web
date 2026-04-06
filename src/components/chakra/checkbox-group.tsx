@@ -13,9 +13,6 @@ export const CheckboxGroupUI = ({ items, value, title, label, onChange }: Checkb
   return (
     <Fieldset.Root id="fieldset">
       <CheckboxGroup defaultValue={defaultValue} value={value} name={title} onValueChange={onChange} >
-        {/* <Fieldset.Legend fontSize="sm" mb="2">
-          {label}
-        </Fieldset.Legend> */}
         <Fieldset.Content gap={1}>
           <For each={items}>
             {(option) => (
