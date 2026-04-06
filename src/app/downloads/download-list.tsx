@@ -217,7 +217,6 @@ export const DownloadList = () => {
                     title={d.name}
                     description={d.description}
                     source={d.source}
-                    updated={d.updated}
                     downloadUrl={`${MEDIA_URL_PREFIX}${d.raw_file}`}
                     highlight={searchQuery}
                     models={modelIds.map(

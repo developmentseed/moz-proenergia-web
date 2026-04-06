@@ -48,6 +48,8 @@ const HighlightText = ({
   );
 };
 
+const NotDisplayKeys = ["id","name","source", "description", "name_pt", "description_pt", "raw_file", "is_public", "is_approved", "dataType", "color"];
+
 export const ModelCard = ({
   title,
   description,
@@ -84,7 +86,6 @@ export const DownloadDataCard = ({
   title,
   description,
   source,
-  updated,
   downloadUrl,
   highlight,
   models,
@@ -94,7 +95,6 @@ export const DownloadDataCard = ({
   title: string;
   description: string | undefined;
   source: string | undefined;
-  updated: string;
   downloadUrl: string;
   highlight?: string;
   models?: string[];
@@ -154,19 +154,7 @@ export const DownloadDataCard = ({
           {item &&
             Object.entries(item).map(
               ([key, value]: [string, string | number]) => {
-                if (
-                  key === "id" ||
-                  key === "name" ||
-                  key === "source" ||
-                  key === "description" ||
-                  key === "name_pt" ||
-                  key === "description_pt" ||
-                  key === "raw_file" ||
-                  key === "is_public" ||
-                  key === "is_approved" ||
-                  key === "dataType" ||
-                  key === "color"
-                ) {
+                if (NotDisplayKeys.includes(key)) {
                   return null;
                 }
                 if (value === null || value === undefined || value === "") {
