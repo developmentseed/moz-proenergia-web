@@ -70,17 +70,19 @@ export const DownloadList = () => {
     })),
   });
 
-  const referenceResult = useQuery({
-    queryKey: ["reference", token],
-    queryFn: async ({ signal }) => {
-      const data = await fetchReferences({ token, signal });
-      return data.map<TaggedDataset>((item) => ({
-        ...item,
-        dataType: "reference",
-        modelIds: [],
-      }));
-    },
-    enabled: isAuthenticated,
+  const referenceResults = useQueries({
+    queries: modelIdList.map((modelId) => ({
+      queryKey: ["reference", token, modelId],
+      queryFn: async ({ signal }: { signal: AbortSignal }) => {
+        const data = await fetchReferences({ modelId, token, signal });
+        return data.map<TaggedDataset>((item) => ({
+          ...item,
+          dataType: "reference",
+          modelIds: [modelId],
+        }));
+      },
+      enabled: isAuthenticated && !!models,
+    })),
   });
 
   // Collapse entries that appear under multiple models into one row whose
@@ -91,7 +93,7 @@ export const DownloadList = () => {
     const tagged = [
       ...vectorResults.flatMap((r) => r.data ?? []),
       ...rasterResults.flatMap((r) => r.data ?? []),
-      ...(referenceResult.data ?? []),
+      ...referenceResults.flatMap((r) => r.data ?? []),
     ];
     for (const item of tagged) {
       const key = `${item.dataType}-${item.id}`;
@@ -105,7 +107,7 @@ export const DownloadList = () => {
       }
     }
     return Array.from(byKey.values());
-  }, [vectorResults, rasterResults, referenceResult.data]);
+  }, [vectorResults, rasterResults, referenceResults]);
 
   const visibleDatasets = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -129,7 +131,7 @@ export const DownloadList = () => {
     (!models ||
       vectorResults.some((r) => r.isPending) ||
       rasterResults.some((r) => r.isPending) ||
-      referenceResult.isPending);
+      referenceResults.some((r) => r.isPending));
 
   const toggleModel = (id: string) => {
     setSelectedModelIds((prev) =>
