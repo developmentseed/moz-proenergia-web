@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryState, parseAsString } from 'nuqs';
 import { ModelProvider } from "@/utils/context/model";
@@ -10,7 +10,7 @@ import { useFilters } from "@/utils/context/filters";
 import { useModel } from "@/utils/context/model";
 import { Flex, Box, IconButton, Skeleton } from "@chakra-ui/react";
 import NextLink from "next/link";
-import MainMap from "@/components/map";
+import MainMap, { type FlyToFn } from "@/components/map";
 import { LuPanelLeftOpen, LuPanelLeftClose, LuPanelRightOpen, LuPanelRightClose } from "react-icons/lu";
 import { useAuth } from "@/utils/context/auth";
 import { zIndex } from "./constant";
@@ -51,6 +51,8 @@ const ExplorerInner = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const flyToRef = useRef<FlyToFn | null>(null);
 
   const resetCluster = useCallback(() => {
     setSelected(null);
@@ -118,6 +120,7 @@ const ExplorerInner = () => {
           main={model.main}
           onClick={onClick}
           clusterId={selected}
+          onFlyToRef={flyToRef}
         />
       </Box>
 
@@ -162,6 +165,7 @@ const ExplorerInner = () => {
         clusterId={selected}
         scenarioId={scenarioId}
         onSelectCluster={setSelected}
+        onFlyTo={(lng, lat) => flyToRef.current?.(lng, lat)}
         popupFields={model.popupFields}
         summaryFields={model.summaryFields}
         filters={updatedFilters}

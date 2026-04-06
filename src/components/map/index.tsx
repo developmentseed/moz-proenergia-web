@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useCallback, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Map,
   ViewStateChangeEvent,
   NavigationControl,
   ScaleControl,
   type MapLayerMouseEvent,
+  type MapRef,
 } from "react-map-gl/maplibre";
 import { Box, Flex } from "@chakra-ui/react";
 import * as pmtiles from "pmtiles";
@@ -43,17 +44,26 @@ const transformRequest: RequestTransformFunction = (url, resourceType) => {
   return { url };
 };
 
+export type FlyToFn = (lng: number, lat: number) => void;
+
 interface MainMapProps {
   main: Main;
   onClick: (event: MapLayerMouseEvent) => void;
   clusterId: string | null;
+  onFlyToRef: React.RefObject<FlyToFn | null>;
 }
 
-const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
+const MainMap = ({ main, onClick, clusterId, onFlyToRef }: MainMapProps) => {
   const { coords, setCoords } = useMapCoords();
   const { lat, lng, zoom } = coords;
 
   const { open } = useToggle(true);
+
+  const mapRef = useRef<MapRef>(null);
+  useEffect(() => {
+    onFlyToRef.current = (lng, lat) =>
+      mapRef.current?.flyTo({ center: [lng, lat], zoom: 14 });
+  }, [onFlyToRef]);
 
   // Attach pmtile + cog protocol to MapLibre
   useEffect(() => {
@@ -105,6 +115,7 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
       {/* Map takes all remaining width */}
       <Box flex={1} h="full" position="relative" pb={{ base: 10, md: 0 }}>
         <Map
+          ref={mapRef}
           initialViewState={{
             longitude: lng,
             latitude: lat,
@@ -142,7 +153,6 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
             position="bottom-left"
             collapsed={true}
             countries="mz"
-            reverseGeocode={true}
             marker={false}
             showResultsWhileTyping={true}
             clearAndBlurOnEsc={true}
