@@ -1,11 +1,11 @@
 import { memo, useState, useEffect } from "react";
-import { Box, Flex, Text, IconButton, Input, Field as ChakraField, Link } from "@chakra-ui/react";
+import { Box, Flex, Text, IconButton, Link } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { api } from "@/utils/api";
 import { fetchModels, slugify } from "@/utils/data-transformation";
 import { useAuth } from "@/utils/context/auth";
 import { useModel } from "@/utils/context/model";
-import { LuChevronLeft, LuSearch, LuChevronsUpDown, LuChevronsDownUp } from "react-icons/lu";
+import { LuChevronLeft, LuChevronsUpDown, LuChevronsDownUp } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
 import { controlZIndex, mapControlCommonStyleProps } from "./control-constant";
 import { type Field, type Filter, type Main } from "@/app/types";
@@ -14,6 +14,7 @@ import { SummaryTable } from "@/components/chakra/summary-table";
 import { useSummaryQuery } from "@/hooks/use-summary-query";
 import { AnimationTime, ControlPanelWidth } from "../ui/main-panel";
 import { useTranslation } from "react-i18next";
+import MapNavigator from "./map-navigator";
 
 interface SummaryPanelProps {
   clusterId: string | null;
@@ -66,70 +67,6 @@ const PanelHeader = ({ title, subtitle, onBack }: PanelHeaderProps) => (
     </Flex>
   </Box>
 );
-
-// Returns [lng, lat] if the value is "lat, lng" (comma required), otherwise null.
-// Auto-swaps if values appear reversed; rejects out-of-range values.
-function parseCoords(value: string): [number, number] | null {
-  const match = value.trim().match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
-  if (!match) return null;
-  let lat = parseFloat(match[1]);
-  let lng = parseFloat(match[2]);
-  if (Math.abs(lat) > 90 && Math.abs(lng) <= 90) [lat, lng] = [lng, lat];
-  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
-  return [lng, lat];
-}
-
-interface MapNavigatorProps {
-  onSelectCluster: (id: string) => void;
-  onFlyTo: (lng: number, lat: number) => void;
-}
-
-const MapNavigator = ({ onSelectCluster, onFlyTo }: MapNavigatorProps) => {
-  const [value, setValue] = useState("");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = value.trim();
-    if (!trimmed) return;
-    const coords = parseCoords(trimmed);
-    if (coords) {
-      onFlyTo(coords[0], coords[1]);
-    } else {
-      onSelectCluster(trimmed);
-    }
-  };
-
-  return (
-    <Box as="form" onSubmit={handleSubmit}>
-      <ChakraField.Root>
-        <ChakraField.Label fontSize="xs" color="fg.muted">
-          Navigate to cluster, site, or coordinates
-        </ChakraField.Label>
-        <Flex gap={1} width="full">
-          <Input
-            size="sm"
-            placeholder="Enter cluster ID or lat, lng…"
-            flexBasis="100%"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-          />
-          <IconButton
-            type="submit"
-            size="sm"
-            variant="surface"
-            aria-label="Navigate to cluster or coordinates"
-            disabled={!value.trim()}
-          >
-            <LuSearch />
-          </IconButton>
-        </Flex>
-        <ChakraField.HelperText fontSize="xs" color="fg.subtle">
-          Coordinates must be in <em>lat, lng</em> format
-        </ChakraField.HelperText>
-      </ChakraField.Root>
-    </Box>
-  );
-};
 
 interface RelatedModelsProps {
   clusterId: string;

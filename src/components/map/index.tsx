@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Map,
-  useMap,
   ViewStateChangeEvent,
   NavigationControl,
   ScaleControl,
   type MapLayerMouseEvent,
+  type MapRef,
 } from "react-map-gl/maplibre";
 import { Box, Flex } from "@chakra-ui/react";
 import * as pmtiles from "pmtiles";
@@ -44,15 +44,6 @@ const transformRequest: RequestTransformFunction = (url, resourceType) => {
   return { url };
 };
 
-// Lives inside <Map> so it can call useMap(); exposes flyTo via a callback ref.
-const FlyToHandler = ({ onReady }: { onReady: (fn: (lng: number, lat: number) => void) => void }) => {
-  const { current: map } = useMap();
-  useEffect(() => {
-    if (map) onReady((lng, lat) => map.flyTo({ center: [lng, lat], zoom: 14 }));
-  }, [map, onReady]);
-  return null;
-};
-
 export type FlyToFn = (lng: number, lat: number) => void;
 
 interface MainMapProps {
@@ -67,6 +58,12 @@ const MainMap = ({ main, onClick, clusterId, onFlyToRef }: MainMapProps) => {
   const { lat, lng, zoom } = coords;
 
   const { open } = useToggle(true);
+
+  const mapRef = useRef<MapRef>(null);
+  useEffect(() => {
+    onFlyToRef.current = (lng, lat) =>
+      mapRef.current?.flyTo({ center: [lng, lat], zoom: 14 });
+  }, [onFlyToRef]);
 
   // Attach pmtile + cog protocol to MapLibre
   useEffect(() => {
@@ -118,6 +115,7 @@ const MainMap = ({ main, onClick, clusterId, onFlyToRef }: MainMapProps) => {
       {/* Map takes all remaining width */}
       <Box flex={1} h="full" position="relative" pb={{ base: 10, md: 0 }}>
         <Map
+          ref={mapRef}
           initialViewState={{
             longitude: lng,
             latitude: lat,
@@ -140,7 +138,6 @@ const MainMap = ({ main, onClick, clusterId, onFlyToRef }: MainMapProps) => {
           transformRequest={transformRequest}
           interactiveLayerIds={zoom > 9 ? [main.id, main.id + '-line', main.id + '-circle'] : []}
       >
-          <FlyToHandler onReady={(fn) => { onFlyToRef.current = fn; }} />
           <RasterContextualLayer beforeId={main.id + '-bg'} />
           <MainLayer
             scenario={scenario}
