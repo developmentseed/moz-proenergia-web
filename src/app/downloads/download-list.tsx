@@ -40,119 +40,99 @@ export const DownloadList = () => {
     [models],
   );
 
+  // Per-model queries. Keys are aligned with `explorer.tsx` so the downloads
+  // page and the map explorer share a single cache entry per (type, model).
+  // Tagging with dataType/modelIds happens in `allDatasets` below, not here,
+  // so the cached value is plain `ApiFileResult[]` — reusable by both pages.
   const vectorResults = useQueries({
     queries: modelIdList.map((modelId) => ({
-      queryKey: ["vector", token, modelId],
-      queryFn: async ({ signal }: { signal: AbortSignal }) => {
-        const data = await fetchVectors({ modelId, token, signal });
-        return data.map<TaggedDataset>((item) => ({
-          ...item,
-          dataType: "vector",
-          modelIds: [modelId],
-        }));
-      },
+      queryKey: ["vectors", modelId, token],
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        fetchVectors({ modelId, token, signal }),
       enabled: isAuthenticated && !!models,
     })),
   });
 
   const rasterResults = useQueries({
     queries: modelIdList.map((modelId) => ({
-      queryKey: ["raster", token, modelId],
-      queryFn: async ({ signal }: { signal: AbortSignal }) => {
-        const data = await fetchRasters({ modelId, token, signal });
-        return data.map<TaggedDataset>((item) => ({
-          ...item,
-          dataType: "raster",
-          modelIds: [modelId],
-        }));
-      },
+      queryKey: ["rasters", modelId, token],
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        fetchRasters({ modelId, token, signal }),
       enabled: isAuthenticated && !!models,
     })),
   });
 
   const referenceResults = useQueries({
     queries: modelIdList.map((modelId) => ({
-      queryKey: ["reference", token, modelId],
-      queryFn: async ({ signal }: { signal: AbortSignal }) => {
-        const data = await fetchReferences({ modelId, token, signal });
-        return data.map<TaggedDataset>((item) => ({
-          ...item,
-          dataType: "reference",
-          modelIds: [modelId],
-        }));
-      },
+      queryKey: ["references", modelId, token],
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        fetchReferences({ modelId, token, signal }),
       enabled: isAuthenticated && !!models,
     })),
   });
 
   // Unfiltered fetches capture datasets that have no model attached — these
-  // never appear in the per-model queries above. Items shared with a per-model
-  // query dedupe via the merge loop, preserving their modelIds.
+  // never appear in the per-model queries above. These keys are downloads-
+  // only (the explorer never fetches unfiltered lists).
   const vectorAllResult = useQuery({
-    queryKey: ["vector", token, null],
-    queryFn: async ({ signal }) => {
-      const data = await fetchVectors({ token, signal });
-      return data.map<TaggedDataset>((item) => ({
-        ...item,
-        dataType: "vector",
-        modelIds: [],
-      }));
-    },
+    queryKey: ["vectors", null, token],
+    queryFn: ({ signal }) => fetchVectors({ token, signal }),
     enabled: isAuthenticated,
   });
 
   const rasterAllResult = useQuery({
-    queryKey: ["raster", token, null],
-    queryFn: async ({ signal }) => {
-      const data = await fetchRasters({ token, signal });
-      return data.map<TaggedDataset>((item) => ({
-        ...item,
-        dataType: "raster",
-        modelIds: [],
-      }));
-    },
+    queryKey: ["rasters", null, token],
+    queryFn: ({ signal }) => fetchRasters({ token, signal }),
     enabled: isAuthenticated,
   });
 
   const referenceAllResult = useQuery({
-    queryKey: ["reference", token, null],
-    queryFn: async ({ signal }) => {
-      const data = await fetchReferences({ token, signal });
-      return data.map<TaggedDataset>((item) => ({
-        ...item,
-        dataType: "reference",
-        modelIds: [],
-      }));
-    },
+    queryKey: ["references", null, token],
+    queryFn: ({ signal }) => fetchReferences({ token, signal }),
     enabled: isAuthenticated,
   });
 
-  // Collapse entries that appear under multiple models into one row whose
-  // modelIds is the union of all sources. Keyed by (dataType, id) since
-  // vector/raster/reference IDs are independent and could collide.
+  // Tag + merge. Each source contributes its modelId (or none, for unfiltered)
+  // and the loop collapses duplicates across models into one row whose
+  // modelIds is the union. Keyed by (dataType, id) since vector/raster/ref
+  // primary keys are independent and could collide.
   const allDatasets = useMemo<TaggedDataset[]>(() => {
     const byKey = new Map<string, TaggedDataset>();
-    const tagged = [
-      ...(vectorAllResult.data ?? []),
-      ...(rasterAllResult.data ?? []),
-      ...(referenceAllResult.data ?? []),
-      ...vectorResults.flatMap((r) => r.data ?? []),
-      ...rasterResults.flatMap((r) => r.data ?? []),
-      ...referenceResults.flatMap((r) => r.data ?? []),
-    ];
-    for (const item of tagged) {
-      const key = `${item.dataType}-${item.id}`;
-      const existing = byKey.get(key);
-      if (existing) {
-        for (const id of item.modelIds) {
-          if (!existing.modelIds.includes(id)) existing.modelIds.push(id);
+
+    const ingest = (
+      items: ApiFileResult[] | undefined,
+      dataType: DataType,
+      modelId: string | null,
+    ) => {
+      for (const item of items ?? []) {
+        const key = `${dataType}-${item.id}`;
+        const existing = byKey.get(key);
+        if (existing) {
+          if (modelId && !existing.modelIds.includes(modelId)) {
+            existing.modelIds.push(modelId);
+          }
+        } else {
+          byKey.set(key, {
+            ...item,
+            dataType,
+            modelIds: modelId ? [modelId] : [],
+          });
         }
-      } else {
-        byKey.set(key, { ...item, modelIds: [...item.modelIds] });
       }
-    }
+    };
+
+    ingest(vectorAllResult.data, "vector", null);
+    ingest(rasterAllResult.data, "raster", null);
+    ingest(referenceAllResult.data, "reference", null);
+    modelIdList.forEach((modelId, idx) => {
+      ingest(vectorResults[idx]?.data, "vector", modelId);
+      ingest(rasterResults[idx]?.data, "raster", modelId);
+      ingest(referenceResults[idx]?.data, "reference", modelId);
+    });
+
     return Array.from(byKey.values());
   }, [
+    modelIdList,
     vectorAllResult.data,
     rasterAllResult.data,
     referenceAllResult.data,
