@@ -2,15 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useQuery, useQueries } from "@tanstack/react-query";
-import {
-  Box,
-  Spinner,
-  Center,
-  Flex,
-  Text,
-  Checkbox,
-  Button,
-} from "@chakra-ui/react";
+import { Box, Spinner, Center, Flex, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { MEDIA_URL_PREFIX } from "@/utils/api";
 import { useAuth } from "@/utils/context/auth";
@@ -21,9 +13,10 @@ import {
   fetchReferences,
   fetchModels,
   type ApiFileResult,
-  DataType
+  DataType,
 } from "@/utils/data-transformation";
 import { fetchRasters } from "@/utils/map/cog";
+import { SidebarFilter } from "./sidebar-filter";
 
 type TaggedDataset = ApiFileResult & {
   dataType: DataType;
@@ -138,8 +131,6 @@ export const DownloadList = () => {
       rasterResults.some((r) => r.isPending) ||
       referenceResult.isPending);
 
-  const hasFilter = selectedModelIds.length > 0;
-
   const toggleModel = (id: string) => {
     setSelectedModelIds((prev) =>
       prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id],
@@ -157,47 +148,12 @@ export const DownloadList = () => {
 
   return (
     <Flex gap={8} align="flex-start" direction={{ base: "column", md: "row" }}>
-      {/* Filter sidebar */}
-      <Box
-        w={{ base: "full", md: "20rem" }}
-        flexShrink={0}
-        position={{ md: "sticky" }}
-        top={{ md: 6 }}
-        order={{ base: 0, md: 1 }}
-      >
-        <Flex justify="space-between" align="center" mb={3}>
-          <Text fontSize="sm" fontWeight="semibold">
-            {t("downloads.filterModels")}
-          </Text>
-        </Flex>
-        <Flex direction="column" gap={2}>
-          {models?.map((model) => (
-            <Checkbox.Root
-              key={model.id}
-              size="sm"
-              checked={selectedModelIds.includes(model.id)}
-              onCheckedChange={() => toggleModel(model.id)}
-            >
-              <Checkbox.HiddenInput />
-              <Checkbox.Control />
-              <Checkbox.Label>
-                <Text fontSize="sm">{model.name}</Text>
-              </Checkbox.Label>
-            </Checkbox.Root>
-          ))}
-        </Flex>
-
-        <Button
-          size="xs"
-          variant="ghost"
-          colorPalette="orange"
-          onClick={() => setSelectedModelIds([])}
-          mt={2}
-          disabled={!hasFilter}
-        >
-          {t("downloads.reset")}
-        </Button>
-      </Box>
+      <SidebarFilter
+        models={models}
+        selectedModelIds={selectedModelIds}
+        onToggle={toggleModel}
+        onReset={() => setSelectedModelIds([])}
+      />
 
       {/* Dataset list */}
       <Box flex={1} minW={0}>
