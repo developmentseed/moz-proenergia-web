@@ -14,6 +14,7 @@ import {
 import { LuDownload } from "react-icons/lu";
 import ReactMarkdown from "react-markdown";
 import { useTranslation } from "react-i18next";
+import { DataType } from "@/utils/data-transformation";
 
 const HighlightText = ({
   text,
@@ -97,7 +98,7 @@ export const DownloadDataCard = ({
   downloadUrl: string;
   highlight?: string;
   models?: string[];
-  dataType?: "vector" | "raster" | "reference";
+  dataType?: DataType;
   item: object;
 }) => {
   const { t } = useTranslation();

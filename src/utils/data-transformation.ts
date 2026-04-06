@@ -62,7 +62,7 @@ export interface ApiModelResponse {
   color_coding: ColorCoding[]
   metric_field_types: Record<string, string>
 }
-
+export type DataType = "vector" | "raster" | "reference";
 export interface ApiFileResult {
   id: number;
   name: string;

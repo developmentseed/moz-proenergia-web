@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useQuery, useQueries, keepPreviousData } from "@tanstack/react-query";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import {
   Box,
   Spinner,
@@ -20,18 +20,15 @@ import {
   fetchVectors,
   fetchReferences,
   fetchModels,
+  type ApiFileResult,
+  DataType
 } from "@/utils/data-transformation";
 import { fetchRasters } from "@/utils/map/cog";
 
-type DataType = "vector" | "raster" | "reference";
-
-function tagItems<T extends { id: number }>(items: T[], dataType: DataType) {
-  return items.map((item) => ({ ...item, dataType }));
-}
-
-function dedupeById<T extends { id: number }>(items: T[]): T[] {
-  return Array.from(new Map(items.map((i) => [i.id, i])).values());
-}
+type TaggedDataset = ApiFileResult & {
+  dataType: DataType;
+  modelIds: string[];
+};
 
 export const DownloadList = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -39,134 +36,124 @@ export const DownloadList = () => {
   const { token, isAuthenticated } = useAuth();
   const { t } = useTranslation();
 
-  const hasFilter = selectedModelIds.length > 0;
-
   const { data: models } = useQuery({
     queryKey: ["models", token],
     queryFn: ({ signal }) => fetchModels(signal, token),
+    enabled: isAuthenticated,
   });
 
-  // ── Display queries ───────────────────────────────────────────────────────
-  // Mirrors the original approach: one query per selected model when filtered,
-  // or a single unfiltered query when no selection. This is the source of truth
-  // for what cards are shown.
-  const displayIds: (string | undefined)[] = hasFilter
-    ? selectedModelIds
-    : [undefined];
-
-  const vectorResults = useQueries({
-    queries: displayIds.map((id) => ({
-      queryKey: ["vector", token, id ?? "all"],
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        fetchVectors({ modelId: id, token, signal }),
-      placeholderData: keepPreviousData,
-    })),
-  });
-
-  const rasterResults = useQueries({
-    queries: displayIds.map((id) => ({
-      queryKey: ["raster", token, id ?? "all"],
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        fetchRasters({ modelId: id, token, signal }),
-      placeholderData: keepPreviousData,
-    })),
-  });
-
-  const referenceResults = useQueries({
-    queries: displayIds.map((id) => ({
-      queryKey: ["reference", token, id ?? "all"],
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        fetchReferences({ modelId: id, token, signal }),
-      placeholderData: keepPreviousData,
-    })),
-  });
-
-  const isLoading =
-    vectorResults.some((r) => r.isLoading) ||
-    rasterResults.some((r) => r.isLoading) ||
-    referenceResults.some((r) => r.isLoading);
-
-  const allData = useMemo(() => {
-    const vectors = tagItems(vectorResults.flatMap((r) => r.data ?? []), "vector");
-    const rasters = tagItems(rasterResults.flatMap((r) => r.data ?? []), "raster");
-    // fetchReferences ignores modelId, so only include references in the
-    // unfiltered view — they'd contaminate model-specific filtered results.
-    const refs = hasFilter
-      ? []
-      : tagItems(referenceResults.flatMap((r) => r.data ?? []), "reference");
-    // Dedupe across all types together so shared IDs only appear once.
-    return dedupeById([...vectors, ...rasters, ...refs]);
-  }, [vectorResults, rasterResults, referenceResults, hasFilter]);
-
-  const filteredData = useMemo(
-    () =>
-      allData.filter(
-        (item) =>
-          item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.description?.toLowerCase().includes(searchQuery.toLowerCase()),
-      ),
-    [allData, searchQuery],
-  );
-  if (!isAuthenticated) {
-        return (
-          <Center py={10}>
-            <Text>Access not allowed</Text>
-          </Center>
-    );
-  }
-
-  // ── Tag queries ───────────────────────────────────────────────────────────
-  // Background per-model queries used only to build the model→dataset map for
-  // tag display. Not included in isLoading; their keys overlap with display
-  // query keys when a filter is active so React Query reuses the cached data.
-  const tagIds: string[] = useMemo(
+  const modelIdList: string[] = useMemo(
     () => models?.map((m) => m.id) ?? [],
     [models],
   );
 
-  const vectorTagResults = useQueries({
-    queries: tagIds.map((id) => ({
-      queryKey: ["vector", token, id],
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        fetchVectors({ modelId: id, token, signal }),
-      placeholderData: keepPreviousData,
+  const vectorResults = useQueries({
+    queries: modelIdList.map((modelId) => ({
+      queryKey: ["vector", token, modelId],
+      queryFn: async ({ signal }: { signal: AbortSignal }) => {
+        const data = await fetchVectors({ modelId, token, signal });
+        return data.map<TaggedDataset>((item) => ({
+          ...item,
+          dataType: "vector",
+          modelIds: [modelId],
+        }));
+      },
+      enabled: isAuthenticated && !!models,
     })),
   });
 
-  const rasterTagResults = useQueries({
-    queries: tagIds.map((id) => ({
-      queryKey: ["raster", token, id],
-      queryFn: ({ signal }: { signal: AbortSignal }) =>
-        fetchRasters({ modelId: id, token, signal }),
-      placeholderData: keepPreviousData,
+  const rasterResults = useQueries({
+    queries: modelIdList.map((modelId) => ({
+      queryKey: ["raster", token, modelId],
+      queryFn: async ({ signal }: { signal: AbortSignal }) => {
+        const data = await fetchRasters({ modelId, token, signal });
+        return data.map<TaggedDataset>((item) => ({
+          ...item,
+          dataType: "raster",
+          modelIds: [modelId],
+        }));
+      },
+      enabled: isAuthenticated && !!models,
     })),
   });
 
-  const itemModelIds = useMemo(() => {
-    const map = new Map<number, string[]>();
-    tagIds.forEach((modelId, idx) => {
-      [vectorTagResults[idx], rasterTagResults[idx]].forEach((result) => {
-        (result?.data ?? []).forEach((item) => {
-          const existing = map.get(item.id) ?? [];
-          if (!existing.includes(modelId)) {
-            map.set(item.id, [...existing, modelId]);
-          }
-        });
-      });
+  const referenceResult = useQuery({
+    queryKey: ["reference", token],
+    queryFn: async ({ signal }) => {
+      const data = await fetchReferences({ token, signal });
+      return data.map<TaggedDataset>((item) => ({
+        ...item,
+        dataType: "reference",
+        modelIds: [],
+      }));
+    },
+    enabled: isAuthenticated,
+  });
+
+  // Collapse entries that appear under multiple models into one row whose
+  // modelIds is the union of all sources. Keyed by (dataType, id) since
+  // vector/raster/reference IDs are independent and could collide.
+  const allDatasets = useMemo<TaggedDataset[]>(() => {
+    const byKey = new Map<string, TaggedDataset>();
+    const tagged = [
+      ...vectorResults.flatMap((r) => r.data ?? []),
+      ...rasterResults.flatMap((r) => r.data ?? []),
+      ...(referenceResult.data ?? []),
+    ];
+    for (const item of tagged) {
+      const key = `${item.dataType}-${item.id}`;
+      const existing = byKey.get(key);
+      if (existing) {
+        for (const id of item.modelIds) {
+          if (!existing.modelIds.includes(id)) existing.modelIds.push(id);
+        }
+      } else {
+        byKey.set(key, { ...item, modelIds: [...item.modelIds] });
+      }
+    }
+    return Array.from(byKey.values());
+  }, [vectorResults, rasterResults, referenceResult.data]);
+
+  const visibleDatasets = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return allDatasets.filter((d) => {
+      // Filter based on model first
+      const modelOk =
+        selectedModelIds.length === 0 ||
+        d.modelIds.some((id) => selectedModelIds.includes(id));
+      if (!modelOk) return false;
+      if (!q) return true;
+      // Filter text based results (name, description)
+      return (
+        d.name?.toLowerCase().includes(q) ||
+        d.description?.toLowerCase().includes(q)
+      );
     });
-    return map;
-  }, [vectorTagResults, rasterTagResults, tagIds]);
+  }, [allDatasets, selectedModelIds, searchQuery]);
 
-  const getModelNames = (itemId: number): string[] => {
-    const ids = itemModelIds.get(itemId) ?? [];
-    return ids.map((id) => models?.find((m) => m.id === id)?.name ?? id);
-  };
+  const isInitialLoading =
+    isAuthenticated &&
+    (!models ||
+      vectorResults.some((r) => r.isPending) ||
+      rasterResults.some((r) => r.isPending) ||
+      referenceResult.isPending);
+
+  const hasFilter = selectedModelIds.length > 0;
 
   const toggleModel = (id: string) => {
     setSelectedModelIds((prev) =>
       prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id],
     );
   };
+
+  // Return unauthenticated user
+  if (!isAuthenticated) {
+    return (
+      <Center py={10}>
+        <Text>Access not allowed</Text>
+      </Center>
+    );
+  }
 
   return (
     <Flex gap={8} align="flex-start" direction={{ base: "column", md: "row" }}>
@@ -222,29 +209,34 @@ export const DownloadList = () => {
           />
         </Box>
 
-        {isLoading ? (
+        {isInitialLoading ? (
           <Center py={10}>
             <Spinner colorPalette="orange" color="colorPalette.600" size="lg" />
           </Center>
         ) : (
           <>
             <Flex direction="column" gap={2}>
-              {filteredData.map((item) => (
-                <DownloadDataCard
-                  key={item.id}
-                  title={item.name}
-                  description={item.description}
-                  source={item.source}
-                  updated={item.updated}
-                  downloadUrl={`${MEDIA_URL_PREFIX}${item.raw_file}`}
-                  highlight={searchQuery}
-                  models={getModelNames(item.id)}
-                  dataType={item.dataType}
-                  item={item}
-                />
-              ))}
+              {visibleDatasets.map((d) => {
+                const { modelIds, dataType, ...cardItem } = d;
+                return (
+                  <DownloadDataCard
+                    key={`${dataType}-${d.id}`}
+                    title={d.name}
+                    description={d.description}
+                    source={d.source}
+                    updated={d.updated}
+                    downloadUrl={`${MEDIA_URL_PREFIX}${d.raw_file}`}
+                    highlight={searchQuery}
+                    models={modelIds.map(
+                      (id) => models?.find((m) => m.id === id)?.name ?? id,
+                    )}
+                    dataType={dataType}
+                    item={cardItem}
+                  />
+                );
+              })}
             </Flex>
-            {filteredData.length === 0 && (
+            {visibleDatasets.length === 0 && (
               <Center py={10}>{t("downloads.noData")}</Center>
             )}
           </>
