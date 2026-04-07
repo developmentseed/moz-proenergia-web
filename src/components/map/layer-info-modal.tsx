@@ -1,12 +1,33 @@
 "use client";
 
-import { Text, DataList } from "@chakra-ui/react";
+import { Text, DataList, Box, Link } from "@chakra-ui/react";
 import { ModalDialog } from "@/components/chakra/modal";
 import { formatIfDate } from "@/utils/format";
 import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 
-const MARKDOWN_KEYS = new Set(["source", "contact", "license", "attribute", "lineage"]);
+const mdComponents = {
+  p: ({ children }: { children?: React.ReactNode }) => <span>{children}</span>,
+  a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
+    <Link
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      color="blue.500"
+      textDecoration="underline"
+    >
+      {children}
+    </Link>
+  ),
+};
+
+const MARKDOWN_KEYS = new Set([
+  "source",
+  "contact",
+  "license",
+  "attribute",
+  "lineage",
+]);
 
 interface LayerInfoModalProps {
   title: string;
@@ -16,7 +37,13 @@ interface LayerInfoModalProps {
   onOpenChange: (details: { open: boolean }) => void;
 }
 
-export function LayerInfoModal({ title, description, metadata, open, onOpenChange }: LayerInfoModalProps) {
+export function LayerInfoModal({
+  title,
+  description,
+  metadata,
+  open,
+  onOpenChange,
+}: LayerInfoModalProps) {
   const { t } = useTranslation();
 
   const hasContent = description || metadata;
@@ -27,14 +54,17 @@ export function LayerInfoModal({ title, description, metadata, open, onOpenChang
       modalContent={
         <>
           {description && (
-            <Text fontSize="sm" mb={4}>
-              <ReactMarkdown>{description}</ReactMarkdown>
-            </Text>
+            <Box fontSize="sm" mb={4}>
+              <ReactMarkdown components={mdComponents}>
+                {description}
+              </ReactMarkdown>
+            </Box>
           )}
           {metadata && (
             <DataList.Root orientation="horizontal" size="sm" gap={3}>
               {Object.entries(metadata).map(([key, value]) => {
-                if (value === null || value === undefined || value === "") return null;
+                if (value === null || value === undefined || value === "")
+                  return null;
                 const formatted = String(formatIfDate(value));
                 return (
                   <DataList.Item key={key}>
@@ -47,7 +77,13 @@ export function LayerInfoModal({ title, description, metadata, open, onOpenChang
                       {t(`metadata.${key}`, { defaultValue: key })}:
                     </DataList.ItemLabel>
                     <DataList.ItemValue fontSize="sm">
-                      {MARKDOWN_KEYS.has(key) ? <ReactMarkdown>{formatted}</ReactMarkdown> : formatted}
+                      {MARKDOWN_KEYS.has(key) ? (
+                        <ReactMarkdown components={mdComponents}>
+                          {formatted}
+                        </ReactMarkdown>
+                      ) : (
+                        formatted
+                      )}
                     </DataList.ItemValue>
                   </DataList.Item>
                 );
