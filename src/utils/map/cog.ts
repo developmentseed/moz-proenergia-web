@@ -5,7 +5,7 @@ import { api, MEDIA_URL_PREFIX } from '@/utils/api';
 import { type ApiFileResult } from '@/utils/data-transformation';
 import { registerI18nResource } from '@/utils/i18n';
 
-const COLOR_SCHEME = 'BrewerGreens6'; // This should be one of https://labs.geomatico.es/maplibre-cog-protocol/color-cheatsheet.html
+const COLOR_SCHEME = 'BrewerYlGnBu9'; // This should be one of https://labs.geomatico.es/maplibre-cog-protocol/color-cheatsheet.html
 
 export async function fetchCogMetadata(filePath: string): Promise<{ min: number; max: number; isRgb: boolean }> {
   const url = `${MEDIA_URL_PREFIX}${filePath}`;

@@ -11,7 +11,7 @@ type ModalDialogProps = {
 
 export function ModalDialog({ modalTitle, modalContent, open, onOpenChange, onExitComplete }: ModalDialogProps) {
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange} onExitComplete={onExitComplete}>
+    <Dialog.Root open={open} onOpenChange={onOpenChange} onExitComplete={onExitComplete} placement="center">
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>

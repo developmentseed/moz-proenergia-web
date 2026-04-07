@@ -82,7 +82,9 @@
   },
   "map": {
     "legend": "Legenda",
-    "additionalLayers": "Camadas adicionais"
+    "additionalLayers": "Camadas adicionais",
+    "rasterMin": "Mín: {{value}}",
+    "rasterMax": "Máx: {{value}}"
   },
   "breadcrumbs": {
     "about": "Sobre",
