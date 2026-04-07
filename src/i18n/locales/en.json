@@ -75,6 +75,18 @@
       "reference": "Reference"
     }
   },
+  "metadata": {
+    "source": "Source",
+    "contact": "Point of Contact",
+    "published": "Publication Date",
+    "temporal_extent": "Temporal Extent",
+    "crs": "CRS",
+    "frequency": "Frequency",
+    "lineage": "Lineage",
+    "license": "License",
+    "attribute": "Attribute",
+    "updated": "Updated"
+  },
   "filters": {
     "typeToSearch": "Type to search",
     "selected": "{{count}} selected",

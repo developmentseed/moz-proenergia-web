@@ -168,7 +168,7 @@ export const DownloadDataCard = ({
                       letterSpacing="wider"
                       textTransform="uppercase"
                     >
-                      {t(key)}:
+                      {t(`metadata.${key}`, { defaultValue: key })}:
                     </DataList.ItemLabel>
                     <DataList.ItemValue fontSize="sm">
                       {String(formatIfDate(value))}

@@ -5,7 +5,7 @@ import { Box, Text, IconButton, HStack, Flex, VStack } from "@chakra-ui/react";
 import { Tooltip } from "@/components/ui/tooltip";
 import { LuX, LuInfo, LuDroplet } from "react-icons/lu";
 import { OpacityControl } from "./opacity-control";
-import { ModalDialog } from "@/components/chakra/modal";
+import { LayerInfoModal } from "./layer-info-modal";
 import type { ItemUnit } from "@/app/types";
 import { formatNumber } from "@/utils/number";
 import { useTranslation } from "react-i18next";
@@ -24,6 +24,7 @@ type LayerEntryProps = ItemUnit & {
   layerType: string | undefined;
   rasterStats?: { min: number; max: number };
   isRgb?: boolean;
+  item?: object;
   switchLayer: (layerId: string) => void;
   setOpacity: (layerId: string, opacity: number) => void;
 };
@@ -36,6 +37,7 @@ export function LayerEntry({
   layerType,
   rasterStats,
   isRgb,
+  item,
   switchLayer,
   setOpacity: setOpacityStore,
 }: LayerEntryProps) {
@@ -119,17 +121,10 @@ export function LayerEntry({
         )}
       </Flex>
 
-      <ModalDialog
-        modalTitle={label}
-        modalContent={
-          description ? (
-            <Text fontSize="sm">{description}</Text>
-          ) : (
-            <Text fontSize="sm" color="fg.muted" fontStyle="italic">
-              No description available.
-            </Text>
-          )
-        }
+      <LayerInfoModal
+        title={label}
+        description={description}
+        metadata={item as Record<string, string | number | boolean | null | undefined> | undefined}
         open={infoOpen}
         onOpenChange={({ open }) => setInfoOpen(open)}
       />
