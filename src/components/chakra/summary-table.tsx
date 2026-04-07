@@ -25,10 +25,12 @@ import {
 } from "@/app/types/summary";
 import { Highlight } from "@/components/chakra/highlight";
 
-const formatValue = (value: string | number, column?: string) => {
+const formatValue = (value: string | number, hasDecimal?: boolean) => {
   //@ts-expect-error @TODO
-  if (!isNaN(value)) return formatDisplayNumber(value as number, column);
-  else return value;
+  if (!isNaN(value)) {
+    return formatDisplayNumber(value as number, hasDecimal);
+  }
+  return value;
 };
 
 // ─── Row style props ────────────────────────────────────────────────────────
@@ -135,14 +137,14 @@ function FlatRowView({ row }: { row: FlatRow }) {
       </Table.Cell>
       <Table.Cell {...tableCellStyleProps}>
         <Text {...valueTextProps}>
-          {formatValue(row.value, row.key)}
+          {formatValue(row.value, row.hasDecimal)}
         </Text>
       </Table.Cell>
     </Table.Row>
   );
 }
 
-function MethodTotalRow({ item }: { item?: SummaryItem }) {
+function MethodTotalRow({ item, hasDecimal }: { item?: SummaryItem; hasDecimal?: boolean }) {
   if (!item) return null;
   return (
     <Table.Row bg="panelBg" css={lastRowStyleProps}>
@@ -151,7 +153,7 @@ function MethodTotalRow({ item }: { item?: SummaryItem }) {
       </Table.Cell>
       <Table.Cell {...tableCellStyleProps} pb={4}>
         <Text {...valueTextProps} fontWeight="semibold">
-          {formatValue(item.value, item.key)}
+          {formatValue(item.value, hasDecimal)}
         </Text>
       </Table.Cell>
     </Table.Row>
@@ -168,12 +170,12 @@ function ChartValueRows({ row }: { row: ChartRow }) {
           </Table.Cell>
           <Table.Cell {...tableCellStyleProps}>
             <Text {...valueTextProps}>
-              {formatValue(item.value, item.key)}
+              {formatValue(item.value, row.hasDecimal)}
             </Text>
           </Table.Cell>
         </Table.Row>
       ))}
-      <MethodTotalRow item={row.methodTotal} />
+      <MethodTotalRow item={row.methodTotal} hasDecimal={row.hasDecimal} />
     </>
   );
 }
@@ -294,12 +296,12 @@ function GroupRowView({ row }: { row: GroupRow }) {
           </Table.Cell>
           <Table.Cell {...tableCellStyleProps}>
             <Text {...valueTextProps}>
-              {formatValue(item.value, item.key)}
+              {formatValue(item.value, row.hasDecimal)}
             </Text>
           </Table.Cell>
         </Table.Row>
       ))}
-      <MethodTotalRow item={row.methodTotal} />
+      <MethodTotalRow item={row.methodTotal} hasDecimal={row.hasDecimal} />
     </>
   );
 }
@@ -338,20 +340,20 @@ function NestedGroupRowView({ row }: { row: NestedGroupRow }) {
             </Table.Cell>
             <Table.Cell {...tableCellStyleProps}>
               <Text {...valueTextProps}>
-                {formatValue(item.value, item.key)}
+                {formatValue(item.value, row.hasDecimal)}
               </Text>
             </Table.Cell>
           </Table.Row>
         )),
       ])}
-      <MethodTotalRow item={row.methodTotal} />
+      <MethodTotalRow item={row.methodTotal} hasDecimal={row.hasDecimal} />
     </>
   );
 }
 
 function HighlightRowView({ row }: { row: HighlightRow }) {
   const items = row.value.map((item) => ({
-    id: String(formatValue(item.value, item.key)),
+    id: String(formatValue(item.value)),
     label: item.label,
   }));
   return (
