@@ -311,11 +311,11 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   if (!modelData || !layers) {
     return (
       <Flex id="container" width="full" height="full" position="relative" direction={{ base: "column", md: "row" }}>
-        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height={{ base: "auto", md: "full" }} flex={1} />
+        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height={{ base: "auto", md: "full" }} flex={{base: 1, md: "initial" }} />
         <Box flex={{ base: 4, md: 1 }} height="full" p={2}>
           <Skeleton width="full" height="full" />
         </Box>
-        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height="full" flex={1} />
+        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height="full" flex={{base: 1, md: "initial" }} />
       </Flex>
     );
   }
