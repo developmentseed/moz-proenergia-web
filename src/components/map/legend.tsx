@@ -100,6 +100,7 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
                               isRgb={layer.isRgb}
                               layerType={layer.layerType}
                               color={layer.color ?? '#1000be'}
+                              item={layer.metadata}
                               switchLayer={(id) => toggleLayer({ [id]: false })}
                               setOpacity={(id, opacity) => setLayerOpacity(id, opacity)}
                             />

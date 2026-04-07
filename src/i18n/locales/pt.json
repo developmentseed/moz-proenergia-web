@@ -75,6 +75,18 @@
       "reference": "Referência"
     }
   },
+  "metadata": {
+    "source": "Proprietário dos Dados",
+    "contact": "Ponto de Contato",
+    "published": "Data de Publicação",
+    "temporal_extent": "Extensão Temporal",
+    "crs": "SRC",
+    "frequency": "Frequência de Manutenção",
+    "lineage": "Linhagem",
+    "license": "Licença Legal / Termos de Uso",
+    "attribute": "Definições de Atributos",
+    "updated": "Última Atualização"
+  },
   "filters": {
     "typeToSearch": "Digite para pesquisar",
     "selected": "{{count}} selecionado(s)",

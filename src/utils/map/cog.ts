@@ -96,6 +96,18 @@ export function transformRastersToLayers(
       layerType: 'raster' as const,
       rasterStats: meta ?? undefined,
       isRgb: meta?.isRgb ?? false,
+      metadata: {
+        source: v.source,
+        contact: v.contact,
+        published: v.published,
+        temporal_extent: v.temporal_extent,
+        crs: v.crs,
+        frequency: v.frequency,
+        lineage: v.lineage,
+        license: v.license,
+        attribute: v.attribute,
+        updated: v.updated,
+      },
     };
   });
 }
