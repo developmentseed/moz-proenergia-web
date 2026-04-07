@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import type { ReactElement } from 'react';
-import * as maplibregl from 'maplibre-gl';
+import maplibregl from 'maplibre-gl';
 import { useControl, Marker, type MarkerProps, type ControlPosition } from 'react-map-gl/maplibre';
 import MaplibreGeocoder, {
   type CarmenGeojsonFeature,

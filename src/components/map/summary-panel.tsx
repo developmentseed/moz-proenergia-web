@@ -1,11 +1,11 @@
 import { memo, useState, useEffect } from "react";
-import { Box, Flex, Text, IconButton, Input, Field as ChakraField, Link } from "@chakra-ui/react";
+import { Box, Flex, Text, IconButton, Link } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { api } from "@/utils/api";
 import { fetchModels, slugify } from "@/utils/data-transformation";
 import { useAuth } from "@/utils/context/auth";
 import { useModel } from "@/utils/context/model";
-import { LuChevronLeft, LuSearch, LuChevronsUpDown, LuChevronsDownUp } from "react-icons/lu";
+import { LuChevronLeft, LuChevronsUpDown, LuChevronsDownUp } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
 import { mapControlCommonStyleProps } from "./control-constant";
 import { zIndex } from "@/components/ui/constant";
@@ -15,6 +15,7 @@ import { SummaryTable } from "@/components/chakra/summary-table";
 import { useSummaryQuery } from "@/hooks/use-summary-query";
 import { AnimationTime, ControlPanelWidth } from "../ui/main-panel";
 import { useTranslation } from "react-i18next";
+import MapNavigator from "./map-navigator";
 
 interface SummaryPanelProps {
   clusterId: string | null;
@@ -25,6 +26,7 @@ interface SummaryPanelProps {
   filterDefs: Filter[];
   resetCluster: () => void;
   onSelectCluster: (id: string) => void;
+  onFlyTo: (lng: number, lat: number) => void;
   main?: Main;
   isOpen: boolean;
   onToggle?: () => void;
@@ -66,48 +68,6 @@ const PanelHeader = ({ title, subtitle, onBack }: PanelHeaderProps) => (
     </Flex>
   </Box>
 );
-
-interface ClusterSearchProps {
-  onSelectCluster: (id: string) => void;
-}
-
-const ClusterSearch = ({ onSelectCluster }: ClusterSearchProps) => {
-  const [value, setValue] = useState("");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = value.trim();
-    if (trimmed) onSelectCluster(trimmed);
-  };
-
-  return (
-    <Box as="form" onSubmit={handleSubmit}>
-      <ChakraField.Root>
-        <ChakraField.Label fontSize="xs" color="fg.muted">
-          Navigate to cluster or site
-        </ChakraField.Label>
-        <Flex gap={1} width="full">
-          <Input
-            size="sm"
-            placeholder="Enter cluster ID…"
-            flexBasis="100%"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-          />
-          <IconButton
-            type="submit"
-            size="sm"
-            variant="surface"
-            aria-label="Navigate to cluster"
-            disabled={!value.trim()}
-          >
-            <LuSearch />
-          </IconButton>
-        </Flex>
-      </ChakraField.Root>
-    </Box>
-  );
-};
 
 interface RelatedModelsProps {
   clusterId: string;
@@ -200,6 +160,7 @@ const SummaryPanel = ({
   filterDefs,
   resetCluster,
   onSelectCluster,
+  onFlyTo,
   main,
   isOpen,
   onToggle = () => {},
@@ -315,7 +276,7 @@ const SummaryPanel = ({
             </Box>
         ) :
             <Box p={4} borderTop="1px solid" borderColor="border">
-              <ClusterSearch onSelectCluster={onSelectCluster} />
+              <MapNavigator onSelectCluster={onSelectCluster} onFlyTo={onFlyTo} />
             </Box>
           }
         </Box>
@@ -345,7 +306,7 @@ const SummaryPanel = ({
           </Box>
         ) :
           <Box p={4} borderTop="1px solid" borderColor="border">
-            <ClusterSearch onSelectCluster={onSelectCluster} />
+            <MapNavigator onSelectCluster={onSelectCluster} onFlyTo={onFlyTo} />
           </Box>
           }
       </Box>

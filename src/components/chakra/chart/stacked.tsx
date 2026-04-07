@@ -22,14 +22,12 @@ export const SummaryStackedBarChart = ({ data, colorMap, unit }: SummaryStackedB
   return (
     <BarSegment.Root chart={chart}>
       <BarSegment.Content>
-        {/* <BarSegment.Value /> */}
         <BarSegment.Bar tooltip />
       </BarSegment.Content>
       <BarSegment.Legend
         showPercent
         gap="1"
         textStyle="xs"
-        // valueFormatter={(value) => formatDisplayNumber(value) + (unit ? ` ${unit}` : "")}
       />
     </BarSegment.Root>
   );

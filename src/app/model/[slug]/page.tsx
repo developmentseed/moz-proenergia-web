@@ -1,10 +1,5 @@
 import { Suspense } from 'react';
 import { Flex, Box } from "@chakra-ui/react";
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from '@tanstack/react-query';
 import Explorer from '@/components/ui/explorer';
 import { SideNav } from '@/components/layout/side-nav';
 import {
@@ -19,7 +14,6 @@ export async function generateStaticParams() {
   return res.map((model) => ({
     slug: slugify(model.name),
   }));
-  //.filter((m,idx) => idx < 4);
 }
 
 export default async function ModelPage({
@@ -28,63 +22,19 @@ export default async function ModelPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params;
-  const queryClient = new QueryClient();
+  const models = await fetchModels();
+  const model = models.find((m) => slugify(m.name) === slug);
 
-  // Prefetch in parallel: models list, model metadata, vectors
-  // await Promise.all([
-    // queryClient.prefetchQuery({
-    //   queryKey: ['models'],
-    //   queryFn: fetchModels,
-    // });
-    const models = await fetchModels();
-    const model = models.find((m) => slugify(m.name) === slug);
-
-    if (!model) {
-      throw new Error(`Model not found for slug: ${slug}`);
-    }
-
-  //   queryClient.prefetchQuery({
-  //     queryKey: ['modelMetadata', slug],
-  //     queryFn: async () => {
-  //       const apiModel = await fetchModelMetadata(slug);
-  //       return transformModelCore(apiModel);
-  //     },
-  //   }),
-  //   queryClient.prefetchQuery({
-  //     queryKey: ['vectors'],
-  //     queryFn: async () => {
-  //       const apiVectors = await fetchVectors();
-  //       return transformVectorsToLayers(apiVectors);
-  //     },
-  //   }),
-  // ]);
-
-  // Get model core to fetch filter options
-  // const modelCore = queryClient.getQueryData<ReturnType<typeof transformModelCore>>(['modelMetadata', slug]);
-  // const defaultScenarioId = modelCore?.scenarios[0]?.id;
-
-  // Prefetch filter options in parallel
-  // if (modelCore && defaultScenarioId) {
-  //   await Promise.all(
-  //     modelCore.filterFields.map(field =>
-  //       queryClient.prefetchQuery({
-  //         queryKey: ['filterOptions', modelCore?.id, field.column],
-  //         queryFn: () => fetchFilterOptions(defaultScenarioId, field.column),
-  //       })
-  //     )
-  //   );
-  // }
-
-  // const models = queryClient.getQueryData<ModelGroupMetadata[]>(['models'])!;
+  if (!model) {
+    throw new Error(`Model not found for slug: ${slug}`);
+  }
 
   return (
     <Flex h="calc(100vh - 3.5rem - 1px)" maxH="calc(100vh - 3.5rem - 1px)" overflow="hidden" width="100%">
       <Suspense>
         <SideNav models={models} currentSlug={slug} />
         <Box id='main-panel' width='full' height="100%">
-          {/* <HydrationBoundary state={dehydrate(queryClient)}> */}
           <Explorer modelId={model.id} />
-          {/* </HydrationBoundary> */}
         </Box>
       </Suspense>
     </Flex>

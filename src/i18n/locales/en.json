@@ -66,7 +66,26 @@
     "noData": "No data found",
     "source": "Source:",
     "updated": "Updated:",
-    "download": "Download"
+    "download": "Download",
+    "filterModels": "Filter by Model",
+    "reset": "Reset",
+    "dataType": {
+      "vector": "Vector",
+      "raster": "Raster",
+      "reference": "Reference"
+    }
+  },
+  "metadata": {
+    "source": "Source",
+    "contact": "Point of Contact",
+    "published": "Publication Date",
+    "temporal_extent": "Temporal Extent",
+    "crs": "CRS",
+    "frequency": "Frequency",
+    "lineage": "Lineage",
+    "license": "License",
+    "attribute": "Attribute",
+    "updated": "Updated"
   },
   "filters": {
     "typeToSearch": "Type to search",
@@ -75,7 +94,9 @@
   },
   "map": {
     "legend": "Legend",
-    "additionalLayers": "Additional layers"
+    "additionalLayers": "Additional layers",
+    "rasterMin": "Min: {{value}}",
+    "rasterMax": "Max: {{value}}"
   },
   "breadcrumbs": {
     "about": "About",

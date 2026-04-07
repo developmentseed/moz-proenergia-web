@@ -19,3 +19,23 @@ export function truncatedClean(str: string | null, maxLength: number) {
 
   return truncated;
 }
+
+/**
+ * Formats a string as a date if it is a valid date string.
+ * @param value - The value to check and potentially format.
+ * @returns The formatted date string or the original value.
+ */
+export function formatIfDate(value: any): string | any {
+  // Check if value is a string and not just a numeric string
+  if (typeof value === 'string' && isNaN(Number(value))) {
+    const date = new Date(value);
+
+    // Check if the date object is valid using .getTime()
+    // A valid date returns a number; an invalid one returns NaN
+    if (!isNaN(date.getTime())) {
+      return date.toLocaleDateString();
+    }
+  }
+  
+  return value; // Return original if not a date
+}

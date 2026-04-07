@@ -5,7 +5,7 @@ import { api, MEDIA_URL_PREFIX } from '@/utils/api';
 import { type ApiFileResult } from '@/utils/data-transformation';
 import { registerI18nResource } from '@/utils/i18n';
 
-const COLOR_SCHEME = 'BrewerGreens6'; // This should be one of https://labs.geomatico.es/maplibre-cog-protocol/color-cheatsheet.html
+const COLOR_SCHEME = 'BrewerYlGnBu9'; // This should be one of https://labs.geomatico.es/maplibre-cog-protocol/color-cheatsheet.html
 
 export async function fetchCogMetadata(filePath: string): Promise<{ min: number; max: number; isRgb: boolean }> {
   const url = `${MEDIA_URL_PREFIX}${filePath}`;
@@ -34,8 +34,6 @@ export async function fetchCogMetadata(filePath: string): Promise<{ min: number;
 }
 
 export function deriveRasterSource(id: string, filePath: string, stats?: { min: number; max: number }, isRgb?: boolean) {
-  console.log('is rgb?')
-  console.log(isRgb);
   const colorFragment = !isRgb && stats
     ? `#color:${COLOR_SCHEME},${stats.min},${stats.max},c`
     : '';
@@ -98,6 +96,18 @@ export function transformRastersToLayers(
       layerType: 'raster' as const,
       rasterStats: meta ?? undefined,
       isRgb: meta?.isRgb ?? false,
+      metadata: {
+        source: v.source,
+        contact: v.contact,
+        published: v.published,
+        temporal_extent: v.temporal_extent,
+        crs: v.crs,
+        frequency: v.frequency,
+        lineage: v.lineage,
+        license: v.license,
+        attribute: v.attribute,
+        updated: v.updated,
+      },
     };
   });
 }

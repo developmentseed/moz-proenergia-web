@@ -16,6 +16,7 @@ export interface Field {
   colors?: Record<string, string>;
   showChartValueRows?: boolean;
   showBarChartAverage?: boolean;
+  hasDecimal?: boolean;
 }
 export interface MapItemUnit extends ItemUnit {
   color?: string;
@@ -62,6 +63,7 @@ export interface Layer extends ItemUnit {
   layerType?: 'vector' | 'raster';
   rasterStats?: { min: number; max: number };
   isRgb?: boolean;
+  metadata?: Record<string, string | number | boolean | null | undefined>;
 }
 
 export interface Main extends BaseScenarioFilter {

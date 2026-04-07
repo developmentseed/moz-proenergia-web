@@ -62,7 +62,7 @@ export interface ApiModelResponse {
   color_coding: ColorCoding[]
   metric_field_types: Record<string, string>
 }
-
+export type DataType = "vector" | "raster" | "reference";
 export interface ApiFileResult {
   id: number;
   name: string;
@@ -70,6 +70,14 @@ export interface ApiFileResult {
   description?: string;
   description_pt?: string;
   source?: string;
+  contact?: string;
+  published?: string;
+  temporal_extent?: string;
+  crs?: string;
+  frequency?: string;
+  lineage?: string;
+  license?: string;
+  attribute?: string;
   created: string;
   updated: string;
   created_by: string;
@@ -250,13 +258,16 @@ export async function fetchVectors({ modelId, token, signal }: { modelId?: strin
   }
 }
 
-export async function fetchReferences({ token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiFileResult[]> {
+export async function fetchReferences({ modelId, token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiFileResult[]> {
   try {
     const endpoint = `reference/`;
     const { data } = await api.get(endpoint, {
       signal,
       ...(token && {
         headers: { 'Authorization': `Token ${token}` }
+      }),
+      ...(modelId && {
+        params: { 'model': modelId }
       })
     });
     const results: ApiFileResult[] = data.results;
@@ -264,7 +275,7 @@ export async function fetchReferences({ token, signal }: { modelId?: string, tok
     return results;
   } catch(e) {
     console.error(e);
-    throw new Error('Failed to fetch vectors');
+    throw new Error('Failed to fetch references');
   }
 }
 
@@ -402,6 +413,18 @@ export function transformVectorsToLayers(apiVectors: ApiFileResult[]): Layer[] {
       filePath: v.raw_file,
       color: v.color,
       layerType: 'vector' as const,
+      metadata: {
+        source: v.source,
+        contact: v.contact,
+        published: v.published,
+        temporal_extent: v.temporal_extent,
+        crs: v.crs,
+        frequency: v.frequency,
+        lineage: v.lineage,
+        license: v.license,
+        attribute: v.attribute,
+        updated: v.updated,
+      },
     };
   });
 }

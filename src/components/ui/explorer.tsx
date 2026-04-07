@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryState, parseAsString } from 'nuqs';
 import { ModelProvider } from "@/utils/context/model";
@@ -10,7 +10,7 @@ import { useFilters } from "@/utils/context/filters";
 import { useModel } from "@/utils/context/model";
 import { Flex, Box, IconButton, Skeleton } from "@chakra-ui/react";
 import NextLink from "next/link";
-import MainMap from "@/components/map";
+import MainMap, { type FlyToFn } from "@/components/map";
 import { LuPanelLeftOpen, LuPanelLeftClose, LuPanelRightOpen, LuPanelRightClose } from "react-icons/lu";
 import { useAuth } from "@/utils/context/auth";
 import { zIndex } from "./constant";
@@ -51,6 +51,8 @@ const ExplorerInner = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const flyToRef = useRef<FlyToFn | null>(null);
 
   const resetCluster = useCallback(() => {
     setSelected(null);
@@ -118,6 +120,7 @@ const ExplorerInner = () => {
           main={model.main}
           onClick={onClick}
           clusterId={selected}
+          onFlyToRef={flyToRef}
         />
       </Box>
 
@@ -162,6 +165,7 @@ const ExplorerInner = () => {
         clusterId={selected}
         scenarioId={scenarioId}
         onSelectCluster={setSelected}
+        onFlyTo={(lng, lat) => flyToRef.current?.(lng, lat)}
         popupFields={model.popupFields}
         summaryFields={model.summaryFields}
         filters={updatedFilters}
@@ -187,33 +191,47 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
       return transformModelCore(apiModel);
     },
   });
-  // contextual layers : separate context
+
+  // The queryKeys below cache the raw ApiFileResult[] so other consumers
+  // (e.g. the downloads page) can share this data. Layer transforms are
+  // applied locally via select / useMemo.
   const { data: vectorLayers } = useQuery({
     queryKey: ["vectors", modelId, token],
-    queryFn: async ({ signal }) => {
-      const apiVectors = await fetchVectors({ modelId, token, signal });
-      return transformVectorsToLayers(apiVectors);
-    },
+    queryFn: ({ signal }) => fetchVectors({ modelId, token, signal }),
+    // Select is synchronious (can't be used for rasters that needs to fetch cog metadata)
+    select: transformVectorsToLayers,
   });
 
-  const { data: rasterLayers = [] } = useQuery({
+  const { data: apiRasters } = useQuery({
     queryKey: ["rasters", modelId, token],
-    queryFn: async ({ signal }) => {
-      const apiRasters = await fetchRasters({ modelId, token, signal });
-      const statsEntries = await Promise.all(
-        apiRasters.map(async (r) => {
+    queryFn: ({ signal }) => fetchRasters({ modelId, token, signal }),
+  });
+
+  const { data: rasterStatsMap } = useQuery({
+    queryKey: ["rasterStats", modelId, token],
+    queryFn: async () => {
+      const entries = await Promise.all(
+        (apiRasters ?? []).map(async (r) => {
           try {
             const stats = await fetchCogMetadata(r.raw_file);
             return [r.id, stats] as const;
           } catch {
             return [r.id, null] as const;
           }
-        })
+        }),
       );
-      const statsMap = new Map(statsEntries);
-      return transformRastersToLayers(apiRasters, statsMap);
+      return new Map(entries);
     },
+    enabled: !!apiRasters && apiRasters.length > 0,
   });
+
+  const rasterLayers = useMemo(
+    () =>
+      apiRasters && rasterStatsMap
+        ? transformRastersToLayers(apiRasters, rasterStatsMap)
+        : [],
+    [apiRasters, rasterStatsMap],
+  );
 
   const layers = useMemo(() => {
     if (!vectorLayers) return undefined;
@@ -293,11 +311,11 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   if (!modelData || !layers) {
     return (
       <Flex id="container" width="full" height="full" position="relative" direction={{ base: "column", md: "row" }}>
-        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height={{ base: "auto", md: "full" }} flex={1} />
+        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height={{ base: "auto", md: "full" }} flex={{base: 1, md: "initial" }} />
         <Box flex={{ base: 4, md: 1 }} height="full" p={2}>
           <Skeleton width="full" height="full" />
         </Box>
-        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height="full" flex={1} />
+        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height="full" flex={{base: 1, md: "initial" }} />
       </Flex>
     );
   }

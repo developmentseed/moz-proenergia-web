@@ -51,6 +51,7 @@ export interface FlatRow {
   category?: string;
   unit?: string;
   value: number | string;
+  hasDecimal?: boolean;
 }
 
 export interface GroupRow {
@@ -61,6 +62,7 @@ export interface GroupRow {
   unit?: string;
   value: SummaryItem[];
   methodTotal?: SummaryItem;
+  hasDecimal?: boolean;
 }
 
 export interface ChartRow {
@@ -76,6 +78,7 @@ export interface ChartRow {
   showBarChartAverage?: boolean;
   colorMap?: Record<string, string>;
   methodTotal?: SummaryItem;
+  hasDecimal?: boolean;
 }
 
 export interface ErrorRow {
@@ -100,6 +103,7 @@ export interface NestedGroupRow {
   unit?: string;
   value: NestedGroupData[];
   methodTotal?: SummaryItem;
+  hasDecimal?: boolean;
 }
 
 export interface HighlightRow {
@@ -110,6 +114,7 @@ export interface HighlightRow {
   unit?: string;
   value: SummaryItem[];
   methodTotal?: SummaryItem;
+  hasDecimal?: boolean;
 }
 
 export type SummaryRow = FlatRow | GroupRow | ChartRow | ErrorRow | NestedGroupRow | HighlightRow;

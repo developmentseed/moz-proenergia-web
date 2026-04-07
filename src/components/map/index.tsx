@@ -1,14 +1,15 @@
-import { useEffect, useMemo, useCallback, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Map,
   ViewStateChangeEvent,
   NavigationControl,
   ScaleControl,
   type MapLayerMouseEvent,
+  type MapRef,
 } from "react-map-gl/maplibre";
 import { Box, Flex } from "@chakra-ui/react";
 import * as pmtiles from "pmtiles";
-import * as maplibregl from "maplibre-gl";
+import maplibregl from "maplibre-gl";
 import { type RequestTransformFunction } from "maplibre-gl";
 import {
   isMapboxURL,
@@ -44,37 +45,32 @@ const transformRequest: RequestTransformFunction = (url, resourceType) => {
   return { url };
 };
 
+export type FlyToFn = (lng: number, lat: number) => void;
+
 interface MainMapProps {
   main: Main;
   onClick: (event: MapLayerMouseEvent) => void;
   clusterId: string | null;
+  onFlyToRef: React.RefObject<FlyToFn | null>;
 }
 
-const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
+const MainMap = ({ main, onClick, clusterId, onFlyToRef }: MainMapProps) => {
   const { coords, setCoords } = useMapCoords();
   const { lat, lng, zoom } = coords;
 
   const { open } = useToggle(true);
+
+  const mapRef = useRef<MapRef>(null);
+  useEffect(() => {
+    onFlyToRef.current = (lng, lat) =>
+      mapRef.current?.flyTo({ center: [lng, lat], zoom: 14 });
+  }, [onFlyToRef]);
 
   // Attach pmtile + cog protocol to MapLibre
   useEffect(() => {
     const protocol = new pmtiles.Protocol();
     maplibregl.addProtocol("pmtiles", protocol.tile);
     maplibregl.addProtocol('cog', COGProtocol.cogProtocol);
-    //   COGProtocol.setColorFunction(cogUrl, (pixel, color) => {
-    //     if (!Number.isFinite(pixel[0])) color.set([0, 0, 0, 0]);
-    //     // else if (pixel[0] < 0.00001) color.set([0, 0, 0, 0]);
-    //     // else {
-    //     //   const value = interpolateCividis(Math.log1p(pixel[0]) / logMax);
-    //     //   const rgbValue = d3color.rgb(value);
-    //     //   color.set([rgbValue.r, rgbValue.g, rgbValue.b, 255]);
-    //     // }
-    //     // else if (pixel[0] < 0.0001)color.set([0, 0, 0, 0]);
-    //     // else if (pixel[0] < 10)color.set([255, 0, 0, 255]); // Red
-    //     // else if (pixel[0] < 300) color.set([255, 255, 0, 255]);
-    //     // else  color.set([0, 255, 0, 255]);
-
-    // });
     return () => {
       maplibregl.removeProtocol("pmtiles");
       maplibregl.removeProtocol("cog");
@@ -113,6 +109,7 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
       {/* Map takes all remaining width */}
       <Box flex={1} h="full" position="relative" pb={{ base: 10, md: 0 }}>
         <Map
+          ref={mapRef}
           initialViewState={{
             longitude: lng,
             latitude: lat,
@@ -150,7 +147,6 @@ const MainMap = ({ main, onClick, clusterId }: MainMapProps) => {
             position="bottom-left"
             collapsed={true}
             countries="mz"
-            reverseGeocode={true}
             marker={false}
             showResultsWhileTyping={true}
             clearAndBlurOnEsc={true}

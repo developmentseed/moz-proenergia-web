@@ -106,17 +106,6 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
             />
           </Field.Root>
 
-          {/* <Flex justify="space-between" align="center">
-            <Link
-              href="/forgot-password"
-              fontSize="sm"
-              color="blue.600"
-              _hover={{ textDecoration: 'underline' }}
-            >
-              Forgot password?
-            </Link>
-          </Flex> */}
-
           <Button
             type="submit"
             colorScheme="blue"
