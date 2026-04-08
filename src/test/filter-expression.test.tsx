@@ -55,8 +55,12 @@ describe("Filter to Expression End-to-End", () => {
 
       expect(expression).toEqual([
         "all",
-        ["all", [">=", ["get", "pop_count"], 0], ["<=", ["get", "pop_count"], 1000]],
-        ["in", ["get", "type_id"], ["literal", ["1","2", "3"]]],
+        [
+          "all",
+          [">=", ["to-number", ["get", "pop_count"]], 0],
+          ["<=", ["to-number", ["get", "pop_count"]], 1000],
+        ],
+        ["in", ["get", "type_id"], ["literal", ["1", "2", "3"]]],
       ]);
     });
   });
@@ -92,7 +96,11 @@ describe("Filter to Expression End-to-End", () => {
 
       expect(expression).toEqual([
         "all",
-        ["all", [">=", ["get", "pop_count"], 0], ["<=", ["get", "pop_count"], 1000]],
+        [
+          "all",
+          [">=", ["to-number", ["get", "pop_count"]], 0],
+          ["<=", ["to-number", ["get", "pop_count"]], 1000],
+        ],
         ["in", ["get", "type_id"], ["literal", ["1", "2"]]],
       ]);
     });
@@ -119,7 +127,11 @@ describe("Filter to Expression End-to-End", () => {
 
       expect(expression).toEqual([
         "all",
-        ["all", [">=", ["get", "pop_count"], 0], ["<=", ["get", "pop_count"], 1000]],
+        [
+          "all",
+          [">=", ["to-number", ["get", "pop_count"]], 0],
+          ["<=", ["to-number", ["get", "pop_count"]], 1000],
+        ],
         ["in", ["get", "type_id"], ["literal", ["1", "2", "3"]]],
         ["in", ["get", "admin_name"], ["literal", ["Maputo"]]],
       ]);
@@ -147,7 +159,11 @@ describe("Filter to Expression End-to-End", () => {
 
       expect(expression).toEqual([
         "all",
-        ["all", [">=", ["get", "pop_count"], 100], ["<=", ["get", "pop_count"], 500]],
+        [
+          "all",
+          [">=", ["to-number", ["get", "pop_count"]], 100],
+          ["<=", ["to-number", ["get", "pop_count"]], 500],
+        ],
         ["in", ["get", "type_id"], ["literal", ["1", "2", "3"]]],
       ]);
     });
@@ -180,7 +196,11 @@ describe("Filter to Expression End-to-End", () => {
 
       expect(expression).toEqual([
         "all",
-        ["all", [">=", ["get", "pop_count"], 200], ["<=", ["get", "pop_count"], 800]],
+        [
+          "all",
+          [">=", ["to-number", ["get", "pop_count"]], 200],
+          ["<=", ["to-number", ["get", "pop_count"]], 800],
+        ],
         ["in", ["get", "type_id"], ["literal", ["2", "3"]]],
         ["in", ["get", "admin_name"], ["literal", ["Gaza", "Inhambane"]]],
       ]);
@@ -194,8 +214,8 @@ describe("Filter to Expression End-to-End", () => {
         column: DEFAULT_COL,
         label: "Main",
         options: [
-          { value: "a", label: "A", color: "#ff0000" },
-          { value: "b", label: "B", color: "#00ff00" },
+          { id: "a", label: "A", color: "#ff0000" },
+          { id: "b", label: "B", color: "#00ff00" },
         ],
       };
 
@@ -214,8 +234,8 @@ describe("Filter to Expression End-to-End", () => {
         column: "technology",
         label: "Main",
         options: [
-          { value: "solar", label: "Solar", color: "#ffcc00" },
-          { value: "wind", label: "Wind", color: "#0066ff" },
+          { id: "solar", label: "Solar", color: "#ffcc00" },
+          { id: "wind", label: "Wind", color: "#0066ff" },
         ],
       };
 
