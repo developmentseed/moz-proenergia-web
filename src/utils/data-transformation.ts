@@ -322,8 +322,12 @@ export function replaceSummaryIdColumn(fields: Field[], metricField: Record<stri
     const idField = f.columns.includes('id');
     if (idField) {
       // Replace 'id' in summary field columns with the main visualization column
-      // @TODO: Falling back to Posto should not happen
-      const filedNameToReplace = Object.keys(metricField).find(value => value !=='id') || 'Posto';
+      const filedNameToReplace = Object.keys(metricField).find(value => value !== 'id');
+      if (!filedNameToReplace) {
+        throw new Error(
+          `replaceSummaryIdColumn: cannot replace 'id' column because metricField has no non-'id' key (got ${JSON.stringify(metricField)})`
+        );
+      }
       const newFields = [...f.columns.filter(c => c !== 'id'), filedNameToReplace];
       return { ...f, columns: newFields, group_by: groupBy };
     }

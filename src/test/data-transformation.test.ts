@@ -7,7 +7,6 @@ import {
   transformOptions,
   deriveSource,
   deriveLayerStyles,
-  getColormap,
   replaceSummaryIdColumn,
 } from '@/utils/data-transformation';
 
@@ -110,11 +109,11 @@ describe('data-transformation', () => {
       expect(transformOptions('string')).toEqual([]);
     });
 
-    it('should transform string options to ItemUnit', () => {
+    it('should transform string options to MapItemUnit', () => {
       const result = transformOptions(['Solar', 'Wind']);
       expect(result).toEqual([
-        { value: 'Solar', label: 'Solar', color: undefined },
-        { value: 'Wind', label: 'Wind', color: undefined },
+        { id: 'Solar', label: 'Solar', color: undefined },
+        { id: 'Wind', label: 'Wind', color: undefined },
       ]);
     });
 
@@ -131,9 +130,9 @@ describe('data-transformation', () => {
       const result = transformOptions(['Solar', 'Wind', 'Hydro'], colormap);
 
       expect(result).toEqual([
-        { value: 'Solar', label: 'Solar', color: '#FFD700' },
-        { value: 'Wind', label: 'Wind', color: '#00CED1' },
-        { value: 'Hydro', label: 'Hydro', color: undefined },
+        { id: 'Solar', label: 'Solar', color: '#FFD700' },
+        { id: 'Wind', label: 'Wind', color: '#00CED1' },
+        { id: 'Hydro', label: 'Hydro', color: undefined },
       ]);
     });
 
@@ -184,11 +183,11 @@ describe('data-transformation', () => {
   });
 
   describe('replaceSummaryIdColumn', () => {
-    it('should replace "id" column with mainColumn', () => {
+    it('should replace "id" column with the first non-"id" key from metricField', () => {
       const fields = [
         { columns: ['id', 'pop_count'], label: 'Population' },
       ];
-      const result = replaceSummaryIdColumn(fields, 'technology');
+      const result = replaceSummaryIdColumn(fields, { id: 'int', technology: 'string' });
 
       expect(result).toEqual([
         { columns: ['pop_count', 'technology'], label: 'Population' },
@@ -199,7 +198,7 @@ describe('data-transformation', () => {
       const fields = [
         { columns: ['pop_count', 'area'], label: 'Stats' },
       ];
-      const result = replaceSummaryIdColumn(fields, 'technology');
+      const result = replaceSummaryIdColumn(fields, { id: 'int', technology: 'string' });
 
       expect(result).toEqual([
         { columns: ['pop_count', 'area'], label: 'Stats' },
@@ -212,7 +211,7 @@ describe('data-transformation', () => {
         { columns: ['area'], label: 'Area' },
         { columns: ['id'], label: 'Count' },
       ];
-      const result = replaceSummaryIdColumn(fields, 'grid_type');
+      const result = replaceSummaryIdColumn(fields, { id: 'int', grid_type: 'string' });
 
       expect(result).toEqual([
         { columns: ['connections', 'grid_type'], label: 'Connections' },
@@ -221,24 +220,88 @@ describe('data-transformation', () => {
       ]);
     });
 
-    it('should use DEFAULT_COL as mainColumn when visualization_column is empty', () => {
+    it('should throw when a field has an "id" column but metricField has no non-"id" key', () => {
       const fields = [
         { columns: ['id'], label: 'Summary' },
       ];
-      const result = replaceSummaryIdColumn(fields, 'default');
 
-      expect(result).toEqual([
-        { columns: ['default'], label: 'Summary' },
-      ]);
+      expect(() => replaceSummaryIdColumn(fields, { id: 'int' })).toThrow(
+        /no non-'id' key/,
+      );
+      expect(() => replaceSummaryIdColumn(fields, {})).toThrow(
+        /no non-'id' key/,
+      );
+    });
+
+    it('should not throw when no field has an "id" column, even if metricField only has "id"', () => {
+      const fields = [
+        { columns: ['pop_count'], label: 'Population' },
+      ];
+
+      // No 'id' column to replace, so the missing replacement key should never be consulted.
+      expect(() => replaceSummaryIdColumn(fields, { id: 'int' })).not.toThrow();
     });
   });
 
   describe('deriveLayerStyles', () => {
-    it('should return both circle and line layer styles', () => {
-      const result = deriveLayerStyles('source-1');
+    it('should return circle, line, and polygon layer styles', () => {
+      const result = deriveLayerStyles('source-1', '#ff0000');
 
       expect(result.circleLayer).toBeDefined();
       expect(result.lineLayer).toBeDefined();
+      expect(result.polygonLayer).toBeDefined();
+    });
+
+    it('should derive layer ids from the sourceId', () => {
+      const result = deriveLayerStyles('my-source', '#ff0000');
+
+      expect(result.circleLayer.id).toBe('my-source-circle-layer');
+      expect(result.lineLayer.id).toBe('my-source-line-layer');
+      expect(result.polygonLayer.id).toBe('my-source-polygon-layer');
+    });
+
+    it('should use the sourceId and default source-layer name on every layer', () => {
+      const result = deriveLayerStyles('source-1', '#ff0000');
+
+      for (const layer of [result.circleLayer, result.lineLayer, result.polygonLayer]) {
+        expect(layer.source).toBe('source-1');
+        expect(layer['source-layer']).toBe('data');
+      }
+    });
+
+    it('should set the correct maplibre type on each layer', () => {
+      const result = deriveLayerStyles('source-1', '#ff0000');
+
+      expect(result.circleLayer.type).toBe('circle');
+      expect(result.lineLayer.type).toBe('line');
+      expect(result.polygonLayer.type).toBe('fill');
+    });
+
+    it('should apply the color to each layer paint', () => {
+      const result = deriveLayerStyles('source-1', '#abcdef');
+
+      expect(result.circleLayer.paint?.['circle-color']).toBe('#abcdef');
+      expect(result.circleLayer.paint?.['circle-stroke-color']).toBe('#fff');
+      expect(result.lineLayer.paint?.['line-color']).toBe('#abcdef');
+      expect(result.polygonLayer.paint?.['fill-color']).toBe('#abcdef');
+      expect(result.polygonLayer.paint?.['fill-outline-color']).toBe('#abcdef');
+    });
+
+    it('should default opacity to 1 when omitted', () => {
+      const result = deriveLayerStyles('source-1', '#ff0000');
+
+      // circle/line layers use 0.8 * opacity, polygon uses 0.5 * opacity
+      expect(result.circleLayer.paint?.['circle-opacity']).toBeCloseTo(0.8);
+      expect(result.lineLayer.paint?.['line-opacity']).toBeCloseTo(0.8);
+      expect(result.polygonLayer.paint?.['fill-opacity']).toBeCloseTo(0.5);
+    });
+
+    it('should scale layer opacities by the opacity argument', () => {
+      const result = deriveLayerStyles('source-1', '#ff0000', 0.5);
+
+      expect(result.circleLayer.paint?.['circle-opacity']).toBeCloseTo(0.4); // 0.8 * 0.5
+      expect(result.lineLayer.paint?.['line-opacity']).toBeCloseTo(0.4); // 0.8 * 0.5
+      expect(result.polygonLayer.paint?.['fill-opacity']).toBeCloseTo(0.25); // 0.5 * 0.5
     });
 
   });
