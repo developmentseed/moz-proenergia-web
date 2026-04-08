@@ -28,6 +28,7 @@ import {
   type HighlightRow,
 } from "@/app/types/summary";
 import { Highlight } from "@/components/chakra/highlight";
+import { useTranslation } from "react-i18next";
 
 const formatValue = (value: string | number, hasDecimal?: boolean) => {
   //@ts-expect-error @TODO
@@ -110,6 +111,7 @@ function groupByCategory(
 }
 
 function ErrorRowView({ row }: { row: ErrorRow }) {
+  const { t } = useTranslation();
   return (
     <Table.Row key={row.key} {...summaryRowProps}>
       <Table.Cell {...tableCellStyleProps}>
@@ -117,7 +119,7 @@ function ErrorRowView({ row }: { row: ErrorRow }) {
       </Table.Cell>
       <Table.Cell {...tableCellStyleProps}>
         <Text textStyle="tableValue" textAlign="right" color="fg.error">
-          error
+          {t('explorer.noData')}
         </Text>
       </Table.Cell>
     </Table.Row>
@@ -453,6 +455,7 @@ export const SummaryTable = ({
   maxHeight,
   collapsible = true,
 }: SummaryTableProps) => {
+  const { t } = useTranslation();
   const groups = data
     ? groupByCategory(data).sort((a, b) => {
         if (a.category === null) return -1;
@@ -469,7 +472,7 @@ export const SummaryTable = ({
             color="fg.muted"
             animation="pulse 1.75s infinite ease-in-out"
           >
-            Loading summaries, please wait
+            {t('explorer.loadingSummary')}
           </Box>
           <Skeleton
             width="60%"
@@ -542,7 +545,7 @@ export const SummaryTable = ({
       {!isLoading && isError && (
         <Box px={4} py={4}>
           <Text color="fg.error" textStyle="tableValue">
-            Failed to load data.
+            {t('explorer.noData')}
           </Text>
         </Box>
       )}
