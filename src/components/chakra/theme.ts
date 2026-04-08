@@ -126,13 +126,13 @@ export const system = createSystem(defaultConfig, {
       colors: {
         bg: {
           DEFAULT: {
-            value: { _light: "{colors.white}", _dark: "#292623" }, // Custom dark background
+            value: { _light: "{colors.white}", _dark: "#18181f" }, // Custom dark background
           },
           subtle: {
-            value: { _light: "{colors.gray.50}", _dark: "#282523" }, // Custom dark subtle background
+            value: { _light: "{colors.gray.50}", _dark: "#21202a" }, // Custom dark subtle background
           },
           muted: {
-            value: { _light: "{colors.gray.100}", _dark: "#312c26" }, // Custom dark muted background
+            value: { _light: "{colors.gray.100}", _dark: "#292835" }, // Custom dark muted background
           },
         },
         fg: {
@@ -140,12 +140,21 @@ export const system = createSystem(defaultConfig, {
             value: { _light: "{colors.gray.700}", _dark: "#e4e4e4" }, // Custom dark text color
           },
           muted: {
-            value: { _light: "{colors.gray.600}", _dark: "#a3a3a3" }, // Custom dark muted text
+            value: { _light: "{colors.gray.600}", _dark: "#b8b8b8" }, // Custom dark muted text
           },
         },
         border: {
           DEFAULT: {
-            value: { _light: "{colors.gray.200}", _dark: "#373737" }, // Custom dark border
+            value: { _light: "{colors.gray.200}", _dark: "#3a3a3a" }, // Custom dark border
+          },
+          subtle: {
+            value: { _light: "{colors.gray.100}", _dark: "#2d2d2d" }, // Custom dark subtle background
+          },
+          muted: {
+            value: { _light: "{colors.gray.300}", _dark: "#292835" }, // Custom dark muted background
+          },
+          emphasized: {
+            value: { _light: "{colors.gray.400}", _dark: "#4a4a4a" }, // Custom dark muted background
           },
         },
       }, 
