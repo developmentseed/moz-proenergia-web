@@ -1,0 +1,20 @@
+[build]
+  command = "pnpm build"
+  publish = "out"
+
+# Rewrite /app/* to the actual files at the root of `out/`.
+# Next.js `output: 'export'` with `basePath: '/app'` emits files flat in `out/`
+# but prefixes all internal URLs with `/app`, so we need this rewrite to map
+# those URLs back to the real file paths. Status 200 = internal rewrite
+# (the browser URL stays at /app/...).
+[[redirects]]
+  from = "/app/*"
+  to = "/:splat"
+  status = 200
+
+# Visitors landing on / get sent to /app/.
+[[redirects]]
+  from = "/"
+  to = "/app/"
+  status = 301
+  force = true
