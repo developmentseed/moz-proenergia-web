@@ -4,6 +4,10 @@ import {
   Table,
   Spinner,
   Text,
+  Skeleton,
+  SkeletonCircle,
+  Flex,
+  Separator,
 } from "@chakra-ui/react";
 import { LuChevronUp } from "react-icons/lu";
 import { InfoTip } from "./toggle-tip";
@@ -92,7 +96,9 @@ function sortChartFirst(rows: SummaryRow[]): SummaryRow[] {
   });
 }
 
-function groupByCategory(rows: SummaryRow[]): { category: string | null; rows: SummaryRow[] }[] {
+function groupByCategory(
+  rows: SummaryRow[],
+): { category: string | null; rows: SummaryRow[] }[] {
   const map = new Map<string | null, SummaryRow[]>();
   for (const row of rows) {
     const cat = row.category || null;
@@ -130,9 +136,7 @@ function FlatRowView({ row }: { row: FlatRow }) {
               {row.unit && `(${row.unit})`}{" "}
             </Text>
           </Text>
-          {row.description && (
-            <InfoTip content={row.description} />
-          )}
+          {row.description && <InfoTip content={row.description} />}
         </Box>
       </Table.Cell>
       <Table.Cell {...tableCellStyleProps}>
@@ -144,12 +148,23 @@ function FlatRowView({ row }: { row: FlatRow }) {
   );
 }
 
-function MethodTotalRow({ item, hasDecimal }: { item?: SummaryItem; hasDecimal?: boolean }) {
+function MethodTotalRow({
+  item,
+  hasDecimal,
+}: {
+  item?: SummaryItem;
+  hasDecimal?: boolean;
+}) {
   if (!item) return null;
   return (
     <Table.Row bg="panelBg" css={lastRowStyleProps}>
       <Table.Cell {...tableCellStyleProps} pb={4}>
-        <Text textStyle="tableAttr"><Text as="span" fontWeight="semibold">Total</Text> ({item.label})</Text>
+        <Text textStyle="tableAttr">
+          <Text as="span" fontWeight="semibold">
+            Total
+          </Text>{" "}
+          ({item.label})
+        </Text>
       </Table.Cell>
       <Table.Cell {...tableCellStyleProps} pb={4}>
         <Text {...valueTextProps} fontWeight="semibold">
@@ -191,7 +206,8 @@ function ChartRowView({ row }: { row: ChartRow }) {
               <Text {...sectionHeaderLabelProps}>
                 {row.label}
                 <Text as="span" fontWeight="normal">
-                  {" "}{row.unit && `(${row.unit})`}
+                  {" "}
+                  {row.unit && `(${row.unit})`}
                 </Text>
               </Text>
               {row.description && row.label !== row.description && (
@@ -202,7 +218,12 @@ function ChartRowView({ row }: { row: ChartRow }) {
         </Table.Row>
         <Table.Row _last={lastRowStyleProps}>
           <Table.Cell colSpan={2} border="none">
-            <SummaryBarChart data={row.value} average={row.showBarChartAverage ? row.average : undefined} colorMap={row.colorMap} unit={row.unit} />
+            <SummaryBarChart
+              data={row.value}
+              average={row.showBarChartAverage ? row.average : undefined}
+              colorMap={row.colorMap}
+              unit={row.unit}
+            />
           </Table.Cell>
         </Table.Row>
         {row.showChartValueRows !== false && <ChartValueRows row={row} />}
@@ -218,7 +239,8 @@ function ChartRowView({ row }: { row: ChartRow }) {
               <Text {...sectionHeaderLabelProps}>
                 {row.label}
                 <Text as="span" fontWeight="normal">
-                  {" "}{row.unit && `(${row.unit})`}
+                  {" "}
+                  {row.unit && `(${row.unit})`}
                 </Text>
               </Text>
               {row.description && row.label !== row.description && (
@@ -229,7 +251,11 @@ function ChartRowView({ row }: { row: ChartRow }) {
         </Table.Row>
         <Table.Row _last={lastRowStyleProps}>
           <Table.Cell colSpan={2} border="none">
-            <SummaryDonutChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
+            <SummaryDonutChart
+              data={row.value}
+              colorMap={row.colorMap}
+              unit={row.unit}
+            />
           </Table.Cell>
         </Table.Row>
         {row.showChartValueRows !== false && <ChartValueRows row={row} />}
@@ -245,7 +271,8 @@ function ChartRowView({ row }: { row: ChartRow }) {
               <Text {...sectionHeaderLabelProps}>
                 {row.label}
                 <Text as="span" fontWeight="normal">
-                  {" "}{row.unit && `(${row.unit})`}
+                  {" "}
+                  {row.unit && `(${row.unit})`}
                 </Text>
               </Text>
               {row.description && row.label !== row.description && (
@@ -256,7 +283,11 @@ function ChartRowView({ row }: { row: ChartRow }) {
         </Table.Row>
         <Table.Row _last={lastRowStyleProps}>
           <Table.Cell colSpan={2} px={2} py={2}>
-            <SummaryStackedBarChart data={row.value} colorMap={row.colorMap} unit={row.unit} />
+            <SummaryStackedBarChart
+              data={row.value}
+              colorMap={row.colorMap}
+              unit={row.unit}
+            />
           </Table.Cell>
         </Table.Row>
         {row.showChartValueRows !== false && <ChartValueRows row={row} />}
@@ -269,7 +300,7 @@ function ChartRowView({ row }: { row: ChartRow }) {
 function GroupRowView({ row }: { row: GroupRow }) {
   return (
     <>
-      <Table.Row key={row.label + '-group-row'} {...sectionHeaderRowProps}>
+      <Table.Row key={row.label + "-group-row"} {...sectionHeaderRowProps}>
         <Table.Cell {...sectionHeaderCellProps}>
           <Box {...labelBoxProps}>
             <Text {...sectionHeaderLabelProps}>
@@ -289,10 +320,7 @@ function GroupRowView({ row }: { row: GroupRow }) {
       {row.value.map((item) => (
         <Table.Row key={item.key} {...summaryRowProps}>
           <Table.Cell {...tableCellStyleProps}>
-            <Text textStyle="tableAttr">
-              {" "}
-              {item.label}
-            </Text>
+            <Text textStyle="tableAttr"> {item.label}</Text>
           </Table.Cell>
           <Table.Cell {...tableCellStyleProps}>
             <Text {...valueTextProps}>
@@ -326,17 +354,27 @@ function NestedGroupRowView({ row }: { row: NestedGroupRow }) {
         </Table.Cell>
       </Table.Row>
       {row.value.flatMap((group) => [
-        <Table.Row key={`${row.label}-${group.key}`} bg="bg" borderTopColor="border" borderTopWidth="1px" _last={lastRowStyleProps}>
-          <Table.Cell colSpan={2} fontWeight="semibold" borderBottomColor="fg.muted">
-            <Text textStyle="tableAttr" fontSize="sm">{group.label}</Text>
+        <Table.Row
+          key={`${row.label}-${group.key}`}
+          bg="bg"
+          borderTopColor="border"
+          borderTopWidth="1px"
+          _last={lastRowStyleProps}
+        >
+          <Table.Cell
+            colSpan={2}
+            fontWeight="semibold"
+            borderBottomColor="fg.muted"
+          >
+            <Text textStyle="tableAttr" fontSize="sm">
+              {group.label}
+            </Text>
           </Table.Cell>
         </Table.Row>,
         ...group.items.map((item) => (
           <Table.Row key={`${group.key}-${item.key}`} {...summaryRowProps}>
             <Table.Cell {...tableCellStyleProps}>
-              <Text textStyle="tableAttr">
-                {item.label}
-              </Text>
+              <Text textStyle="tableAttr">{item.label}</Text>
             </Table.Cell>
             <Table.Cell {...tableCellStyleProps}>
               <Text {...valueTextProps}>
@@ -358,13 +396,20 @@ function HighlightRowView({ row }: { row: HighlightRow }) {
   }));
   return (
     <>
-      <Table.Row bg="bg" borderTopColor="border" borderTopWidth="1px" h="30px" _last={lastRowStyleProps}>
+      <Table.Row
+        bg="bg"
+        borderTopColor="border"
+        borderTopWidth="1px"
+        h="30px"
+        _last={lastRowStyleProps}
+      >
         <Table.Cell {...sectionHeaderCellProps}>
           <Box {...labelBoxProps}>
             <Text {...sectionHeaderLabelProps}>
               {row.label}
               <Text as="span" fontWeight="normal">
-                {" "}{row.unit && `(${row.unit})`}
+                {" "}
+                {row.unit && `(${row.unit})`}
               </Text>
             </Text>
             {row.description && row.label !== row.description && (
@@ -384,17 +429,30 @@ function HighlightRowView({ row }: { row: HighlightRow }) {
 
 function SummaryRowView({ row }: { row: SummaryRow }) {
   switch (row.type) {
-    case "error": return <ErrorRowView row={row} />;
-    case "flat": return <FlatRowView row={row} />;
-    case "chart": return <ChartRowView row={row} />;
-    case "group": return <GroupRowView row={row} />;
-    case "nested-group": return <NestedGroupRowView row={row} />;
-    case "highlight": return <HighlightRowView row={row} />;
-    default: return null;
+    case "error":
+      return <ErrorRowView row={row} />;
+    case "flat":
+      return <FlatRowView row={row} />;
+    case "chart":
+      return <ChartRowView row={row} />;
+    case "group":
+      return <GroupRowView row={row} />;
+    case "nested-group":
+      return <NestedGroupRowView row={row} />;
+    case "highlight":
+      return <HighlightRowView row={row} />;
+    default:
+      return null;
   }
 }
 
-export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible = true }: SummaryTableProps) => {
+export const SummaryTable = ({
+  data,
+  isLoading,
+  isError,
+  maxHeight,
+  collapsible = true,
+}: SummaryTableProps) => {
   const groups = data
     ? groupByCategory(data).sort((a, b) => {
         if (a.category === null) return -1;
@@ -405,8 +463,79 @@ export const SummaryTable = ({ data, isLoading, isError, maxHeight, collapsible 
   return (
     <Box maxHeight={maxHeight} width="100%">
       {isLoading && (
-        <Box display="flex" alignItems="center" justifyContent="center" py={8}>
-          <Spinner colorPalette="orange" color="colorPalette.600" size="xl" />
+        <Box display="flex" flexDir="column" py={4} gap={4}>
+          <Box
+            fontSize="sm"
+            color="fg.muted"
+            animation="pulse 1.75s infinite ease-in-out"
+          >
+            Loading summaries, please wait
+          </Box>
+          <Skeleton
+            width="60%"
+            height="16px"
+            borderRadius="lg"
+            variant="shine"
+          />
+          <SkeletonCircle
+            size="44"
+            mx="auto"
+            pos="relative"
+            variant="shine"
+            _after={{
+              content: "' '",
+              position: "absolute",
+              top: "25%",
+              left: "25%",
+              width: "50%",
+              height: "50%",
+              rounded: "full",
+              bg: "bg",
+              visibility: "visible",
+            }}
+          />
+          <Flex direction="column" gap={2}>
+            <Flex justify="space-between">
+              <Skeleton width="20%" height="12px" variant="shine" />
+              <Skeleton width="70%" height="12px" variant="shine" />
+            </Flex>
+            <Flex justify="space-between">
+              <Skeleton width="25%" height="12px" variant="shine" />
+              <Skeleton width="60%" height="12px" variant="shine" />
+            </Flex>
+            <Flex justify="space-between">
+              <Skeleton width="22%" height="12px" variant="shine" />
+              <Skeleton width="65%" height="12px" variant="shine" />
+            </Flex>
+          </Flex>
+          <Separator my={4} />
+          <Skeleton
+            width="70%"
+            height="16px"
+            borderRadius="lg"
+            variant="shine"
+          />
+          <Flex gap={4} alignItems="end">
+            <Skeleton flex="1" height="40px" variant="shine" />
+            <Skeleton flex="1" height="60px" variant="shine" />
+            <Skeleton flex="1" height="45px" variant="shine" />
+            <Skeleton flex="1" height="80px" variant="shine" />
+            <Skeleton flex="1" height="120px" variant="shine" />
+          </Flex>
+          <Flex direction="column" gap={2}>
+            <Flex justify="space-between">
+              <Skeleton width="22%" height="12px" variant="shine" />
+              <Skeleton width="65%" height="12px" variant="shine" />
+            </Flex>
+            <Flex justify="space-between">
+              <Skeleton width="25%" height="12px" variant="shine" />
+              <Skeleton width="60%" height="12px" variant="shine" />
+            </Flex>
+            <Flex justify="space-between">
+              <Skeleton width="20%" height="12px" variant="shine" />
+              <Skeleton width="70%" height="12px" variant="shine" />
+            </Flex>
+          </Flex>
         </Box>
       )}
 
