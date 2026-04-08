@@ -14,7 +14,7 @@ Run the development server:
 pnpm dev
 ```
 
-Open http://localhost:3000/${BASE_PATH} with your browser to see the result.
+Open http://localhost:3000/ with your browser to see the result.
 
 ### Build
 

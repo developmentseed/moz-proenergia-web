@@ -5,7 +5,8 @@ import { BASE_PATH } from './src/config/website';
 
 const nextConfig: NextConfig = {
   output: 'export',
-  basePath: BASE_PATH,
+  // BASE_PATH is empty for `pnpm dev` / `pnpm build` and `/app` under `build-prod`.
+  basePath: BASE_PATH || undefined,
   trailingSlash: true,
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   /* config options here */

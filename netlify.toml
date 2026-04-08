@@ -1,10 +1,8 @@
 [build]
-  # After `next build`, physically move the exported `out/` into `out/app/`
-  # so that the URL path (`/app/...`) matches the filesystem. This avoids
-  # a `/app/* -> /:splat` rewrite, which mangles URL-encoded characters like
-  # `%5Bslug%5D` inside dynamic-route chunks and breaks pages such as
-  # `/app/model/<slug>/`.
-  command = "pnpm build && rm -rf out-staging && mv out out-staging && mkdir out && mv out-staging out/app"
+  # `build-prod` sets NEXT_PUBLIC_BASE_PATH=/app and, after `next build`,
+  # relocates the exported `out/` into `out/app/` so the URL path matches
+  # the filesystem. See package.json for the exact command.
+  command = "pnpm build-prod"
   publish = "out"
 
 # Visitors landing on / get sent to /app/.
