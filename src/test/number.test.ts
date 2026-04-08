@@ -8,32 +8,72 @@ describe('formatNumber', () => {
 });
 
 describe('formatDisplayNumber', () => {
-  it('returns abbreviated billions', () => {
-    expect(formatDisplayNumber(3_500_000_000)).toBe('3.5B');
+  describe('default (rounds to integer)', () => {
+    it('abbreviates billions', () => {
+      expect(formatDisplayNumber(3_500_000_000)).toBe('3.5B');
+    });
+
+    it('abbreviates millions', () => {
+      expect(formatDisplayNumber(1_200_000)).toBe('1.2M');
+    });
+
+    it('abbreviates thousands', () => {
+      expect(formatDisplayNumber(12_345)).toBe('12.35K');
+    });
+
+    it('uses compact notation starting at the 1,000 boundary', () => {
+      expect(formatDisplayNumber(1_000)).toBe('1K');
+      expect(formatDisplayNumber(1_234)).toBe('1.23K');
+    });
+
+    it('formats sub-thousand integers without abbreviation', () => {
+      expect(formatDisplayNumber(999)).toBe('999');
+      expect(formatDisplayNumber(0)).toBe('0');
+    });
+
+    it('rounds decimal inputs to the nearest integer', () => {
+      expect(formatDisplayNumber(12.7)).toBe('13');
+    });
+
+    it('rounds up into the compact range when rounding crosses 1,000', () => {
+      // Math.round(999.99) === 1000, which triggers compact notation.
+      expect(formatDisplayNumber(999.99)).toBe('1K');
+    });
+
+    it('stays below the compact threshold when rounding stays under 1,000', () => {
+      // Math.round(999.4) === 999, below 1000, formatted normally.
+      expect(formatDisplayNumber(999.4)).toBe('999');
+    });
   });
 
-  it('returns abbreviated millions', () => {
-    expect(formatDisplayNumber(1_200_000)).toBe('1.2M');
+  describe('hasDecimal=true (preserves decimals)', () => {
+    it('keeps decimals for sub-thousand values', () => {
+      expect(formatDisplayNumber(12.3, true)).toBe('12.3');
+      expect(formatDisplayNumber(12.34, true)).toBe('12.34');
+    });
+
+    it('does not round before the compact threshold check', () => {
+      // 999.99 stays below 1000 and is formatted without compact notation.
+      expect(formatDisplayNumber(999.99, true)).toBe('999.99');
+      expect(formatDisplayNumber(999.4, true)).toBe('999.4');
+    });
+
+    it('abbreviates thousands while capping at two fraction digits', () => {
+      expect(formatDisplayNumber(1234.56, true)).toBe('1.23K');
+    });
+
+    it('abbreviates millions while capping at two fraction digits', () => {
+      expect(formatDisplayNumber(1_234_567.89, true)).toBe('1.23M');
+    });
   });
 
-  it('falls back to formatNumber for numbers below 1M', () => {
-    expect(formatDisplayNumber(12345)).toBe('12,345');
-  });
+  describe('negative values', () => {
+    it('abbreviates large negative values', () => {
+      expect(formatDisplayNumber(-2_500_000)).toBe('-2.5M');
+    });
 
-  it('rounds to integer for integerColumns (case-insensitive)', () => {
-    expect(formatDisplayNumber(1234.7, 'population')).toBe('1,235');
-    expect(formatDisplayNumber(1234.7, 'Population')).toBe('1,235');
-  });
-
-  it('rounds integer column values before abbreviating', () => {
-    expect(formatDisplayNumber(1_230_000.8, 'Population')).toBe('1.23M');
-  });
-
-  it('preserves decimals for non-integer columns', () => {
-    expect(formatDisplayNumber(999.99)).toBe('999.99');
-  });
-
-  it('matches partial column names', () => {
-    expect(formatDisplayNumber(1234.7, 'PopStartYear')).toBe('1,235');
+    it('triggers compact notation via the absolute value threshold', () => {
+      expect(formatDisplayNumber(-1_000)).toBe('-1K');
+    });
   });
 });
