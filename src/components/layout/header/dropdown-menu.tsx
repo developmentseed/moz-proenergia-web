@@ -4,7 +4,7 @@ import { Text, Button, Link, MenuRoot, Menu, MenuTrigger, MenuContent, MenuItem,
 import Modal from "../../chakra/modal";
 import LoginForm from "../login-form";
 import { useAuth } from "@/utils/context/auth";
-import { LuExternalLink, LuCircleUser } from "react-icons/lu";
+import { LuExternalLink, LuCircleUserRound, LuLogOut, LuLogIn } from "react-icons/lu";
 import { zIndex } from "@/components/ui/constant";
 import { SDI_PORTAL_URL } from "@/config/website";
 import { useTranslation } from "react-i18next";
@@ -20,20 +20,23 @@ const DropdownMenu = () => {
         <MenuTrigger asChild>
           <Button
             variant="plain"
-            padding={0}
-            pl={1}
-            pr={1}
-            fontSize="sm"
-            fontWeight="medium"
-            color="orange.contrast"
+            colorPalette="orange"
+            size="sm"
             gap={1.5}
+            fontWeight="semibold"
+            px={1.5}
+            _hover={{ bg: "orange.fg", color: "orange.subtle" }}
+            color="inherit"
           >
             {isAuthenticated && username ? (
-              <Box display={"flex"} gap="1">
-                <LuCircleUser />
+              <>
+                <LuCircleUserRound size={20} />
                 <Text maxW="80px" truncate>{username}</Text>
-              </Box>
-            ) : t('nav.login')}
+              </>
+            ) : <>
+              <LuLogIn />
+              {t('nav.login')}
+            </> }
           </Button>
         </MenuTrigger>
 
@@ -41,6 +44,7 @@ const DropdownMenu = () => {
           <MenuContent zIndex={zIndex.menu}>
             {isAuthenticated ? (
               <MenuItem value="logout" onClick={() => logout()} cursor={"pointer"}>
+                <LuLogOut />
                 {t('nav.logout')}
               </MenuItem>
             ) : (
@@ -52,6 +56,7 @@ const DropdownMenu = () => {
                   });
                 });
               }}>
+                <LuLogIn />
                 {t('nav.login')}
               </MenuItem>
             )}
@@ -107,7 +112,7 @@ export const DropdownMenuItems = ({ onAction }: { onAction?: () => void }) => {
         >
           {username ? (
             <Box display="flex" gap="1" alignItems="center">
-              <LuCircleUser />
+              <LuCircleUserRound size={20} />
               <Text maxW="80px" truncate>{username}</Text>
             </Box>
           ) : t('nav.login')}
