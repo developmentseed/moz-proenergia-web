@@ -24,6 +24,12 @@ The command below will build the website.
 pnpm run build
 ```
 
+The command below will build the production version of website, with base path defined. 
+
+```
+pnpm run build-prod
+```
+
 ## Configuration
 
 ### Website Name and Description
@@ -33,8 +39,17 @@ Edit `src/config/website.ts` to change the website title and description:
 ```ts
 export const WEBSITE_TITLE = "Proenergia + IEP";
 export const WEBSITE_DESC = "Proenergia";
+```
 
-export const BASE_PATH = "/app";
+### Base Path
+
+Edit `NEXT_PUBLIC_BASE_PATH` variable in `build-prod` command that you can find from package.json
+
+
+```ts
+...
+"build-prod": "NEXT_PUBLIC_BASE_PATH=/app next build --webpack && rm -rf .out-tmp && mv out .out-tmp && mkdir out && mv .out-tmp out/app",
+...
 ```
 
 ## Learn More
