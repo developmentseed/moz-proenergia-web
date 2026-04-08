@@ -14,7 +14,7 @@ Run the development server:
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000/${BASE_PATH} with your browser to see the result.
 
 ### Build
 
@@ -33,6 +33,8 @@ Edit `src/config/website.ts` to change the website title and description:
 ```ts
 export const WEBSITE_TITLE = "Proenergia + IEP";
 export const WEBSITE_DESC = "Proenergia";
+
+export const BASE_PATH = "/app";
 ```
 
 ## Learn More

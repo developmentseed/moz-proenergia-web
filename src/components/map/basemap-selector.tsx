@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { LuCheck, LuMap } from "react-icons/lu";
 import { zIndex } from "@/components/ui/constant";
-
+import { BASE_PATH } from "@/config/website";
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 // Mapbox Static Images API — centered on Mozambique
@@ -29,13 +29,13 @@ export const BASEMAP_OPTIONS: BasemapOption[] = [
   {
     id: "light",
     name: "Light",
-    styleUrl: "/basemap-style.json",
+    styleUrl: `${BASE_PATH}/basemap-style.json`,
     thumbnailUrl: thumbnail("mapbox/light-v11"),
   },
   {
     id: "dark",
     name: "Dark",
-    styleUrl: "/dark-basemap-style.json",
+    styleUrl: `${BASE_PATH}/dark-basemap-style.json`,
     thumbnailUrl: thumbnail("mapbox/dark-v11"),
   },
   {

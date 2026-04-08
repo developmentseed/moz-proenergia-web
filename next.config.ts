@@ -1,9 +1,11 @@
 import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from "next";
 import createMDX from '@next/mdx';
+import { BASE_PATH } from './src/config/website';
 
 const nextConfig: NextConfig = {
   output: 'export',
+  basePath: BASE_PATH,
   trailingSlash: true,
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   /* config options here */
