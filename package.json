@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
+    "build-prod": "NEXT_PUBLIC_BASE_PATH=/app next build --webpack && rm -rf .out-tmp && mv out .out-tmp && mkdir out && mv .out-tmp out/app",
     "start": "npx serve@latest out",
     "lint": "eslint",
     "test": "vitest",

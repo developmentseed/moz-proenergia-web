@@ -11,6 +11,7 @@ import { LanguageSwitcher } from "./language-switcher";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/utils/context/auth";
 import { zIndex } from "@/components/ui/constant";
+import { BASE_PATH } from "@/config/website";
 
 export interface NavigationItem {
   label: string;
@@ -22,7 +23,7 @@ interface HeaderProps {
 }
 
 export const Header = ({
-  logoSrc = "/Emblem_of_Mozambique.svg",
+  logoSrc = `${BASE_PATH}/Emblem_of_Mozambique.svg`,
 }: HeaderProps) => {
   const pathname = usePathname();
   const { t } = useTranslation();
@@ -141,18 +142,18 @@ export const Header = ({
                         {navigationItems.map((item) => {
                           if (item.href === "/downloads" && !isAuthenticated) return null;
                           return (
-                          <Link
-                            key={item.href}
-                            fontSize="sm"
-                            fontWeight={isActive(item.href) ? "bold" : "medium"}
-                            color={isActive(item.href) ? "fg" : "fg.muted"}
-                            asChild
-                            _hover={{ textDecoration: "none", color: "fg" }}
-                            onClick={() => setDrawerOpen(false)}
+                            <Link
+                              key={item.href}
+                              fontSize="sm"
+                              fontWeight={isActive(item.href) ? "bold" : "medium"}
+                              color={isActive(item.href) ? "fg" : "fg.muted"}
+                              asChild
+                              _hover={{ textDecoration: "none", color: "fg" }}
+                              onClick={() => setDrawerOpen(false)}
                           >
-                            <NextLink href={item.href}>{item.label}</NextLink>
-                          </Link>
-                        )})}
+                              <NextLink href={item.href}>{item.label}</NextLink>
+                            </Link>
+                        );})}
                         <Separator mt="auto" />
                         <LanguageSwitcher />
                         <Separator />
