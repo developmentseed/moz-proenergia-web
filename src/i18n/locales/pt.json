@@ -52,6 +52,8 @@
     "reset": "Redefinir",
     "apply": "Aplicar",
     "loadingSummary": "Carregando dados de resumo",
+    "loadingSummaryStage1": "Processando dados…",
+    "loadingSummaryStage2": "Preparando resultados…",
     "noData": "Falha ao carregar dados de resumo",
     "analysis": "análise",
     "summary": "Resumo",

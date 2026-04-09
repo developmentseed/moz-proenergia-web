@@ -1,15 +1,6 @@
-import {
-  Accordion,
-  Box,
-  Table,
-  Spinner,
-  Text,
-  Skeleton,
-  SkeletonCircle,
-  Flex,
-  Separator,
-} from "@chakra-ui/react";
+import { Accordion, Box, Table, Text, Flex } from "@chakra-ui/react";
 import { LuChevronUp } from "react-icons/lu";
+import { SummaryTableSkeleton } from "@/components/chakra/summary-table-skeleton";
 import { InfoTip } from "./toggle-tip";
 import { formatDisplayNumber } from "@/utils/number";
 import { parseSortPrefix, stripSortPrefix } from "@/utils/string";
@@ -465,82 +456,7 @@ export const SummaryTable = ({
     : [];
   return (
     <Box maxHeight={maxHeight} width="100%">
-      {isLoading && (
-        <Box display="flex" flexDir="column" py={4} gap={4}>
-          <Box
-            fontSize="sm"
-            color="fg.muted"
-            animation="pulse 1.75s infinite ease-in-out"
-          >
-            {t('explorer.loadingSummary')}
-          </Box>
-          <Skeleton
-            width="60%"
-            height="16px"
-            borderRadius="lg"
-            variant="shine"
-          />
-          <SkeletonCircle
-            size="44"
-            mx="auto"
-            pos="relative"
-            variant="shine"
-            _after={{
-              content: "' '",
-              position: "absolute",
-              top: "25%",
-              left: "25%",
-              width: "50%",
-              height: "50%",
-              rounded: "full",
-              bg: "bg",
-              visibility: "visible",
-            }}
-          />
-          <Flex direction="column" gap={2}>
-            <Flex justify="space-between">
-              <Skeleton width="20%" height="12px" variant="shine" />
-              <Skeleton width="70%" height="12px" variant="shine" />
-            </Flex>
-            <Flex justify="space-between">
-              <Skeleton width="25%" height="12px" variant="shine" />
-              <Skeleton width="60%" height="12px" variant="shine" />
-            </Flex>
-            <Flex justify="space-between">
-              <Skeleton width="22%" height="12px" variant="shine" />
-              <Skeleton width="65%" height="12px" variant="shine" />
-            </Flex>
-          </Flex>
-          <Separator my={4} />
-          <Skeleton
-            width="70%"
-            height="16px"
-            borderRadius="lg"
-            variant="shine"
-          />
-          <Flex gap={4} alignItems="end">
-            <Skeleton flex="1" height="40px" variant="shine" />
-            <Skeleton flex="1" height="60px" variant="shine" />
-            <Skeleton flex="1" height="45px" variant="shine" />
-            <Skeleton flex="1" height="80px" variant="shine" />
-            <Skeleton flex="1" height="120px" variant="shine" />
-          </Flex>
-          <Flex direction="column" gap={2}>
-            <Flex justify="space-between">
-              <Skeleton width="22%" height="12px" variant="shine" />
-              <Skeleton width="65%" height="12px" variant="shine" />
-            </Flex>
-            <Flex justify="space-between">
-              <Skeleton width="25%" height="12px" variant="shine" />
-              <Skeleton width="60%" height="12px" variant="shine" />
-            </Flex>
-            <Flex justify="space-between">
-              <Skeleton width="20%" height="12px" variant="shine" />
-              <Skeleton width="70%" height="12px" variant="shine" />
-            </Flex>
-          </Flex>
-        </Box>
-      )}
+      {isLoading && <SummaryTableSkeleton />}
 
       {!isLoading && isError && (
         <Box px={4} py={4}>

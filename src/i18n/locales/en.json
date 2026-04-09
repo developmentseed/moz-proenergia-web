@@ -52,6 +52,8 @@
     "reset": "Reset",
     "apply": "Apply",
     "loadingSummary": "Loading summary data",
+    "loadingSummaryStage1": "Processing data…",
+    "loadingSummaryStage2": "Preparing results…",
     "noData": "Failed to load summary data",
     "analysis": "analysis",
     "summary": "Summary",
