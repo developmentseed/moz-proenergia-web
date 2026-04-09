@@ -147,6 +147,15 @@ export function transformOptions(
 }
 
 export function deriveSource(id: string, filePath: string) {
+  // @TODO: Hardcode tile for cooking polygons to test
+  if (id ==='14') {
+    return {
+      id,
+      type: 'vector' as const,
+      minzoom: mapConfig.minZoom,
+      url: "pmtiles://https://mozsebar.s3.us-east-1.amazonaws.com/prototype/data/cooking.pmtiles"
+    };
+  }
   const pmtilesUrl = filePath.replace(/\.[^.]+$/, '.pmtiles');
   return {
     id,
