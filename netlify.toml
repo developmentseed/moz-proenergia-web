@@ -1,8 +1,6 @@
 [build]
-  # `build-prod` sets NEXT_PUBLIC_BASE_PATH=/app and, after `next build`,
-  # relocates the exported `out/` into `out/app/` so the URL path matches
-  # the filesystem. See package.json for the exact command.
-  command = "pnpm build-prod"
+  # `build-prod` should be used for actual production build with basepath
+  command = "pnpm build"
   publish = "out"
 
 # Visitors landing on / get sent to /app/.
