@@ -2,10 +2,3 @@
   # `build-prod` should be used for actual production build with basepath
   command = "pnpm build"
   publish = "out"
-
-# Visitors landing on / get sent to /app/.
-[[redirects]]
-  from = "/"
-  to = "/app/"
-  status = 301
-  force = true
