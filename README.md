@@ -2,13 +2,25 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+Project use [pnpm](https://pnpm.io/). If you don't have it yet, get pnpm first by running the command below.
+
+```bash
+npm install -g pnpm
+```
+
 Install dependencies:
 
 ```bash
 pnpm install
 ```
 
-Run the development server:
+You need to set up Mapbox token in your env file to be able to run the application locally. Save your token in `.env` as `NEXT_PUBLIC_MAPBOX_TOKEN`.
+
+```.env
+NEXT_PUBLIC_MAPBOX_TOKEN=YOUR_MAPBOX_TOKEN
+```
+
+After installing dependencies and setting up Mapbox token, run the development server:
 
 ```bash
 pnpm dev
