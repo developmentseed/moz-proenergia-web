@@ -1,0 +1,4 @@
+[build]
+  # `build-prod` should be used for actual production build with basepath
+  command = "pnpm build"
+  publish = "out"

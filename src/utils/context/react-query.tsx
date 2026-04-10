@@ -7,10 +7,16 @@ import {
   isServer,
   QueryClient,
   QueryClientProvider,
+  QueryCache,
 } from '@tanstack/react-query';
 
 function makeQueryClient() {
   return new QueryClient({
+    queryCache: new QueryCache({
+      onError: (error, query) => {
+        console.error(`Query [${query.queryKey.join(', ')}] failed:`, error);
+      },
+    }),
     defaultOptions: {
       queries: {
         // With SSR, we usually want to set some default staleTime
