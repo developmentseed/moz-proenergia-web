@@ -184,7 +184,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const { t } = useTranslation();
 
   // Query 1: Model metadata
-  const { data: modelCore } = useQuery({
+  const { data: modelCore, isFetching: modelCoreFetching } = useQuery({
     queryKey: ["modelMetadata", modelId, token],
     queryFn: async ({ signal }) => {
       const apiModel = await fetchModelMetadata(modelId, signal, token);
@@ -195,7 +195,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   // The queryKeys below cache the raw ApiFileResult[] so other consumers
   // (e.g. the downloads page) can share this data. Layer transforms are
   // applied locally via select / useMemo.
-  const { data: vectorLayers } = useQuery({
+  const { data: vectorLayers, isFetching: vectorsFetching } = useQuery({
     queryKey: ["vectors", modelId, token],
     queryFn: ({ signal }) => fetchVectors({ modelId, token, signal }),
     // Select is synchronious (can't be used for rasters that needs to fetch cog metadata)
@@ -247,7 +247,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   // Filter options (single batch fetch, refetches per scenario)
   const filterColumns = (modelCore?.filterFields ?? []).map((f) => f.column);
 
-  const { data: allFilterOptions } = useQuery({
+  const { data: allFilterOptions, isFetching: filterOptionsFetching } = useQuery({
     queryKey: ["filterOptions", modelCore?.id, activeScenarioId, filterColumns],
     queryFn: ({ signal }) =>
       fetchAllFilterOptions(activeScenarioId!, filterColumns, signal),
@@ -277,6 +277,33 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
       summaryFields: modelCore.summaryFields,
     };
   }, [modelCore, allFilterOptions]);
+
+  // isReady is keyed to modelId so it resets automatically on every model switch.
+  // minDelayPassed and dataReady refs let us require both conditions before
+  // hiding the skeleton — ensuring it's always visible even on instant cache hits.
+  const [readyForModelId, setReadyForModelId] = useState<string | number | null>(null);
+  const isReady = readyForModelId === modelId;
+  const minDelayPassed = useRef(false);
+  const dataIsReady = useRef(false);
+
+  useEffect(() => {
+    minDelayPassed.current = false;
+    dataIsReady.current = false;
+
+    const id = setTimeout(() => {
+      minDelayPassed.current = true;
+      if (dataIsReady.current) setReadyForModelId(modelId);
+    }, 400);
+
+    return () => clearTimeout(id);
+  }, [modelId]);
+
+  useEffect(() => {
+    if (modelData && layers && !modelCoreFetching && !vectorsFetching && !filterOptionsFetching) {
+      dataIsReady.current = true;
+      if (minDelayPassed.current) setReadyForModelId(modelId);
+    }
+  }, [modelId, modelData, layers, modelCoreFetching, vectorsFetching, filterOptionsFetching]);
 
   // Get rid of coordinates related query parameters when explorer is unmounted
   const { removeCoordinates } = useMapCoords();
@@ -308,7 +335,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     );
   }
 
-  if (!modelData || !layers) {
+  if (!isReady || !modelData || !layers) {
     return (
       <Flex id="container" width="full" height="full" position="relative" direction={{ base: "column", md: "row" }}>
         <Skeleton width={{ base: "full", md: ControlPanelWidth }} height={{ base: "auto", md: "full" }} flex={{base: 1, md: "initial" }} />
