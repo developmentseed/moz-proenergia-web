@@ -52,13 +52,17 @@
     "reset": "Redefinir",
     "apply": "Aplicar",
     "loadingSummary": "Carregando dados de resumo",
+    "loadingSummaryStage1": "Processando dados…",
+    "loadingSummaryStage2": "Preparando resultados…",
+    "noData": "Falha ao carregar dados de resumo",
     "analysis": "análise",
     "summary": "Resumo",
     "cluster": "Cluster - {{clusterId}}",
     "failedClusterData": "Falha ao carregar dados do cluster.",
     "onlyBarChart": "Apenas Gráfico de Barras está disponível.",
     "errorNotReady": "Estes dados não parecem estar prontos. Certifique-se de que existem cenários relacionados a este modelo.",
-    "returnToModels": "Voltar para modelos"
+    "returnToModels": "Voltar para modelos",
+    "relatedClusters": "Ver cluster em outros modelos"
   },
   "downloads": {
     "title": "Downloads",
