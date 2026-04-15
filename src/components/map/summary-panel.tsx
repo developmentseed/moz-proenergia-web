@@ -286,6 +286,7 @@ const SummaryPanel = ({
 
       {/* Desktop: right panel with width animation */}
       <Box
+        data-tour="summary-panel"
         display={{ base: "none", md: "flex" }}
         {...mapControlCommonStyleProps}
         position="relative"

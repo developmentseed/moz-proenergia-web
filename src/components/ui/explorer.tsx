@@ -33,10 +33,12 @@ import { useTranslation } from "react-i18next";
 import { useToggle } from "@/hooks/use-toggle";
 import { useMouseEvent } from "@/components/map/hooks/use-mouse-event";
 import { ControlPanelWidth, AnimationTime } from "./main-panel";
+import { ExplorerTour } from "@/components/tour/explorer-tour";
+import { useTour } from "@/context/tour";
 
 const ExplorerInner = () => {
   const { model, scenarioId } = useModel();
-  const { updatedFilters } = useFilters();
+  const { updatedFilters, setPendingFilters, applyPendingChanges } = useFilters();
   const { selected, onClick, setSelected } = useMouseEvent();
   const { t } = useTranslation();
 
@@ -63,6 +65,28 @@ const ExplorerInner = () => {
       openSummary();
     }
   }, [selected, openSummary]);
+
+  // Tour: register programmatic actions
+  const { registerAction } = useTour();
+
+  useEffect(() => {
+    // Apply first numeric filter to half its max value as a demo
+    registerAction("applyDemoFilter", () => {
+      const numericFilter = model.filters.find((f) => f.type === "numeric");
+      if (numericFilter) {
+        const opts = numericFilter.options as [number, number];
+        const mid = Math.round(opts[0] + (opts[1] - opts[0]) / 2);
+        setPendingFilters({ [numericFilter.id]: [opts[0], mid] });
+        // Small delay so the user sees the filter update before apply fires
+        setTimeout(() => applyPendingChanges(), 300);
+      }
+    });
+
+    registerAction("selectDemoCluster", () => {
+      const demoCluster = "20819";
+      setSelected(demoCluster);
+    });
+  }, [registerAction, model.filters, setPendingFilters, applyPendingChanges, setSelected]);
 
   return (
     <Box
@@ -115,7 +139,7 @@ const ExplorerInner = () => {
       </Tooltip>
 
       {/* Map area */}
-      <Box flex={1} height="full" minHeight={0} position="relative">
+      <Box data-tour="map" flex={1} height="full" minHeight={0} position="relative">
         <MainMap
           main={model.main}
           onClick={onClick}
@@ -175,6 +199,8 @@ const ExplorerInner = () => {
         isOpen={isSummaryOpen}
         onToggle={toggleSummary}
       />
+
+      <ExplorerTour />
     </Box>
   );
 };

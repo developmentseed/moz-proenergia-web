@@ -33,6 +33,7 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
 
   return (
     <Box
+      data-tour="side-nav"
       display={{ base: 'none', md: 'flex' }}
       flexDirection="column"
       height="full"

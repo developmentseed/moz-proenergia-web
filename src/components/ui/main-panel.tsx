@@ -115,15 +115,19 @@ const MainPanel = ({
           <Heading as="h2" textStyle="modelTitle">
             {t(`model.${model.id}.name`, { defaultValue: model.title })}
           </Heading>
-          <Select
-            title={t('explorer.scenario')}
-            items={scenarioItems}
-            value={scenarioId}
-            onChange={onChange}
-            props={{}}
-          />
+          <Box data-tour="scenario-select">
+            <Select
+              title={t('explorer.scenario')}
+              items={scenarioItems}
+              value={scenarioId}
+              onChange={onChange}
+              props={{}}
+            />
+          </Box>
         </Box>
-        <ControlPanel />
+        <Box data-tour="filters-panel" flex="1" display="flex" flexDirection="column" overflow="hidden">
+          <ControlPanel />
+        </Box>
       </Box>
     </Box>
   );

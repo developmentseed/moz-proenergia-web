@@ -102,6 +102,47 @@
     "rasterMin": "Mín: {{value}}",
     "rasterMax": "Máx: {{value}}"
   },
+  "tour": {
+    "back": "Anterior",
+    "close": "Fechar",
+    "finish": "Concluir",
+    "next": "Próximo",
+    "skip": "Pular visita",
+    "openTour": "Abrir visita guiada",
+    "dontShowAgain": "Não mostrar esta visita automaticamente novamente",
+    "step1": {
+      "title": "Bem-vindo à Plataforma Integrada de Electrificação",
+      "content": "Esta plataforma permite explorar os resultados de modelos de acesso à energia em Moçambique. Pode visualizar os caminhos de eletrificação de menor custo, filtrar por geografia e atributos, e consultar estatísticas resumidas para qualquer área."
+    },
+    "step2": {
+      "title": "Selecionar um Modelo",
+      "content": "Utilize os ícones na barra lateral para alternar entre os modelos de planeamento disponíveis. Cada modelo representa um conjunto de dados ou cenário analítico distinto."
+    },
+    "step3": {
+      "title": "Escolher um Cenário",
+      "content": "Cada modelo pode conter vários cenários — por exemplo, diferentes horizontes de investimento ou pressupostos de política. Utilize este menu para alternar entre eles."
+    },
+    "step4": {
+      "title": "Aplicar Filtros",
+      "content": "Utilize o painel de Controles para filtrar assentamentos por atributos como distância a infraestruturas, dimensão da população ou área administrativa. Ajuste os valores e pressione Aplicar para atualizar o mapa e o resumo."
+    },
+    "step5": {
+      "title": "Explorar o Mapa",
+      "content": "O mapa atualiza-se para refletir os seus filtros ativos. Cada ponto representa um assentamento, colorido pela tecnologia de eletrificação de menor custo. Clique em qualquer assentamento para o inspecionar individualmente."
+    },
+    "step6": {
+      "title": "Resumo Nacional",
+      "content": "O painel de resumo mostra estatísticas agregadas para todos os assentamentos visíveis com os seus filtros atuais — incluindo desagregação por tecnologia, população e ligações previstas."
+    },
+    "step7": {
+      "title": "Detalhe do Cluster",
+      "content": "Ao selecionar um assentamento individual, o painel de resumo passa a mostrar os seus atributos específicos — como coordenadas, população e a tecnologia de eletrificação recomendada."
+    },
+    "step8": {
+      "title": "Camadas Adicionais",
+      "content": "Mude para o separador Camadas para ativar ou desativar camadas contextuais do mapa, como limites administrativos, infraestrutura de rede ou outros conjuntos de dados de referência."
+    }
+  },
   "breadcrumbs": {
     "about": "Sobre",
     "downloads": "Downloads"

@@ -8,6 +8,7 @@ import Image from "next/image";
 import { LuMenu } from "react-icons/lu";
 import DropdownMenu, { DropdownMenuItems } from "./dropdown-menu";
 import { LanguageSwitcher } from "./language-switcher";
+import { TourHelpButton } from "@/components/tour/explorer-tour";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/utils/context/auth";
 import { zIndex } from "@/components/ui/constant";
@@ -42,6 +43,8 @@ export const Header = ({
       return true;
     return pathname === href + "/";
   };
+
+  const showTourHelpButton = pathname.startsWith("/model") || pathname === "/models/";
 
   return (
     <Box
@@ -108,6 +111,7 @@ export const Header = ({
             })}
             <Separator orientation="vertical" height="4" />
             <LanguageSwitcher />
+            {showTourHelpButton && <TourHelpButton />}
             <Separator orientation="vertical" height="4" />
           </HStack>
 
