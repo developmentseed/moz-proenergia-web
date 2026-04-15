@@ -6,12 +6,14 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { createSerializer } from 'nuqs/server';
 import { ModelGroupMetadata } from '@/app/types';
-import { slugify } from '@/utils/data-transformation';
+import { slugify, fetchModels } from '@/utils/data-transformation';
 import { zIndex } from '@/components/ui/constant';
 import { getIconPath } from '@/utils/model-icon';
 import { coordinateParsers } from '@/utils/context/map-coords';
 import { Tooltip } from '../ui/tooltip';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/utils/context/auth';
 
 //Generate URL with coordinates
 const serialize = createSerializer(coordinateParsers);
@@ -21,9 +23,16 @@ interface SideNavProps {
   currentSlug: string;
 }
 
-export const SideNav = ({ models, currentSlug }: SideNavProps) => {
+export const SideNav = ({ models: initialModels, currentSlug }: SideNavProps) => {
   const searchParams = useSearchParams();
   const { t } = useTranslation();
+  const { token } = useAuth();
+
+  const { data: models = initialModels } = useQuery({
+    queryKey: ['models', token],
+    queryFn: ({ signal }) => fetchModels(signal, token),
+    initialData: initialModels,
+  });
   // Only carry coordinate params (lat, lng, zoom) to model links
       const coordQuery = serialize({
       lat: searchParams.get('lat') ? parseFloat(searchParams.get('lat')!) : null,
