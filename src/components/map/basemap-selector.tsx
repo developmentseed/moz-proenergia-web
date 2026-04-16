@@ -11,17 +11,57 @@ import {
 import { LuCheck, LuMap } from "react-icons/lu";
 import { zIndex } from "@/components/ui/constant";
 import { BASE_PATH } from "@/config/website";
+import type { StyleSpecification } from "maplibre-gl";
+
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 // Mapbox Static Images API — centered on Mozambique
 const thumbnail = (styleId: string) =>
   `https://api.mapbox.com/styles/v1/${styleId}/static/36,-20,2,0/200x200@2x?access_token=${MAPBOX_TOKEN}`;
 
+const BING_STYLE: StyleSpecification = {
+  version: 8,
+  sources: {
+    bing: {
+      type: "raster",
+      scheme: "xyz",
+      tiles: [
+        "https://ecn.t0.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z",
+        "https://ecn.t1.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z",
+        "https://ecn.t2.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z",
+        "https://ecn.t3.tiles.virtualearth.net/tiles/a{quadkey}.jpeg?g=587&mkt=en-gb&n=z",
+      ],
+      tileSize: 256,
+      maxzoom: 20,
+      attribution: "Imagery © Microsoft Corporation",
+    },
+  },
+  layers: [{ id: "imagery", type: "raster", source: "bing" }],
+};
+
+const ESRI_STYLE: StyleSpecification = {
+  version: 8,
+  sources: {
+    esri: {
+      type: "raster",
+      scheme: "xyz",
+      tiles: [
+        "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?blankTile=false",
+        "https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?blankTile=false",
+      ],
+      tileSize: 256,
+      maxzoom: 20,
+      attribution: "Imagery © Esri",
+    },
+  },
+  layers: [{ id: "imagery", type: "raster", source: "esri" }],
+};
+
 export interface BasemapOption {
   id: string;
   name: string;
-  /** Mapbox style URL passed to mapStyle, or null for the local JSON basemap */
-  styleUrl: string;
+  /** Mapbox style URL, local JSON path, or inline MapLibre StyleSpecification */
+  styleUrl: string | StyleSpecification;
   thumbnailUrl: string;
 }
 
@@ -40,9 +80,21 @@ export const BASEMAP_OPTIONS: BasemapOption[] = [
   },
   {
     id: "satellite",
-    name: "Satellite",
+    name: "Mapbox Satellite",
     styleUrl: "mapbox://styles/mapbox/satellite-v9",
     thumbnailUrl: thumbnail("mapbox/satellite-v9"),
+  },
+  {
+    id: "bing",
+    name: "Bing Satellite",
+    styleUrl: BING_STYLE,
+    thumbnailUrl: "https://ecn.t0.tiles.virtualearth.net/tiles/a1203.jpeg?g=587&mkt=en-gb&n=z",
+  },
+  {
+    id: "esri",
+    name: "Esri Satellite",
+    styleUrl: ESRI_STYLE,
+    thumbnailUrl: "https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/4/9/9",
   },
 ];
 
@@ -73,7 +125,7 @@ export const BasemapSelector = ({
           bg={`url(${current.thumbnailUrl})`}
           bgSize="cover"
           borderWidth="0"
-          color={current.id === "satellite" ? "white" : "fg.muted"}
+          color={["light"].includes(current.id) ? "fg.muted" : "white"}
           _hover={{ opacity: 0.85 }}
         >
           <LuMap />
@@ -81,7 +133,7 @@ export const BasemapSelector = ({
       </Popover.Trigger>
       <Portal>
         <Popover.Positioner>
-          <Popover.Content maxW="10rem" zIndex={zIndex.mapPopover}>
+          <Popover.Content maxW="13rem" zIndex={zIndex.mapPopover}>
             <Popover.Body p={3}>
               <Text textStyle="allCapLabel" mb={3}>
                 Basemap
