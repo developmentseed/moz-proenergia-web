@@ -3,6 +3,7 @@
 import { Box, Heading, Text, Button, Image, VStack } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useTranslation } from "react-i18next";
+import { BASE_PATH } from "@/config/website";
 
 export default function Home() {
   const { t } = useTranslation();
@@ -18,7 +19,7 @@ export default function Home() {
         py={8}
       >
         <VStack gap={6} maxW="4xl" align="start">
-          <Heading as="h1" size={{base: "3xl", md: "4xl"}} textTransform="uppercase" fontWeight="900" lineHeight="1" letterSpacing="0.8px">
+          <Heading as="h1" size={{ base: "3xl", md: "4xl" }} textTransform="uppercase" fontWeight="900" lineHeight="1" letterSpacing="0.8px">
             <span style={{ fontWeight: "300" }}>{t('home.countryName')}</span> <br />
             {t('home.title')}
           </Heading>
@@ -48,7 +49,7 @@ export default function Home() {
         bg="bg"
       >
         <Image
-          src="/landing-image1.png"
+          src={`${BASE_PATH}/landing-image1.png`}
           alt={t('home.imageAlt')}
           style={{ height: "100%", width: "100%", objectFit: "cover" }}
         />

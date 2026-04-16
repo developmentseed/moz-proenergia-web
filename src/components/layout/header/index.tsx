@@ -12,6 +12,7 @@ import { ColorModeButton } from "@/components/chakra/color-mode";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/utils/context/auth";
 import { zIndex } from "@/components/ui/constant";
+import { BASE_PATH } from "@/config/website";
 
 export interface NavigationItem {
   label: string;
@@ -23,7 +24,7 @@ interface HeaderProps {
 }
 
 export const Header = ({
-  logoSrc = "/Emblem_of_Mozambique.svg",
+  logoSrc = `${BASE_PATH}/Emblem_of_Mozambique.svg`,
 }: HeaderProps) => {
   const pathname = usePathname();
   const { t } = useTranslation();
@@ -51,14 +52,14 @@ export const Header = ({
       color="orange.contrast"
       borderBottom="1px solid"
       borderBottomColor="border.subtle"
-      px={3}
+      px={{ base: 2, md: 3 }}
       py={2}
       pr={{ base: 3, md: 6 }}
     >
       <Flex mx="auto" justify="space-between" align="center">
         {/* Logo Section - Left */}
         <NextLink href="/">
-          <Flex align="center" gap={3}>
+          <Flex align="center" gap={{ base: 2, md: 3 }}>
             <Image
               src={logoSrc}
               alt="Logo"
@@ -67,19 +68,18 @@ export const Header = ({
               style={{ objectFit: "contain" }}
             />
             <Heading
-              fontSize="1rem"
+              fontSize={{ base: "xs", md:"1rem" }}
               fontWeight="300"
               fontFamily="body"
-              lineHeight="1rem"
+              lineHeight={{ base: 1.1, md:"1rem" }}
               textTransform="uppercase"
-              letterSpacing="0.5px"
+              letterSpacing={{ base: "0.25px", md: "0.5px" }}
               color="orange.contrast"
+              truncate
+              maxW="full"
             >
               {t('nav.countryName')} <br />
-              <Text display={{ base: "inline", md: "none" }} as="span" color="orange.contrast" fontWeight="900">
-                {t('nav.shortName')}
-              </Text>
-              <Text display={{ base: "none", md: "inline" }} as="span" color="orange.contrast" fontWeight="900">
+              <Text truncate as="span" color="orange.contrast" fontWeight="900" maxW="full">
                 {t('nav.longName')}
               </Text>
             </Heading>
@@ -126,7 +126,7 @@ export const Header = ({
                   aria-label="Open navigation menu"
                   variant="plain"
                   size="sm"
-                  color="fg.muted"
+                  color="orange.contrast"
                 >
                   <LuMenu />
                 </IconButton>
@@ -143,18 +143,18 @@ export const Header = ({
                         {navigationItems.map((item) => {
                           if (item.href === "/downloads" && !isAuthenticated) return null;
                           return (
-                          <Link
-                            key={item.href}
-                            fontSize="sm"
-                            fontWeight={isActive(item.href) ? "bold" : "medium"}
-                            color={isActive(item.href) ? "fg" : "fg.muted"}
-                            asChild
-                            _hover={{ textDecoration: "none", color: "fg" }}
-                            onClick={() => setDrawerOpen(false)}
+                            <Link
+                              key={item.href}
+                              fontSize="sm"
+                              fontWeight={isActive(item.href) ? "bold" : "medium"}
+                              color={isActive(item.href) ? "fg" : "fg.muted"}
+                              asChild
+                              _hover={{ textDecoration: "none", color: "fg" }}
+                              onClick={() => setDrawerOpen(false)}
                           >
-                            <NextLink href={item.href}>{item.label}</NextLink>
-                          </Link>
-                        )})}
+                              <NextLink href={item.href}>{item.label}</NextLink>
+                            </Link>
+                        );})}
                         <Separator mt="auto" />
                         <LanguageSwitcher />
                         <ColorModeButton alignSelf="flex-start" colorPalette="orange" />

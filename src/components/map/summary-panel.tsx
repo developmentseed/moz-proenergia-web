@@ -80,6 +80,7 @@ const RelatedModels = ({ clusterId }: RelatedModelsProps) => {
     queryKey: ["models", token],
     queryFn: ({ signal }) => fetchModels(signal, token),
   });
+  const { t } = useTranslation();
 
   const currentModelData = models?.find((m) => String(m.id) === model.id);
   const currentVectorDatasetId = currentModelData?.scenarios[0]?.vector_dataset?.id;
@@ -95,7 +96,7 @@ const RelatedModels = ({ clusterId }: RelatedModelsProps) => {
   return (
     <Box display="flex" flexDirection="column" gap={1}>
       <Text fontSize="xs" color="fg.muted">
-        View cluster in other models
+        {t('explorer.relatedClusters')}
       </Text>
       {related.map((m) => (
         <Link

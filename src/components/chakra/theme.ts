@@ -1,4 +1,4 @@
-import { createSystem, defaultConfig, defineConfig, defineTextStyles } from "@chakra-ui/react";
+import { createSystem, defaultConfig, defineConfig, defineTextStyles, defineKeyframes } from "@chakra-ui/react";
 // Text style sets
 
 export const textStyles = defineTextStyles({
@@ -94,8 +94,16 @@ export const textStyles = defineTextStyles({
   }
 });
 
+const keyframes = defineKeyframes({
+  fadeSlideIn: {
+    from: { opacity: 0, transform: "translateY(6px)" },
+    to:   { opacity: 1, transform: "translateY(0)" },
+  },
+});
+
 export const system = createSystem(defaultConfig, {
   theme: {
+    keyframes,
     tokens: {
       fonts: {
         heading: { value: "var(--font-dm-sans)" },

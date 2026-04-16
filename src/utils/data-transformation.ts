@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { LayerProps } from "react-map-gl/maplibre";
 import { interpolateWarm } from 'd3-scale-chromatic';
 import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, Field, MapItemUnit, Scenario, Layer, Main } from '@/app/types';
@@ -200,83 +201,62 @@ export function deriveLayerStyles(sourceId: string, color: string, opacity: numb
 }
 
 export async function fetchModels(signal?: AbortSignal, token?: string| null): Promise<ModelGroupMetadata[]> {
-  try {
-    const { data } = await api.get('model/', { signal, ...(token && {
-        headers: { 'Authorization': `Token ${token}` }
-      }), });
-    // @TODO return models as it is. Returning lcoe and mini grids until data getting ingested.
-    const models = data.results as ModelGroupMetadata[];
+  const { data } = await api.get('model/', { signal, ...(token && {
+      headers: { 'Authorization': `Token ${token}` }
+    }), });
+  const models = data.results as ModelGroupMetadata[];
 
-    models.forEach((m) => {
-      registerI18nResource(`model.${m.id}`, {
-        name: { en: m.name, pt: m.name_pt },
-        description: { en: m.description, pt: m.description_pt },
-      });
+  models.forEach((m) => {
+    registerI18nResource(`model.${m.id}`, {
+      name: { en: m.name, pt: m.name_pt },
+      description: { en: m.description, pt: m.description_pt },
     });
+  });
 
-    return models;
-  } catch(e) {
-    console.error(e);
-    throw new Error('failed to fetch models');
-  }
+  return models;
 }
 
 export async function fetchModelMetadata(slug: string, signal?: AbortSignal, token?: string | null): Promise<ApiModelResponse> {
-  try {
-    const { data } = await api.get(`model/${slug}/`, { signal, ...(token && {
-        headers: { 'Authorization': `Token ${token}` }
-      }), });
-    return data;
-  } catch(e) {
-    console.error(e);
-    throw new Error('failed to fetch model metadata for model ID: ' + slug);
-  }
+  const { data } = await api.get(`model/${slug}/`, { signal, ...(token && {
+      headers: { 'Authorization': `Token ${token}` }
+    }), });
+  return data;
 }
 
 export async function fetchVectors({ modelId, token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiFileResult[]> {
-  try {
-    const endpoint = `vector/`;
-    const { data } = await api.get(endpoint, {
-      signal,
-      ...(token && {
-        headers: { 'Authorization': `Token ${token}` }
-      }),
-      ...(modelId && {
-        params: { 'model': modelId }
-      })
-    });
+  const endpoint = `vector/`;
+  const { data } = await api.get(endpoint, {
+    signal,
+    ...(token && {
+      headers: { 'Authorization': `Token ${token}` }
+    }),
+    ...(modelId && {
+      params: { 'model': modelId }
+    })
+  });
     const results: ApiFileResult[] = data.results;
 
-    return results.map((v, idx) => ({
-      ...v,
-      // @TODO would this come from endpoint at some point?
-      color: interpolateWarm(idx / results.length),
-    }));
-  } catch(e) {
-    console.error(e);
-    throw new Error('Failed to fetch vectors');
-  }
+  return results.map((v, idx) => ({
+    ...v,
+    // @TODO would this come from endpoint at some point?
+    color: interpolateWarm(idx / results.length),
+  }));
 }
 
 export async function fetchReferences({ modelId, token, signal }: { modelId?: string, token?: string | null, signal?: AbortSignal} = {}): Promise<ApiFileResult[]> {
-  try {
-    const endpoint = `reference/`;
-    const { data } = await api.get(endpoint, {
-      signal,
-      ...(token && {
-        headers: { 'Authorization': `Token ${token}` }
-      }),
-      ...(modelId && {
-        params: { 'model': modelId }
-      })
-    });
-    const results: ApiFileResult[] = data.results;
+  const endpoint = `reference/`;
+  const { data } = await api.get(endpoint, {
+    signal,
+    ...(token && {
+      headers: { 'Authorization': `Token ${token}` }
+    }),
+    ...(modelId && {
+      params: { 'model': modelId }
+    })
+  });
+  const results: ApiFileResult[] = data.results;
 
-    return results;
-  } catch(e) {
-    console.error(e);
-    throw new Error('Failed to fetch references');
-  }
+  return results;
 }
 
 export async function fetchAllFilterOptions(
@@ -311,6 +291,8 @@ export async function fetchAllFilterOptions(
     }
     return result;
   } catch(e) {
+    // Let cancellation errors propagate so React Query handles them gracefully
+    if (axios.isCancel(e)) throw e;
     console.warn(`fetchAllFilterOptions failed, using fallback`, e);
     return Object.fromEntries(columns.map(c => [c, []]));
   }
@@ -322,8 +304,12 @@ export function replaceSummaryIdColumn(fields: Field[], metricField: Record<stri
     const idField = f.columns.includes('id');
     if (idField) {
       // Replace 'id' in summary field columns with the main visualization column
-      // @TODO: Falling back to Posto should not happen
-      const filedNameToReplace = Object.keys(metricField).find(value => value !=='id') || 'Posto';
+      const filedNameToReplace = Object.keys(metricField).find(value => value !== 'id');
+      if (!filedNameToReplace) {
+        throw new Error(
+          `replaceSummaryIdColumn: cannot replace 'id' column because metricField has no non-'id' key (got ${JSON.stringify(metricField)})`
+        );
+      }
       const newFields = [...f.columns.filter(c => c !== 'id'), filedNameToReplace];
       return { ...f, columns: newFields, group_by: groupBy };
     }

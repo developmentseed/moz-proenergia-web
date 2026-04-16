@@ -51,14 +51,18 @@
     "pleaseWait": "Please wait",
     "reset": "Reset",
     "apply": "Apply",
-    "loadingSummary": "Loading Summary data",
+    "loadingSummary": "Loading summary data",
+    "loadingSummaryStage1": "Processing data…",
+    "loadingSummaryStage2": "Preparing results…",
+    "noData": "Failed to load summary data",
     "analysis": "analysis",
     "summary": "Summary",
     "cluster": "Cluster - {{clusterId}}",
     "failedClusterData": "Failed to load cluster data.",
     "onlyBarChart": "Only Bar Chart is available.",
     "errorNotReady": "This data doesn't look like it is ready. Make sure there are scenarios related to this model.",
-    "returnToModels": "Return to models"
+    "returnToModels": "Return to models",
+    "relatedClusters": "View cluster in other models"
   },
   "downloads": {
     "title": "Downloads",

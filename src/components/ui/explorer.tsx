@@ -126,7 +126,7 @@ const ExplorerInner = () => {
 
       {/* Desktop-only summary panel toggle button */}
       <Tooltip
-        content={isSummaryOpen ? "Collapse summary panel" : "Expand summary panel"}
+        content={isSummaryOpen ? t("collapsePanel") : t("expandPanel")}
       >
         <Box
           display={{ base: "none", md: "block" }}
@@ -142,7 +142,7 @@ const ExplorerInner = () => {
           transition={`right ${AnimationTime} ease`}
         >
           <IconButton
-            aria-label={isSummaryOpen ? "Collapse summary panel" : "Expand summary panel"}
+            aria-label={isSummaryOpen ? t("collapsePanel") : t("expandPanel")}
             onClick={toggleSummary}
             variant="solid"
             size="sm"
