@@ -264,7 +264,6 @@ const Control = ({
         </>
       ),
       Component: LayersPanel,
-      triggerProps: { "data-tour": "layers-tab" },
     },
   ];
   return (

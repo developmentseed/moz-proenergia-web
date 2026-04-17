@@ -121,7 +121,7 @@ export function ExplorerTour() {
       content: t("tour.step7.content"),
     },
     {
-      target: '[data-tour="layers-tab"]',
+      target: '[data-tour="filters-panel"]',
       placement: "right",
       skipBeacon: true,
       title: t("tour.step8.title"),
@@ -143,8 +143,10 @@ export function ExplorerTour() {
             callAction("selectDemoCluster");
           }
           if (index === 6) {
-            // Switch to layers tab so the panel content is visible
+            // Switch to layers tab, wait for DOM update, then advance
             callAction("switchToLayers");
+            setTimeout(() => setStepIndex(7), 200);
+            return;
           }
         }
         if (isPrev && index === 7) {
