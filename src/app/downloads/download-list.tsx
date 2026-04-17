@@ -11,10 +11,10 @@ import { Search } from "@/components/ui/search";
 import {
   fetchVectors,
   fetchReferences,
-  fetchModels,
   type ApiFileResult,
   DataType,
 } from "@/utils/data-transformation";
+import { useModels } from "@/hooks/use-models";
 import { fetchRasters } from "@/utils/map/cog";
 import { SidebarFilter } from "./sidebar-filter";
 
@@ -29,9 +29,7 @@ export const DownloadList = () => {
   const { token, isAuthenticated } = useAuth();
   const { t } = useTranslation();
 
-  const { data: models } = useQuery({
-    queryKey: ["models", token],
-    queryFn: ({ signal }) => fetchModels(signal, token),
+  const { data: models } = useModels({
     enabled: isAuthenticated,
   });
 

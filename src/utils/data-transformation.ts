@@ -40,6 +40,7 @@ export interface ApiScenario {
   id: number;
   name: string;
   name_pt?: string;
+  presentation_order?: number;
   description?: string;
   description_pt?: string;
   model_file: string | null;
@@ -200,6 +201,12 @@ export function deriveLayerStyles(sourceId: string, color: string, opacity: numb
   };
 }
 
+export function byPresentationOrder(a: { presentation_order?: number | null }, b: { presentation_order?: number | null }) {
+  if (!a.presentation_order) return 1;
+  if (!b.presentation_order) return -1;
+  return a.presentation_order - b.presentation_order;
+}
+
 export async function fetchModels(signal?: AbortSignal, token?: string| null): Promise<ModelGroupMetadata[]> {
   const { data } = await api.get('model/', { signal, ...(token && {
       headers: { 'Authorization': `Token ${token}` }
@@ -327,9 +334,8 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
   });
 
   const scenarios: Scenario[] = apiModel.scenarios
-    // @TODO: Filtering LCOE model until performance improvement
-    // .filter(s => s.id !== 1)
     .filter(s => s.model_file !== null)
+    .toSorted(byPresentationOrder)
     .map(s => {
       registerI18nResource(`scenario.${s.id}`, {
         name: { en: s.name, pt: s.name_pt },

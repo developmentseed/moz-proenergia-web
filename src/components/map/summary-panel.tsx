@@ -2,8 +2,8 @@ import { memo, useState, useEffect } from "react";
 import { Box, Flex, Text, IconButton, Link } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { api } from "@/utils/api";
-import { fetchModels, slugify } from "@/utils/data-transformation";
-import { useAuth } from "@/utils/context/auth";
+import { slugify } from "@/utils/data-transformation";
+import { useModels } from "@/hooks/use-models";
 import { useModel } from "@/utils/context/model";
 import { LuChevronLeft, LuChevronsUpDown, LuChevronsDownUp } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
@@ -75,11 +75,7 @@ interface RelatedModelsProps {
 
 const RelatedModels = ({ clusterId }: RelatedModelsProps) => {
   const { model } = useModel();
-  const { token } = useAuth();
-  const { data: models } = useQuery({
-    queryKey: ["models", token],
-    queryFn: ({ signal }) => fetchModels(signal, token),
-  });
+  const { data: models } = useModels();
   const { t } = useTranslation();
 
   const currentModelData = models?.find((m) => String(m.id) === model.id);

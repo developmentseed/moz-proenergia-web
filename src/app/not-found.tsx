@@ -2,16 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { Flex, Box, Spinner, Center, Heading, Text } from '@chakra-ui/react';
-import { useQuery } from '@tanstack/react-query';
 import Explorer from '@/components/ui/explorer';
 import { SideNav } from '@/components/layout/side-nav';
-import { fetchModels, slugify } from '@/utils/data-transformation';
-import { useAuth } from '@/utils/context/auth';
+import { slugify } from '@/utils/data-transformation';
+import { useModels } from '@/hooks/use-models';
 import { MapCoordsProvider } from '@/utils/context/map-coords';
 
 export default function NotFound() {
   const [slug, setSlug] = useState<string | null>(null);
-  const { token } = useAuth();
 
   useEffect(() => {
     const match = window.location.pathname.match(/^\/model\/([^/]+)\/?$/);
@@ -20,9 +18,7 @@ export default function NotFound() {
     }
   }, []);
 
-  const { data: models, isLoading } = useQuery({
-    queryKey: ['models', token],
-    queryFn: ({ signal }) => fetchModels(signal, token),
+  const { data: models, isLoading } = useModels({
     enabled: slug !== null,
   });
 
