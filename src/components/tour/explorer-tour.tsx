@@ -138,14 +138,18 @@ export function ExplorerTour() {
         const isPrev = action === "prev";
 
         if (isNext) {
-          if (index === 3) {
-            // Leaving filters step — programmatically apply a demo filter
-            callAction("applyDemoFilter");
-          }
           if (index === 5) {
             // Leaving national summary step — select a demo cluster
             callAction("selectDemoCluster");
           }
+          if (index === 6) {
+            // Switch to layers tab so the panel content is visible
+            callAction("switchToLayers");
+          }
+        }
+        if (isPrev && index === 7) {
+          // Going back from layers step — restore controls tab
+          callAction("switchToControls");
         }
 
         setStepIndex(index + (isPrev ? -1 : 1));

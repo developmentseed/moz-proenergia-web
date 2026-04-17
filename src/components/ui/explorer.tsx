@@ -38,7 +38,8 @@ import { useTour } from "@/context/tour";
 
 const ExplorerInner = () => {
   const { model, scenarioId } = useModel();
-  const { updatedFilters, setPendingFilters, applyPendingChanges } = useFilters();
+  const { updatedFilters } = useFilters();
+  const [activeControlTab, setActiveControlTab] = useState<string>("controls");
   const { selected, onClick, setSelected } = useMouseEvent();
   const { t } = useTranslation();
 
@@ -70,23 +71,18 @@ const ExplorerInner = () => {
   const { registerAction } = useTour();
 
   useEffect(() => {
-    // Apply first numeric filter to half its max value as a demo
-    registerAction("applyDemoFilter", () => {
-      const numericFilter = model.filters.find((f) => f.type === "numeric");
-      if (numericFilter) {
-        const opts = numericFilter.options as [number, number];
-        const mid = Math.round(opts[0] + (opts[1] - opts[0]) / 2);
-        setPendingFilters({ [numericFilter.id]: [opts[0], mid] });
-        // Small delay so the user sees the filter update before apply fires
-        setTimeout(() => applyPendingChanges(), 300);
-      }
+    registerAction("selectDemoCluster", () => {
+      setSelected("20213");
     });
 
-    registerAction("selectDemoCluster", () => {
-      const demoCluster = "20819";
-      setSelected(demoCluster);
+    registerAction("switchToLayers", () => {
+      setActiveControlTab("layers");
     });
-  }, [registerAction, model.filters, setPendingFilters, applyPendingChanges, setSelected]);
+
+    registerAction("switchToControls", () => {
+      setActiveControlTab("controls");
+    });
+  }, [registerAction, setSelected, setActiveControlTab]);
 
   return (
     <Box
@@ -99,6 +95,8 @@ const ExplorerInner = () => {
       <MainPanel
         isOpen={isControlsOpen}
         onToggle={() => setIsControlsOpen((prev) => !prev)}
+        activeTab={activeControlTab}
+        onTabChange={setActiveControlTab}
       />
 
       {/* Desktop-only toggle button */}

@@ -16,9 +16,13 @@ export const AnimationTime = "0.32s";
 const MainPanel = ({
   isOpen,
   onToggle = () => {},
+  activeTab,
+  onTabChange,
 }: {
   isOpen: boolean;
   onToggle?: () => void;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
 }) => {
   const { model, scenarioId, setScenarioId } = useModel();
   const { t } = useTranslation();
@@ -126,7 +130,7 @@ const MainPanel = ({
           </Box>
         </Box>
         <Box data-tour="filters-panel" flex="1" display="flex" flexDirection="column" overflow="hidden">
-          <ControlPanel />
+          <ControlPanel activeTab={activeTab} onTabChange={onTabChange} />
         </Box>
       </Box>
     </Box>
