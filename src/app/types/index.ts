@@ -46,7 +46,6 @@ export interface Scenario {
   id: string;
   name: string;
   name_pt?: string;
-  presentation_order?: number;
   label: string;
   description?: string;
   source: SourceProps,

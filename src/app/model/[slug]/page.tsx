@@ -4,13 +4,14 @@ import Explorer from '@/components/ui/explorer';
 import { SideNav } from '@/components/layout/side-nav';
 import {
   fetchModels,
+  byPresentationOrder,
   slugify,
 } from '@/utils/data-transformation';
 
 export const dynamicParams = false;
 // Generate pages per model id
 export async function generateStaticParams() {
-  const res = await fetchModels();
+  const res = (await fetchModels()).toSorted(byPresentationOrder);
   return res.map((model) => ({
     slug: slugify(model.name),
   }));
@@ -22,7 +23,7 @@ export default async function ModelPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params;
-  const models = await fetchModels();
+  const models = (await fetchModels()).toSorted(byPresentationOrder);
   const model = models.find((m) => slugify(m.name) === slug);
 
   if (!model) {

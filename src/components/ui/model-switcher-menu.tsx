@@ -3,21 +3,16 @@
 import { Text, Box, Flex, MenuRoot, Menu, MenuTrigger, MenuContent, MenuItem } from "@chakra-ui/react";
 import Image from "next/image";
 import NextLink from "next/link";
-import { useQuery } from "@tanstack/react-query";
 import { useModel } from "@/utils/context/model";
-import { fetchModels, slugify } from "@/utils/data-transformation";
-import { useAuth } from "@/utils/context/auth";
+import { slugify } from "@/utils/data-transformation";
+import { useModels } from "@/hooks/use-models";
 import { getIconPath } from "@/utils/model-icon";
 import { zIndex } from "@/components/ui/constant";
 
 const ModelSwitcherMenu = () => {
   const { model } = useModel();
-  const { token } = useAuth();
 
-  const { data: models } = useQuery({
-    queryKey: ["models", token],
-    queryFn: ({ signal }) => fetchModels(signal, token),
-  });
+  const { data: models } = useModels();
 
   const iconPath = getIconPath(model.id);
 
