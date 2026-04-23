@@ -166,6 +166,14 @@ export const DownloadList = () => {
       rasterResults.some((r) => r.isPending) ||
       referenceResults.some((r) => r.isPending));
 
+  const isError =
+    vectorAllResult.isError ||
+    rasterAllResult.isError ||
+    referenceAllResult.isError ||
+    vectorResults.some((r) => r.isError) ||
+    rasterResults.some((r) => r.isError) ||
+    referenceResults.some((r) => r.isError);
+
   const toggleModel = (id: string) => {
     setSelectedModelIds((prev) =>
       prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id],
@@ -203,6 +211,10 @@ export const DownloadList = () => {
         {isInitialLoading ? (
           <Center py={10}>
             <Spinner colorPalette="orange" color="colorPalette.600" size="lg" />
+          </Center>
+        ) : isError ? (
+          <Center py={10}>
+            <Text color="fg.muted">{t("downloads.loadError")}</Text>
           </Center>
         ) : (
           <>

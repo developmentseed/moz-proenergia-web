@@ -62,6 +62,7 @@
     "onlyBarChart": "Only Bar Chart is available.",
     "errorNotReady": "This data doesn't look like it is ready. Make sure there are scenarios related to this model.",
     "returnToModels": "Return to models",
+    "loadError": "Failed to load model data. Please try again later.",
     "relatedClusters": "View cluster in other models"
   },
   "downloads": {
@@ -73,6 +74,7 @@
     "download": "Download",
     "filterModels": "Filter by Model",
     "reset": "Reset",
+    "loadError": "Failed to load datasets. Please try again later.",
     "dataType": {
       "vector": "Vector",
       "raster": "Raster",

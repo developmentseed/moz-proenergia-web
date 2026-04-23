@@ -184,7 +184,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   const { t } = useTranslation();
 
   // Query 1: Model metadata
-  const { data: modelCore } = useQuery({
+  const { data: modelCore, isError: modelCoreError } = useQuery({
     queryKey: ["modelMetadata", modelId, token],
     queryFn: async ({ signal }) => {
       const apiModel = await fetchModelMetadata(modelId, signal, token);
@@ -301,6 +301,17 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
         <Box>
           {t('explorer.errorNotReady')}
         </Box>
+        <Box mt={4} textDecoration="underline">
+          <NextLink href="/models">{t('explorer.returnToModels')}</NextLink>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (modelCoreError) {
+    return (
+      <Box h="full" w="full" display="flex" justifyContent="center" alignItems="center" flexDirection="column">
+        <Box>{t('explorer.loadError')}</Box>
         <Box mt={4} textDecoration="underline">
           <NextLink href="/models">{t('explorer.returnToModels')}</NextLink>
         </Box>

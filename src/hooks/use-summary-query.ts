@@ -138,6 +138,7 @@ export function useSummaryQuery({
     : undefined;
 
   const isLoading = queries.some((q) => q.isLoading);
+  const isError = !isLoading && queries.every((q) => q.isError);
 
-  return { data, isLoading };
+  return { data, isLoading, isError };
 }

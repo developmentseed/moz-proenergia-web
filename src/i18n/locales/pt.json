@@ -62,6 +62,7 @@
     "onlyBarChart": "Apenas Gráfico de Barras está disponível.",
     "errorNotReady": "Estes dados não parecem estar prontos. Certifique-se de que existem cenários relacionados a este modelo.",
     "returnToModels": "Voltar para modelos",
+    "loadError": "Falha ao carregar dados do modelo. Por favor, tente novamente mais tarde.",
     "relatedClusters": "Ver cluster em outros modelos"
   },
   "downloads": {
@@ -73,6 +74,7 @@
     "download": "Baixar",
     "filterModels": "Filtrar por Modelo",
     "reset": "Redefinir",
+    "loadError": "Falha ao carregar conjuntos de dados. Por favor, tente novamente mais tarde.",
     "dataType": {
       "vector": "Vetorial",
       "raster": "Raster",
