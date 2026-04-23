@@ -32,6 +32,7 @@ import { Tooltip } from "./tooltip";
 import { useTranslation } from "react-i18next";
 import { useToggle } from "@/hooks/use-toggle";
 import { useMouseEvent } from "@/components/map/hooks/use-mouse-event";
+import { ErrorBoundary } from "./error-boundary";
 import { ControlPanelWidth, AnimationTime } from "./main-panel";
 
 const ExplorerInner = () => {
@@ -116,12 +117,14 @@ const ExplorerInner = () => {
 
       {/* Map area */}
       <Box flex={1} height="full" minHeight={0} position="relative">
-        <MainMap
-          main={model.main}
-          onClick={onClick}
-          clusterId={selected}
-          onFlyToRef={flyToRef}
-        />
+        <ErrorBoundary>
+          <MainMap
+            main={model.main}
+            onClick={onClick}
+            clusterId={selected}
+            onFlyToRef={flyToRef}
+          />
+        </ErrorBoundary>
       </Box>
 
       {/* Desktop-only summary panel toggle button */}
@@ -161,20 +164,36 @@ const ExplorerInner = () => {
         </Box>
       </Tooltip>
 
-      <SummaryPanel
-        clusterId={selected}
-        scenarioId={scenarioId}
-        onSelectCluster={setSelected}
-        onFlyTo={(lng, lat) => flyToRef.current?.(lng, lat)}
-        popupFields={model.popupFields}
-        summaryFields={model.summaryFields}
-        filters={updatedFilters}
-        filterDefs={model.filters}
-        resetCluster={resetCluster}
-        main={model.main}
-        isOpen={isSummaryOpen}
-        onToggle={toggleSummary}
-      />
+      <ErrorBoundary
+        fallback={
+          <Box
+            display={{ base: "none", md: "flex" }}
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            width={ControlPanelWidth}
+            fontSize="sm"
+            color="fg.muted"
+          >
+            Summary unavailable
+          </Box>
+        }
+      >
+        <SummaryPanel
+          clusterId={selected}
+          scenarioId={scenarioId}
+          onSelectCluster={setSelected}
+          onFlyTo={(lng, lat) => flyToRef.current?.(lng, lat)}
+          popupFields={model.popupFields}
+          summaryFields={model.summaryFields}
+          filters={updatedFilters}
+          filterDefs={model.filters}
+          resetCluster={resetCluster}
+          main={model.main}
+          isOpen={isSummaryOpen}
+          onToggle={toggleSummary}
+        />
+      </ErrorBoundary>
     </Box>
   );
 };
