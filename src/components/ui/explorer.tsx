@@ -31,6 +31,7 @@ import SummaryPanel from "@/components/map/summary-panel";
 import { Tooltip } from "./tooltip";
 import { useTranslation } from "react-i18next";
 import { useToggle } from "@/hooks/use-toggle";
+import { toaster } from "./toaster";
 import { useMouseEvent } from "@/components/map/hooks/use-mouse-event";
 import { ControlPanelWidth, AnimationTime } from "./main-panel";
 
@@ -243,6 +244,19 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   // Scenario state (lifted from ModelProvider so filter query can react to changes)
   const [scenarioId, setScenarioId] = useQueryState('scenario', parseAsString);
   const activeScenarioId = scenarioId ?? defaultScenarioId;
+
+  // Validate scenarioId against known scenarios once model loads
+  useEffect(() => {
+    if (!modelCore || !scenarioId) return;
+    const valid = modelCore.scenarios.some((s) => s.id === scenarioId);
+    if (!valid) {
+      setScenarioId(null);
+      toaster.create({
+        type: "error",
+        title: t('explorer.invalidScenario'),
+      });
+    }
+  }, [modelCore, scenarioId, setScenarioId, t]);
 
   // Filter options (single batch fetch, refetches per scenario)
   const filterColumns = (modelCore?.filterFields ?? []).map((f) => f.column);

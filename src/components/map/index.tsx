@@ -83,7 +83,8 @@ const MainMap = ({ main, onClick, clusterId, onFlyToRef }: MainMapProps) => {
     return buildExpressionWithFilter(model.filters, updatedFilters);
   }, [updatedFilters, model.filters]);
 
-  const scenario = model.scenarios.find((s) => s.id === scenarioId)!;
+  const scenario = model.scenarios.find((s) => s.id === scenarioId);
+  if (!scenario) return null;
 
   const [mainLayerOpacity, setMainLayerOpacity] = useState(100);
   const [currentBasemapId, setCurrentBasemapId] = useState("light");

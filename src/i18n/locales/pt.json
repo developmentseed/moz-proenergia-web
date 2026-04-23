@@ -62,7 +62,8 @@
     "onlyBarChart": "Apenas Gráfico de Barras está disponível.",
     "errorNotReady": "Estes dados não parecem estar prontos. Certifique-se de que existem cenários relacionados a este modelo.",
     "returnToModels": "Voltar para modelos",
-    "relatedClusters": "Ver cluster em outros modelos"
+    "relatedClusters": "Ver cluster em outros modelos",
+    "invalidScenario": "O cenário selecionado não foi encontrado; o cenário padrão foi carregado."
   },
   "downloads": {
     "title": "Downloads",
