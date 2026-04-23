@@ -62,7 +62,9 @@
     "onlyBarChart": "Only Bar Chart is available.",
     "errorNotReady": "This data doesn't look like it is ready. Make sure there are scenarios related to this model.",
     "returnToModels": "Return to models",
-    "relatedClusters": "View cluster in other models"
+    "relatedClusters": "View cluster in other models",
+    "summaryUnavailable": "Summary unavailable — results could not be calculated for the current filters.",
+    "resetFilters": "Reset filters"
   },
   "downloads": {
     "title": "Downloads",

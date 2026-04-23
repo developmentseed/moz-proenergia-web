@@ -62,7 +62,9 @@
     "onlyBarChart": "Apenas Gráfico de Barras está disponível.",
     "errorNotReady": "Estes dados não parecem estar prontos. Certifique-se de que existem cenários relacionados a este modelo.",
     "returnToModels": "Voltar para modelos",
-    "relatedClusters": "Ver cluster em outros modelos"
+    "relatedClusters": "Ver cluster em outros modelos",
+    "summaryUnavailable": "Resumo indisponível — os resultados não puderam ser calculados para os filtros atuais.",
+    "resetFilters": "Redefinir filtros"
   },
   "downloads": {
     "title": "Downloads",
