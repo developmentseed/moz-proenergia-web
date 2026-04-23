@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { Box, Heading, Flex, HStack, Text, Link, Separator, Drawer, CloseButton, IconButton, Portal, VStack } from "@chakra-ui/react";
+import { Box, Heading, Flex, HStack, Text, Link, Separator, Drawer, CloseButton, IconButton, Portal, VStack, Button } from "@chakra-ui/react";
 import NextLink from "next/link";
 import Image from "next/image";
-import { LuMenu } from "react-icons/lu";
+import { LuDownload, LuInfo, LuMap, LuMenu } from "react-icons/lu";
 import DropdownMenu, { DropdownMenuItems } from "./dropdown-menu";
 import { LanguageSwitcher } from "./language-switcher";
 import { useTranslation } from "react-i18next";
@@ -16,6 +16,7 @@ import { BASE_PATH } from "@/config/website";
 export interface NavigationItem {
   label: string;
   href: string;
+  icon: React.ReactNode;
 }
 
 interface HeaderProps {
@@ -31,9 +32,9 @@ export const Header = ({
   const { isAuthenticated } = useAuth();
 
   const navigationItems: NavigationItem[] = [
-    { label: t('nav.explorer'), href: "/models" },
-    { label: t('nav.about'), href: "/about" },
-    { label: t('nav.downloads'), href: "/downloads" },
+    { label: t('nav.explorer'), href: "/models", icon: <LuMap size={20} /> },
+    { label: t('nav.about'), href: "/about", icon: <LuInfo size={20} /> },
+    { label: t('nav.downloads'), href: "/downloads", icon: <LuDownload size={20} /> },
   ];
 
   const isActive = (href: string) => {
@@ -87,23 +88,27 @@ export const Header = ({
 
         {/* Navigation Items - Right */}
         <HStack fontFamily="body" gap={6}>
-          <HStack gap={6} display={{ base: 'none', md: 'flex' }}>
+          <HStack gap={3} display={{ base: 'none', md: 'flex' }}>
             {navigationItems.map((item) => {
               if (item.href === "/downloads" && !isAuthenticated) return null;
               const active = isActive(item.href);
               return (
-                <Box key={item.href}>
-                  <Link
-                    fontSize="sm"
-                    fontWeight={active ? "bold" : "medium"}
-                    color="orange.contrast"
-                    transition="color 0.2s"
-                    asChild
-                    _hover={{ textDecoration: "none", outline: "none" }}
-                  >
-                    <NextLink href={item.href}>{item.label}</NextLink>
-                  </Link>
-                </Box>
+                <Button key={item.href} fontSize="sm"
+                  fontWeight="semibold"
+                  colorPalette="orange"
+                  size="sm"
+                  px={2}
+                  bg={active ? "orange.fg" : "transparent"}
+                  color="orange.contrast"
+                  variant="ghost"
+                  asChild
+                  _hover={{ bg: "orange.fg", color: "orange.subtle" }}
+                >
+                    <NextLink href={item.href}>
+                      {item.icon}
+                      {item.label}
+                    </NextLink>
+                </Button>
               );
             })}
             <Separator orientation="vertical" height="4" />
@@ -141,18 +146,18 @@ export const Header = ({
                         {navigationItems.map((item) => {
                           if (item.href === "/downloads" && !isAuthenticated) return null;
                           return (
-                            <Link
-                              key={item.href}
-                              fontSize="sm"
-                              fontWeight={isActive(item.href) ? "bold" : "medium"}
-                              color={isActive(item.href) ? "fg" : "fg.muted"}
-                              asChild
-                              _hover={{ textDecoration: "none", color: "fg" }}
-                              onClick={() => setDrawerOpen(false)}
+                          <Link
+                            key={item.href}
+                            fontSize="sm"
+                            fontWeight={isActive(item.href) ? "bold" : "medium"}
+                            color={isActive(item.href) ? "fg" : "fg.muted"}
+                            asChild
+                            _hover={{ textDecoration: "none", color: "fg" }}
+                            onClick={() => setDrawerOpen(false)}
                           >
-                              <NextLink href={item.href}>{item.label}</NextLink>
-                            </Link>
-                        );})}
+                            <NextLink href={item.href}>{item.icon}{item.label}</NextLink>
+                          </Link>
+                        )})}
                         <Separator mt="auto" />
                         <LanguageSwitcher />
                         <Separator />
@@ -168,7 +173,7 @@ export const Header = ({
             </Drawer.Root>
           </Box>
 
-          <Box display={{ base: "none", md: "block" }}>
+          <Box display={{ base: "none", md: "block" }} mx={-3}>
             <DropdownMenu />
           </Box>
         </HStack>

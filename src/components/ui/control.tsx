@@ -249,7 +249,7 @@ const Control = ({
       id: "controls",
       label: (
         <>
-          <LuSettings2 />
+          <LuSettings2 size={16} />
           <Text textStyle="subTitle">{t('explorer.controls')}</Text>
         </>
       ),
@@ -259,7 +259,7 @@ const Control = ({
       id: "layers",
       label: (
         <>
-          <LuLayers />
+          <LuLayers size={16} />
           <Text textStyle="subTitle">{t('explorer.layers')}</Text>
         </>
       ),
