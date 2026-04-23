@@ -70,9 +70,19 @@ const ExplorerInner = () => {
   // Tour: register programmatic actions
   const { registerAction } = useTour();
 
+  // Known representative cluster IDs per model, used by the guided tour
+  const DEMO_CLUSTERS: Record<string, string> = {
+    "1": "20213",
+    "2": "20213",
+    "3": "20213",
+    "4": "1525",
+    "5": "364261",
+  };
+
   useEffect(() => {
     registerAction("selectDemoCluster", () => {
-      setSelected("20213");
+      const clusterId = DEMO_CLUSTERS[String(model.id)];
+      if (clusterId) setSelected(clusterId);
     });
 
     registerAction("switchToLayers", () => {
@@ -82,7 +92,7 @@ const ExplorerInner = () => {
     registerAction("switchToControls", () => {
       setActiveControlTab("controls");
     });
-  }, [registerAction, setSelected, setActiveControlTab]);
+  }, [registerAction, model.id, setSelected, setActiveControlTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Box
