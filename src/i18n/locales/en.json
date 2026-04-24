@@ -4,11 +4,16 @@
     "longName": "Integrated Energy Planning Platform",
     "shortName": "PIE",
     "explorer": "Explorer",
+    "explorerTitle": "Explore models and scenarios",
     "about": "About",
+    "aboutTitle": "Learn more about the project",
     "downloads": "Downloads",
+    "downloadsTitle": "Download resources",
     "login": "Login",
     "logout": "Log out",
     "sdiPortal": "SDI Portal",
+    "userGuide": "User Guide",
+    "userGuideTitle": "Visit the User Guide",
     "menu": "Menu"
   },
   "home": {

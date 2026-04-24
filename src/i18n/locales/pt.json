@@ -4,11 +4,16 @@
     "longName": "Plataforma Integrada de Electrificação",
     "shortName": "PIE",
     "explorer": "Explorador",
+    "explorerTitle": "Explorar modelos e cenários",
     "about": "Sobre",
+    "aboutTitle": "Saber mais sobre o projeto",
     "downloads": "Downloads",
+    "downloadsTitle": "Descarregar recursos",
     "login": "Entrar",
     "logout": "Sair",
     "sdiPortal": "Portal SDI",
+    "userGuide": "Guia do Utilizador",
+    "userGuideTitle": "Visitar o Guia do Utilizador",
     "menu": "Menu"
   },
   "home": {
