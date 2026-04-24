@@ -107,6 +107,47 @@
     "rasterMin": "Min: {{value}}",
     "rasterMax": "Max: {{value}}"
   },
+  "tour": {
+    "back": "Back",
+    "close": "Close",
+    "finish": "Finish",
+    "next": "Next",
+    "skip": "Skip tour",
+    "openTour": "Open guided tour",
+    "dontShowAgain": "Don't show this tour automatically again",
+    "step1": {
+      "title": "Welcome to the Integrated Energy Planning Platform",
+      "content": "This platform allows you to explore energy access modelling results for Mozambique. You can visualise least-cost electrification pathways, filter by geography and attributes, and inspect summary statistics for any area."
+    },
+    "step2": {
+      "title": "Select a Model",
+      "content": "Use the sidebar icons to switch between available planning models. Each model represents a distinct analytical scenario or dataset."
+    },
+    "step3": {
+      "title": "Choose a Scenario",
+      "content": "Each model may contain multiple scenarios — for example, different investment horizons or policy assumptions. Use this dropdown to switch between them."
+    },
+    "step4": {
+      "title": "Apply Filters",
+      "content": "Use the Controls panel to filter settlements by attributes such as distance to infrastructure, population size, or administrative area. Adjust the values and press Apply to update the map and summary."
+    },
+    "step5": {
+      "title": "Explore the Map",
+      "content": "The map updates to reflect your active filters. Each point represents a settlement, coloured by the least-cost electrification technology. Click any settlement to inspect it individually."
+    },
+    "step6": {
+      "title": "National Summary",
+      "content": "The summary panel shows aggregated statistics for all settlements currently visible given your filters — including technology breakdowns, population, and projected connections."
+    },
+    "step7": {
+      "title": "Cluster Detail",
+      "content": "When you select an individual settlement, the summary panel switches to show its specific attributes — such as coordinates, population, and the recommended electrification technology."
+    },
+    "step8": {
+      "title": "Additional Layers",
+      "content": "Switch to the Layers tab to toggle contextual map layers such as administrative boundaries, grid infrastructure, or other reference datasets."
+    }
+  },
   "breadcrumbs": {
     "about": "About",
     "downloads": "Downloads"

@@ -33,10 +33,13 @@ import { useTranslation } from "react-i18next";
 import { useToggle } from "@/hooks/use-toggle";
 import { useMouseEvent } from "@/components/map/hooks/use-mouse-event";
 import { ControlPanelWidth, AnimationTime } from "./main-panel";
+import { ExplorerTour } from "@/components/tour/explorer-tour";
+import { useTour } from "@/context/tour";
 
 const ExplorerInner = () => {
   const { model, scenarioId } = useModel();
   const { updatedFilters } = useFilters();
+  const [activeControlTab, setActiveControlTab] = useState<string>("controls");
   const { selected, onClick, setSelected } = useMouseEvent();
   const { t } = useTranslation();
 
@@ -64,6 +67,33 @@ const ExplorerInner = () => {
     }
   }, [selected, openSummary]);
 
+  // Tour: register programmatic actions
+  const { registerAction } = useTour();
+
+  // Known representative cluster IDs per model, used by the guided tour
+  const DEMO_CLUSTERS: Record<string, string> = {
+    "1": "20213",
+    "2": "20213",
+    "3": "20213",
+    "4": "1525",
+    "5": "364261",
+  };
+
+  useEffect(() => {
+    registerAction("selectDemoCluster", () => {
+      const clusterId = DEMO_CLUSTERS[String(model.id)];
+      if (clusterId) setSelected(clusterId);
+    });
+
+    registerAction("switchToLayers", () => {
+      setActiveControlTab("layers");
+    });
+
+    registerAction("switchToControls", () => {
+      setActiveControlTab("controls");
+    });
+  }, [registerAction, model.id, setSelected, setActiveControlTab]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <Box
       display={{ base: "grid", md: "flex" }}
@@ -75,6 +105,8 @@ const ExplorerInner = () => {
       <MainPanel
         isOpen={isControlsOpen}
         onToggle={() => setIsControlsOpen((prev) => !prev)}
+        activeTab={activeControlTab}
+        onTabChange={setActiveControlTab}
       />
 
       {/* Desktop-only toggle button */}
@@ -115,7 +147,7 @@ const ExplorerInner = () => {
       </Tooltip>
 
       {/* Map area */}
-      <Box flex={1} height="full" minHeight={0} position="relative">
+      <Box data-tour="map" flex={1} height="full" minHeight={0} position="relative">
         <MainMap
           main={model.main}
           onClick={onClick}
@@ -175,6 +207,8 @@ const ExplorerInner = () => {
         isOpen={isSummaryOpen}
         onToggle={toggleSummary}
       />
+
+      <ExplorerTour />
     </Box>
   );
 };
