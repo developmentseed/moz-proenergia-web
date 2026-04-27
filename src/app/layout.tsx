@@ -6,6 +6,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { WEBSITE_DESC, WEBSITE_TITLE } from "@/config/website";
 import Header from "@/components/layout/header/";
 import { AuthProvider } from "@/utils/context/auth";
+import { TourProvider } from "@/context/tour";
 import { I18nProvider } from "@/i18n/provider";
 import { DM_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";
@@ -47,10 +48,12 @@ export default function RootLayout({
             <NuqsAdapter>
               <Provider>
                 <AuthProvider>
-                  <Header />
-                  <Box as="main" bg="bg">
-                    {children}
-                  </Box>
+                  <TourProvider>
+                    <Header />
+                    <Box as="main" bg="bg">
+                      {children}
+                    </Box>
+                  </TourProvider>
                 </AuthProvider>
               </Provider>
             </NuqsAdapter>
