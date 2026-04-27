@@ -67,7 +67,8 @@
     "onlyBarChart": "Only Bar Chart is available.",
     "errorNotReady": "This data doesn't look like it is ready. Make sure there are scenarios related to this model.",
     "returnToModels": "Return to models",
-    "relatedClusters": "View cluster in other models"
+    "relatedClusters": "View cluster in other models",
+    "invalidScenario": "Selected scenario was not found; the default scenario has been loaded."
   },
   "downloads": {
     "title": "Downloads",
