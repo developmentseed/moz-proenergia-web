@@ -31,7 +31,7 @@ import SummaryPanel from "@/components/map/summary-panel";
 import { Tooltip } from "./tooltip";
 import { useTranslation } from "react-i18next";
 import { useToggle } from "@/hooks/use-toggle";
-import { toaster } from "./toaster";
+import { toaster } from "../chakra/toaster";
 import { useMouseEvent } from "@/components/map/hooks/use-mouse-event";
 import { ControlPanelWidth, AnimationTime } from "./main-panel";
 
@@ -250,13 +250,13 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     if (!modelCore || !scenarioId) return;
     const valid = modelCore.scenarios.some((s) => s.id === scenarioId);
     if (!valid) {
-      setScenarioId(null);
+      setScenarioId(defaultScenarioId?? null);
       toaster.create({
         type: "error",
         title: t('explorer.invalidScenario'),
       });
     }
-  }, [modelCore, scenarioId, setScenarioId, t]);
+  }, [modelCore, scenarioId, setScenarioId, t, defaultScenarioId]);
 
   // Filter options (single batch fetch, refetches per scenario)
   const filterColumns = (modelCore?.filterFields ?? []).map((f) => f.column);
@@ -325,11 +325,11 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   if (!modelData || !layers) {
     return (
       <Flex id="container" width="full" height="full" position="relative" direction={{ base: "column", md: "row" }}>
-        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height={{ base: "auto", md: "full" }} flex={{base: 1, md: "initial" }} />
+        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height={{ base: "auto", md: "full" }} flex={{ base: 1, md: "initial" }} />
         <Box flex={{ base: 4, md: 1 }} height="full" p={2}>
           <Skeleton width="full" height="full" />
         </Box>
-        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height="full" flex={{base: 1, md: "initial" }} />
+        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height="full" flex={{ base: 1, md: "initial" }} />
       </Flex>
     );
   }
