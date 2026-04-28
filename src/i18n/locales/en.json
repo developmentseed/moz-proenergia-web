@@ -88,6 +88,9 @@
     "download": "Download",
     "filterModels": "Filter by Model",
     "reset": "Reset",
+    "vectorLoadError": "Failed to load vector datasets",
+    "rasterLoadError": "Failed to load raster datasets",
+    "referenceLoadError": "Failed to load reference datasets",
     "dataType": {
       "vector": "Vector",
       "raster": "Raster",

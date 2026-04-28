@@ -88,6 +88,9 @@
     "download": "Baixar",
     "filterModels": "Filtrar por Modelo",
     "reset": "Redefinir",
+    "vectorLoadError": "Falha ao carregar conjuntos de dados vetoriais",
+    "rasterLoadError": "Falha ao carregar conjuntos de dados raster",
+    "referenceLoadError": "Falha ao carregar conjuntos de dados de referência",
     "dataType": {
       "vector": "Vetorial",
       "raster": "Raster",
