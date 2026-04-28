@@ -4,4 +4,5 @@ export type TabItem = {
   id: string;
   label: JSX.Element;
   Component: FunctionComponent;
+  triggerProps?: Record<string, string>;
 }

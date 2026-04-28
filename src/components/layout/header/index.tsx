@@ -5,17 +5,19 @@ import { usePathname } from "next/navigation";
 import { Box, Heading, Flex, HStack, Text, Link, Separator, Drawer, CloseButton, IconButton, Portal, VStack, Button } from "@chakra-ui/react";
 import NextLink from "next/link";
 import Image from "next/image";
-import { LuDownload, LuInfo, LuMap, LuMenu } from "react-icons/lu";
+import { LuBookOpen, LuDownload, LuInfo, LuMap, LuMenu } from "react-icons/lu";
 import DropdownMenu, { DropdownMenuItems } from "./dropdown-menu";
 import { LanguageSwitcher } from "./language-switcher";
+import { TourHelpButton } from "@/components/tour/explorer-tour";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/utils/context/auth";
 import { zIndex } from "@/components/ui/constant";
-import { BASE_PATH } from "@/config/website";
+import { BASE_PATH, USER_GUIDE_URL } from "@/config/website";
 
 export interface NavigationItem {
   label: string;
   href: string;
+  title: string;
   icon: React.ReactNode;
 }
 
@@ -32,9 +34,9 @@ export const Header = ({
   const { isAuthenticated } = useAuth();
 
   const navigationItems: NavigationItem[] = [
-    { label: t('nav.explorer'), href: "/models", icon: <LuMap size={20} /> },
-    { label: t('nav.about'), href: "/about", icon: <LuInfo size={20} /> },
-    { label: t('nav.downloads'), href: "/downloads", icon: <LuDownload size={20} /> },
+    { label: t('nav.explorer'), href: "/models", title: t('nav.explorerTitle'), icon: <LuMap size={20} /> },
+    { label: t('nav.about'), href: "/about", title: t('nav.aboutTitle'), icon: <LuInfo size={20} /> },
+    { label: t('nav.downloads'), href: "/downloads", title: t('nav.downloadsTitle'), icon: <LuDownload size={20} /> },
   ];
 
   const isActive = (href: string) => {
@@ -43,6 +45,8 @@ export const Header = ({
       return true;
     return pathname === href + "/";
   };
+
+  const showTourHelpButton = pathname.startsWith("/model")
 
   return (
     <Box
@@ -103,6 +107,7 @@ export const Header = ({
                   variant="ghost"
                   asChild
                   _hover={{ bg: "orange.fg", color: "orange.subtle" }}
+                  title={item.title}
                 >
                     <NextLink href={item.href}>
                       {item.icon}
@@ -111,8 +116,29 @@ export const Header = ({
                 </Button>
               );
             })}
+            {USER_GUIDE_URL && (
+              <Button
+                fontSize="sm"
+                fontWeight="semibold"
+                colorPalette="orange"
+                size="sm"
+                px={2}
+                bg="transparent"
+                color="orange.contrast"
+                variant="ghost"
+                asChild
+                _hover={{ bg: "orange.fg", color: "orange.subtle" }}
+                title={t('nav.userGuideTitle')}
+              >
+                <a href={USER_GUIDE_URL} target="_blank" rel="noopener noreferrer">
+                  <LuBookOpen size={20} />
+                  {t('nav.userGuide')}
+                </a>
+              </Button>
+            )}
             <Separator orientation="vertical" height="4" />
             <LanguageSwitcher />
+            {showTourHelpButton && <TourHelpButton />}
             <Separator orientation="vertical" height="4" />
           </HStack>
 
@@ -154,10 +180,28 @@ export const Header = ({
                             asChild
                             _hover={{ textDecoration: "none", color: "fg" }}
                             onClick={() => setDrawerOpen(false)}
+                            title={item.title}
                           >
                             <NextLink href={item.href}>{item.icon}{item.label}</NextLink>
                           </Link>
                         )})}
+                        {USER_GUIDE_URL && (
+                          <Link
+                            fontSize="sm"
+                            fontWeight="medium"
+                            color="fg.muted"
+                            href={USER_GUIDE_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            display="flex"
+                            alignItems="center"
+                            gap={1.5}
+                            title={t('nav.userGuideTitle')}
+                            _hover={{ textDecoration: "none", color: "fg" }}
+                          >
+                            <LuBookOpen size={20} /> {t('nav.userGuide')}
+                          </Link>
+                        )}
                         <Separator mt="auto" />
                         <LanguageSwitcher />
                         <Separator />

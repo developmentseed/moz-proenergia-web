@@ -31,9 +31,12 @@ import SummaryPanel from "@/components/map/summary-panel";
 import { Tooltip } from "./tooltip";
 import { useTranslation } from "react-i18next";
 import { useToggle } from "@/hooks/use-toggle";
+import { toaster } from "../chakra/toaster";
 import { useMouseEvent } from "@/components/map/hooks/use-mouse-event";
 import { ErrorBoundary } from "./error-boundary";
 import { ControlPanelWidth, AnimationTime } from "./main-panel";
+import { ExplorerTour } from "@/components/tour/explorer-tour";
+import { useTour } from "@/context/tour";
 
 const SummaryErrorFallback = () => {
   const { resetAllFilters } = useFilters();
@@ -64,6 +67,7 @@ const SummaryErrorFallback = () => {
 const ExplorerInner = () => {
   const { model, scenarioId } = useModel();
   const { updatedFilters } = useFilters();
+  const [activeControlTab, setActiveControlTab] = useState<string>("controls");
   const { selected, onClick, setSelected } = useMouseEvent();
   const { t } = useTranslation();
 
@@ -91,6 +95,33 @@ const ExplorerInner = () => {
     }
   }, [selected, openSummary]);
 
+  // Tour: register programmatic actions
+  const { registerAction } = useTour();
+
+  // Known representative cluster IDs per model, used by the guided tour
+  const DEMO_CLUSTERS: Record<string, string> = {
+    "1": "20213",
+    "2": "20213",
+    "3": "20213",
+    "4": "1525",
+    "5": "364261",
+  };
+
+  useEffect(() => {
+    registerAction("selectDemoCluster", () => {
+      const clusterId = DEMO_CLUSTERS[String(model.id)];
+      if (clusterId) setSelected(clusterId);
+    });
+
+    registerAction("switchToLayers", () => {
+      setActiveControlTab("layers");
+    });
+
+    registerAction("switchToControls", () => {
+      setActiveControlTab("controls");
+    });
+  }, [registerAction, model.id, setSelected, setActiveControlTab]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <Box
       display={{ base: "grid", md: "flex" }}
@@ -102,6 +133,8 @@ const ExplorerInner = () => {
       <MainPanel
         isOpen={isControlsOpen}
         onToggle={() => setIsControlsOpen((prev) => !prev)}
+        activeTab={activeControlTab}
+        onTabChange={setActiveControlTab}
       />
 
       {/* Desktop-only toggle button */}
@@ -142,6 +175,7 @@ const ExplorerInner = () => {
       </Tooltip>
 
       {/* Map area */}
+
       <Box flex={1} height="full" minHeight={0} position="relative">
         <ErrorBoundary>
           <MainMap
@@ -151,6 +185,7 @@ const ExplorerInner = () => {
             onFlyToRef={flyToRef}
           />
         </ErrorBoundary>
+
       </Box>
 
       {/* Desktop-only summary panel toggle button */}
@@ -205,6 +240,8 @@ const ExplorerInner = () => {
           isOpen={isSummaryOpen}
           onToggle={toggleSummary}
         />
+
+        <ExplorerTour />
       </ErrorBoundary>
     </Box>
   );
@@ -226,16 +263,18 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   // The queryKeys below cache the raw ApiFileResult[] so other consumers
   // (e.g. the downloads page) can share this data. Layer transforms are
   // applied locally via select / useMemo.
-  const { data: vectorLayers } = useQuery({
+  const { data: vectorLayers, isError: vectorsError } = useQuery({
     queryKey: ["vectors", modelId, token],
     queryFn: ({ signal }) => fetchVectors({ modelId, token, signal }),
     // Select is synchronious (can't be used for rasters that needs to fetch cog metadata)
     select: transformVectorsToLayers,
+    throwOnError: false,
   });
 
-  const { data: apiRasters } = useQuery({
+  const { data: apiRasters, isError: rastersError } = useQuery({
     queryKey: ["rasters", modelId, token],
     queryFn: ({ signal }) => fetchRasters({ modelId, token, signal }),
+    throwOnError: false,
   });
 
   const { data: rasterStatsMap } = useQuery({
@@ -254,7 +293,17 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
       return new Map(entries);
     },
     enabled: !!apiRasters && apiRasters.length > 0,
+    throwOnError: false,
   });
+
+  useEffect(() => {
+    if (vectorsError) {
+      toaster.create({ type: "error", title: t('explorer.vectorLoadError', { defaultValue: 'Failed to load vector layers' }) });
+    }
+    if (rastersError) {
+      toaster.create({ type: "error", title: t('explorer.rasterLoadError', { defaultValue: 'Failed to load raster layers' }) });
+    }
+  }, [vectorsError, rastersError, t]);
 
   const rasterLayers = useMemo(
     () =>
@@ -274,6 +323,19 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   // Scenario state (lifted from ModelProvider so filter query can react to changes)
   const [scenarioId, setScenarioId] = useQueryState('scenario', parseAsString);
   const activeScenarioId = scenarioId ?? defaultScenarioId;
+
+  // Validate scenarioId against known scenarios once model loads
+  useEffect(() => {
+    if (!modelCore || !scenarioId) return;
+    const valid = modelCore.scenarios.some((s) => s.id === scenarioId);
+    if (!valid) {
+      setScenarioId(defaultScenarioId?? null);
+      toaster.create({
+        type: "error",
+        title: t('explorer.invalidScenario'),
+      });
+    }
+  }, [modelCore, scenarioId, setScenarioId, t, defaultScenarioId]);
 
   // Filter options (single batch fetch, refetches per scenario)
   const filterColumns = (modelCore?.filterFields ?? []).map((f) => f.column);
@@ -342,11 +404,11 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   if (!modelData || !layers) {
     return (
       <Flex id="container" width="full" height="full" position="relative" direction={{ base: "column", md: "row" }}>
-        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height={{ base: "auto", md: "full" }} flex={{base: 1, md: "initial" }} />
+        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height={{ base: "auto", md: "full" }} flex={{ base: 1, md: "initial" }} />
         <Box flex={{ base: 4, md: 1 }} height="full" p={2}>
           <Skeleton width="full" height="full" />
         </Box>
-        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height="full" flex={{base: 1, md: "initial" }} />
+        <Skeleton width={{ base: "full", md: ControlPanelWidth }} height="full" flex={{ base: 1, md: "initial" }} />
       </Flex>
     );
   }

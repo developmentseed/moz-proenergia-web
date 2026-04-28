@@ -16,9 +16,13 @@ export const AnimationTime = "0.32s";
 const MainPanel = ({
   isOpen,
   onToggle = () => {},
+  activeTab,
+  onTabChange,
 }: {
   isOpen: boolean;
   onToggle?: () => void;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
 }) => {
   const { model, scenarioId, setScenarioId } = useModel();
   const { t } = useTranslation();
@@ -115,15 +119,19 @@ const MainPanel = ({
           <Heading as="h2" textStyle="modelTitle">
             {t(`model.${model.id}.name`, { defaultValue: model.title })}
           </Heading>
-          <Select
-            title={t('explorer.scenario')}
-            items={scenarioItems}
-            value={scenarioId}
-            onChange={onChange}
-            props={{}}
-          />
+          <Box data-tour="scenario-select">
+            <Select
+              title={t('explorer.scenario')}
+              items={scenarioItems}
+              value={scenarioId}
+              onChange={onChange}
+              props={{}}
+            />
+          </Box>
         </Box>
-        <ControlPanel />
+        <Box data-tour="filters-panel" flex="1" display="flex" flexDirection="column" overflow="hidden">
+          <ControlPanel activeTab={activeTab} onTabChange={onTabChange} />
+        </Box>
       </Box>
     </Box>
   );
