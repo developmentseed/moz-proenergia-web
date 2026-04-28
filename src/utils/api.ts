@@ -17,15 +17,7 @@ export function handleApiError(error: {
   response?: { status: number };
   config?: { url?: string };
 }): Promise<never> {
-  if (error.response?.status === 401) {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('cache_date');
-    // Full navigation clears React state; the header will reflect logged-out status
-    if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-      window.location.reload();
-    }
-  } else if ((error.response?.status ?? 0) >= 500) {
+  if ((error.response?.status ?? 0) >= 500) {
     console.error(`[API] Server error ${error.response!.status}:`, error.config?.url);
   }
   return Promise.reject(error);

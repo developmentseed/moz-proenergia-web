@@ -15,7 +15,6 @@ import { handleApiError } from "@/utils/api";
 
 const TOKEN_KEY = "token";
 const USERNAME_KEY = "username";
-const CACHE_KEY = "cache_date";
 
 beforeEach(() => {
   localStorageMock.setItem(TOKEN_KEY, "test-token");
