@@ -24,6 +24,7 @@ function makeQueryClient() {
         staleTime: 60 * 1000,
         // @TODO rethink about this behavior
         refetchOnWindowFocus: false,
+        throwOnError: true,
       },
     },
   });
