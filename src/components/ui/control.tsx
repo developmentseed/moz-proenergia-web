@@ -82,6 +82,14 @@ const LayersPanel = () => {
     [toggleLayer],
   );
 
+  if (layers.length === 0) {
+    return (
+      <Box p={4}>
+        <Text fontSize="sm" color="fg.muted">{t('explorer.noLayersFound')}</Text>
+      </Box>
+    );
+  }
+
   return (
     <Box>
       {layers.map((layer) => {

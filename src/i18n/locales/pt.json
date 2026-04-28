@@ -72,7 +72,8 @@
     "resetFilters": "Redefinir filtros",
     "invalidScenario": "O cenário selecionado não foi encontrado; o cenário padrão foi carregado.",
     "vectorLoadError": "Falha ao carregar camadas vetoriais",
-    "rasterLoadError": "Falha ao carregar camadas raster"
+    "rasterLoadError": "Falha ao carregar camadas raster",
+    "noLayersFound": "Nenhuma camada encontrada"
   },
   "error": {
     "accessDeniedTitle": "Acesso negado",

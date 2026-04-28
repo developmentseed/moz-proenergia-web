@@ -72,7 +72,8 @@
     "resetFilters": "Reset filters",
     "invalidScenario": "Selected scenario was not found; the default scenario has been loaded.",
     "vectorLoadError": "Failed to load vector layers",
-    "rasterLoadError": "Failed to load raster layers"
+    "rasterLoadError": "Failed to load raster layers",
+    "noLayersFound": "No layers found"
   },
   "error": {
     "accessDeniedTitle": "Access denied",
