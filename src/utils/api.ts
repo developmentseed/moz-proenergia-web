@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { toaster } from '@/components/chakra/toaster';
 
 export const API_ENDPOINT = 'https://proenergia-staging.ds.io/api/v1/';
 export const MEDIA_URL_PREFIX = 'https://proenergia-staging.ds.io/media/';
@@ -17,7 +18,13 @@ export function handleApiError(error: {
   response?: { status: number };
   config?: { url?: string };
 }): Promise<never> {
-  if ((error.response?.status ?? 0) >= 500) {
+  if (error.response?.status === 403) {
+    toaster.create({
+      type: "error",
+      title: "Access denied",
+      description: "Please log out and log in again.",
+    });
+  } else if ((error.response?.status ?? 0) >= 500) {
     console.error(`[API] Server error ${error.response!.status}:`, error.config?.url);
   }
   return Promise.reject(error);

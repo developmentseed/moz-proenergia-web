@@ -175,6 +175,7 @@ const SummaryPanel = ({
       fetchClusterData(scenarioId, clusterId!, popupFields, signal),
     retry: false,
     enabled: !!clusterId,
+    throwOnError: false,
   });
 
   // Defer summary fetches so map tiles get network priority
