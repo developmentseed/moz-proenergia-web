@@ -298,10 +298,10 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
 
   useEffect(() => {
     if (vectorsError) {
-      toaster.create({ type: "error", title: t('explorer.vectorLoadError') });
+      queueMicrotask(() => toaster.create({ type: "error", title: t('explorer.vectorLoadError') }));
     }
     if (rastersError) {
-      toaster.create({ type: "error", title: t('explorer.rasterLoadError') });
+      queueMicrotask(() => toaster.create({ type: "error", title: t('explorer.rasterLoadError') }));
     }
   }, [vectorsError, rastersError, t]);
 
@@ -330,10 +330,10 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     const valid = modelCore.scenarios.some((s) => s.id === scenarioId);
     if (!valid) {
       setScenarioId(defaultScenarioId?? null);
-      toaster.create({
+      queueMicrotask(() => toaster.create({
         type: "error",
         title: t('explorer.invalidScenario'),
-      });
+      }));
     }
   }, [modelCore, scenarioId, setScenarioId, t, defaultScenarioId]);
 
