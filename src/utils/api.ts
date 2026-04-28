@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { toaster } from '@/components/chakra/toaster';
-import i18next from '@/i18n/instance';
+import i18next from 'i18next';
 
 export const API_ENDPOINT = 'https://proenergia-staging.ds.io/api/v1/';
 export const MEDIA_URL_PREFIX = 'https://proenergia-staging.ds.io/media/';
