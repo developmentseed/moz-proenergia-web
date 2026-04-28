@@ -70,7 +70,13 @@
     "relatedClusters": "View cluster in other models",
     "summaryUnavailable": "Summary unavailable — results could not be calculated for the current filters.",
     "resetFilters": "Reset filters",
-    "invalidScenario": "Selected scenario was not found; the default scenario has been loaded."
+    "invalidScenario": "Selected scenario was not found; the default scenario has been loaded.",
+    "vectorLoadError": "Failed to load vector layers",
+    "rasterLoadError": "Failed to load raster layers"
+  },
+  "error": {
+    "accessDeniedTitle": "Access denied",
+    "accessDeniedDescription": "Something is wrong with credential. Please log out and log in again."
   },
   "downloads": {
     "title": "Downloads",

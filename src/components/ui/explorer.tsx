@@ -298,10 +298,10 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
 
   useEffect(() => {
     if (vectorsError) {
-      toaster.create({ type: "error", title: t('explorer.vectorLoadError', { defaultValue: 'Failed to load vector layers' }) });
+      toaster.create({ type: "error", title: t('explorer.vectorLoadError') });
     }
     if (rastersError) {
-      toaster.create({ type: "error", title: t('explorer.rasterLoadError', { defaultValue: 'Failed to load raster layers' }) });
+      toaster.create({ type: "error", title: t('explorer.rasterLoadError') });
     }
   }, [vectorsError, rastersError, t]);
 
@@ -314,9 +314,9 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   );
 
   const layers = useMemo(() => {
-    if (!vectorLayers) return undefined;
-    return [...rasterLayers, ...vectorLayers];
-  }, [vectorLayers, rasterLayers]);
+    if (!vectorLayers && !vectorsError) return undefined;
+    return [...rasterLayers, ...(vectorLayers ?? [])];
+  }, [vectorLayers, vectorsError, rasterLayers]);
 
   const defaultScenarioId = modelCore?.scenarios[0]?.id;
 

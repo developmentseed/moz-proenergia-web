@@ -70,7 +70,13 @@
     "relatedClusters": "Ver cluster em outros modelos",
     "summaryUnavailable": "Resumo indisponível — os resultados não puderam ser calculados para os filtros atuais.",
     "resetFilters": "Redefinir filtros",
-    "invalidScenario": "O cenário selecionado não foi encontrado; o cenário padrão foi carregado."
+    "invalidScenario": "O cenário selecionado não foi encontrado; o cenário padrão foi carregado.",
+    "vectorLoadError": "Falha ao carregar camadas vetoriais",
+    "rasterLoadError": "Falha ao carregar camadas raster"
+  },
+  "error": {
+    "accessDeniedTitle": "Acesso negado",
+    "accessDeniedDescription": "Algo está errado com a credencial. Por favor, saia e faça login novamente."
   },
   "downloads": {
     "title": "Downloads",
