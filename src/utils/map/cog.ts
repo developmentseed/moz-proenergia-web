@@ -66,7 +66,7 @@ export async function fetchRasters({ modelId, token, signal }: { modelId?: strin
         params: { 'model': modelId }
       })
     });
-    const results: ApiFileResult[] = data.results;
+    const results: ApiFileResult[] = data.results.filter((r: ApiFileResult) => r.raw_file);
     return results;
   } catch(e) {
     console.error(e);

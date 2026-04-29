@@ -241,7 +241,7 @@ export async function fetchVectors({ modelId, token, signal }: { modelId?: strin
       params: { 'model': modelId }
     })
   });
-    const results: ApiFileResult[] = data.results;
+    const results: ApiFileResult[] = data.results.filter((v: ApiFileResult) => v.raw_file);
 
   return results.map((v, idx) => ({
     ...v,
@@ -261,7 +261,7 @@ export async function fetchReferences({ modelId, token, signal }: { modelId?: st
       params: { 'model': modelId }
     })
   });
-  const results: ApiFileResult[] = data.results;
+  const results: ApiFileResult[] = data.results.filter((r: ApiFileResult) => r.raw_file);
 
   return results;
 }
