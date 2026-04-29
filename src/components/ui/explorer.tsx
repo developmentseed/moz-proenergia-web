@@ -8,7 +8,7 @@ import { ContextualLayersProvider } from "@/utils/context/contextual-layers";
 import { FiltersProvider } from "@/utils/context/filters";
 import { useFilters } from "@/utils/context/filters";
 import { useModel } from "@/utils/context/model";
-import { Flex, Box, IconButton, Skeleton } from "@chakra-ui/react";
+import { Flex, Box, IconButton, Skeleton, Text, Button } from "@chakra-ui/react";
 import NextLink from "next/link";
 import MainMap, { type FlyToFn } from "@/components/map";
 import { LuPanelLeftOpen, LuPanelLeftClose, LuPanelRightOpen, LuPanelRightClose } from "react-icons/lu";
@@ -33,9 +33,36 @@ import { useTranslation } from "react-i18next";
 import { useToggle } from "@/hooks/use-toggle";
 import { toaster } from "../chakra/toaster";
 import { useMouseEvent } from "@/components/map/hooks/use-mouse-event";
+import { ErrorBoundary } from "./error-boundary";
 import { ControlPanelWidth, AnimationTime } from "./main-panel";
 import { ExplorerTour } from "@/components/tour/explorer-tour";
 import { useTour } from "@/context/tour";
+
+const SummaryErrorFallback = () => {
+  const { resetAllFilters } = useFilters();
+  const { t } = useTranslation();
+  return (
+    <Box
+      display={{ base: "none", md: "flex" }}
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      width={ControlPanelWidth}
+      height="100%"
+      borderLeft="1px solid"
+      borderColor="panelBorder"
+      bg="panelBg"
+      p={4}
+      gap={3}
+      textAlign="center"
+    >
+      <Text fontSize="sm" color="fg.muted">{t('explorer.summaryUnavailable')}</Text>
+      <Button size="xs" variant="outline" onClick={resetAllFilters}>
+        {t('explorer.resetFilters')}
+      </Button>
+    </Box>
+  );
+};
 
 const ExplorerInner = () => {
   const { model, scenarioId } = useModel();
@@ -148,13 +175,17 @@ const ExplorerInner = () => {
       </Tooltip>
 
       {/* Map area */}
-      <Box data-tour="map" flex={1} height="full" minHeight={0} position="relative">
-        <MainMap
-          main={model.main}
-          onClick={onClick}
-          clusterId={selected}
-          onFlyToRef={flyToRef}
-        />
+
+      <Box flex={1} height="full" minHeight={0} position="relative">
+        <ErrorBoundary>
+          <MainMap
+            main={model.main}
+            onClick={onClick}
+            clusterId={selected}
+            onFlyToRef={flyToRef}
+          />
+        </ErrorBoundary>
+
       </Box>
 
       {/* Desktop-only summary panel toggle button */}
@@ -194,22 +225,24 @@ const ExplorerInner = () => {
         </Box>
       </Tooltip>
 
-      <SummaryPanel
-        clusterId={selected}
-        scenarioId={scenarioId}
-        onSelectCluster={setSelected}
-        onFlyTo={(lng, lat) => flyToRef.current?.(lng, lat)}
-        popupFields={model.popupFields}
-        summaryFields={model.summaryFields}
-        filters={updatedFilters}
-        filterDefs={model.filters}
-        resetCluster={resetCluster}
-        main={model.main}
-        isOpen={isSummaryOpen}
-        onToggle={toggleSummary}
-      />
+      <ErrorBoundary fallback={<SummaryErrorFallback />}>
+        <SummaryPanel
+          clusterId={selected}
+          scenarioId={scenarioId}
+          onSelectCluster={setSelected}
+          onFlyTo={(lng, lat) => flyToRef.current?.(lng, lat)}
+          popupFields={model.popupFields}
+          summaryFields={model.summaryFields}
+          filters={updatedFilters}
+          filterDefs={model.filters}
+          resetCluster={resetCluster}
+          main={model.main}
+          isOpen={isSummaryOpen}
+          onToggle={toggleSummary}
+        />
 
-      <ExplorerTour />
+        <ExplorerTour />
+      </ErrorBoundary>
     </Box>
   );
 };
@@ -230,16 +263,18 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   // The queryKeys below cache the raw ApiFileResult[] so other consumers
   // (e.g. the downloads page) can share this data. Layer transforms are
   // applied locally via select / useMemo.
-  const { data: vectorLayers } = useQuery({
+  const { data: vectorLayers, isError: vectorsError } = useQuery({
     queryKey: ["vectors", modelId, token],
     queryFn: ({ signal }) => fetchVectors({ modelId, token, signal }),
     // Select is synchronious (can't be used for rasters that needs to fetch cog metadata)
     select: transformVectorsToLayers,
+    throwOnError: false,
   });
 
-  const { data: apiRasters } = useQuery({
+  const { data: apiRasters, isError: rastersError } = useQuery({
     queryKey: ["rasters", modelId, token],
     queryFn: ({ signal }) => fetchRasters({ modelId, token, signal }),
+    throwOnError: false,
   });
 
   const { data: rasterStatsMap } = useQuery({
@@ -258,7 +293,17 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
       return new Map(entries);
     },
     enabled: !!apiRasters && apiRasters.length > 0,
+    throwOnError: false,
   });
+
+  useEffect(() => {
+    if (vectorsError) {
+      queueMicrotask(() => toaster.create({ type: "error", title: t('explorer.vectorLoadError') }));
+    }
+    if (rastersError) {
+      queueMicrotask(() => toaster.create({ type: "error", title: t('explorer.rasterLoadError') }));
+    }
+  }, [vectorsError, rastersError, t]);
 
   const rasterLayers = useMemo(
     () =>
@@ -269,9 +314,9 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
   );
 
   const layers = useMemo(() => {
-    if (!vectorLayers) return undefined;
-    return [...rasterLayers, ...vectorLayers];
-  }, [vectorLayers, rasterLayers]);
+    if (!vectorLayers && !vectorsError) return undefined;
+    return [...rasterLayers, ...(vectorLayers ?? [])];
+  }, [vectorLayers, vectorsError, rasterLayers]);
 
   const defaultScenarioId = modelCore?.scenarios[0]?.id;
 
@@ -285,10 +330,10 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     const valid = modelCore.scenarios.some((s) => s.id === scenarioId);
     if (!valid) {
       setScenarioId(defaultScenarioId?? null);
-      toaster.create({
+      queueMicrotask(() => toaster.create({
         type: "error",
         title: t('explorer.invalidScenario'),
-      });
+      }));
     }
   }, [modelCore, scenarioId, setScenarioId, t, defaultScenarioId]);
 

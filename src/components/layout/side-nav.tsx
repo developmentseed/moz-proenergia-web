@@ -32,6 +32,7 @@ export const SideNav = ({ models: initialModels, currentSlug }: SideNavProps) =>
     queryKey: ['models', token],
     queryFn: ({ signal }) => fetchModels(signal, token),
     initialData: initialModels,
+    throwOnError: false,
   });
   // Only carry coordinate params (lat, lng, zoom) to model links
       const coordQuery = serialize({
