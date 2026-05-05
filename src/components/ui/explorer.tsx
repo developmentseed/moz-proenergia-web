@@ -352,7 +352,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     if (!modelCore || !allFilterOptions) return undefined;
 
     const filters = modelCore.filterFields.map((field) =>
-      transformFilterField(field, allFilterOptions[field.column] ?? null),
+      transformFilterField(field, allFilterOptions[field.column] ?? null, modelCore.id),
     );
 
     const resolvedMainOptions = transformMainOptions(modelCore.colorCoding);

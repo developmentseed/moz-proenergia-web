@@ -8,6 +8,8 @@ export interface Field {
   columns: string[];
   label: string;
   description?: string;
+  labelKey?: string;
+  descriptionKey?: string;
   category?: string;
   group_by?: string[];
   method?: 'count' | 'min' | 'max' | 'sum' | 'average';
@@ -24,7 +26,7 @@ export interface MapItemUnit extends ItemUnit {
 
 export enum FilterType { numeric = 'numeric', checkbox = 'checkbox', admin='admin'};
 
-type BaseScenarioFilter = ItemUnit & { column: string };
+type BaseScenarioFilter = ItemUnit & { column: string; labelKey?: string; descriptionKey?: string };
 interface NumericScenarioFilter extends BaseScenarioFilter {
   type: FilterType.numeric;
   options: [number, number]

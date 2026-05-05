@@ -122,6 +122,8 @@ function transformClusterData(
       key: field.columns[0],
       label: field.label,
       description: field.description,
+      labelKey: field.labelKey,
+      descriptionKey: field.descriptionKey,
       value: data[field.columns[0]],
     }));
 }
