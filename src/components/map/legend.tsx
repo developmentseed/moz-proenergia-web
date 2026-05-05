@@ -45,7 +45,7 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
         <VStack align="stretch" gap={2}>
           <HStack w="full" align="center">
             <Text textStyle='tableAttr' mr="auto">
-              {main.label || t('map.legend')}
+              {main.labelKey ? t(main.labelKey, { defaultValue: main.label }) : main.label || t('map.legend')}
             </Text>
             <HStack gap={0} flexShrink={0}>
               <OpacityControl value={mainOpacity} onValueChange={handleMainOpacity}>

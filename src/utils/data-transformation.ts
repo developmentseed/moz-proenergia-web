@@ -407,6 +407,10 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
     column: mainColumn,
     label: mainField?.label || makeLabel(mainColumn),
     description: mainField?.description,
+    ...(mainField && {
+      labelKey: `field.${modelId}.${mainColumn}.label`,
+      descriptionKey: mainField.description ? `field.${modelId}.${mainColumn}.description` : undefined,
+    }),
     options: [], // Options fetched separately
   };
 
