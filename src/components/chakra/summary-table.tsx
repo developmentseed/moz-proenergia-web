@@ -151,13 +151,14 @@ function MethodTotalRow({
   item?: SummaryItem;
   hasDecimal?: boolean;
 }) {
+  const { t } = useTranslation();
   if (!item) return null;
   return (
     <Table.Row bg="panelBg" css={lastRowStyleProps}>
       <Table.Cell {...tableCellStyleProps} pb={4}>
         <Text textStyle="tableAttr">
           <Text as="span" fontWeight="semibold">
-            Total
+            {t('explorer.total')}
           </Text>{" "}
           ({item.label})
         </Text>
@@ -293,7 +294,7 @@ function ChartRowView({ row }: { row: ChartRow }) {
       </>
     );
   }
-  return <Text> Only Bar/Stacked/Donut Chart is available.</Text>;
+  return <Text>{t('explorer.onlyChartAvailable')}</Text>;
 }
 
 function GroupRowView({ row }: { row: GroupRow }) {

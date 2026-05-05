@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Flex, Box, Spinner, Center, Heading, Text } from '@chakra-ui/react';
+import { useTranslation } from 'react-i18next';
 import Explorer from '@/components/ui/explorer';
 import { SideNav } from '@/components/layout/side-nav';
 import { slugify } from '@/utils/data-transformation';
@@ -9,6 +10,7 @@ import { useModels } from '@/hooks/use-models';
 import { MapCoordsProvider } from '@/utils/context/map-coords';
 
 export default function NotFound() {
+  const { t } = useTranslation();
   const [slug, setSlug] = useState<string | null>(null);
 
   useEffect(() => {
@@ -28,7 +30,7 @@ export default function NotFound() {
       <Center h="calc(100vh - 3.5rem - 1px)">
         <Box textAlign="center">
           <Heading size="2xl">404</Heading>
-          <Text mt={2}>Page not found</Text>
+          <Text mt={2}>{t('error.pageNotFound')}</Text>
         </Box>
       </Center>
     );
@@ -52,7 +54,7 @@ export default function NotFound() {
       <Center h="calc(100vh - 3.5rem - 1px)">
         <Box textAlign="center">
           <Heading size="2xl">404</Heading>
-          <Text mt={2}>Model not found</Text>
+          <Text mt={2}>{t('error.modelNotFound')}</Text>
         </Box>
       </Center>
     );

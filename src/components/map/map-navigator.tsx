@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Box, Flex, Input, IconButton, Field as ChakraField } from "@chakra-ui/react";
 import { LuSearch } from "react-icons/lu";
+import { useTranslation, Trans } from "react-i18next";
 
 const COORD_PATTERN = /^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/;
 
@@ -30,6 +31,7 @@ interface MapNavigatorProps {
 const MapNavigator = ({ onSelectCluster, onFlyTo }: MapNavigatorProps) => {
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +45,7 @@ const MapNavigator = ({ onSelectCluster, onFlyTo }: MapNavigatorProps) => {
     }
     const coords = parseCoords(trimmed);
     if (!coords) {
-      setError("Coordinates out of range. Latitude must be between -90 and 90, longitude between -180 and 180.");
+      setError(t('map.navigateCoordsError'));
       return;
     }
     setError(null);
@@ -54,12 +56,12 @@ const MapNavigator = ({ onSelectCluster, onFlyTo }: MapNavigatorProps) => {
     <Box as="form" onSubmit={handleSubmit}>
       <ChakraField.Root invalid={!!error}>
         <ChakraField.Label fontSize="xs" color="fg.muted">
-          Navigate to cluster, site, or coordinates
+          {t('map.navigateTitle')}
         </ChakraField.Label>
         <Flex gap={1} width="full">
           <Input
             size="sm"
-            placeholder="Enter cluster ID or lat, lng…"
+            placeholder={t('map.navigatePlaceholder')}
             flexBasis="100%"
             value={value}
             onChange={(e) => {
@@ -71,7 +73,7 @@ const MapNavigator = ({ onSelectCluster, onFlyTo }: MapNavigatorProps) => {
             type="submit"
             size="sm"
             variant="surface"
-            aria-label="Navigate to cluster or coordinates"
+            aria-label={t('map.navigateAriaLabel')}
             disabled={!value.trim()}
           >
             <LuSearch />
@@ -81,7 +83,7 @@ const MapNavigator = ({ onSelectCluster, onFlyTo }: MapNavigatorProps) => {
           <ChakraField.ErrorText fontSize="xs">{error}</ChakraField.ErrorText>
         ) : (
           <ChakraField.HelperText fontSize="xs" color="fg.subtle">
-            Coordinates must be in <em>lat, lng</em> format
+            <Trans i18nKey="map.navigateHelperText" components={{ em: <em /> }} />
           </ChakraField.HelperText>
         )}
       </ChakraField.Root>

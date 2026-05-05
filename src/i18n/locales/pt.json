@@ -25,6 +25,7 @@
     "imageAlt": "Ilustração de infraestrutura de energia"
   },
   "models": {
+    "models": "Modelos",
     "exploreModel": "Explorar Modelo"
   },
   "auth": {
@@ -48,6 +49,10 @@
   "explorer": {
     "model": "Modelo",
     "scenario": "Cenário",
+    "collapseControlPanel": "Recolher painel de controlo",
+    "expandControlPanel": "Expandir painel de controlo",
+    "total": "Total",
+    "onlyChartAvailable": "Apenas Gráfico de Barras/Pilhas/Donuts está disponível.",
     "collapsePanel": "Recolher painel",
     "expandPanel": "Expandir painel",
     "controls": "Controles",
@@ -77,11 +82,18 @@
   },
   "error": {
     "accessDeniedTitle": "Acesso negado",
-    "accessDeniedDescription": "Algo está errado com a credencial. Por favor, saia e faça login novamente."
+    "accessDeniedDescription": "Algo está errado com a credencial. Por favor, saia e faça login novamente.",
+    "tryAgain": "Tentar novamente",
+    "returnToHome": "Voltar ao início",
+    "unexpectedError": "Ocorreu um erro inesperado.",
+    "pageNotFound": "Página não encontrada",
+    "modelNotFound": "Modelo não encontrado",
+    "accessNotAllowed": "Acesso não permitido"
   },
   "downloads": {
     "title": "Downloads",
     "searchPlaceholder": "Pesquisar conjuntos de dados...",
+    "downloadItem": "Descarregar {{label}}",
     "noData": "Nenhum dado encontrado",
     "source": "Fonte:",
     "updated": "Atualizado:",
@@ -118,7 +130,22 @@
     "legend": "Legenda",
     "additionalLayers": "Camadas adicionais",
     "rasterMin": "Mín: {{value}}",
-    "rasterMax": "Máx: {{value}}"
+    "rasterMax": "Máx: {{value}}",
+    "share": "Partilhar",
+    "shareLink": "Partilhar link",
+    "urlCopied": "URL copiada",
+    "basemap": "Mapa base",
+    "changeBasemap": "Mudar mapa base",
+    "layerInfo": "Informação da camada",
+    "removeLayer": "Remover camada",
+    "centerMap": "Centrar mapa",
+    "opacity": "Opacidade: {{value}}%",
+    "navigateTitle": "Navegar para cluster, local ou coordenadas",
+    "navigatePlaceholder": "Introduza ID do cluster ou lat, lng…",
+    "navigateAriaLabel": "Navegar para cluster ou coordenadas",
+    "navigateHelperText": "As coordenadas devem estar no formato <em>lat, lng</em>",
+    "navigateCoordsError": "Coordenadas fora do intervalo. A latitude deve estar entre -90 e 90, a longitude entre -180 e 180.",
+    "noDescription": "Sem descrição disponível."
   },
   "tour": {
     "back": "Anterior",

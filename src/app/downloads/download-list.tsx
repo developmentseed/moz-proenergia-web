@@ -201,7 +201,7 @@ export const DownloadList = () => {
   if (!isAuthenticated) {
     return (
       <Center py={10}>
-        <Text>Access not allowed</Text>
+        <Text>{t('error.accessNotAllowed')}</Text>
       </Center>
     );
   }

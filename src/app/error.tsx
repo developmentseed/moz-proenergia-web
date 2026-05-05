@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { Center, Box, Heading, Text, Button } from '@chakra-ui/react';
 import NextLink from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 export default function AppError({
   error,
@@ -11,6 +12,8 @@ export default function AppError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const { t } = useTranslation();
+
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -20,13 +23,13 @@ export default function AppError({
       <Box textAlign="center">
         <Heading size="2xl">500</Heading>
         <Text mt={2} color="fg.muted">
-          {error.message || 'An unexpected error occurred.'}
+          {error.message || t('error.unexpectedError')}
         </Text>
         <Button mt={4} variant="outline" onClick={reset}>
-          Try again
+          {t('error.tryAgain')}
         </Button>
         <Box mt={2}>
-          <NextLink href="/">Return to home</NextLink>
+          <NextLink href="/">{t('error.returnToHome')}</NextLink>
         </Box>
       </Box>
     </Center>

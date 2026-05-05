@@ -92,7 +92,7 @@ export function LayerInfoModal({
           )}
           {!hasContent && (
             <Text fontSize="sm" color="fg.muted" fontStyle="italic">
-              No description available.
+              {t('map.noDescription')}
             </Text>
           )}
         </>

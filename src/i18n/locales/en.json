@@ -25,6 +25,7 @@
     "imageAlt": "Energy infrastructure illustration"
   },
   "models": {
+    "models": "Models",
     "exploreModel": "Explore Model"
   },
   "auth": {
@@ -48,6 +49,10 @@
   "explorer": {
     "model": "Model",
     "scenario": "Scenario",
+    "collapseControlPanel": "Collapse control panel",
+    "expandControlPanel": "Expand control panel",
+    "total": "Total",
+    "onlyChartAvailable": "Only Bar/Stacked/Donut Chart is available.",
     "collapsePanel": "Collapse panel",
     "expandPanel": "Expand panel",
     "controls": "Controls",
@@ -77,11 +82,18 @@
   },
   "error": {
     "accessDeniedTitle": "Access denied",
-    "accessDeniedDescription": "Something is wrong with credential. Please log out and log in again."
+    "accessDeniedDescription": "Something is wrong with credential. Please log out and log in again.",
+    "tryAgain": "Try again",
+    "returnToHome": "Return to home",
+    "unexpectedError": "An unexpected error occurred.",
+    "pageNotFound": "Page not found",
+    "modelNotFound": "Model not found",
+    "accessNotAllowed": "Access not allowed"
   },
   "downloads": {
     "title": "Downloads",
     "searchPlaceholder": "Search datasets...",
+    "downloadItem": "Download {{label}}",
     "noData": "No data found. Please try later.",
     "source": "Source:",
     "updated": "Updated:",
@@ -118,7 +130,22 @@
     "legend": "Legend",
     "additionalLayers": "Additional layers",
     "rasterMin": "Min: {{value}}",
-    "rasterMax": "Max: {{value}}"
+    "rasterMax": "Max: {{value}}",
+    "share": "Share",
+    "shareLink": "Share link",
+    "urlCopied": "URL copied",
+    "basemap": "Basemap",
+    "changeBasemap": "Change basemap",
+    "layerInfo": "Layer info",
+    "removeLayer": "Remove layer",
+    "centerMap": "Center map",
+    "opacity": "Opacity: {{value}}%",
+    "navigateTitle": "Navigate to cluster, site, or coordinates",
+    "navigatePlaceholder": "Enter cluster ID or lat, lng…",
+    "navigateAriaLabel": "Navigate to cluster or coordinates",
+    "navigateHelperText": "Coordinates must be in <em>lat, lng</em> format",
+    "navigateCoordsError": "Coordinates out of range. Latitude must be between -90 and 90, longitude between -180 and 180.",
+    "noDescription": "No description available."
   },
   "tour": {
     "back": "Back",
