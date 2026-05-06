@@ -48,6 +48,8 @@ export interface FlatRow {
   label: string;
   key: string;
   description?: string;
+  labelKey?: string;
+  descriptionKey?: string;
   category?: string;
   unit?: string;
   value: number | string;
@@ -58,6 +60,8 @@ export interface GroupRow {
   type: "group";
   label: string;
   description?: string;
+  labelKey?: string;
+  descriptionKey?: string;
   category?: string;
   unit?: string;
   value: SummaryItem[];
@@ -70,6 +74,8 @@ export interface ChartRow {
   chartType: "bar" | "donut" | "stacked";
   label: string;
   description?: string;
+  labelKey?: string;
+  descriptionKey?: string;
   category?: string;
   unit?: string;
   value: SummaryItem[];
@@ -99,6 +105,8 @@ export interface NestedGroupRow {
   type: "nested-group";
   label: string;
   description?: string;
+  labelKey?: string;
+  descriptionKey?: string;
   category?: string;
   unit?: string;
   value: NestedGroupData[];
@@ -110,6 +118,8 @@ export interface HighlightRow {
   type: "highlight";
   label: string;
   description?: string;
+  labelKey?: string;
+  descriptionKey?: string;
   category?: string;
   unit?: string;
   value: SummaryItem[];

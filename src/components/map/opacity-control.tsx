@@ -1,6 +1,7 @@
 import { Popover, Portal, Slider, Box, Text } from '@chakra-ui/react';
 import type { ReactNode } from 'react';
 import { zIndex } from '@/components/ui/constant';
+import { useTranslation } from 'react-i18next';
 
 interface OpacityControlProps {
   value: number; // 0–100
@@ -9,6 +10,7 @@ interface OpacityControlProps {
 }
 
 export function OpacityControl({ value, onValueChange, children }: OpacityControlProps) {
+  const { t } = useTranslation();
   return (
     <Popover.Root positioning={{ placement: 'top' }}>
       <Popover.Trigger asChild>
@@ -19,7 +21,7 @@ export function OpacityControl({ value, onValueChange, children }: OpacityContro
           <Popover.Content width="180px" p={3} zIndex={zIndex.mapPopover}>
             <Box mb={2}>
               <Text fontSize="xs" fontWeight="medium" color="fg.muted">
-                Opacity: {value}%
+                {t('map.opacity', { value })}
               </Text>
             </Box>
             <Slider.Root

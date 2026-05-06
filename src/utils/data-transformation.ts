@@ -32,8 +32,27 @@ const ADMIN_COLUMNS = [
 // ----- API Response Types -----
 export interface ApiFilterField {
   label: string;
+  label_pt?: string;
   column: string;
   description: string;
+  description_pt?: string;
+}
+
+export interface ApiField {
+  columns: string[];
+  label: string;
+  label_pt?: string;
+  description?: string;
+  description_pt?: string;
+  category?: string;
+  group_by?: string[];
+  method?: 'count' | 'min' | 'max' | 'sum' | 'average';
+  unit?: string;
+  chartType?: 'bar' | 'donut' | 'stacked' | 'highlight';
+  colors?: Record<string, string>;
+  showChartValueRows?: boolean;
+  showBarChartAverage?: boolean;
+  hasDecimal?: boolean;
 }
 
 export interface ApiScenario {
@@ -58,7 +77,7 @@ export interface ApiModelResponse {
   description_pt?: string;
   filter_fields: ApiFilterField[];
   popup_fields: ApiFilterField[];
-  summary_fields: Field[];
+  summary_fields: ApiField[];
   scenarios: ApiScenario[];
   visualization_column: string | null; // for main column
   color_coding: ColorCoding[]
@@ -357,18 +376,41 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
         },
       };
     });
+  // Register i18n for filter_fields and popup_fields
+  for (const f of [...apiModel.filter_fields, ...apiModel.popup_fields]) {
+    registerI18nResource(`field.${modelId}.${f.column}`, {
+      label: { en: f.label, pt: f.label_pt },
+      ...(f.description && { description: { en: f.description, pt: f.description_pt } }),
+    });
+  }
+
   // whwen visuaslization column is empty or null
   const mainColumn = (!apiModel.visualization_column || apiModel.visualization_column === '')? DEFAULT_COL: apiModel.visualization_column;
   const mainField = apiModel.filter_fields.find(f => f.column === mainColumn);
 
   //@NOTE: ID column should be replaced to something else to make summary work
-  const summaryFields = replaceSummaryIdColumn(apiModel.summary_fields, apiModel.metric_field_types);
+  const summaryFieldsWithKeys = apiModel.summary_fields.map(f => {
+    registerI18nResource(`field.${modelId}.${f.columns[0]}`, {
+      label: { en: f.label, pt: f.label_pt },
+      ...(f.description && { description: { en: f.description, pt: f.description_pt } }),
+    });
+    return {
+      ...f,
+      labelKey: `field.${modelId}.${f.columns[0]}.label`,
+      descriptionKey: f.description ? `field.${modelId}.${f.columns[0]}.description` : undefined,
+    };
+  });
+  const summaryFields = replaceSummaryIdColumn(summaryFieldsWithKeys, apiModel.metric_field_types);
 
   const main: Main = {
     id: slugify(mainColumn) + 'main-ids',
     column: mainColumn,
     label: mainField?.label || makeLabel(mainColumn),
     description: mainField?.description,
+    ...(mainField && {
+      labelKey: `field.${modelId}.${mainColumn}.label`,
+      descriptionKey: mainField.description ? `field.${modelId}.${mainColumn}.description` : undefined,
+    }),
     options: [], // Options fetched separately
   };
 
@@ -381,6 +423,8 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
       columns: [f.column],
       label: f.label,
       description: f.description,
+      labelKey: `field.${modelId}.${f.column}.label`,
+      descriptionKey: f.description ? `field.${modelId}.${f.column}.description` : undefined,
     })),
     summaryFields: summaryFields,
     filterFields: apiModel.filter_fields,
@@ -424,7 +468,8 @@ export function transformVectorsToLayers(apiVectors: ApiFileResult[]): Layer[] {
 // Transform filter options response to Filter
 export function transformFilterField(
   field: ApiFilterField,
-  rawOptions: string[] | number[] | null
+  rawOptions: string[] | number[] | null,
+  modelId?: string,
 ): Filter {
   const filterType = deriveFilterType(field.column, rawOptions);
   const options = filterType === 'checkbox' ? transformOptions(rawOptions) : rawOptions;
@@ -433,6 +478,10 @@ export function transformFilterField(
     column: field.column,
     label: field.label,
     description: field.description,
+    ...(modelId && {
+      labelKey: `field.${modelId}.${field.column}.label`,
+      descriptionKey: field.description ? `field.${modelId}.${field.column}.description` : undefined,
+    }),
     type: filterType,
     options: options
   } as Filter;

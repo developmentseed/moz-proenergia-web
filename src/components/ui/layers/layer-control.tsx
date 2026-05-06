@@ -33,7 +33,7 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
         <Box display="flex" alignItems="center" gap="1">
           <Text fontSize="sm" fontFamily="body">{layerLabel}</Text>
           <IconButton
-            aria-label="Layer info"
+            aria-label={t('map.layerInfo')}
             size="2xs"
             variant="ghost"
             colorPalette="gray"
@@ -43,7 +43,7 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
           </IconButton>
         </Box>
         <Box display="flex" alignItems="center" gap="2">
-          {layer.filePath && isAuthenticated && <DownloadButton url={`${MEDIA_URL_PREFIX}${layer.filePath}`} label={`Download ${layerLabel}`} />}
+          {layer.filePath && isAuthenticated && <DownloadButton url={`${MEDIA_URL_PREFIX}${layer.filePath}`} label={t('downloads.downloadItem', { label: layerLabel })} />}
           <Switch.Root value={layer.id} onCheckedChange={onCheckedChange} checked={selected}>
             <Switch.HiddenInput />
             <Switch.Control>

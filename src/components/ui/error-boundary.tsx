@@ -2,6 +2,7 @@
 
 import { Component, type ReactNode } from 'react';
 import { Box, Text, Button } from '@chakra-ui/react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   children: ReactNode;
@@ -11,6 +12,30 @@ interface Props {
 interface State {
   hasError: boolean;
   error: Error | null;
+}
+
+function ErrorFallback({ error, onReset }: { error: Error | null; onReset: () => void }) {
+  const { t } = useTranslation();
+  return (
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      height="full"
+      width="full"
+      gap={3}
+      p={4}
+      textAlign="center"
+    >
+      <Text fontSize="sm" color="fg.muted">
+        {error?.message ?? t('error.unexpectedError')}
+      </Text>
+      <Button size="xs" variant="outline" onClick={onReset}>
+        {t('error.tryAgain')}
+      </Button>
+    </Box>
+  );
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -32,26 +57,7 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
-      return (
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          height="full"
-          width="full"
-          gap={3}
-          p={4}
-          textAlign="center"
-        >
-          <Text fontSize="sm" color="fg.muted">
-            {this.state.error?.message ?? 'Something went wrong.'}
-          </Text>
-          <Button size="xs" variant="outline" onClick={this.reset}>
-            Try again
-          </Button>
-        </Box>
-      );
+      return <ErrorFallback error={this.state.error} onReset={this.reset} />;
     }
     return this.props.children;
   }

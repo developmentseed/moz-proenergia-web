@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { Combobox, CheckboxGroup } from "@/components/chakra";
 import { type Filter } from "@/app/types";
 import TextRange from "./text-range";
@@ -11,13 +12,17 @@ type FilterControlProps = {
 };
 
 export const FilterControl = memo(function FilterControl({ config, value, hasPending, onChange }: FilterControlProps) {
+  const { t } = useTranslation();
+  const label = config.labelKey ? t(config.labelKey, { defaultValue: config.label }) : config.label;
+  const description = config.descriptionKey ? t(config.descriptionKey, { defaultValue: config.description }) : config.description;
+
   switch (config.type) {
     case 'numeric':
       return (
         <TextRange
-          title={config.label}
+          title={label}
           hasPending={hasPending}
-          description={config.description}
+          description={description}
           min={config.options[0]}
           max={config.options[1]}
           value={value as number[]}
@@ -28,8 +33,8 @@ export const FilterControl = memo(function FilterControl({ config, value, hasPen
     case 'checkbox':
       return (
         <CheckboxGroup
-          title={config.label}
-          label={config.label}
+          title={label}
+          label={label}
           items={config.options}
           value={value as string[]}
           onChange={onChange}
@@ -40,7 +45,7 @@ export const FilterControl = memo(function FilterControl({ config, value, hasPen
       const items = config.options.map(s => ({ label: s, id: s }));
       return (
         <Combobox
-          title={config.label}
+          title={label}
           items={items}
           value={value as (string[] | undefined)}
           onChange={onChange}

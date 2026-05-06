@@ -96,7 +96,7 @@ const MainPanel = ({
         <Box h="80dvh" display="flex" flexDirection="column">
           <Box p={4} display={isOpen ? "block" : "none"} flexShrink={0}>
             <Select
-              title="Scenario"
+              title={t('explorer.scenario')}
               items={scenarioItems}
               value={scenarioId}
               onChange={onChange}

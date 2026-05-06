@@ -2,14 +2,13 @@
 
 import { useState } from 'react';
 import { Box, VStack, HStack, Text, Separator, ScrollArea, IconButton } from '@chakra-ui/react';
-import { LuInfo, LuDroplet } from 'react-icons/lu';
+import { LuDroplet } from 'react-icons/lu';
 import { type MapItemUnit, type Main } from '@/app/types';
 import { useContextualLayers } from '@/utils/context/contextual-layers';
 import { mapControlCommonStyleProps } from './control-constant';
 import { zIndex } from '@/components/ui/constant';
 import { LayerEntry } from './layer-entry';
 import { OpacityControl } from './opacity-control';
-import { ModalDialog } from '@/components/chakra/modal';
 import { useTranslation } from 'react-i18next';
 
 interface LegendProps {
@@ -24,7 +23,6 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
   const contextualLayers = layers.filter(l => activeLayers.includes(l.id));
 
   const [mainOpacity, setMainOpacity] = useState(100);
-  const [mainInfoOpen, setMainInfoOpen] = useState(false);
 
   const handleMainOpacity = (opacity: number) => {
     setMainOpacity(opacity);
@@ -45,7 +43,7 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
         <VStack align="stretch" gap={2}>
           <HStack w="full" align="center">
             <Text textStyle='tableAttr' mr="auto">
-              {main.label || t('map.legend')}
+              {main.labelKey ? t(main.labelKey, { defaultValue: main.label }) : main.label || t('map.legend')}
             </Text>
             <HStack gap={0} flexShrink={0}>
               <OpacityControl value={mainOpacity} onValueChange={handleMainOpacity}>
@@ -53,14 +51,6 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
                   <LuDroplet />
                 </IconButton>
               </OpacityControl>
-              <IconButton
-                aria-label="Main layer info"
-                size="2xs"
-                variant="ghost"
-                onClick={() => setMainInfoOpen(true)}
-              >
-                <LuInfo />
-              </IconButton>
             </HStack>
           </HStack>
 
@@ -117,19 +107,6 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
           )}
         </VStack>
       </Box>
-
-      <ModalDialog
-        modalTitle={main.label || t('map.legend')}
-        modalContent={main.description ? (
-          <Text fontSize="sm">{main.description}</Text>
-        ) : (
-          <Text fontSize="sm" color="fg.muted" fontStyle="italic">
-            No description available.
-          </Text>
-        )}
-        open={mainInfoOpen}
-        onOpenChange={({ open }) => setMainInfoOpen(open)}
-      />
     </>
   );
 }

@@ -133,9 +133,9 @@ const CollapsibleGroup = memo(function CollapsibleGroup({
           pendingCount={pendingCount}
           textStyle="collapsibleGroupTitle"
         />
-        {collapsibleItem.items[0].description && (
+        {collapsibleItem.description && (
           <Tooltip
-            content={collapsibleItem.items[0].description}
+            content={collapsibleItem.description}
             contentProps={{ css: { "--tooltip-bg": "colors.bg", color: "fg" } }}
           >
             <IconButton as='span' variant="ghost" size="2xs" p={0}>
@@ -187,7 +187,11 @@ const ControlsPanel = () => {
     (f) => f.type === FilterType.checkbox,
   );
   const checkboxFilters = !!checkboxExists.length
-    ? checkboxExists.map((item) => ({ title: item.label, items: [item] }))
+    ? checkboxExists.map((item) => ({
+        title: item.labelKey ? t(item.labelKey, { defaultValue: item.label }) : item.label,
+        description: item.descriptionKey ? t(item.descriptionKey, { defaultValue: item.description }) : item.description,
+        items: [item],
+      }))
     : [];
 
   // Group area selection related filter together here.
