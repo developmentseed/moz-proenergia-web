@@ -184,6 +184,7 @@ export function ExplorerTour() {
         close: t("tour.close"),
         last: t("tour.finish"),
         next: t("tour.next"),
+        nextWithProgress: t("tour.nextWithProgress"),
         skip: t("tour.skip"),
       }}
       styles={{

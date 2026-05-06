@@ -152,6 +152,7 @@
     "close": "Fechar",
     "finish": "Concluir",
     "next": "Próximo",
+    "nextWithProgress": "Próximo ({current} de {total})",
     "skip": "Pular visita",
     "openTour": "Abrir visita guiada",
     "dontShowAgain": "Não mostrar esta visita automaticamente novamente",

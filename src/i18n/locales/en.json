@@ -152,6 +152,7 @@
     "close": "Close",
     "finish": "Finish",
     "next": "Next",
+    "nextWithProgress": "Next ({current} of {total})",
     "skip": "Skip tour",
     "openTour": "Open guided tour",
     "dontShowAgain": "Don't show this tour automatically again",
