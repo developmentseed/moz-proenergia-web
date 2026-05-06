@@ -5,7 +5,6 @@ import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, Field, MapItemUn
 import { api, MEDIA_URL_PREFIX, DEFAULT_COL } from '@/utils/api';
 import { sortFilterOptions } from '@/config/filters';
 import mapConfig from '@/config/map.json';
-import { registerI18nResource } from '@/utils/i18n';
 const ADMIN_COLUMNS = [
   "Admin_1",
   "Admin_2",
@@ -232,13 +231,6 @@ export async function fetchModels(signal?: AbortSignal, token?: string| null): P
     }), });
   const models = data.results as ModelGroupMetadata[];
 
-  models.forEach((m) => {
-    registerI18nResource(`model.${m.id}`, {
-      name: { en: m.name, pt: m.name_pt },
-      description: { en: m.description, pt: m.description_pt },
-    });
-  });
-
   return models;
 }
 
@@ -347,84 +339,54 @@ export function replaceSummaryIdColumn(fields: Field[], metricField: Record<stri
 export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetadata, 'filters' | 'layers'> & { filterFields: ApiFilterField[]; colorCoding: ColorCoding[] } {
   const modelId = String(apiModel.id);
 
-  registerI18nResource(`model.${modelId}`, {
-    name: { en: apiModel.name, pt: apiModel.name_pt },
-    description: { en: apiModel.description, pt: apiModel.description_pt },
-  });
-
   const scenarios: Scenario[] = apiModel.scenarios
     .filter(s => s.model_file !== null)
     .toSorted(byPresentationOrder)
-    .map(s => {
-      registerI18nResource(`scenario.${s.id}`, {
-        name: { en: s.name, pt: s.name_pt },
-        ...(s.description && { description: { en: s.description, pt: s.description_pt } }),
-      });
-
-      return {
-        id: String(s.id),
-        name: s.name,
-        name_pt: s.name_pt,
-        label: s.name,
-        description: s.description,
-        source: deriveSource(String(s.id), s.model_file!),
-        layer: {
-          id: `${s.id}-main`,
-          source: String(s.id),
-          'source-layer': mapConfig.sourceLayerName,
-          type: 'fill' as const,
-        },
-      };
-    });
-  // Register i18n for filter_fields and popup_fields
-  for (const f of [...apiModel.filter_fields, ...apiModel.popup_fields]) {
-    registerI18nResource(`field.${modelId}.${f.column}`, {
-      label: { en: f.label, pt: f.label_pt },
-      ...(f.description && { description: { en: f.description, pt: f.description_pt } }),
-    });
-  }
+    .map(s => ({
+      id: String(s.id),
+      name: s.name,
+      name_pt: s.name_pt,
+      label: s.name,
+      description: s.description,
+      description_pt: s.description_pt,
+      source: deriveSource(String(s.id), s.model_file!),
+      layer: {
+        id: `${s.id}-main`,
+        source: String(s.id),
+        'source-layer': mapConfig.sourceLayerName,
+        type: 'fill' as const,
+      },
+    }));
 
   // whwen visuaslization column is empty or null
   const mainColumn = (!apiModel.visualization_column || apiModel.visualization_column === '')? DEFAULT_COL: apiModel.visualization_column;
   const mainField = apiModel.filter_fields.find(f => f.column === mainColumn);
 
   //@NOTE: ID column should be replaced to something else to make summary work
-  const summaryFieldsWithKeys = apiModel.summary_fields.map(f => {
-    registerI18nResource(`field.${modelId}.${f.columns[0]}`, {
-      label: { en: f.label, pt: f.label_pt },
-      ...(f.description && { description: { en: f.description, pt: f.description_pt } }),
-    });
-    return {
-      ...f,
-      labelKey: `field.${modelId}.${f.columns[0]}.label`,
-      descriptionKey: f.description ? `field.${modelId}.${f.columns[0]}.description` : undefined,
-    };
-  });
-  const summaryFields = replaceSummaryIdColumn(summaryFieldsWithKeys, apiModel.metric_field_types);
+  const summaryFields = replaceSummaryIdColumn(apiModel.summary_fields, apiModel.metric_field_types);
 
   const main: Main = {
     id: slugify(mainColumn) + 'main-ids',
     column: mainColumn,
     label: mainField?.label || makeLabel(mainColumn),
+    label_pt: mainField?.label_pt,
     description: mainField?.description,
-    ...(mainField && {
-      labelKey: `field.${modelId}.${mainColumn}.label`,
-      descriptionKey: mainField.description ? `field.${modelId}.${mainColumn}.description` : undefined,
-    }),
+    description_pt: mainField?.description_pt,
     options: [], // Options fetched separately
   };
 
   return {
     id: modelId,
     title: apiModel.name,
+    title_pt: apiModel.name_pt,
     scenarios,
     main,
     popupFields: apiModel.popup_fields.map(f => ({
       columns: [f.column],
       label: f.label,
+      label_pt: f.label_pt,
       description: f.description,
-      labelKey: `field.${modelId}.${f.column}.label`,
-      descriptionKey: f.description ? `field.${modelId}.${f.column}.description` : undefined,
+      description_pt: f.description_pt,
     })),
     summaryFields: summaryFields,
     filterFields: apiModel.filter_fields,
@@ -437,15 +399,12 @@ export function transformVectorsToLayers(apiVectors: ApiFileResult[]): Layer[] {
   return apiVectors.map(v => {
     const sourceId = String(v.id) + 'vector-source';
 
-    registerI18nResource(`layer.${sourceId}`, {
-      label: { en: v.name, pt: v.name_pt },
-      description: { en: v.description?? '', pt: v.description_pt },
-    });
-
     return {
       id: sourceId,
       label: v.name,
+      label_pt: v.name_pt,
       description: v.description,
+      description_pt: v.description_pt,
       filePath: v.raw_file,
       color: v.color,
       layerType: 'vector' as const,
@@ -477,11 +436,9 @@ export function transformFilterField(
     id: slugify(field.column),
     column: field.column,
     label: field.label,
+    label_pt: field.label_pt,
     description: field.description,
-    ...(modelId && {
-      labelKey: `field.${modelId}.${field.column}.label`,
-      descriptionKey: field.description ? `field.${modelId}.${field.column}.description` : undefined,
-    }),
+    description_pt: field.description_pt,
     type: filterType,
     options: options
   } as Filter;

@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { useTranslation } from "react-i18next";
+import { useLocalize } from "@/utils/i18n";
 import { Combobox, CheckboxGroup } from "@/components/chakra";
 import { type Filter } from "@/app/types";
 import TextRange from "./text-range";
@@ -12,9 +12,9 @@ type FilterControlProps = {
 };
 
 export const FilterControl = memo(function FilterControl({ config, value, hasPending, onChange }: FilterControlProps) {
-  const { t } = useTranslation();
-  const label = config.labelKey ? t(config.labelKey, { defaultValue: config.label }) : config.label;
-  const description = config.descriptionKey ? t(config.descriptionKey, { defaultValue: config.description }) : config.description;
+  const localize = useLocalize();
+  const label = localize(config.label, config.label_pt);
+  const description = config.description ? localize(config.description, config.description_pt) : undefined;
 
   switch (config.type) {
     case 'numeric':

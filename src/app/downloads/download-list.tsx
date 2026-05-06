@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { Box, Spinner, Center, Flex, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
+import { useLocalize } from "@/utils/i18n";
 import { MEDIA_URL_PREFIX } from "@/utils/api";
 import { useAuth } from "@/utils/context/auth";
 import { DownloadDataCard } from "@/components/chakra/card";
@@ -29,6 +30,7 @@ export const DownloadList = () => {
   const [selectedModelIds, setSelectedModelIds] = useState<string[]>([]);
   const { token, isAuthenticated } = useAuth();
   const { t } = useTranslation();
+  const localize = useLocalize();
 
   const { data: models } = useModels({
     enabled: isAuthenticated,
@@ -158,7 +160,9 @@ export const DownloadList = () => {
       // Filter text based results (name, description)
       return (
         d.name?.toLowerCase().includes(q) ||
-        d.description?.toLowerCase().includes(q)
+        d.name_pt?.toLowerCase().includes(q) ||
+        d.description?.toLowerCase().includes(q) ||
+        d.description_pt?.toLowerCase().includes(q)
       );
     });
   }, [allDatasets, selectedModelIds, searchQuery]);
@@ -237,14 +241,15 @@ export const DownloadList = () => {
                 return (
                   <DownloadDataCard
                     key={`${dataType}-${d.id}`}
-                    title={d.name}
-                    description={d.description}
+                    title={localize(d.name, d.name_pt)}
+                    description={d.description ? localize(d.description, d.description_pt) : undefined}
                     source={d.source}
                     downloadUrl={`${MEDIA_URL_PREFIX}${d.raw_file}`}
                     highlight={searchQuery}
-                    models={modelIds.map(
-                      (id) => models?.find((m) => m.id === id)?.name ?? id,
-                    )}
+                    models={modelIds.map((id) => {
+                      const m = models?.find((m) => m.id === id);
+                      return m ? localize(m.name, m.name_pt) : id;
+                    })}
                     dataType={dataType}
                     item={cardItem}
                   />

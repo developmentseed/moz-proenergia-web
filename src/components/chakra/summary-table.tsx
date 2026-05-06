@@ -20,6 +20,7 @@ import {
 } from "@/app/types/summary";
 import { Highlight } from "@/components/chakra/highlight";
 import { useTranslation } from "react-i18next";
+import { useLocalize } from "@/utils/i18n";
 
 const formatValue = (value: string | number, hasDecimal?: boolean) => {
   //@ts-expect-error @TODO
@@ -118,9 +119,9 @@ function ErrorRowView({ row }: { row: ErrorRow }) {
 }
 
 function FlatRowView({ row }: { row: FlatRow }) {
-  const { t } = useTranslation();
-  const label = row.labelKey ? t(row.labelKey, { defaultValue: row.label }) : row.label;
-  const description = row.descriptionKey ? t(row.descriptionKey, { defaultValue: row.description }) : row.description;
+  const localize = useLocalize();
+  const label = localize(row.label, row.label_pt);
+  const description = row.description ? localize(row.description, row.description_pt) : undefined;
   return (
     <Table.Row key={row.key} bg="panelBg">
       <Table.Cell {...tableCellStyleProps} p={0.5}>
@@ -194,8 +195,9 @@ function ChartValueRows({ row }: { row: ChartRow }) {
 
 function ChartRowView({ row }: { row: ChartRow }) {
   const { t } = useTranslation();
-  const label = row.labelKey ? t(row.labelKey, { defaultValue: row.label }) : row.label;
-  const description = row.descriptionKey ? t(row.descriptionKey, { defaultValue: row.description }) : row.description;
+  const localize = useLocalize();
+  const label = localize(row.label, row.label_pt);
+  const description = row.description ? localize(row.description, row.description_pt) : undefined;
   if (!Array.isArray(row.value)) return null;
   if (row.chartType === "bar") {
     return (
@@ -298,9 +300,9 @@ function ChartRowView({ row }: { row: ChartRow }) {
 }
 
 function GroupRowView({ row }: { row: GroupRow }) {
-  const { t } = useTranslation();
-  const label = row.labelKey ? t(row.labelKey, { defaultValue: row.label }) : row.label;
-  const description = row.descriptionKey ? t(row.descriptionKey, { defaultValue: row.description }) : row.description;
+  const localize = useLocalize();
+  const label = localize(row.label, row.label_pt);
+  const description = row.description ? localize(row.description, row.description_pt) : undefined;
   return (
     <>
       <Table.Row key={label + "-group-row"} {...sectionHeaderRowProps}>
@@ -338,9 +340,9 @@ function GroupRowView({ row }: { row: GroupRow }) {
 }
 
 function NestedGroupRowView({ row }: { row: NestedGroupRow }) {
-  const { t } = useTranslation();
-  const label = row.labelKey ? t(row.labelKey, { defaultValue: row.label }) : row.label;
-  const description = row.descriptionKey ? t(row.descriptionKey, { defaultValue: row.description }) : row.description;
+  const localize = useLocalize();
+  const label = localize(row.label, row.label_pt);
+  const description = row.description ? localize(row.description, row.description_pt) : undefined;
   return (
     <>
       <Table.Row key={label} {...sectionHeaderRowProps}>
@@ -396,9 +398,9 @@ function NestedGroupRowView({ row }: { row: NestedGroupRow }) {
 }
 
 function HighlightRowView({ row }: { row: HighlightRow }) {
-  const { t } = useTranslation();
-  const label = row.labelKey ? t(row.labelKey, { defaultValue: row.label }) : row.label;
-  const description = row.descriptionKey ? t(row.descriptionKey, { defaultValue: row.description }) : row.description;
+  const localize = useLocalize();
+  const label = localize(row.label, row.label_pt);
+  const description = row.description ? localize(row.description, row.description_pt) : undefined;
   const items = row.value.map((item) => ({
     id: String(formatValue(item.value)),
     label: item.label,

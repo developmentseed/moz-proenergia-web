@@ -10,6 +10,7 @@ import { zIndex } from '@/components/ui/constant';
 import { LayerEntry } from './layer-entry';
 import { OpacityControl } from './opacity-control';
 import { useTranslation } from 'react-i18next';
+import { useLocalize } from '@/utils/i18n';
 
 interface LegendProps {
   items: MapItemUnit[];
@@ -20,6 +21,7 @@ interface LegendProps {
 export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
   const { layers, activeLayers, toggleLayer, setLayerOpacity } = useContextualLayers();
   const { t } = useTranslation();
+  const localize = useLocalize();
   const contextualLayers = layers.filter(l => activeLayers.includes(l.id));
 
   const [mainOpacity, setMainOpacity] = useState(100);
@@ -43,7 +45,7 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
         <VStack align="stretch" gap={2}>
           <HStack w="full" align="center">
             <Text textStyle='tableAttr' mr="auto">
-              {main.labelKey ? t(main.labelKey, { defaultValue: main.label }) : main.label || t('map.legend')}
+              {localize(main.label, main.label_pt) || t('map.legend')}
             </Text>
             <HStack gap={0} flexShrink={0}>
               <OpacityControl value={mainOpacity} onValueChange={handleMainOpacity}>
@@ -84,8 +86,8 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
                           <Box key={layer.id} borderBottom="1px solid" borderColor="border.subtle" _last={{ borderBottom: "none" }}>
                             <LayerEntry
                               id={layer.id}
-                              label={t(`layer.${layer.id}.label`, { defaultValue: layer.label })}
-                              description={layer.description ? t(`layer.${layer.id}.description`, { defaultValue: layer.description }) : undefined}
+                              label={localize(layer.label, layer.label_pt)}
+                              description={layer.description ? localize(layer.description, layer.description_pt) : undefined}
                               rasterStats={layer.rasterStats}
                               isRgb={layer.isRgb}
                               layerType={layer.layerType}

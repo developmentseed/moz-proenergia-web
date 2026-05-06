@@ -23,6 +23,7 @@ import { ApplyActions } from "./apply-actions";
 import { FilterType, type Filter, type ItemUnit } from "@/app/types";
 import { Tooltip } from "./tooltip";
 import { useTranslation } from "react-i18next";
+import { useLocalize } from "@/utils/i18n";
 
 interface ColGroup {
   title: string;
@@ -168,6 +169,7 @@ const ControlsPanel = () => {
   const { displayFilters, setPendingFilters, getFilterPendingStatus } =
     useFilters();
   const { t } = useTranslation();
+  const localize = useLocalize();
 
   if (!displayFilters) return <div>{t('explorer.pleaseWait')}</div>;
 
@@ -188,8 +190,8 @@ const ControlsPanel = () => {
   );
   const checkboxFilters = !!checkboxExists.length
     ? checkboxExists.map((item) => ({
-        title: item.labelKey ? t(item.labelKey, { defaultValue: item.label }) : item.label,
-        description: item.descriptionKey ? t(item.descriptionKey, { defaultValue: item.description }) : item.description,
+        title: localize(item.label, item.label_pt),
+        description: item.description ? localize(item.description, item.description_pt) : undefined,
         items: [item],
       }))
     : [];

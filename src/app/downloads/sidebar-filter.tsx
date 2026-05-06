@@ -2,6 +2,7 @@
 
 import { Box, Flex, Text, Checkbox, Button } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
+import { useLocalize } from "@/utils/i18n";
 import type { ModelGroupMetadata } from "@/app/types";
 
 type SidebarFilterProps = {
@@ -18,6 +19,7 @@ export const SidebarFilter = ({
   onReset,
 }: SidebarFilterProps) => {
   const { t } = useTranslation();
+  const localize = useLocalize();
   const hasFilter = selectedModelIds.length > 0;
 
   return (
@@ -44,7 +46,7 @@ export const SidebarFilter = ({
             <Checkbox.HiddenInput />
             <Checkbox.Control />
             <Checkbox.Label>
-              <Text fontSize="sm">{model.name}</Text>
+              <Text fontSize="sm">{localize(model.name, model.name_pt)}</Text>
             </Checkbox.Label>
           </Checkbox.Root>
         ))}
