@@ -46,16 +46,18 @@ describe('formatDisplayNumber', () => {
     });
   });
 
-  describe('hasDecimal=true (preserves decimals)', () => {
-    it('keeps decimals for sub-thousand values', () => {
+  describe('hasDecimal=true (significant figures for values < 1, two decimal places otherwise)', () => {
+    it('keeps up to two decimal places for values >= 1', () => {
       expect(formatDisplayNumber(12.3, true)).toBe('12.3');
       expect(formatDisplayNumber(12.34, true)).toBe('12.34');
+      expect(formatDisplayNumber(999.4, true)).toBe('999.4');
+      expect(formatDisplayNumber(999.99, true)).toBe('999.99');
     });
 
-    it('does not round before the compact threshold check', () => {
-      // 999.99 stays below 1000 and is formatted without compact notation.
-      expect(formatDisplayNumber(999.99, true)).toBe('999.99');
-      expect(formatDisplayNumber(999.4, true)).toBe('999.4');
+    it('uses 2 significant figures for values < 1 to preserve small numbers', () => {
+      expect(formatDisplayNumber(0.0045, true)).toBe('0.0045');
+      expect(formatDisplayNumber(0.001234, true)).toBe('0.0012');
+      expect(formatDisplayNumber(0.5, true)).toBe('0.5');
     });
 
     it('abbreviates thousands while capping at two fraction digits', () => {
