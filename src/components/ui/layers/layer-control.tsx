@@ -9,6 +9,7 @@ import { DownloadButton } from "@/components/chakra/download-button";
 import { LayerInfoModal } from "@/components/map/layer-info-modal";
 import { type Layer } from "@/app/types";
 import { useTranslation } from "react-i18next";
+import { useLocalize } from "@/utils/i18n";
 
 interface LayerControlProps {
   layer: Layer;
@@ -18,9 +19,10 @@ interface LayerControlProps {
 
 export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) => {
   const { t } = useTranslation();
+  const localize = useLocalize();
   const [infoOpen, setInfoOpen] = useState(false);
-  const layerLabel = t(`layer.${layer.id}.label`, { defaultValue: layer.label });
-  const layerDescription = layer.description ? t(`layer.${layer.id}.description`, { defaultValue: layer.description }) : undefined;
+  const layerLabel = localize(layer.label, layer.label_pt);
+  const layerDescription = layer.description ? localize(layer.description, layer.description_pt) : undefined;
 
   const onCheckedChange = (details: CheckboxCheckedChangeDetails) => {
     onChange({ [layer.id]: details.checked as boolean });

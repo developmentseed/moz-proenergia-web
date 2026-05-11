@@ -3,7 +3,6 @@ import { LayerProps } from "react-map-gl/maplibre";
 import { type Layer } from '@/app/types';
 import { api, MEDIA_URL_PREFIX } from '@/utils/api';
 import { type ApiFileResult } from '@/utils/data-transformation';
-import { registerI18nResource } from '@/utils/i18n';
 
 const COLOR_SCHEME = 'BrewerYlGnBu9'; // This should be one of https://labs.geomatico.es/maplibre-cog-protocol/color-cheatsheet.html
 
@@ -83,15 +82,12 @@ export function transformRastersToLayers(
     const sourceId = String(v.id) + 'raster-source';
     const meta = statsMap.get(v.id);
 
-    registerI18nResource(`layer.${sourceId}`, {
-      label: { en: v.name, pt: v.name_pt },
-      description: { en: v.description?? '', pt: v.description_pt },
-    });
-
     return {
       id: sourceId,
       label: v.name,
+      label_pt: v.name_pt,
       description: v.description,
+      description_pt: v.description_pt,
       filePath: v.raw_file,
       layerType: 'raster' as const,
       rasterStats: meta ?? undefined,

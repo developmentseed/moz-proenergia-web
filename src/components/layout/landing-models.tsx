@@ -10,12 +10,14 @@ import { ChakraDrawer } from '@/components/chakra/drawer';
 import { slugify } from '@/utils/data-transformation';
 import { useModels } from '@/hooks/use-models';
 import { useTranslation } from 'react-i18next';
+import { useLocalize } from '@/utils/i18n';
 import { SimpleGrid, Text, Box } from '@chakra-ui/react';
 import { DrawerSummaryTable } from './drawer-summary-table';
 import { LuArrowRight } from 'react-icons/lu';
 
 export default function ModelCards() {
   const { t } = useTranslation();
+  const localize = useLocalize();
   const [selectedModel, setSelectedModel] = useState<{ id: string; name: string; description: string; slug: string } | null>(null);
 
   const { data: models } = useModels();
@@ -25,8 +27,8 @@ export default function ModelCards() {
       <Heading size="3xl">{t('models.models')}</Heading>
       <SimpleGrid columns={{ base: 1, md: 2 }} py={6} gap={6} minChildWidth={{ base: "none",md: "md" }}>
         {models?.map(e => (
-          <div key={e.id} onClick={() => setSelectedModel({ id: String(e.id), name: t(`model.${e.id}.name`, { defaultValue: e.name }), description: t(`model.${e.id}.description`, { defaultValue: e.description }), slug: slugify(e.name) })} style={{ cursor: 'pointer' }}>
-            <Card title={t(`model.${e.id}.name`, { defaultValue: e.name })} description={t(`model.${e.id}.description`, { defaultValue: e.description })} />
+          <div key={e.id} onClick={() => setSelectedModel({ id: String(e.id), name: localize(e.name, e.name_pt), description: localize(e.description, e.description_pt), slug: slugify(e.name) })} style={{ cursor: 'pointer' }}>
+            <Card title={localize(e.name, e.name_pt)} description={localize(e.description, e.description_pt)} />
           </div>
         ))}
         {!models && <Center py={10}>

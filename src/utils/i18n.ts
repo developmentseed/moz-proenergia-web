@@ -1,13 +1,7 @@
-import i18n from '@/i18n/instance';
+import { useTranslation } from 'react-i18next';
 
-export function registerI18nResource(
-  keyPrefix: string,
-  fields: Record<string, { en: string; pt?: string }>
-) {
-  for (const [field, values] of Object.entries(fields)) {
-    i18n.addResource('en', 'translation', `${keyPrefix}.${field}`, values.en);
-    if (values.pt) {
-      i18n.addResource('pt', 'translation', `${keyPrefix}.${field}`, values.pt);
-    }
-  }
+export function useLocalize() {
+  const { i18n } = useTranslation();
+  return (en: string, pt?: string | null): string =>
+    i18n.language === 'pt' ? (pt || en) : en;
 }

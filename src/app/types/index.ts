@@ -7,9 +7,9 @@ export interface ItemUnit {
 export interface Field {
   columns: string[];
   label: string;
+  label_pt?: string;
   description?: string;
-  labelKey?: string;
-  descriptionKey?: string;
+  description_pt?: string;
   category?: string;
   group_by?: string[];
   method?: 'count' | 'min' | 'max' | 'sum' | 'average';
@@ -26,7 +26,7 @@ export interface MapItemUnit extends ItemUnit {
 
 export enum FilterType { numeric = 'numeric', checkbox = 'checkbox', admin='admin'};
 
-type BaseScenarioFilter = ItemUnit & { column: string; labelKey?: string; descriptionKey?: string };
+type BaseScenarioFilter = ItemUnit & { column: string; label_pt?: string; description_pt?: string };
 interface NumericScenarioFilter extends BaseScenarioFilter {
   type: FilterType.numeric;
   options: [number, number]
@@ -50,6 +50,7 @@ export interface Scenario {
   name_pt?: string;
   label: string;
   description?: string;
+  description_pt?: string;
   source: SourceProps,
   layer: {
     "source": string;
@@ -60,6 +61,8 @@ export interface Scenario {
 
 export interface Layer extends ItemUnit {
   filePath: string;
+  label_pt?: string;
+  description_pt?: string;
   downloadLink?: string;
   color?: string;
   layerType?: 'vector' | 'raster';
@@ -75,6 +78,7 @@ export interface Main extends BaseScenarioFilter {
 export interface ModelMetadata {
   id: string;
   title: string;
+  title_pt?: string;
   scenarios: Scenario[];
   main: Main;
   filters: Filter[];

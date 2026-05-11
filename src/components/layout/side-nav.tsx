@@ -12,6 +12,7 @@ import { getIconPath } from '@/utils/model-icon';
 import { coordinateParsers } from '@/utils/context/map-coords';
 import { Tooltip } from '../ui/tooltip';
 import { useTranslation } from 'react-i18next';
+import { useLocalize } from '@/utils/i18n';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/utils/context/auth';
 
@@ -26,6 +27,7 @@ interface SideNavProps {
 export const SideNav = ({ models: initialModels, currentSlug }: SideNavProps) => {
   const searchParams = useSearchParams();
   const { t } = useTranslation();
+  const localize = useLocalize();
   const { token } = useAuth();
 
   const { data: models = initialModels } = useQuery({
@@ -64,7 +66,7 @@ export const SideNav = ({ models: initialModels, currentSlug }: SideNavProps) =>
               href={`/model/${modelSlug}/` + coordQuery}
               style={{ textDecoration: 'none' }}
             >
-              <Tooltip content={t(`model.${model.id}.name`, { defaultValue: model.name })}>
+              <Tooltip content={localize(model.name, model.name_pt)}>
                 <Box
                   display="flex"
                   alignItems="center"
@@ -82,12 +84,12 @@ export const SideNav = ({ models: initialModels, currentSlug }: SideNavProps) =>
                   {iconPath ? (
                     <Image
                       src={iconPath}
-                      alt={t(`model.${model.id}.name`, { defaultValue: model.name })}
+                      alt={localize(model.name, model.name_pt)}
                       width={20}
                       height={20}
                     />
                   ) : (
-                    t(`model.${model.id}.name`, { defaultValue: model.name })
+                    localize(model.name, model.name_pt)
                   )}
                 </Box>
               </Tooltip>

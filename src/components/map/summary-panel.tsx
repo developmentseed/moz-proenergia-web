@@ -15,6 +15,7 @@ import { SummaryTable } from "@/components/chakra/summary-table";
 import { useSummaryQuery } from "@/hooks/use-summary-query";
 import { AnimationTime, ControlPanelWidth } from "../ui/main-panel";
 import { useTranslation } from "react-i18next";
+import { useLocalize } from "@/utils/i18n";
 import MapNavigator from "./map-navigator";
 
 interface SummaryPanelProps {
@@ -77,6 +78,7 @@ const RelatedModels = ({ clusterId }: RelatedModelsProps) => {
   const { model } = useModel();
   const { data: models } = useModels();
   const { t } = useTranslation();
+  const localize = useLocalize();
 
   const currentModelData = models?.find((m) => String(m.id) === model.id);
   const currentVectorDatasetId = currentModelData?.scenarios[0]?.vector_dataset?.id;
@@ -103,7 +105,7 @@ const RelatedModels = ({ clusterId }: RelatedModelsProps) => {
           _hover={{ textDecoration: "underline" }}
         >
           <NextLink href={`/model/${slugify(m.name)}?cluster=${clusterId}`}>
-            {m.name}
+            {localize(m.name, m.name_pt)}
           </NextLink>
         </Link>
       ))}
@@ -122,8 +124,8 @@ function transformClusterData(
       key: field.columns[0],
       label: field.label,
       description: field.description,
-      labelKey: field.labelKey,
-      descriptionKey: field.descriptionKey,
+      label_pt: field.label_pt,
+      description_pt: field.description_pt,
       value: data[field.columns[0]],
     }));
 }
