@@ -211,7 +211,7 @@ export const DownloadList = () => {
   }
 
   return (
-    <Flex gap={8} align="flex-start" direction={{ base: "column", md: "row" }}>
+    <Flex gap={8} align="flex-start" direction={{ base: "column", lg: "row" }}>
       <SidebarFilter
         models={models}
         selectedModelIds={selectedModelIds}

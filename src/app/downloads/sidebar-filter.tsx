@@ -28,7 +28,7 @@ export const SidebarFilter = ({
       flexShrink={0}
       position={{ md: "sticky" }}
       top={{ md: 6 }}
-      order={{ base: 0, md: 1 }}
+      order={{ base: 0, lg: 1 }}
     >
       <Flex justify="space-between" align="center" mb={3}>
         <Text fontSize="sm" fontWeight="semibold">

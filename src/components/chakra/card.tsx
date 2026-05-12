@@ -6,6 +6,7 @@ import {
   Heading,
   Box,
   Button,
+  Link,
   Tag,
   Flex,
   Text,
@@ -16,6 +17,26 @@ import ReactMarkdown from "react-markdown";
 import { useTranslation } from "react-i18next";
 import { DataType } from "@/utils/data-transformation";
 
+const mdComponents = {
+  p: ({ children }: { children?: React.ReactNode }) => <span>{children}</span>,
+  a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
+    <Link
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      color="blue.500"
+      textDecoration="underline"
+    >
+      {children}
+    </Link>
+  ),
+};
+const dataTypeColors: Record<DataType, string> = {
+  vector: "green",
+  raster: "blue",
+  reference: "purple",
+};
+
 const HighlightText = ({
   text,
   highlight,
@@ -24,7 +45,7 @@ const HighlightText = ({
   highlight?: string;
 }) => {
   if (!highlight || !highlight.trim()) {
-    return <>{text}</>;
+    return <ReactMarkdown components={mdComponents}>{text}</ReactMarkdown>;
   }
 
   const regex = new RegExp(
@@ -41,14 +62,26 @@ const HighlightText = ({
             {part}
           </Box>
         ) : (
-          part
+          <ReactMarkdown components={mdComponents}>{part}</ReactMarkdown>
         ),
       )}
     </>
   );
 };
 
-const NotDisplayKeys = ["id","name","source", "description", "name_pt", "description_pt", "raw_file", "is_public", "is_approved", "dataType", "color"];
+const NotDisplayKeys = [
+  "id",
+  "name",
+  "source",
+  "description",
+  "name_pt",
+  "description_pt",
+  "raw_file",
+  "is_public",
+  "is_approved",
+  "dataType",
+  "color",
+];
 
 export const ModelCard = ({
   title,
@@ -110,19 +143,34 @@ export const DownloadDataCard = ({
           {title && <HighlightText text={title} highlight={highlight} />}
         </Heading>
         {source && (
-          <Heading size="xs" color="fg.muted" mt={1}>
-            {source}
-          </Heading>
-        )}
-        {models && models.length > 0 && (
-          <Flex gap={1} flexWrap="wrap" mt={2}>
+          <Flex gap={1} align="baseline">
             <Text
               color="fg.muted"
+              opacity="0.8"
               fontSize="xs"
-              letterSpacing="wider"
+              letterSpacing="wide"
               textTransform="uppercase"
+              minW={12}
+              mr={1}
             >
-              Models:
+              Source
+            </Text>
+            <Heading size="sm" color="fg.muted" fontWeight="bold">
+              {source}
+            </Heading>
+          </Flex>
+        )}
+        {models && models.length > 0 && (
+          <Flex gap={1} flexWrap="wrap">
+            <Text
+              color="fg.muted"
+              opacity="0.8"
+              fontSize="xs"
+              letterSpacing="wide"
+              textTransform="uppercase"
+              minW={12}
+            >
+              Models
             </Text>
             {models.map((m) => (
               <Tag.Root
@@ -136,20 +184,40 @@ export const DownloadDataCard = ({
             ))}
           </Flex>
         )}
+        {dataType && (
+          <Flex gap={1} align="center">
+            <Text
+              color="fg.muted"
+              opacity="0.8"
+              fontSize="xs"
+              letterSpacing="wide"
+              textTransform="uppercase"
+              minW={12}
+            >
+              Type
+            </Text>
+            <Tag.Root
+              size="sm"
+              variant="surface"
+              colorPalette={dataTypeColors[dataType]}
+            >
+              <Tag.Label>{t(`downloads.dataType.${dataType}`)}</Tag.Label>
+            </Tag.Root>
+          </Flex>
+        )}
       </Card.Header>
 
-      <Card.Body color="fg.muted">
-        <Text fontSize="sm" mb={2}>
-          {description && (
+      <Card.Body color="fg.muted" py={3}>
+        {description && (
+          <Text fontSize="sm" mb={4}>
             <HighlightText text={description} highlight={highlight} />
-          )}
-        </Text>
+          </Text>
+        )}
         <DataList.Root
-          orientation="horizontal"
           display="grid"
-          gap={{ base: 2, md: 4 }}
+          gap={{ base: 2, lg: 4 }}
           size="sm"
-          gridTemplateColumns="repeat(auto-fill, minmax(10rem, 314px))"
+          gridTemplateColumns="repeat(auto-fill, minmax(20rem, 1fr))"
         >
           {item &&
             Object.entries(item).map(
@@ -164,11 +232,12 @@ export const DownloadDataCard = ({
                   <DataList.Item key={key}>
                     <DataList.ItemLabel
                       color="fg.muted"
+                      opacity="0.8"
                       fontSize="xs"
-                      letterSpacing="wider"
+                      letterSpacing="wide"
                       textTransform="uppercase"
                     >
-                      {t(`metadata.${key}`, { defaultValue: key })}:
+                      {t(`metadata.${key}`, { defaultValue: key })}
                     </DataList.ItemLabel>
                     <DataList.ItemValue fontSize="sm">
                       {String(formatIfDate(value))}
@@ -178,13 +247,6 @@ export const DownloadDataCard = ({
               },
             )}
         </DataList.Root>
-        {dataType && (
-          <Box mt={2}>
-            <Tag.Root size="sm" variant="outline">
-              <Tag.Label>{t(`downloads.dataType.${dataType}`)}</Tag.Label>
-            </Tag.Root>
-          </Box>
-        )}
       </Card.Body>
       <Card.Footer>
         <Button asChild variant="outline" colorPalette="orange" size="xs">
