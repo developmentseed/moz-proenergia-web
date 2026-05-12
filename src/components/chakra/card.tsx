@@ -143,17 +143,19 @@ export const DownloadDataCard = ({
           {title && <HighlightText text={title} highlight={highlight} />}
         </Heading>
         {source && (
-          <Flex gap={1} align="center">
+          <Flex gap={1} align="baseline">
             <Text
               color="fg.muted"
               opacity="0.8"
               fontSize="xs"
               letterSpacing="wide"
               textTransform="uppercase"
+              minW={12}
+              mr={1}
             >
               Source
             </Text>
-            <Heading size="xs" color="fg.muted">
+            <Heading size="sm" color="fg.muted" fontWeight="bold">
               {source}
             </Heading>
           </Flex>
@@ -166,6 +168,7 @@ export const DownloadDataCard = ({
               fontSize="xs"
               letterSpacing="wide"
               textTransform="uppercase"
+              minW={12}
             >
               Models
             </Text>
@@ -179,6 +182,27 @@ export const DownloadDataCard = ({
                 <Tag.Label>{m}</Tag.Label>
               </Tag.Root>
             ))}
+          </Flex>
+        )}
+        {dataType && (
+          <Flex gap={1} align="center">
+            <Text
+              color="fg.muted"
+              opacity="0.8"
+              fontSize="xs"
+              letterSpacing="wide"
+              textTransform="uppercase"
+              minW={12}
+            >
+              Type
+            </Text>
+            <Tag.Root
+              size="sm"
+              variant="surface"
+              colorPalette={dataTypeColors[dataType]}
+            >
+              <Tag.Label>{t(`downloads.dataType.${dataType}`)}</Tag.Label>
+            </Tag.Root>
           </Flex>
         )}
       </Card.Header>
@@ -223,26 +247,6 @@ export const DownloadDataCard = ({
               },
             )}
         </DataList.Root>
-        {dataType && (
-          <Flex gap={1} align="center" mt={1}>
-            <Text
-              color="fg.muted"
-              opacity="0.8"
-              fontSize="xs"
-              letterSpacing="wide"
-              textTransform="uppercase"
-            >
-              Type
-            </Text>
-            <Tag.Root
-              size="sm"
-              variant="surface"
-              colorPalette={dataTypeColors[dataType]}
-            >
-              <Tag.Label>{t(`downloads.dataType.${dataType}`)}</Tag.Label>
-            </Tag.Root>
-          </Flex>
-        )}
       </Card.Body>
       <Card.Footer>
         <Button asChild variant="outline" colorPalette="orange" size="xs">
