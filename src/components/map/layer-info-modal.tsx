@@ -61,7 +61,7 @@ export function LayerInfoModal({
             </Box>
           )}
           {metadata && (
-            <DataList.Root orientation="horizontal" size="sm" gap={3}>
+            <DataList.Root size="sm" gap={3}>
               {Object.entries(metadata).map(([key, value]) => {
                 if (value === null || value === undefined || value === "")
                   return null;
@@ -70,11 +70,12 @@ export function LayerInfoModal({
                   <DataList.Item key={key}>
                     <DataList.ItemLabel
                       color="fg.muted"
+                      opacity="0.8"
                       fontSize="xs"
                       letterSpacing="wider"
                       textTransform="uppercase"
                     >
-                      {t(`metadata.${key}`, { defaultValue: key })}:
+                      {t(`metadata.${key}`, { defaultValue: key })}
                     </DataList.ItemLabel>
                     <DataList.ItemValue fontSize="sm">
                       {MARKDOWN_KEYS.has(key) ? (
