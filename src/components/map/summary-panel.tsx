@@ -127,6 +127,8 @@ function transformClusterData(
       label_pt: field.label_pt,
       description_pt: field.description_pt,
       value: data[field.columns[0]],
+      unit: field.unit,
+      hasDecimal: field.hasDecimal,
     }));
 }
 

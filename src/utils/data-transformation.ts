@@ -35,6 +35,8 @@ export interface ApiFilterField {
   column: string;
   description: string;
   description_pt?: string;
+  unit?: string;
+  hasDecimal?: boolean;
 }
 
 export interface ApiField {
@@ -387,6 +389,8 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
       label_pt: f.label_pt,
       description: f.description,
       description_pt: f.description_pt,
+      unit: f.unit,
+      hasDecimal: f.hasDecimal,
     })),
     summaryFields: summaryFields,
     filterFields: apiModel.filter_fields,
