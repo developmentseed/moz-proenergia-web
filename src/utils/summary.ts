@@ -191,6 +191,7 @@ export function transformFieldSummary(
         description_pt: field.description_pt,
         unit: field.unit,
         value: [{ key: column, label: makeLabel(column), value: getNumericValue(summary, methodName) }],
+        hasDecimal: field.hasDecimal,
       };
     }
 

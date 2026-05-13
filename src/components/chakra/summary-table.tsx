@@ -402,7 +402,7 @@ function HighlightRowView({ row }: { row: HighlightRow }) {
   const label = localize(row.label, row.label_pt);
   const description = row.description ? localize(row.description, row.description_pt) : undefined;
   const items = row.value.map((item) => ({
-    id: String(formatValue(item.value)),
+    id: String(formatValue(item.value, row.hasDecimal)),
     label: item.label,
   }));
   return (
