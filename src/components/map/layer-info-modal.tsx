@@ -31,7 +31,7 @@ const MARKDOWN_KEYS = new Set([
 
 interface LayerInfoModalProps {
   title: string;
-  description?: string;
+  description?: string | null;
   metadata?: Record<string, string | number | boolean | null | undefined>;
   open: boolean;
   onOpenChange: (details: { open: boolean }) => void;

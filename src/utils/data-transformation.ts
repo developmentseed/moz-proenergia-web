@@ -81,6 +81,8 @@ export interface ApiModelResponse {
   summary_fields: ApiField[];
   scenarios: ApiScenario[];
   visualization_column: string | null; // for main column
+  visualization_column_description: string | null;
+  visualization_column_description_pt: string | null; // for main column
   color_coding: ColorCoding[]
   metric_field_types: Record<string, string>
 }
@@ -372,8 +374,8 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
     column: mainColumn,
     label: mainField?.label || makeLabel(mainColumn),
     label_pt: mainField?.label_pt,
-    description: mainField?.description,
-    description_pt: mainField?.description_pt,
+    description: apiModel.visualization_column_description,
+    description_pt: apiModel.visualization_column_description_pt,
     options: [], // Options fetched separately
   };
 
