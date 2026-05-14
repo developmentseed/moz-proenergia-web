@@ -2,7 +2,7 @@ import type { SourceProps } from "react-map-gl/maplibre";
 export interface ItemUnit {
   id: string;
   label: string;
-  description?: string;
+  description?: string | null;
 }
 export interface Field {
   columns: string[];
@@ -26,7 +26,7 @@ export interface MapItemUnit extends ItemUnit {
 
 export enum FilterType { numeric = 'numeric', checkbox = 'checkbox', admin='admin'};
 
-type BaseScenarioFilter = ItemUnit & { column: string; label_pt?: string; description_pt?: string };
+type BaseScenarioFilter = ItemUnit & { column: string; label_pt?: string; description_pt?: string | null };
 interface NumericScenarioFilter extends BaseScenarioFilter {
   type: FilterType.numeric;
   options: [number, number]

@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { Box, VStack, HStack, Text, Separator, ScrollArea, IconButton } from '@chakra-ui/react';
-import { LuDroplet } from 'react-icons/lu';
+import { LuInfo, LuDroplet } from 'react-icons/lu';
+import { ModalDialog } from '@/components/chakra/modal';
 import { type MapItemUnit, type Main } from '@/app/types';
 import { useContextualLayers } from '@/utils/context/contextual-layers';
 import { mapControlCommonStyleProps } from './control-constant';
@@ -25,6 +26,7 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
   const contextualLayers = layers.filter(l => activeLayers.includes(l.id));
 
   const [mainOpacity, setMainOpacity] = useState(100);
+  const [mainInfoOpen, setMainInfoOpen] = useState(false);
 
   const handleMainOpacity = (opacity: number) => {
     setMainOpacity(opacity);
@@ -53,6 +55,14 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
                   <LuDroplet />
                 </IconButton>
               </OpacityControl>
+              <IconButton
+                aria-label="Main layer info"
+                size="2xs"
+                variant="ghost"
+                onClick={() => setMainInfoOpen(true)}
+              >
+                <LuInfo />
+              </IconButton>
             </HStack>
           </HStack>
 
@@ -109,6 +119,18 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
           )}
         </VStack>
       </Box>
+      <ModalDialog
+        modalTitle={main.label || t('map.legend')}
+        modalContent={localize(main.description ?? null, main.description_pt) !=='' ? (
+          <Text fontSize="sm">{main.description}</Text>
+        ) : (
+          <Text fontSize="sm" color="fg.muted" fontStyle="italic">
+            {t('map.noDescription')}
+          </Text>
+        )}
+        open={mainInfoOpen}
+        onOpenChange={({ open }) => setMainInfoOpen(open)}
+      />
     </>
   );
 }
