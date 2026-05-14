@@ -213,6 +213,8 @@ describe("Filter to Expression End-to-End", () => {
         id: "main",
         column: DEFAULT_COL,
         label: "Main",
+        description: null,
+        description_pt: null,
         options: [
           { id: "a", label: "A", color: "#ff0000" },
           { id: "b", label: "B", color: "#00ff00" },
@@ -233,6 +235,8 @@ describe("Filter to Expression End-to-End", () => {
         id: "main",
         column: "technology",
         label: "Main",
+        description: null,
+        description_pt: null,
         options: [
           { id: "solar", label: "Solar", color: "#ffcc00" },
           { id: "wind", label: "Wind", color: "#0066ff" },
@@ -253,6 +257,8 @@ describe("Filter to Expression End-to-End", () => {
         id: "main",
         column: DEFAULT_COL,
         label: "Main",
+        description: null,
+        description_pt: null,
         options: [],
       };
 

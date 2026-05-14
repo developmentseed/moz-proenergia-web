@@ -121,7 +121,7 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
       </Box>
       <ModalDialog
         modalTitle={main.label || t('map.legend')}
-        modalContent={localize(main.description ?? null, main.description_pt) !=='' ? (
+        modalContent={localize(main.description, main.description_pt) !=='' ? (
           <Text fontSize="sm">{main.description}</Text>
         ) : (
           <Text fontSize="sm" color="fg.muted" fontStyle="italic">

@@ -72,6 +72,8 @@ export interface Layer extends ItemUnit {
 }
 
 export interface Main extends BaseScenarioFilter {
+  description: string | null;
+  description_pt: string | null;
   options: MapItemUnit[];
 }
 
