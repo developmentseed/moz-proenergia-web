@@ -9,6 +9,7 @@ import { DownloadButton } from "@/components/chakra/download-button";
 import { LayerInfoModal } from "@/components/map/layer-info-modal";
 import { type Layer } from "@/app/types";
 import { useTranslation } from "react-i18next";
+import { useLocalize } from "@/utils/i18n";
 
 interface LayerControlProps {
   layer: Layer;
@@ -18,9 +19,10 @@ interface LayerControlProps {
 
 export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) => {
   const { t } = useTranslation();
+  const localize = useLocalize();
   const [infoOpen, setInfoOpen] = useState(false);
-  const layerLabel = t(`layer.${layer.id}.label`, { defaultValue: layer.label });
-  const layerDescription = layer.description ? t(`layer.${layer.id}.description`, { defaultValue: layer.description }) : undefined;
+  const layerLabel = localize(layer.label, layer.label_pt);
+  const layerDescription = layer.description ? localize(layer.description, layer.description_pt) : undefined;
 
   const onCheckedChange = (details: CheckboxCheckedChangeDetails) => {
     onChange({ [layer.id]: details.checked as boolean });
@@ -33,7 +35,7 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
         <Box display="flex" alignItems="center" gap="1">
           <Text fontSize="sm" fontFamily="body">{layerLabel}</Text>
           <IconButton
-            aria-label="Layer info"
+            aria-label={t('map.layerInfo')}
             size="2xs"
             variant="ghost"
             colorPalette="gray"
@@ -43,7 +45,7 @@ export const LayerControl = ({ layer, onChange, selected }: LayerControlProps) =
           </IconButton>
         </Box>
         <Box display="flex" alignItems="center" gap="2">
-          {layer.filePath && isAuthenticated && <DownloadButton url={`${MEDIA_URL_PREFIX}${layer.filePath}`} label={`Download ${layerLabel}`} />}
+          {layer.filePath && isAuthenticated && <DownloadButton url={`${MEDIA_URL_PREFIX}${layer.filePath}`} label={t('downloads.downloadItem', { label: layerLabel })} />}
           <Switch.Root value={layer.id} onCheckedChange={onCheckedChange} checked={selected}>
             <Switch.HiddenInput />
             <Switch.Control>

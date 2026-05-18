@@ -8,6 +8,7 @@ import { Control as ControlPanel } from "./control";
 import { useModel } from "@/utils/context/model";
 import { ModelSwitcherMenu } from "./model-switcher-menu";
 import { useTranslation } from "react-i18next";
+import { useLocalize } from "@/utils/i18n";
 import { zIndex } from "./constant";
 
 export const ControlPanelWidth = 350;
@@ -16,12 +17,17 @@ export const AnimationTime = "0.32s";
 const MainPanel = ({
   isOpen,
   onToggle = () => {},
+  activeTab,
+  onTabChange,
 }: {
   isOpen: boolean;
   onToggle?: () => void;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
 }) => {
   const { model, scenarioId, setScenarioId } = useModel();
   const { t } = useTranslation();
+  const localize = useLocalize();
 
   const onChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setScenarioId(e.target.value);
@@ -29,8 +35,8 @@ const MainPanel = ({
 
   const scenarioItems = model.scenarios.map((s) => ({
     id: s.id,
-    label: t(`scenario.${s.id}.name`, { defaultValue: s.label }),
-    description: s.description ? t(`scenario.${s.id}.description`, { defaultValue: s.description }) : undefined,
+    label: localize(s.label, s.name_pt),
+    description: s.description ? localize(s.description, s.description_pt) : undefined,
   }));
 
   return (
@@ -92,7 +98,7 @@ const MainPanel = ({
         <Box h="80dvh" display="flex" flexDirection="column">
           <Box p={4} display={isOpen ? "block" : "none"} flexShrink={0}>
             <Select
-              title="Scenario"
+              title={t('explorer.scenario')}
               items={scenarioItems}
               value={scenarioId}
               onChange={onChange}
@@ -113,17 +119,21 @@ const MainPanel = ({
         <Box p={4}>
           <Text textStyle="subTitle">{t('explorer.model')}</Text>
           <Heading as="h2" textStyle="modelTitle">
-            {t(`model.${model.id}.name`, { defaultValue: model.title })}
+            {localize(model.title, model.title_pt)}
           </Heading>
-          <Select
-            title={t('explorer.scenario')}
-            items={scenarioItems}
-            value={scenarioId}
-            onChange={onChange}
-            props={{}}
-          />
+          <Box data-tour="scenario-select">
+            <Select
+              title={t('explorer.scenario')}
+              items={scenarioItems}
+              value={scenarioId}
+              onChange={onChange}
+              props={{}}
+            />
+          </Box>
         </Box>
-        <ControlPanel />
+        <Box data-tour="filters-panel" flex="1" display="flex" flexDirection="column" overflow="hidden">
+          <ControlPanel activeTab={activeTab} onTabChange={onTabChange} />
+        </Box>
       </Box>
     </Box>
   );

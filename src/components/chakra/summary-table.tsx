@@ -20,6 +20,7 @@ import {
 } from "@/app/types/summary";
 import { Highlight } from "@/components/chakra/highlight";
 import { useTranslation } from "react-i18next";
+import { useLocalize } from "@/utils/i18n";
 
 const formatValue = (value: string | number, hasDecimal?: boolean) => {
   //@ts-expect-error @TODO
@@ -118,18 +119,21 @@ function ErrorRowView({ row }: { row: ErrorRow }) {
 }
 
 function FlatRowView({ row }: { row: FlatRow }) {
+  const localize = useLocalize();
+  const label = localize(row.label, row.label_pt);
+  const description = row.description ? localize(row.description, row.description_pt) : undefined;
   return (
     <Table.Row key={row.key} bg="panelBg">
       <Table.Cell {...tableCellStyleProps} p={0.5}>
         {" "}
         <Box {...labelBoxProps}>
           <Text textStyle="tableAttr">
-            {row.label}{" "}
+            {label}{" "}
             <Text as="span" fontWeight="normal">
               {row.unit && `(${row.unit})`}{" "}
             </Text>
           </Text>
-          {row.description && <InfoTip content={row.description} />}
+          {description && <InfoTip content={description} />}
         </Box>
       </Table.Cell>
       <Table.Cell {...tableCellStyleProps}>
@@ -148,13 +152,14 @@ function MethodTotalRow({
   item?: SummaryItem;
   hasDecimal?: boolean;
 }) {
+  const { t } = useTranslation();
   if (!item) return null;
   return (
     <Table.Row bg="panelBg" css={lastRowStyleProps}>
       <Table.Cell {...tableCellStyleProps} pb={4}>
         <Text textStyle="tableAttr">
           <Text as="span" fontWeight="semibold">
-            Total
+            {t('explorer.total')}
           </Text>{" "}
           ({item.label})
         </Text>
@@ -189,6 +194,10 @@ function ChartValueRows({ row }: { row: ChartRow }) {
 }
 
 function ChartRowView({ row }: { row: ChartRow }) {
+  const { t } = useTranslation();
+  const localize = useLocalize();
+  const label = localize(row.label, row.label_pt);
+  const description = row.description ? localize(row.description, row.description_pt) : undefined;
   if (!Array.isArray(row.value)) return null;
   if (row.chartType === "bar") {
     return (
@@ -197,14 +206,14 @@ function ChartRowView({ row }: { row: ChartRow }) {
           <Table.Cell {...sectionHeaderCellProps}>
             <Box {...labelBoxProps}>
               <Text {...sectionHeaderLabelProps}>
-                {row.label}
+                {label}
                 <Text as="span" fontWeight="normal">
                   {" "}
                   {row.unit && `(${row.unit})`}
                 </Text>
               </Text>
-              {row.description && row.label !== row.description && (
-                <InfoTip content={row.description} />
+              {description && label !== description && (
+                <InfoTip content={description} />
               )}
             </Box>
           </Table.Cell>
@@ -230,14 +239,14 @@ function ChartRowView({ row }: { row: ChartRow }) {
           <Table.Cell {...sectionHeaderCellProps}>
             <Box {...labelBoxProps}>
               <Text {...sectionHeaderLabelProps}>
-                {row.label}
+                {label}
                 <Text as="span" fontWeight="normal">
                   {" "}
                   {row.unit && `(${row.unit})`}
                 </Text>
               </Text>
-              {row.description && row.label !== row.description && (
-                <InfoTip content={row.description} />
+              {description && label !== description && (
+                <InfoTip content={description} />
               )}
             </Box>
           </Table.Cell>
@@ -262,14 +271,14 @@ function ChartRowView({ row }: { row: ChartRow }) {
           <Table.Cell {...sectionHeaderCellProps}>
             <Box {...labelBoxProps}>
               <Text {...sectionHeaderLabelProps}>
-                {row.label}
+                {label}
                 <Text as="span" fontWeight="normal">
                   {" "}
                   {row.unit && `(${row.unit})`}
                 </Text>
               </Text>
-              {row.description && row.label !== row.description && (
-                <InfoTip content={row.description} />
+              {description && label !== description && (
+                <InfoTip content={description} />
               )}
             </Box>
           </Table.Cell>
@@ -287,25 +296,28 @@ function ChartRowView({ row }: { row: ChartRow }) {
       </>
     );
   }
-  return <Text> Only Bar/Stacked/Donut Chart is available.</Text>;
+  return <Text>{t('explorer.onlyChartAvailable')}</Text>;
 }
 
 function GroupRowView({ row }: { row: GroupRow }) {
+  const localize = useLocalize();
+  const label = localize(row.label, row.label_pt);
+  const description = row.description ? localize(row.description, row.description_pt) : undefined;
   return (
     <>
-      <Table.Row key={row.label + "-group-row"} {...sectionHeaderRowProps}>
+      <Table.Row key={label + "-group-row"} {...sectionHeaderRowProps}>
         <Table.Cell {...sectionHeaderCellProps}>
           <Box {...labelBoxProps}>
             <Text {...sectionHeaderLabelProps}>
               {" "}
-              {row.label}
+              {label}
               <Text as="span" fontWeight="normal">
                 {" "}
                 {row.unit && `(${row.unit})`}
               </Text>
             </Text>
-            {row.description && row.label !== row.description && (
-              <InfoTip content={row.description} />
+            {description && label !== description && (
+              <InfoTip content={description} />
             )}
           </Box>
         </Table.Cell>
@@ -328,20 +340,23 @@ function GroupRowView({ row }: { row: GroupRow }) {
 }
 
 function NestedGroupRowView({ row }: { row: NestedGroupRow }) {
+  const localize = useLocalize();
+  const label = localize(row.label, row.label_pt);
+  const description = row.description ? localize(row.description, row.description_pt) : undefined;
   return (
     <>
-      <Table.Row key={row.label} {...sectionHeaderRowProps}>
+      <Table.Row key={label} {...sectionHeaderRowProps}>
         <Table.Cell colSpan={2} fontWeight="bold" borderBottomColor="fg.muted">
           <Box {...labelBoxProps}>
             <Text {...sectionHeaderLabelProps}>
-              {row.label}
+              {label}
               <Text as="span" fontWeight="normal">
                 {" "}
                 {row.unit && `(${row.unit})`}
               </Text>
             </Text>
-            {row.description && row.label !== row.description && (
-              <InfoTip content={row.description} />
+            {description && label !== description && (
+              <InfoTip content={description} />
             )}
           </Box>
         </Table.Cell>
@@ -383,8 +398,11 @@ function NestedGroupRowView({ row }: { row: NestedGroupRow }) {
 }
 
 function HighlightRowView({ row }: { row: HighlightRow }) {
+  const localize = useLocalize();
+  const label = localize(row.label, row.label_pt);
+  const description = row.description ? localize(row.description, row.description_pt) : undefined;
   const items = row.value.map((item) => ({
-    id: String(formatValue(item.value)),
+    id: String(formatValue(item.value, row.hasDecimal)),
     label: item.label,
   }));
   return (
@@ -399,14 +417,14 @@ function HighlightRowView({ row }: { row: HighlightRow }) {
         <Table.Cell {...sectionHeaderCellProps}>
           <Box {...labelBoxProps}>
             <Text {...sectionHeaderLabelProps}>
-              {row.label}
+              {label}
               <Text as="span" fontWeight="normal">
                 {" "}
                 {row.unit && `(${row.unit})`}
               </Text>
             </Text>
-            {row.description && row.label !== row.description && (
-              <InfoTip content={row.description} />
+            {description && label !== description && (
+              <InfoTip content={description} />
             )}
           </Box>
         </Table.Cell>

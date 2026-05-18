@@ -4,11 +4,16 @@
     "longName": "Plataforma Integrada de Electrificação",
     "shortName": "PIE",
     "explorer": "Explorador",
+    "explorerTitle": "Explorar modelos e cenários",
     "about": "Sobre",
+    "aboutTitle": "Saber mais sobre o projeto",
     "downloads": "Downloads",
+    "downloadsTitle": "Descarregar recursos",
     "login": "Entrar",
     "logout": "Sair",
     "sdiPortal": "Portal SDI",
+    "userGuide": "Guia do Utilizador",
+    "userGuideTitle": "Visitar o Guia do Utilizador",
     "menu": "Menu"
   },
   "home": {
@@ -20,6 +25,7 @@
     "imageAlt": "Ilustração de infraestrutura de energia"
   },
   "models": {
+    "models": "Modelos",
     "exploreModel": "Explorar Modelo"
   },
   "auth": {
@@ -43,6 +49,10 @@
   "explorer": {
     "model": "Modelo",
     "scenario": "Cenário",
+    "collapseControlPanel": "Recolher painel de controlo",
+    "expandControlPanel": "Expandir painel de controlo",
+    "total": "Total",
+    "onlyChartAvailable": "Apenas Gráfico de Barras/Pilhas/Donuts está disponível.",
     "collapsePanel": "Recolher painel",
     "expandPanel": "Expandir painel",
     "controls": "Controles",
@@ -62,17 +72,37 @@
     "onlyBarChart": "Apenas Gráfico de Barras está disponível.",
     "errorNotReady": "Estes dados não parecem estar prontos. Certifique-se de que existem cenários relacionados a este modelo.",
     "returnToModels": "Voltar para modelos",
-    "relatedClusters": "Ver cluster em outros modelos"
+    "relatedClusters": "Ver cluster em outros modelos",
+    "summaryUnavailable": "Resumo indisponível — os resultados não puderam ser calculados para os filtros atuais.",
+    "resetFilters": "Redefinir filtros",
+    "invalidScenario": "O cenário selecionado não foi encontrado; o cenário padrão foi carregado.",
+    "vectorLoadError": "Falha ao carregar camadas vetoriais",
+    "rasterLoadError": "Falha ao carregar camadas raster",
+    "noLayersFound": "Nenhuma camada encontrada"
+  },
+  "error": {
+    "accessDeniedTitle": "Acesso negado",
+    "accessDeniedDescription": "Algo está errado com a credencial. Por favor, saia e faça login novamente.",
+    "tryAgain": "Tentar novamente",
+    "returnToHome": "Voltar ao início",
+    "unexpectedError": "Ocorreu um erro inesperado.",
+    "pageNotFound": "Página não encontrada",
+    "modelNotFound": "Modelo não encontrado",
+    "accessNotAllowed": "Acesso não permitido"
   },
   "downloads": {
     "title": "Downloads",
     "searchPlaceholder": "Pesquisar conjuntos de dados...",
+    "downloadItem": "Descarregar {{label}}",
     "noData": "Nenhum dado encontrado",
     "source": "Fonte:",
     "updated": "Atualizado:",
-    "download": "Baixar",
+    "download": "Download",
     "filterModels": "Filtrar por Modelo",
     "reset": "Redefinir",
+    "vectorLoadError": "Falha ao carregar conjuntos de dados vetoriais",
+    "rasterLoadError": "Falha ao carregar conjuntos de dados raster",
+    "referenceLoadError": "Falha ao carregar conjuntos de dados de referência",
     "dataType": {
       "vector": "Vetorial",
       "raster": "Raster",
@@ -100,7 +130,64 @@
     "legend": "Legenda",
     "additionalLayers": "Camadas adicionais",
     "rasterMin": "Mín: {{value}}",
-    "rasterMax": "Máx: {{value}}"
+    "rasterMax": "Máx: {{value}}",
+    "share": "Partilhar",
+    "shareLink": "Partilhar link",
+    "urlCopied": "URL copiada",
+    "basemap": "Mapa base",
+    "changeBasemap": "Mudar mapa base",
+    "layerInfo": "Informação da camada",
+    "removeLayer": "Remover camada",
+    "centerMap": "Centrar mapa",
+    "opacity": "Opacidade: {{value}}%",
+    "navigateTitle": "Navegar para cluster, local ou coordenadas",
+    "navigatePlaceholder": "Introduza ID do cluster ou lat, lng…",
+    "navigateAriaLabel": "Navegar para cluster ou coordenadas",
+    "navigateHelperText": "As coordenadas devem estar no formato <em>lat, lng</em>",
+    "navigateCoordsError": "Coordenadas fora do intervalo. A latitude deve estar entre -90 e 90, a longitude entre -180 e 180.",
+    "noDescription": "Sem descrição disponível."
+  },
+  "tour": {
+    "back": "Anterior",
+    "close": "Fechar",
+    "finish": "Concluir",
+    "next": "Próximo",
+    "nextWithProgress": "Próximo ({current} de {total})",
+    "skip": "Pular visita",
+    "openTour": "Abrir visita guiada",
+    "dontShowAgain": "Não mostrar esta visita automaticamente novamente",
+    "step1": {
+      "title": "Bem-vindo à Plataforma Integrada de Electrificação",
+      "content": "Esta plataforma permite explorar os resultados de modelos de acesso à energia em Moçambique. Pode visualizar os caminhos de eletrificação de menor custo, filtrar por geografia e atributos, e consultar estatísticas resumidas para qualquer área."
+    },
+    "step2": {
+      "title": "Selecionar um Modelo",
+      "content": "Utilize os ícones na barra lateral para alternar entre os modelos de planeamento disponíveis. Cada modelo representa um conjunto de dados ou cenário analítico distinto."
+    },
+    "step3": {
+      "title": "Escolher um Cenário",
+      "content": "Cada modelo pode conter vários cenários — por exemplo, diferentes horizontes de investimento ou pressupostos de política. Utilize este menu para alternar entre eles."
+    },
+    "step4": {
+      "title": "Aplicar Filtros",
+      "content": "Utilize o painel de Controles para filtrar assentamentos por atributos como distância a infraestruturas, dimensão da população ou área administrativa. Ajuste os valores e pressione Aplicar para atualizar o mapa e o resumo."
+    },
+    "step5": {
+      "title": "Explorar o Mapa",
+      "content": "O mapa atualiza-se para refletir os seus filtros ativos. Cada ponto representa um assentamento, colorido pela tecnologia de eletrificação de menor custo. Clique em qualquer assentamento para o inspecionar individualmente."
+    },
+    "step6": {
+      "title": "Resumo Nacional",
+      "content": "O painel de resumo mostra estatísticas agregadas para todos os assentamentos visíveis com os seus filtros atuais — incluindo desagregação por tecnologia, população e ligações previstas."
+    },
+    "step7": {
+      "title": "Detalhe do Cluster",
+      "content": "Ao selecionar um assentamento individual, o painel de resumo passa a mostrar os seus atributos específicos — como coordenadas, população e a tecnologia de eletrificação recomendada."
+    },
+    "step8": {
+      "title": "Camadas Adicionais",
+      "content": "Mude para o separador Camadas para ativar ou desativar camadas contextuais do mapa, como limites administrativos, infraestrutura de rede ou outros conjuntos de dados de referência."
+    }
   },
   "breadcrumbs": {
     "about": "Sobre",

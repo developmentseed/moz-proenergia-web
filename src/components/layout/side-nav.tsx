@@ -6,12 +6,15 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { createSerializer } from 'nuqs/server';
 import { ModelGroupMetadata } from '@/app/types';
-import { slugify } from '@/utils/data-transformation';
+import { slugify, fetchModels } from '@/utils/data-transformation';
 import { zIndex } from '@/components/ui/constant';
 import { getIconPath } from '@/utils/model-icon';
 import { coordinateParsers } from '@/utils/context/map-coords';
 import { Tooltip } from '../ui/tooltip';
 import { useTranslation } from 'react-i18next';
+import { useLocalize } from '@/utils/i18n';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/utils/context/auth';
 
 //Generate URL with coordinates
 const serialize = createSerializer(coordinateParsers);
@@ -21,9 +24,18 @@ interface SideNavProps {
   currentSlug: string;
 }
 
-export const SideNav = ({ models, currentSlug }: SideNavProps) => {
+export const SideNav = ({ models: initialModels, currentSlug }: SideNavProps) => {
   const searchParams = useSearchParams();
   const { t } = useTranslation();
+  const localize = useLocalize();
+  const { token } = useAuth();
+
+  const { data: models = initialModels } = useQuery({
+    queryKey: ['models', token],
+    queryFn: ({ signal }) => fetchModels(signal, token),
+    initialData: initialModels,
+    throwOnError: false,
+  });
   // Only carry coordinate params (lat, lng, zoom) to model links
       const coordQuery = serialize({
       lat: searchParams.get('lat') ? parseFloat(searchParams.get('lat')!) : null,
@@ -33,6 +45,7 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
 
   return (
     <Box
+      data-tour="side-nav"
       display={{ base: 'none', md: 'flex' }}
       flexDirection="column"
       height="full"
@@ -53,7 +66,7 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
               href={`/model/${modelSlug}/` + coordQuery}
               style={{ textDecoration: 'none' }}
             >
-              <Tooltip content={t(`model.${model.id}.name`, { defaultValue: model.name })}>
+              <Tooltip content={localize(model.name, model.name_pt)}>
                 <Box
                   display="flex"
                   alignItems="center"
@@ -77,13 +90,13 @@ export const SideNav = ({ models, currentSlug }: SideNavProps) => {
                     >
                     <Image
                       src={iconPath}
-                      alt={t(`model.${model.id}.name`, { defaultValue: model.name })}
+                      alt={localize(model.name, model.name_pt)}
                       width={20}
                       height={20}
                       />
                     </ChakraImage>
                   ) : (
-                    t(`model.${model.id}.name`, { defaultValue: model.name })
+                    localize(model.name, model.name_pt)
                   )}
                 </Box>
               </Tooltip>

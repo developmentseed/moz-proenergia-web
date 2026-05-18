@@ -23,6 +23,7 @@ import { ApplyActions } from "./apply-actions";
 import { FilterType, type Filter, type ItemUnit } from "@/app/types";
 import { Tooltip } from "./tooltip";
 import { useTranslation } from "react-i18next";
+import { useLocalize } from "@/utils/i18n";
 
 interface ColGroup {
   title: string;
@@ -82,6 +83,14 @@ const LayersPanel = () => {
     [toggleLayer],
   );
 
+  if (layers.length === 0) {
+    return (
+      <Box p={4}>
+        <Text fontSize="sm" color="fg.muted">{t('explorer.noLayersFound')}</Text>
+      </Box>
+    );
+  }
+
   return (
     <Box>
       {layers.map((layer) => {
@@ -125,9 +134,9 @@ const CollapsibleGroup = memo(function CollapsibleGroup({
           pendingCount={pendingCount}
           textStyle="collapsibleGroupTitle"
         />
-        {collapsibleItem.items[0].description && (
+        {collapsibleItem.description && (
           <Tooltip
-            content={collapsibleItem.items[0].description}
+            content={collapsibleItem.description}
             contentProps={{ css: { "--tooltip-bg": "colors.bg", color: "fg" } }}
           >
             <IconButton as='span' variant="ghost" size="2xs" p={0}>
@@ -160,6 +169,7 @@ const ControlsPanel = () => {
   const { displayFilters, setPendingFilters, getFilterPendingStatus } =
     useFilters();
   const { t } = useTranslation();
+  const localize = useLocalize();
 
   if (!displayFilters) return <div>{t('explorer.pleaseWait')}</div>;
 
@@ -179,7 +189,11 @@ const ControlsPanel = () => {
     (f) => f.type === FilterType.checkbox,
   );
   const checkboxFilters = !!checkboxExists.length
-    ? checkboxExists.map((item) => ({ title: item.label, items: [item] }))
+    ? checkboxExists.map((item) => ({
+        title: localize(item.label, item.label_pt),
+        description: item.description ? localize(item.description, item.description_pt) : undefined,
+        items: [item],
+      }))
     : [];
 
   // Group area selection related filter together here.
@@ -249,7 +263,7 @@ const Control = ({
       id: "controls",
       label: (
         <>
-          <LuSettings2 />
+          <LuSettings2 size={16} />
           <Text textStyle="subTitle">{t('explorer.controls')}</Text>
         </>
       ),
@@ -259,7 +273,7 @@ const Control = ({
       id: "layers",
       label: (
         <>
-          <LuLayers />
+          <LuLayers size={16} />
           <Text textStyle="subTitle">{t('explorer.layers')}</Text>
         </>
       ),

@@ -11,10 +11,12 @@ import {
   Portal,
 } from "@chakra-ui/react";
 import { LuShare } from "react-icons/lu";
+import { useTranslation } from "react-i18next";
 
 const ShareButton = () => {
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
   const [isCopied, setIsCopied] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <Menu.Root>
@@ -30,7 +32,7 @@ const ShareButton = () => {
           right={{base: 2, md: 12}}
           fontFamily="body"
         >
-          Share
+          {t('map.share')}
           <LuShare />
         </Button>
       </Menu.Trigger>
@@ -49,7 +51,7 @@ const ShareButton = () => {
                 }
               }}
             >
-              <Clipboard.Label textStyle="label">Share link</Clipboard.Label>
+              <Clipboard.Label textStyle="label">{t('map.shareLink')}</Clipboard.Label>
               <InputGroup
                 endElement={
                   <Clipboard.Trigger asChild>
@@ -59,7 +61,7 @@ const ShareButton = () => {
                   </Clipboard.Trigger>
                 }
               >
-                <Input readOnly value={isCopied ? "URL copied" : currentUrl} />
+                <Input readOnly value={isCopied ? t('map.urlCopied') : currentUrl} />
               </InputGroup>
             </Clipboard.Root>
           </Menu.Content>

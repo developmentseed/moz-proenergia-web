@@ -4,6 +4,7 @@ import {
 
 import { useCallback } from "react";
 import { IconButton } from "@chakra-ui/react";
+import { useTranslation } from "react-i18next";
 import { LuScan } from "react-icons/lu";
 import {
   DEFAULT_COORDS,
@@ -15,6 +16,7 @@ import { zIndex } from "@/components/ui/constant";
 export function CenterMapControl() {
   const { current: map } = useMap();
   const { coords } = useMapCoords();
+  const { t } = useTranslation();
   const { lat: viewLat, lng: viewLng, zoom: viewZoom } = coords;
 
   const resetCenter = useCallback(() => {
@@ -32,7 +34,7 @@ export function CenterMapControl() {
 
   return (
     <IconButton
-      aria-label="Center map"
+      aria-label={t('map.centerMap')}
       bg="bg"
       position="absolute"
       bottom="12.5rem"

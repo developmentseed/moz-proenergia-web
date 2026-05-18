@@ -3,6 +3,7 @@
 import { Box, Heading, Text, Button, Image, VStack } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useTranslation } from "react-i18next";
+import { LuInfo, LuMap } from "react-icons/lu";
 import { BASE_PATH } from "@/config/website";
 
 export default function Home() {
@@ -34,10 +35,10 @@ export default function Home() {
             width="full"
           >
             <Button asChild size="lg" variant="outline">
-              <NextLink href="/about">{t('home.learnMore')}</NextLink>
+              <NextLink href="/about"><LuInfo size={20} /> {t('home.learnMore')}</NextLink>
             </Button>
             <Button asChild size="lg" variant="solid" colorPalette="orange">
-              <NextLink href="/models">{t('home.viewModels')}</NextLink>
+              <NextLink href="/models"><LuMap size={20} /> {t('home.viewModels')}</NextLink>
             </Button>
           </Box>
         </VStack>

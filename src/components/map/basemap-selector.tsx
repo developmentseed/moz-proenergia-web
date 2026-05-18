@@ -11,6 +11,7 @@ import {
 import { LuCheck, LuMap } from "react-icons/lu";
 import { zIndex } from "@/components/ui/constant";
 import { BASE_PATH } from "@/config/website";
+import { useTranslation } from "react-i18next";
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 // Mapbox Static Images API — centered on Mozambique
@@ -55,6 +56,7 @@ export const BasemapSelector = ({
   currentBasemapId,
   onBasemapChange,
 }: BasemapSelectorProps) => {
+  const { t } = useTranslation();
   const current =
     BASEMAP_OPTIONS.find((o) => o.id === currentBasemapId) ??
     BASEMAP_OPTIONS[0];
@@ -63,7 +65,7 @@ export const BasemapSelector = ({
     <Popover.Root positioning={{ placement: "top-start" }}>
       <Popover.Trigger asChild>
         <IconButton
-          aria-label="Change basemap"
+          aria-label={t('map.changeBasemap')}
           position="absolute"
           bottom="9.75rem"
           left="10px"
@@ -84,7 +86,7 @@ export const BasemapSelector = ({
           <Popover.Content maxW="10rem" zIndex={zIndex.mapPopover}>
             <Popover.Body p={3}>
               <Text textStyle="allCapLabel" mb={3}>
-                Basemap
+                {t('map.basemap')}
               </Text>
               {BASEMAP_OPTIONS.map((option) => {
                 const isActive = option.id === currentBasemapId;

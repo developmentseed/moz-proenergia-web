@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { Box, Spinner, Center, Flex, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
+import { useLocalize } from "@/utils/i18n";
 import { MEDIA_URL_PREFIX } from "@/utils/api";
 import { useAuth } from "@/utils/context/auth";
 import { DownloadDataCard } from "@/components/chakra/card";
@@ -11,11 +12,12 @@ import { Search } from "@/components/ui/search";
 import {
   fetchVectors,
   fetchReferences,
-  fetchModels,
   type ApiFileResult,
   DataType,
 } from "@/utils/data-transformation";
+import { useModels } from "@/hooks/use-models";
 import { fetchRasters } from "@/utils/map/cog";
+import { toaster } from "@/components/chakra/toaster";
 import { SidebarFilter } from "./sidebar-filter";
 
 type TaggedDataset = ApiFileResult & {
@@ -28,10 +30,9 @@ export const DownloadList = () => {
   const [selectedModelIds, setSelectedModelIds] = useState<string[]>([]);
   const { token, isAuthenticated } = useAuth();
   const { t } = useTranslation();
+  const localize = useLocalize();
 
-  const { data: models } = useQuery({
-    queryKey: ["models", token],
-    queryFn: ({ signal }) => fetchModels(signal, token),
+  const { data: models } = useModels({
     enabled: isAuthenticated,
   });
 
@@ -50,6 +51,7 @@ export const DownloadList = () => {
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         fetchVectors({ modelId, token, signal }),
       enabled: isAuthenticated && !!models,
+      throwOnError: false,
     })),
   });
 
@@ -59,6 +61,7 @@ export const DownloadList = () => {
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         fetchRasters({ modelId, token, signal }),
       enabled: isAuthenticated && !!models,
+      throwOnError: false,
     })),
   });
 
@@ -68,6 +71,7 @@ export const DownloadList = () => {
       queryFn: ({ signal }: { signal: AbortSignal }) =>
         fetchReferences({ modelId, token, signal }),
       enabled: isAuthenticated && !!models,
+      throwOnError: false,
     })),
   });
 
@@ -78,18 +82,21 @@ export const DownloadList = () => {
     queryKey: ["vectors", null, token],
     queryFn: ({ signal }) => fetchVectors({ token, signal }),
     enabled: isAuthenticated,
+    throwOnError: false,
   });
 
   const rasterAllResult = useQuery({
     queryKey: ["rasters", null, token],
     queryFn: ({ signal }) => fetchRasters({ token, signal }),
     enabled: isAuthenticated,
+    throwOnError: false,
   });
 
   const referenceAllResult = useQuery({
     queryKey: ["references", null, token],
     queryFn: ({ signal }) => fetchReferences({ token, signal }),
     enabled: isAuthenticated,
+    throwOnError: false,
   });
 
   // Tag + merge. Each source contributes its modelId (or none, for unfiltered)
@@ -153,20 +160,40 @@ export const DownloadList = () => {
       // Filter text based results (name, description)
       return (
         d.name?.toLowerCase().includes(q) ||
-        d.description?.toLowerCase().includes(q)
+        d.name_pt?.toLowerCase().includes(q) ||
+        d.description?.toLowerCase().includes(q) ||
+        d.description_pt?.toLowerCase().includes(q)
       );
     });
   }, [allDatasets, selectedModelIds, searchQuery]);
 
+  const vectorsHasError = vectorAllResult.isError || vectorResults.some((r) => r.isError);
+  const rastersHasError = rasterAllResult.isError || rasterResults.some((r) => r.isError);
+  const referencesHasError = referenceAllResult.isError || referenceResults.some((r) => r.isError);
+
+  useEffect(() => {
+    if (vectorsHasError) {
+      queueMicrotask(() => toaster.create({ type: "error", title: t('downloads.vectorLoadError') }));
+    }
+    if (rastersHasError) {
+      queueMicrotask(() => toaster.create({ type: "error", title: t('downloads.rasterLoadError') }));
+    }
+    if (referencesHasError) {
+      queueMicrotask(() => toaster.create({ type: "error", title: t('downloads.referenceLoadError') }));
+    }
+  }, [vectorsHasError, rastersHasError, referencesHasError, t]);
+
+  const isSettled = (r: { isPending: boolean; isError: boolean }) => !r.isPending || r.isError;
+
   const isInitialLoading =
     isAuthenticated &&
     (!models ||
-      vectorAllResult.isPending ||
-      rasterAllResult.isPending ||
-      referenceAllResult.isPending ||
-      vectorResults.some((r) => r.isPending) ||
-      rasterResults.some((r) => r.isPending) ||
-      referenceResults.some((r) => r.isPending));
+      !isSettled(vectorAllResult) ||
+      !isSettled(rasterAllResult) ||
+      !isSettled(referenceAllResult) ||
+      vectorResults.some((r) => !isSettled(r)) ||
+      rasterResults.some((r) => !isSettled(r)) ||
+      referenceResults.some((r) => !isSettled(r)));
 
   const toggleModel = (id: string) => {
     setSelectedModelIds((prev) =>
@@ -178,13 +205,13 @@ export const DownloadList = () => {
   if (!isAuthenticated) {
     return (
       <Center py={10}>
-        <Text>Access not allowed</Text>
+        <Text>{t('error.accessNotAllowed')}</Text>
       </Center>
     );
   }
 
   return (
-    <Flex gap={8} align="flex-start" direction={{ base: "column", md: "row" }}>
+    <Flex gap={8} align="flex-start" direction={{ base: "column", lg: "row" }}>
       <SidebarFilter
         models={models}
         selectedModelIds={selectedModelIds}
@@ -214,14 +241,15 @@ export const DownloadList = () => {
                 return (
                   <DownloadDataCard
                     key={`${dataType}-${d.id}`}
-                    title={d.name}
-                    description={d.description}
+                    title={localize(d.name, d.name_pt)}
+                    description={d.description ? localize(d.description, d.description_pt) : undefined}
                     source={d.source}
                     downloadUrl={`${MEDIA_URL_PREFIX}${d.raw_file}`}
                     highlight={searchQuery}
-                    models={modelIds.map(
-                      (id) => models?.find((m) => m.id === id)?.name ?? id,
-                    )}
+                    models={modelIds.map((id) => {
+                      const m = models?.find((m) => m.id === id);
+                      return m ? localize(m.name, m.name_pt) : id;
+                    })}
                     dataType={dataType}
                     item={cardItem}
                   />

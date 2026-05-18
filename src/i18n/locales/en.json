@@ -4,11 +4,16 @@
     "longName": "Integrated Energy Planning Platform",
     "shortName": "PIE",
     "explorer": "Explorer",
+    "explorerTitle": "Explore models and scenarios",
     "about": "About",
+    "aboutTitle": "Learn more about the project",
     "downloads": "Downloads",
+    "downloadsTitle": "Download resources",
     "login": "Login",
     "logout": "Log out",
     "sdiPortal": "SDI Portal",
+    "userGuide": "User Guide",
+    "userGuideTitle": "Visit the User Guide",
     "menu": "Menu"
   },
   "home": {
@@ -20,6 +25,7 @@
     "imageAlt": "Energy infrastructure illustration"
   },
   "models": {
+    "models": "Models",
     "exploreModel": "Explore Model"
   },
   "auth": {
@@ -43,6 +49,10 @@
   "explorer": {
     "model": "Model",
     "scenario": "Scenario",
+    "collapseControlPanel": "Collapse control panel",
+    "expandControlPanel": "Expand control panel",
+    "total": "Total",
+    "onlyChartAvailable": "Only Bar/Stacked/Donut Chart is available.",
     "collapsePanel": "Collapse panel",
     "expandPanel": "Expand panel",
     "controls": "Controls",
@@ -62,17 +72,37 @@
     "onlyBarChart": "Only Bar Chart is available.",
     "errorNotReady": "This data doesn't look like it is ready. Make sure there are scenarios related to this model.",
     "returnToModels": "Return to models",
-    "relatedClusters": "View cluster in other models"
+    "relatedClusters": "View cluster in other models",
+    "summaryUnavailable": "Summary unavailable — results could not be calculated for the current filters.",
+    "resetFilters": "Reset filters",
+    "invalidScenario": "Selected scenario was not found; the default scenario has been loaded.",
+    "vectorLoadError": "Failed to load vector layers",
+    "rasterLoadError": "Failed to load raster layers",
+    "noLayersFound": "No layers found"
+  },
+  "error": {
+    "accessDeniedTitle": "Access denied",
+    "accessDeniedDescription": "Something is wrong with credential. Please log out and log in again.",
+    "tryAgain": "Try again",
+    "returnToHome": "Return to home",
+    "unexpectedError": "An unexpected error occurred.",
+    "pageNotFound": "Page not found",
+    "modelNotFound": "Model not found",
+    "accessNotAllowed": "Access not allowed"
   },
   "downloads": {
     "title": "Downloads",
     "searchPlaceholder": "Search datasets...",
-    "noData": "No data found",
+    "downloadItem": "Download {{label}}",
+    "noData": "No data found. Please try later.",
     "source": "Source:",
     "updated": "Updated:",
     "download": "Download",
     "filterModels": "Filter by Model",
     "reset": "Reset",
+    "vectorLoadError": "Failed to load vector datasets",
+    "rasterLoadError": "Failed to load raster datasets",
+    "referenceLoadError": "Failed to load reference datasets",
     "dataType": {
       "vector": "Vector",
       "raster": "Raster",
@@ -100,7 +130,64 @@
     "legend": "Legend",
     "additionalLayers": "Additional layers",
     "rasterMin": "Min: {{value}}",
-    "rasterMax": "Max: {{value}}"
+    "rasterMax": "Max: {{value}}",
+    "share": "Share",
+    "shareLink": "Share link",
+    "urlCopied": "URL copied",
+    "basemap": "Basemap",
+    "changeBasemap": "Change basemap",
+    "layerInfo": "Layer info",
+    "removeLayer": "Remove layer",
+    "centerMap": "Center map",
+    "opacity": "Opacity: {{value}}%",
+    "navigateTitle": "Navigate to cluster, site, or coordinates",
+    "navigatePlaceholder": "Enter cluster ID or lat, lng…",
+    "navigateAriaLabel": "Navigate to cluster or coordinates",
+    "navigateHelperText": "Coordinates must be in <em>lat, lng</em> format",
+    "navigateCoordsError": "Coordinates out of range. Latitude must be between -90 and 90, longitude between -180 and 180.",
+    "noDescription": "No description available."
+  },
+  "tour": {
+    "back": "Back",
+    "close": "Close",
+    "finish": "Finish",
+    "next": "Next",
+    "nextWithProgress": "Next ({current} of {total})",
+    "skip": "Skip tour",
+    "openTour": "Open guided tour",
+    "dontShowAgain": "Don't show this tour automatically again",
+    "step1": {
+      "title": "Welcome to the Integrated Energy Planning Platform",
+      "content": "This platform allows you to explore energy access modelling results for Mozambique. You can visualise least-cost electrification pathways, filter by geography and attributes, and inspect summary statistics for any area."
+    },
+    "step2": {
+      "title": "Select a Model",
+      "content": "Use the sidebar icons to switch between available planning models. Each model represents a distinct analytical scenario or dataset."
+    },
+    "step3": {
+      "title": "Choose a Scenario",
+      "content": "Each model may contain multiple scenarios — for example, different investment horizons or policy assumptions. Use this dropdown to switch between them."
+    },
+    "step4": {
+      "title": "Apply Filters",
+      "content": "Use the Controls panel to filter settlements by attributes such as distance to infrastructure, population size, or administrative area. Adjust the values and press Apply to update the map and summary."
+    },
+    "step5": {
+      "title": "Explore the Map",
+      "content": "The map updates to reflect your active filters. Each point represents a settlement, coloured by the least-cost electrification technology. Click any settlement to inspect it individually."
+    },
+    "step6": {
+      "title": "National Summary",
+      "content": "The summary panel shows aggregated statistics for all settlements currently visible given your filters — including technology breakdowns, population, and projected connections."
+    },
+    "step7": {
+      "title": "Cluster Detail",
+      "content": "When you select an individual settlement, the summary panel switches to show its specific attributes — such as coordinates, population, and the recommended electrification technology."
+    },
+    "step8": {
+      "title": "Additional Layers",
+      "content": "Switch to the Layers tab to toggle contextual map layers such as administrative boundaries, grid infrastructure, or other reference datasets."
+    }
   },
   "breadcrumbs": {
     "about": "About",

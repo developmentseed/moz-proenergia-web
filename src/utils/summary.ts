@@ -15,6 +15,8 @@ function makeGroupOrChartRow(
       type: "highlight",
       label: field.label,
       description: field.description,
+      label_pt: field.label_pt,
+      description_pt: field.description_pt,
       unit: field.unit,
       value: items,
       methodTotal,
@@ -37,6 +39,8 @@ function makeGroupOrChartRow(
       chartType: field.chartType,
       label: makeLabel(field.label),
       description: field.description,
+      label_pt: field.label_pt,
+      description_pt: field.description_pt,
       unit: field.unit,
       value: items,
       average,
@@ -50,7 +54,9 @@ function makeGroupOrChartRow(
   return {
     type: "group",
     label: makeLabel(field.label),
+    label_pt: field.label_pt,
     description: field.description,
+    description_pt: field.description_pt,
     unit: field.unit,
     value: items,
     methodTotal,
@@ -66,7 +72,9 @@ function makeNestedGroup(
   return {
     type: "nested-group",
     label: makeLabel(field.label),
+    label_pt: field.label_pt,
     description: field.description,
+    description_pt: field.description_pt,
     unit: field.unit,
     value: groups,
     methodTotal,
@@ -137,6 +145,8 @@ export function transformFieldSummary(
       key: column,
       label: field.label,
       description: field.description,
+      label_pt: field.label_pt,
+      description_pt: field.description_pt,
       value: 0,
       unit: field.unit,
       hasDecimal: field.hasDecimal,
@@ -176,9 +186,12 @@ export function transformFieldSummary(
       return {
         type: "highlight",
         label: field.label,
+        label_pt: field.label_pt,
         description: field.description,
+        description_pt: field.description_pt,
         unit: field.unit,
         value: [{ key: column, label: makeLabel(column), value: getNumericValue(summary, methodName) }],
+        hasDecimal: field.hasDecimal,
       };
     }
 
@@ -187,6 +200,8 @@ export function transformFieldSummary(
       key: column,
       label: makeLabel(field.label),
       description: field.description,
+      label_pt: field.label_pt,
+      description_pt: field.description_pt,
       value: getNumericValue(summary, methodName),
       unit: field.unit,
       hasDecimal: field.hasDecimal,

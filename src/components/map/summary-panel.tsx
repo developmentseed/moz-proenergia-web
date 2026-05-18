@@ -2,8 +2,8 @@ import { memo, useState, useEffect } from "react";
 import { Box, Flex, Text, IconButton, Link } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { api } from "@/utils/api";
-import { fetchModels, slugify } from "@/utils/data-transformation";
-import { useAuth } from "@/utils/context/auth";
+import { slugify } from "@/utils/data-transformation";
+import { useModels } from "@/hooks/use-models";
 import { useModel } from "@/utils/context/model";
 import { LuChevronLeft, LuChevronsUpDown, LuChevronsDownUp } from "react-icons/lu";
 import { useQuery } from "@tanstack/react-query";
@@ -15,6 +15,7 @@ import { SummaryTable } from "@/components/chakra/summary-table";
 import { useSummaryQuery } from "@/hooks/use-summary-query";
 import { AnimationTime, ControlPanelWidth } from "../ui/main-panel";
 import { useTranslation } from "react-i18next";
+import { useLocalize } from "@/utils/i18n";
 import MapNavigator from "./map-navigator";
 
 interface SummaryPanelProps {
@@ -75,12 +76,9 @@ interface RelatedModelsProps {
 
 const RelatedModels = ({ clusterId }: RelatedModelsProps) => {
   const { model } = useModel();
-  const { token } = useAuth();
-  const { data: models } = useQuery({
-    queryKey: ["models", token],
-    queryFn: ({ signal }) => fetchModels(signal, token),
-  });
+  const { data: models } = useModels();
   const { t } = useTranslation();
+  const localize = useLocalize();
 
   const currentModelData = models?.find((m) => String(m.id) === model.id);
   const currentVectorDatasetId = currentModelData?.scenarios[0]?.vector_dataset?.id;
@@ -107,7 +105,7 @@ const RelatedModels = ({ clusterId }: RelatedModelsProps) => {
           _hover={{ textDecoration: "underline" }}
         >
           <NextLink href={`/model/${slugify(m.name)}?cluster=${clusterId}`}>
-            {m.name}
+            {localize(m.name, m.name_pt)}
           </NextLink>
         </Link>
       ))}
@@ -126,7 +124,11 @@ function transformClusterData(
       key: field.columns[0],
       label: field.label,
       description: field.description,
+      label_pt: field.label_pt,
+      description_pt: field.description_pt,
       value: data[field.columns[0]],
+      unit: field.unit,
+      hasDecimal: field.hasDecimal,
     }));
 }
 
@@ -179,6 +181,7 @@ const SummaryPanel = ({
       fetchClusterData(scenarioId, clusterId!, popupFields, signal),
     retry: false,
     enabled: !!clusterId,
+    throwOnError: false,
   });
 
   // Defer summary fetches so map tiles get network priority
@@ -286,6 +289,7 @@ const SummaryPanel = ({
 
       {/* Desktop: right panel with width animation */}
       <Box
+        data-tour="summary-panel"
         display={{ base: "none", md: "flex" }}
         {...mapControlCommonStyleProps}
         position="relative"

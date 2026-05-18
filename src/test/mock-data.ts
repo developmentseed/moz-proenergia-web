@@ -17,6 +17,8 @@ export const mockModel: ModelMetadata = {
     id: "main",
     column: "main_col",
     label: "Main",
+    description: null,
+    description_pt: null,
     options: [{ id: "a", label: "A", color: "#000" }],
   },
   filters: [

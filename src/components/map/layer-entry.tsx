@@ -72,9 +72,9 @@ export function LayerEntry({
             {label}
           </Text>
           <HStack gap={0} flexShrink={0}>
-            <Tooltip content="Layer info" positioning={{ placement: "top" }}>
+            <Tooltip content={t('map.layerInfo')} positioning={{ placement: "top" }}>
               <IconButton
-                aria-label="Layer info"
+                aria-label={t('map.layerInfo')}
                 size="2xs"
                 variant="ghost"
                 onClick={() => setInfoOpen(true)}
@@ -93,9 +93,9 @@ export function LayerEntry({
               </IconButton>
             </OpacityControl>
 
-            <Tooltip content="Remove layer" positioning={{ placement: "top" }}>
+            <Tooltip content={t('map.removeLayer')} positioning={{ placement: "top" }}>
               <IconButton
-                aria-label="Remove layer"
+                aria-label={t('map.removeLayer')}
                 size="2xs"
                 variant="ghost"
                 onClick={() => switchLayer(id)}

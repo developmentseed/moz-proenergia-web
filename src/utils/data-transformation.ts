@@ -5,7 +5,6 @@ import { Filter, FilterType, ModelMetadata, ModelGroupMetadata, Field, MapItemUn
 import { api, MEDIA_URL_PREFIX, DEFAULT_COL } from '@/utils/api';
 import { sortFilterOptions } from '@/config/filters';
 import mapConfig from '@/config/map.json';
-import { registerI18nResource } from '@/utils/i18n';
 const ADMIN_COLUMNS = [
   "Admin_1",
   "Admin_2",
@@ -32,14 +31,36 @@ const ADMIN_COLUMNS = [
 // ----- API Response Types -----
 export interface ApiFilterField {
   label: string;
+  label_pt?: string;
   column: string;
   description: string;
+  description_pt?: string;
+  unit?: string;
+  hasDecimal?: boolean;
+}
+
+export interface ApiField {
+  columns: string[];
+  label: string;
+  label_pt?: string;
+  description?: string;
+  description_pt?: string;
+  category?: string;
+  group_by?: string[];
+  method?: 'count' | 'min' | 'max' | 'sum' | 'average';
+  unit?: string;
+  chartType?: 'bar' | 'donut' | 'stacked' | 'highlight';
+  colors?: Record<string, string>;
+  showChartValueRows?: boolean;
+  showBarChartAverage?: boolean;
+  hasDecimal?: boolean;
 }
 
 export interface ApiScenario {
   id: number;
   name: string;
   name_pt?: string;
+  presentation_order?: number;
   description?: string;
   description_pt?: string;
   model_file: string | null;
@@ -57,9 +78,11 @@ export interface ApiModelResponse {
   description_pt?: string;
   filter_fields: ApiFilterField[];
   popup_fields: ApiFilterField[];
-  summary_fields: Field[];
+  summary_fields: ApiField[];
   scenarios: ApiScenario[];
   visualization_column: string | null; // for main column
+  visualization_column_description: string | null;
+  visualization_column_description_pt: string | null; // for main column
   color_coding: ColorCoding[]
   metric_field_types: Record<string, string>
 }
@@ -200,18 +223,17 @@ export function deriveLayerStyles(sourceId: string, color: string, opacity: numb
   };
 }
 
+export function byPresentationOrder(a: { presentation_order?: number | null }, b: { presentation_order?: number | null }) {
+  if (!a.presentation_order) return 1;
+  if (!b.presentation_order) return -1;
+  return a.presentation_order - b.presentation_order;
+}
+
 export async function fetchModels(signal?: AbortSignal, token?: string| null): Promise<ModelGroupMetadata[]> {
   const { data } = await api.get('model/', { signal, ...(token && {
       headers: { 'Authorization': `Token ${token}` }
     }), });
   const models = data.results as ModelGroupMetadata[];
-
-  models.forEach((m) => {
-    registerI18nResource(`model.${m.id}`, {
-      name: { en: m.name, pt: m.name_pt },
-      description: { en: m.description, pt: m.description_pt },
-    });
-  });
 
   return models;
 }
@@ -234,7 +256,7 @@ export async function fetchVectors({ modelId, token, signal }: { modelId?: strin
       params: { 'model': modelId }
     })
   });
-    const results: ApiFileResult[] = data.results;
+    const results: ApiFileResult[] = data.results.filter((v: ApiFileResult) => v.raw_file);
 
   return results.map((v, idx) => ({
     ...v,
@@ -254,7 +276,7 @@ export async function fetchReferences({ modelId, token, signal }: { modelId?: st
       params: { 'model': modelId }
     })
   });
-  const results: ApiFileResult[] = data.results;
+  const results: ApiFileResult[] = data.results.filter((r: ApiFileResult) => r.raw_file);
 
   return results;
 }
@@ -321,36 +343,25 @@ export function replaceSummaryIdColumn(fields: Field[], metricField: Record<stri
 export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetadata, 'filters' | 'layers'> & { filterFields: ApiFilterField[]; colorCoding: ColorCoding[] } {
   const modelId = String(apiModel.id);
 
-  registerI18nResource(`model.${modelId}`, {
-    name: { en: apiModel.name, pt: apiModel.name_pt },
-    description: { en: apiModel.description, pt: apiModel.description_pt },
-  });
-
   const scenarios: Scenario[] = apiModel.scenarios
-    // @TODO: Filtering LCOE model until performance improvement
-    // .filter(s => s.id !== 1)
     .filter(s => s.model_file !== null)
-    .map(s => {
-      registerI18nResource(`scenario.${s.id}`, {
-        name: { en: s.name, pt: s.name_pt },
-        ...(s.description && { description: { en: s.description, pt: s.description_pt } }),
-      });
+    .toSorted(byPresentationOrder)
+    .map(s => ({
+      id: String(s.id),
+      name: s.name,
+      name_pt: s.name_pt,
+      label: s.name,
+      description: s.description,
+      description_pt: s.description_pt,
+      source: deriveSource(String(s.id), s.model_file!),
+      layer: {
+        id: `${s.id}-main`,
+        source: String(s.id),
+        'source-layer': mapConfig.sourceLayerName,
+        type: 'fill' as const,
+      },
+    }));
 
-      return {
-        id: String(s.id),
-        name: s.name,
-        name_pt: s.name_pt,
-        label: s.name,
-        description: s.description,
-        source: deriveSource(String(s.id), s.model_file!),
-        layer: {
-          id: `${s.id}-main`,
-          source: String(s.id),
-          'source-layer': mapConfig.sourceLayerName,
-          type: 'fill' as const,
-        },
-      };
-    });
   // whwen visuaslization column is empty or null
   const mainColumn = (!apiModel.visualization_column || apiModel.visualization_column === '')? DEFAULT_COL: apiModel.visualization_column;
   const mainField = apiModel.filter_fields.find(f => f.column === mainColumn);
@@ -362,19 +373,26 @@ export function transformModelCore(apiModel: ApiModelResponse): Omit<ModelMetada
     id: slugify(mainColumn) + 'main-ids',
     column: mainColumn,
     label: mainField?.label || makeLabel(mainColumn),
-    description: mainField?.description,
+    label_pt: mainField?.label_pt,
+    description: apiModel.visualization_column_description,
+    description_pt: apiModel.visualization_column_description_pt,
     options: [], // Options fetched separately
   };
 
   return {
     id: modelId,
     title: apiModel.name,
+    title_pt: apiModel.name_pt,
     scenarios,
     main,
     popupFields: apiModel.popup_fields.map(f => ({
       columns: [f.column],
       label: f.label,
+      label_pt: f.label_pt,
       description: f.description,
+      description_pt: f.description_pt,
+      unit: f.unit,
+      hasDecimal: f.hasDecimal,
     })),
     summaryFields: summaryFields,
     filterFields: apiModel.filter_fields,
@@ -387,15 +405,12 @@ export function transformVectorsToLayers(apiVectors: ApiFileResult[]): Layer[] {
   return apiVectors.map(v => {
     const sourceId = String(v.id) + 'vector-source';
 
-    registerI18nResource(`layer.${sourceId}`, {
-      label: { en: v.name, pt: v.name_pt },
-      description: { en: v.description?? '', pt: v.description_pt },
-    });
-
     return {
       id: sourceId,
       label: v.name,
+      label_pt: v.name_pt,
       description: v.description,
+      description_pt: v.description_pt,
       filePath: v.raw_file,
       color: v.color,
       layerType: 'vector' as const,
@@ -418,7 +433,8 @@ export function transformVectorsToLayers(apiVectors: ApiFileResult[]): Layer[] {
 // Transform filter options response to Filter
 export function transformFilterField(
   field: ApiFilterField,
-  rawOptions: string[] | number[] | null
+  rawOptions: string[] | number[] | null,
+  modelId?: string,
 ): Filter {
   const filterType = deriveFilterType(field.column, rawOptions);
   const options = filterType === 'checkbox' ? transformOptions(rawOptions) : rawOptions;
@@ -426,7 +442,9 @@ export function transformFilterField(
     id: slugify(field.column),
     column: field.column,
     label: field.label,
+    label_pt: field.label_pt,
     description: field.description,
+    description_pt: field.description_pt,
     type: filterType,
     options: options
   } as Filter;

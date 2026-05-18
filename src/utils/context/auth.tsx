@@ -45,7 +45,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const logout = () => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USERNAME_KEY);
-    localStorage.removeItem("cache_date");
     setToken(null);
     setUsername(null);
   };
