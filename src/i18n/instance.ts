@@ -7,7 +7,7 @@ i18next.init({
     en: { translation: en },
     pt: { translation: pt },
   },
-  fallbackLng: 'en',
+  fallbackLng: 'pt',
   defaultNS: 'translation',
   interpolation: {
     escapeValue: false,
