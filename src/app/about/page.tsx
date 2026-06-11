@@ -36,7 +36,7 @@ function H3({ children }: ChildrenType) {
 }
 
 function Paragraph({ children }: ChildrenType) {
-  return <Text mb={4} lineHeight="normal">{children}</Text>;
+  return <Text textAlign="justify" mb={4} lineHeight="normal">{children}</Text>;
 }
 
 function UL({ children }: ChildrenType) {
