@@ -29,7 +29,8 @@ export const Header = ({
   logoSrc = `${BASE_PATH}/Emblem_of_Mozambique.svg`,
 }: HeaderProps) => {
   const pathname = usePathname();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const userGuideUrl = i18n.language?.startsWith("pt") ? `${USER_GUIDE_URL}pt/` : USER_GUIDE_URL;
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { isAuthenticated } = useAuth();
 
@@ -46,7 +47,7 @@ export const Header = ({
     return pathname === href + "/";
   };
 
-  const showTourHelpButton = pathname.startsWith("/model")
+  const showTourHelpButton = pathname.startsWith("/model");
 
   return (
     <Box
@@ -109,10 +110,10 @@ export const Header = ({
                   _hover={{ bg: "orange.fg", color: "orange.subtle" }}
                   title={item.title}
                 >
-                    <NextLink href={item.href}>
-                      {item.icon}
-                      {item.label}
-                    </NextLink>
+                  <NextLink href={item.href}>
+                    {item.icon}
+                    {item.label}
+                  </NextLink>
                 </Button>
               );
             })}
@@ -130,7 +131,7 @@ export const Header = ({
                 _hover={{ bg: "orange.fg", color: "orange.subtle" }}
                 title={t('nav.userGuideTitle')}
               >
-                <a href={USER_GUIDE_URL} target="_blank" rel="noopener noreferrer">
+                <a href={userGuideUrl} target="_blank" rel="noopener noreferrer">
                   <LuBookOpen size={20} />
                   {t('nav.userGuide')}
                 </a>
@@ -172,19 +173,19 @@ export const Header = ({
                         {navigationItems.map((item) => {
                           if (item.href === "/downloads" && !isAuthenticated) return null;
                           return (
-                          <Link
-                            key={item.href}
-                            fontSize="sm"
-                            fontWeight={isActive(item.href) ? "bold" : "medium"}
-                            color={isActive(item.href) ? "fg" : "fg.muted"}
-                            asChild
-                            _hover={{ textDecoration: "none", color: "fg" }}
-                            onClick={() => setDrawerOpen(false)}
-                            title={item.title}
+                            <Link
+                              key={item.href}
+                              fontSize="sm"
+                              fontWeight={isActive(item.href) ? "bold" : "medium"}
+                              color={isActive(item.href) ? "fg" : "fg.muted"}
+                              asChild
+                              _hover={{ textDecoration: "none", color: "fg" }}
+                              onClick={() => setDrawerOpen(false)}
+                              title={item.title}
                           >
-                            <NextLink href={item.href}>{item.icon}{item.label}</NextLink>
-                          </Link>
-                        )})}
+                              <NextLink href={item.href}>{item.icon}{item.label}</NextLink>
+                            </Link>
+                        );})}
                         {USER_GUIDE_URL && (
                           <Link
                             fontSize="sm"

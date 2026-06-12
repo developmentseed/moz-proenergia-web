@@ -6,12 +6,14 @@ import LoginForm from "../login-form";
 import { useAuth } from "@/utils/context/auth";
 import { LuExternalLink, LuCircleUserRound, LuLogOut, LuLogIn } from "react-icons/lu";
 import { zIndex } from "@/components/ui/constant";
-import { SDI_PORTAL_URL } from "@/config/website";
+import { SDI_PORTAL_BASE_URL } from "@/config/website";
 import { useTranslation } from "react-i18next";
 
 const DropdownMenu = () => {
   const { login, logout, isAuthenticated, username } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.startsWith("pt") ? "pt" : "en";
+  const adminURL = `${SDI_PORTAL_BASE_URL}${lang}/admin/`;
 
   return (
     <>
@@ -61,7 +63,7 @@ const DropdownMenu = () => {
               </MenuItem>
             )}
             <MenuItem value="sdi-portal" cursor={"pointer"} asChild>
-              <a href={SDI_PORTAL_URL} target="_blank" rel="noopener noreferrer">
+              <a href={adminURL} target="_blank" rel="noopener noreferrer">
                 <LuExternalLink /> {t('nav.sdiPortal')}
               </a>
             </MenuItem>
@@ -74,7 +76,9 @@ const DropdownMenu = () => {
 
 export const DropdownMenuItems = ({ onAction }: { onAction?: () => void }) => {
   const { login, logout, isAuthenticated, username } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.startsWith("pt") ? "pt" : "en";
+  const adminURL = `${SDI_PORTAL_BASE_URL}${lang}/admin/`;
 
   const openLoginModal = () => {
     onAction?.();
@@ -122,7 +126,7 @@ export const DropdownMenuItems = ({ onAction }: { onAction?: () => void }) => {
         fontSize="sm"
         fontWeight="medium"
         color="fg.muted"
-        href={SDI_PORTAL_URL}
+        href={adminURL}
         target="_blank"
         rel="noopener noreferrer"
         display="flex"
