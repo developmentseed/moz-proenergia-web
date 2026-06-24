@@ -360,6 +360,7 @@ const ExplorerContent = ({ modelId }: { modelId: string }) => {
     return {
       id: modelCore.id,
       title: modelCore.title,
+      title_pt: modelCore.title_pt,
       scenarios: modelCore.scenarios,
       main: {
         ...modelCore.main,
