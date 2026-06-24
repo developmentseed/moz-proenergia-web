@@ -104,10 +104,11 @@ function groupByCategory(
 
 function ErrorRowView({ row }: { row: ErrorRow }) {
   const { t } = useTranslation();
+  const localize = useLocalize();
   return (
     <Table.Row key={row.key} {...summaryRowProps}>
       <Table.Cell {...tableCellStyleProps}>
-        <Text textStyle="tableAttr">{row.label}</Text>
+        <Text textStyle="tableAttr">{localize(row.label, row.label_pt)}</Text>
       </Table.Cell>
       <Table.Cell {...tableCellStyleProps}>
         <Text textStyle="tableValue" textAlign="right" color="fg.error">

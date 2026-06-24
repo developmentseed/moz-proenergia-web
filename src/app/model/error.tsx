@@ -22,9 +22,9 @@ export default function ModelError({
     <Center h="calc(100vh - 3.5rem - 1px)">
       <Box textAlign="center">
         <Heading size="2xl">500</Heading>
-        <Text mt={2}>{error.message || 'An unexpected error occurred.'}</Text>
+        <Text mt={2}>{error.message || t('error.unexpectedError')}</Text>
         <Button mt={4} variant="outline" onClick={reset}>
-          Try again
+          {t('error.tryAgain')}
         </Button>
         <Box mt={2} textDecoration="underline">
           <NextLink href="/models">{t('explorer.returnToModels')}</NextLink>
