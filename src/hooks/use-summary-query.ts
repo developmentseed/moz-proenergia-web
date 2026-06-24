@@ -34,6 +34,7 @@ function transformRows(
       return {
         type: "error" as const,
         label: field.label,
+        label_pt: field.label_pt,
         key: field.columns[0],
         category: field.category,
       };

@@ -153,7 +153,7 @@ export const DownloadDataCard = ({
               minW={12}
               mr={1}
             >
-              Source
+              {t('downloads.source')}
             </Text>
             <Heading size="sm" color="fg.muted" fontWeight="bold">
               {source}

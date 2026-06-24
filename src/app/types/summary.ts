@@ -90,6 +90,7 @@ export interface ChartRow {
 export interface ErrorRow {
   type: "error";
   label: string;
+  label_pt?: string;
   key: string;
   category?: string;
 }
