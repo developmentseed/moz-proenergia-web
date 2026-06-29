@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import {
   Map,
   ViewStateChangeEvent,
@@ -158,4 +158,4 @@ const MainMap = ({ main, onClick, clusterId, onFlyToRef }: MainMapProps) => {
   );
 };
 
-export default MainMap;
+export default memo(MainMap);

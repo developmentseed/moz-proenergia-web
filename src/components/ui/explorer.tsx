@@ -89,6 +89,10 @@ const ExplorerInner = () => {
     setSelected(null);
   }, [setSelected]);
 
+  const onFlyTo = useCallback((lng: number, lat: number) => {
+    flyToRef.current?.(lng, lat);
+  }, []);
+
   useEffect(() => {
     if (selected !== null) {
       openSummary();
@@ -230,7 +234,7 @@ const ExplorerInner = () => {
           clusterId={selected}
           scenarioId={scenarioId}
           onSelectCluster={setSelected}
-          onFlyTo={(lng, lat) => flyToRef.current?.(lng, lat)}
+          onFlyTo={onFlyTo}
           popupFields={model.popupFields}
           summaryFields={model.summaryFields}
           filters={updatedFilters}
