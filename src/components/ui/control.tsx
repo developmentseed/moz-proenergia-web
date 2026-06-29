@@ -218,6 +218,7 @@ const ControlsPanel = () => {
               defaultValue={["b"]}
               size="sm"
               variant="plain"
+              lazyMount={true}
             >
               {collapsibleGroups.map((group) => (
                 <CollapsibleGroup collapsibleItem={group} key={group.title} />
