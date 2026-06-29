@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Box,
   Stack,
@@ -48,7 +49,10 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
       }
       setSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('auth.login.error', 'Login failed. Please try again.'));
+      const apiMessage = axios.isAxiosError<{ non_field_errors?: string[] }>(err)
+        ? err.response?.data?.non_field_errors?.[0]
+        : undefined;
+      setError(apiMessage ?? t('auth.login.error', 'Login failed. Please try again.'));
     } finally {
       setIsLoading(false);
     }
