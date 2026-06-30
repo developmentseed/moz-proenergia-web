@@ -14,11 +14,15 @@ Install dependencies:
 pnpm install
 ```
 
-You need to set up Mapbox token in your env file to be able to run the application locally. Save your token in `.env` as `NEXT_PUBLIC_MAPBOX_TOKEN`.
+You need to set up Mapbox token and energia endpoint in your env file to be able to run the application locally. Save your token in `.env` as `NEXT_PUBLIC_MAPBOX_TOKEN`.
 
 ```.env
+NEXT_PUBLIC_ENERGIA_ENDPOINT=ENDPOINT_WITHOUT_SLASH 
 NEXT_PUBLIC_MAPBOX_TOKEN=YOUR_MAPBOX_TOKEN
 ```
+
+For `NEXT_PUBLIC_ENERGIA_ENDPOINT`, make sure that the URL doesn't have a slash at the end. 
+ex. 🟢 https://api.example.com ,❌ https://api.example.com/ 
 
 After installing dependencies and setting up Mapbox token, run the development server:
 
