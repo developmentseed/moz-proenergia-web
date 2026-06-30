@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Accordion, Box, VStack, HStack, Text, Separator, ScrollArea, IconButton } from '@chakra-ui/react';
-import { LuInfo, LuDroplet, LuChevronUp } from 'react-icons/lu';
+import { LuInfo, LuDroplet } from 'react-icons/lu';
 import { ModalDialog } from '@/components/chakra/modal';
 import { type MapItemUnit, type Main } from '@/app/types';
 import { useContextualLayers } from '@/utils/context/contextual-layers';
@@ -27,6 +27,14 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
 
   const [mainOpacity, setMainOpacity] = useState(100);
   const [mainInfoOpen, setMainInfoOpen] = useState(false);
+  const [legendOpen, setLegendOpen] = useState(true);
+
+  // Collapsed by default on mobile; keep it open on desktop
+  useEffect(() => {
+    if (!window.matchMedia("(min-width: 768px)").matches) {
+      setLegendOpen(false);
+    }
+  }, []);
 
   const handleMainOpacity = (opacity: number) => {
     setMainOpacity(opacity);
@@ -44,15 +52,19 @@ export function Legend({ items, main, onMainOpacityChange }: LegendProps) {
         zIndex={zIndex.mapControl}
         minW="150px"
       >
-        <Accordion.Root collapsible defaultValue={["legend"]} size="sm" variant="plain">
+        <Accordion.Root
+          collapsible
+          value={legendOpen ? ["legend"] : []}
+          onValueChange={({ value }) => setLegendOpen(value.includes("legend"))}
+          size="sm"
+          variant="plain"
+        >
           <Accordion.Item value="legend" border="none">
             <Accordion.ItemTrigger display="flex" gap="2" alignItems="center" width="100%" p={0}>
               <Text textStyle="subTitle" mr="auto">
                 {t('map.legend')}
               </Text>
-              <Accordion.ItemIndicator>
-                <LuChevronUp />
-              </Accordion.ItemIndicator>
+              <Accordion.ItemIndicator />
             </Accordion.ItemTrigger>
             <Accordion.ItemContent>
               <VStack align="stretch" gap={2} pt={2}>
