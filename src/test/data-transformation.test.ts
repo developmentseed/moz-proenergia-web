@@ -166,7 +166,7 @@ describe('data-transformation', () => {
       expect(result).toEqual({
         id: 'source-1',
         type: 'vector',
-        minzoom: 5,
+        minzoom: 4.5,
         url: `pmtiles://${MEDIA_URL_PREFIX}https://example.com/data.pmtiles`,
       });
     });
