@@ -3,10 +3,14 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, cleanup, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "@/components/chakra/provider";
+import { I18nProvider } from "@/i18n/provider";
+import i18n from "@/i18n/config";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 const Wrapper = ({ children }: { children: ReactNode }) => (
-  <Provider>{children}</Provider>
+  <Provider>
+    <I18nProvider>{children}</I18nProvider>
+  </Provider>
 );
 
 // Component that throws on render
@@ -17,6 +21,7 @@ const Bomb = ({ shouldThrow }: { shouldThrow: boolean }) => {
 
 // Suppress jsdom console.error noise from intentional throws
 beforeEach(() => {
+  i18n.changeLanguage("en");
   vi.spyOn(console, "error").mockImplementation(() => {});
 });
 afterEach(() => {
