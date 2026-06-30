@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { FilterType } from '@/app/types';
+import { MEDIA_URL_PREFIX } from '@/utils/api';
 import {
   deriveFilterType,
   slugify,
@@ -165,15 +166,15 @@ describe('data-transformation', () => {
       expect(result).toEqual({
         id: 'source-1',
         type: 'vector',
-        minzoom: 5,
-        url: 'pmtiles://https://proenergia-staging.ds.io/media/https://example.com/data.pmtiles',
+        minzoom: 4.5,
+        url: `pmtiles://${MEDIA_URL_PREFIX}https://example.com/data.pmtiles`,
       });
     });
 
     it('should replace any file extension with .pmtiles', () => {
-      expect(deriveSource('id', 'file.json').url).toBe('pmtiles://https://proenergia-staging.ds.io/media/file.pmtiles');
-      expect(deriveSource('id', 'file.csv').url).toBe('pmtiles://https://proenergia-staging.ds.io/media/file.pmtiles');
-      expect(deriveSource('id', 'path/to/file.geojson').url).toBe('pmtiles://https://proenergia-staging.ds.io/media/path/to/file.pmtiles');
+      expect(deriveSource('id', 'file.json').url).toBe(`pmtiles://${MEDIA_URL_PREFIX}file.pmtiles`);
+      expect(deriveSource('id', 'file.csv').url).toBe(`pmtiles://${MEDIA_URL_PREFIX}file.pmtiles`);
+      expect(deriveSource('id', 'path/to/file.geojson').url).toBe(`pmtiles://${MEDIA_URL_PREFIX}path/to/file.pmtiles`);
     });
 
     it('should use provided id', () => {

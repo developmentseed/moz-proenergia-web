@@ -2,8 +2,8 @@ import axios from 'axios';
 import { toaster } from '@/components/chakra/toaster';
 import i18next from 'i18next';
 
-export const API_ENDPOINT = 'https://proenergia-staging.ds.io/api/v1/';
-export const MEDIA_URL_PREFIX = 'https://proenergia-staging.ds.io/media/';
+export const API_ENDPOINT = `${process.env.NEXT_PUBLIC_ENERGIA_ENDPOINT}/api/v1/`;
+export const MEDIA_URL_PREFIX = `${process.env.NEXT_PUBLIC_ENERGIA_ENDPOINT}/media/`;
 
 //@TODO
 export const STALE_TIME = 600000; // 1 hour
