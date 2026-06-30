@@ -39,6 +39,8 @@
       "submit": "Sign In",
       "submitting": "Signing in...",
       "validationError": "Please fill in all fields",
+      "missingCredentials": "Must include \"username\" and \"password\".",
+      "invalidCredentials": "Unable to log in with provided credentials.",
       "success": "Login successful!"
     },
     "logout": {

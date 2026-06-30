@@ -11,11 +11,20 @@ import {
 } from '@chakra-ui/react';
 import { LoginResponse } from '@/utils/context/auth';
 import { useTranslation } from 'react-i18next';
+import { isAxiosError } from 'axios';
 
 interface LoginModalProps {
   onSubmit?: (username: string, password: string) => void | Promise<LoginResponse>;
   onClose?: () => void;
 }
+
+const normalizeErrorMessage = (message: string) =>
+  message.normalize('NFC').toLowerCase().trim();
+
+const NON_FIELD_ERROR_KEYS: Record<string, string> = {
+  [normalizeErrorMessage('Must include "username" and "password".')]: 'auth.login.missingCredentials',
+  [normalizeErrorMessage('Unable to log in with provided credentials.')]: 'auth.login.invalidCredentials',
+};
 
 export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
   const [username, setUsername] = useState('');
@@ -48,7 +57,13 @@ export const LoginModalContent = ({ onSubmit, onClose }: LoginModalProps) => {
       }
       setSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('auth.login.error', 'Login failed. Please try again.'));
+      const nonFieldError = isAxiosError(err) ? err.response?.data?.non_field_errors?.[0] : undefined;
+      const translationKey = nonFieldError && NON_FIELD_ERROR_KEYS[normalizeErrorMessage(nonFieldError)];
+      if (translationKey) {
+        setError(t(translationKey));
+      } else {
+        setError(err instanceof Error ? err.message : t('auth.login.error', 'Login failed. Please try again.'));
+      }
     } finally {
       setIsLoading(false);
     }

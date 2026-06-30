@@ -39,6 +39,8 @@
       "submit": "Entrar",
       "submitting": "Entrando...",
       "validationError": "Por favor preencha todos os campos",
+      "missingCredentials": "Deve incluir o \"utilizador\" e a \"senha\".",
+      "invalidCredentials": "Não foi possível entrar com as credenciais fornecidas.",
       "success": "Login realizado com sucesso!"
     },
     "logout": {
