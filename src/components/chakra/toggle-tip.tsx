@@ -37,6 +37,7 @@ export const ToggleTip = React.forwardRef<HTMLDivElement, ToggleTipProps>(
           <ChakraPopover.Positioner>
             <ChakraPopover.Content
               width="auto"
+              maxW={{ base: "calc(100dvw - 1rem)", sm: "xs" }}
               px="2"
               py="1"
               textStyle="xs"
