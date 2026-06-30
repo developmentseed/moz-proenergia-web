@@ -27,7 +27,7 @@ export default function NotFound() {
   // Not a /model/[slug] path — show normal 404
   if (slug === null) {
     return (
-      <Center h="calc(100vh - 3.5rem - 1px)">
+      <Center h="calc(100dvh - 3.5rem - 1px)">
         <Box textAlign="center">
           <Heading size="2xl">404</Heading>
           <Text mt={2}>{t('error.pageNotFound')}</Text>
@@ -38,7 +38,7 @@ export default function NotFound() {
 
   if (isLoading) {
     return (
-      <Center h="calc(100vh - 3.5rem - 1px)">
+      <Center h="calc(100dvh - 3.5rem - 1px)">
         <Spinner colorPalette="orange" color="colorPalette.600" size="xl" />
       </Center>
     );
@@ -51,7 +51,7 @@ export default function NotFound() {
   // URL matched /model/[slug] but no model found in API
   if (!model) {
     return (
-      <Center h="calc(100vh - 3.5rem - 1px)">
+      <Center h="calc(100dvh - 3.5rem - 1px)">
         <Box textAlign="center">
           <Heading size="2xl">404</Heading>
           <Text mt={2}>{t('error.modelNotFound')}</Text>
@@ -62,7 +62,7 @@ export default function NotFound() {
   // Finally, return explorer page if model was found
   return (
     <MapCoordsProvider>
-      <Flex h="calc(100vh - 3.5rem - 1px)" maxH="calc(100vh - 3.5rem - 1px)" overflow="hidden" width="100%">
+      <Flex h="calc(100dvh - 3.5rem - 1px)" maxH="calc(100dvh - 3.5rem - 1px)" overflow="hidden" width="100%">
         <SideNav models={models!} currentSlug={slug} />
         <Box id='main-panel' width='full' height="100%">
           <Explorer modelId={model.id} />

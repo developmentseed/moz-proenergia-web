@@ -31,7 +31,7 @@ export default async function ModelPage({
   }
 
   return (
-    <Flex h="calc(100vh - 3.5rem - 1px)" maxH="calc(100vh - 3.5rem - 1px)" overflow="hidden" width="100%">
+    <Flex h="calc(100dvh - 3.5rem - 1px)" maxH="calc(100dvh - 3.5rem - 1px)" overflow="hidden" width="100%">
       <Suspense>
         <SideNav models={models} currentSlug={slug} />
         <Box id='main-panel' width='full' height="100%">
