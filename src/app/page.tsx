@@ -10,7 +10,7 @@ export default function Home() {
   const { t } = useTranslation();
 
   return (
-    <Box h="calc(100vh - 57px)" display="flex">
+    <Box h="calc(100dvh - 57px)" display="flex">
       <Box
         flex={1}
         display="flex"

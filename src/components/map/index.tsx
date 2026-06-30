@@ -10,7 +10,7 @@ import {
 import { Box, Flex } from "@chakra-ui/react";
 import * as pmtiles from "pmtiles";
 import maplibregl from "maplibre-gl";
-import { type RequestTransformFunction } from "maplibre-gl";
+import { type RequestTransformFunction, type MapLibreEvent } from "maplibre-gl";
 import {
   isMapboxURL,
   transformMapboxUrl,
@@ -110,9 +110,10 @@ const MainMap = ({ main, onClick, clusterId, onFlyToRef }: MainMapProps) => {
             padding: { top: 20, bottom: 20, left: 20, right: 20 },
           }}
           dragRotate={false}
-          touchZoomRotate={false}
+          touchPitch={false}
           minZoom={mapConfig.minZoom}
           style={{ width: "100%", height: "100%" }}
+          onLoad={(e: MapLibreEvent) => e.target.touchZoomRotate.disableRotation()}
           onClick={onClick}
           onMoveEnd={(e: ViewStateChangeEvent) => {
             setCoords({

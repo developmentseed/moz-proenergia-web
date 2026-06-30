@@ -19,7 +19,7 @@ export default function ModelError({
   }, [error]);
 
   return (
-    <Center h="calc(100vh - 3.5rem - 1px)">
+    <Center h="calc(100dvh - 3.5rem - 1px)">
       <Box textAlign="center">
         <Heading size="2xl">500</Heading>
         <Text mt={2}>{error.message || t('error.unexpectedError')}</Text>
