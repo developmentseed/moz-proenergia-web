@@ -30,10 +30,13 @@ export const SideNav = ({ models: initialModels, currentSlug }: SideNavProps) =>
   const localize = useLocalize();
   const { token } = useAuth();
 
-  const { data: models = initialModels } = useQuery({
+  const { data: models } = useQuery({
     queryKey: ['models', token],
     queryFn: ({ signal }) => fetchModels(signal, token),
-    initialData: initialModels,
+    // placeholderData (not initialData) — shows the build-time model list
+    // instantly without marking the query "already fetched", so the live
+    // fetch still runs immediately and replaces it once it resolves.
+    placeholderData: initialModels,
     throwOnError: false,
   });
   // Only carry coordinate params (lat, lng, zoom) to model links
