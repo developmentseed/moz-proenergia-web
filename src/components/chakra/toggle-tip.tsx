@@ -74,6 +74,12 @@ export const InfoTip = (props: InfoTipProps) => {
           size="2xs"
           colorPalette="gray"
           {...buttonProps}
+          onClick={(e) => {
+            // Prevent the click from also triggering an enclosing
+            // interactive element (e.g. an Accordion.ItemTrigger).
+            e.stopPropagation();
+            buttonProps?.onClick?.(e);
+          }}
         >
           <LuInfo />
         </IconButton>
