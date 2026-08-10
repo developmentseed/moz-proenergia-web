@@ -20,14 +20,20 @@ export function truncatedClean(str: string | null, maxLength: number) {
   return truncated;
 }
 
+// Matches ISO 8601 dates/datetimes only, e.g. "2023-01-15" or
+// "2023-01-15T10:30:00Z". `new Date(str)` is too lenient for arbitrary
+// strings (e.g. it parses "EPSG:3857" as the year 3857), so we only
+// attempt parsing when the string already looks like an ISO date.
+const ISO_DATE_REGEX =
+  /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})?)?$/;
+
 /**
- * Formats a string as a date if it is a valid date string.
+ * Formats a string as a date if it is a valid ISO 8601 date string.
  * @param value - The value to check and potentially format.
  * @returns The formatted date string or the original value.
  */
 export function formatIfDate(value: any): string | any {
-  // Check if value is a string and not just a numeric string
-  if (typeof value === 'string' && isNaN(Number(value))) {
+  if (typeof value === 'string' && ISO_DATE_REGEX.test(value)) {
     const date = new Date(value);
 
     // Check if the date object is valid using .getTime()
@@ -36,6 +42,6 @@ export function formatIfDate(value: any): string | any {
       return date.toLocaleDateString();
     }
   }
-  
+
   return value; // Return original if not a date
 }
