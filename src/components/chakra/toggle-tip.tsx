@@ -73,12 +73,27 @@ export const InfoTip = (props: InfoTipProps) => {
           aria-label="info"
           size="2xs"
           colorPalette="gray"
+          // Rendered as a span (not a button) because this is meant to sit
+          // inside other interactive elements (e.g. an Accordion.ItemTrigger),
+          // and nested <button>s are invalid HTML. role/tabIndex/onKeyDown
+          // below restore the keyboard behavior a real button gets for free.
+          as="span"
+          role="button"
+          tabIndex={0}
           {...buttonProps}
           onClick={(e) => {
             // Prevent the click from also triggering an enclosing
             // interactive element (e.g. an Accordion.ItemTrigger).
             e.stopPropagation();
             buttonProps?.onClick?.(e);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              e.stopPropagation();
+              e.currentTarget.click();
+            }
+            buttonProps?.onKeyDown?.(e);
           }}
         >
           <LuInfo />

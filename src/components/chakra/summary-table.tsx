@@ -1,4 +1,4 @@
-import { Accordion, Box, Table, Text, Flex } from "@chakra-ui/react";
+import { Accordion, Box, Table, Text } from "@chakra-ui/react";
 import { LuChevronUp } from "react-icons/lu";
 import { SummaryTableSkeleton } from "@/components/chakra/summary-table-skeleton";
 import { InfoTip } from "./toggle-tip";
