@@ -58,7 +58,7 @@ export const SideNav = ({ models: initialModels, currentSlug }: SideNavProps) =>
       zIndex={zIndex.sideNav}
     >
       <VStack p={2} gap={2} align="center">
-        {models.map((model) => {
+        {models?.map((model) => {
           const modelSlug = slugify(model.name);
           const isActive = modelSlug === currentSlug;
           const iconPath = getIconPath(model.id);
