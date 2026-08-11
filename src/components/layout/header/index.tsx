@@ -47,7 +47,7 @@ export const Header = ({
     return pathname === href + "/";
   };
 
-  const showTourHelpButton = pathname.startsWith("/model");
+  const showTourHelpButton = pathname.startsWith("/model/");
 
   return (
     <Box
