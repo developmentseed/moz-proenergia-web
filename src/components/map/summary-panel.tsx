@@ -1,6 +1,6 @@
 import { memo, useState, useEffect } from "react";
 import { Box, Flex, Text, IconButton, Link } from "@chakra-ui/react";
-import NextLink from "next/link";
+import NextLink from "@/components/localized-link";
 import { api } from "@/utils/api";
 import { slugify } from "@/utils/data-transformation";
 import { useModels } from "@/hooks/use-models";

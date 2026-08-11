@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { Center, Box, Heading, Text, Button } from '@chakra-ui/react';
-import NextLink from 'next/link';
+import NextLink from '@/components/localized-link';
 import { useTranslation } from 'react-i18next';
 
 export default function AppError({
