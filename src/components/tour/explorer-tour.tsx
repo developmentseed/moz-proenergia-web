@@ -57,16 +57,18 @@ export function ExplorerTour() {
     if (optOut) return;
 
     const alreadyCounted = sessionStorage.getItem(TOUR_SESSION_KEY) === "true";
+    let newVisits: number;
     if (!alreadyCounted) {
       sessionStorage.setItem(TOUR_SESSION_KEY, "true");
       const visits = parseInt(localStorage.getItem(TOUR_VISITS_KEY) ?? "0", 10);
-      const newVisits = visits + 1;
+      newVisits = visits + 1;
       localStorage.setItem(TOUR_VISITS_KEY, String(newVisits));
-
-      if (newVisits <= MAX_AUTO_SHOW_VISITS) {
-        const id = setTimeout(() => startTour(false), 900);
-        return () => clearTimeout(id);
-      }
+    } else {
+      newVisits = parseInt(localStorage.getItem(TOUR_VISITS_KEY) ?? "0", 10);
+    }
+    if (newVisits <= MAX_AUTO_SHOW_VISITS) {
+      const id = setTimeout(() => startTour(false), 900);
+      return () => clearTimeout(id);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
