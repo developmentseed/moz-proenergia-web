@@ -29,6 +29,8 @@ export const SummaryStackedBarChart = ({ data, colorMap, unit }: SummaryStackedB
           <Tooltip
             key={item.name}
             positioning={{ placement: "top" }}
+            openDelay={0}
+            closeDelay={0}
             contentProps={{
               bg: "bg.panel",
               color: "fg",
