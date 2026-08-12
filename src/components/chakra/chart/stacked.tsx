@@ -1,7 +1,8 @@
 "use client";
 
-import { ColorSwatch, HStack, Span } from "@chakra-ui/react";
+import { Box, ColorSwatch, HStack, Span, Text } from "@chakra-ui/react";
 import { BarSegment, useChart } from "@chakra-ui/charts";
+import { Tooltip } from "@/components/ui/tooltip";
 import { type SummaryItem } from "@/app/types/summary";
 import { formatDisplayNumber } from "@/utils/number";
 import { DEFAULT_COLORS } from './config';
@@ -23,33 +24,43 @@ export const SummaryStackedBarChart = ({ data, colorMap, unit }: SummaryStackedB
 
   return (
     <BarSegment.Root chart={chart}>
-      <BarSegment.Content>
-        <BarSegment.Bar
-          tooltip={({ payload }) => {
-            if (chart.highlightedSeries !== payload.name) return null;
-            return (
-              <HStack
-                pos="absolute"
-                top="-4"
-                right="4"
-                bg="bg.panel"
-                textStyle="xs"
-                px="2.5"
-                py="1"
-                gap="1.5"
-                rounded="l2"
-                shadow="md"
-              >
-                <ColorSwatch value={chart.color(payload.color)} boxSize="0.82em" rounded="full" />
-                <Span>{payload.name}</Span>
-                <Span fontFamily="mono" fontWeight="medium">
-                  {formatDisplayNumber(payload.value)}{unit ? ` ${unit}` : ""}
-                </Span>
+      <HStack pos="relative" gap="0.5" w="full">
+        {chart.data.map((item) => (
+          <Tooltip
+            key={item.name}
+            positioning={{ placement: "top" }}
+            contentProps={{
+              bg: "bg.panel",
+              color: "fg",
+              px: "2.5",
+              py: "1",
+              rounded: "l2",
+              boxShadow: "md",
+              textStyle: "xs",
+            }}
+            content={
+              <HStack gap="1.5" _icon={{ boxSize: "2.5" }}>
+                <ColorSwatch rounded="full" boxSize="2" value={chart.color(item.color)} />
+                <HStack justify="space-between" flex="1">
+                  <Span color="fg.muted">{item.name}</Span>
+                  <Text fontFamily="mono" fontWeight="medium" fontVariantNumeric="tabular-nums">
+                    {formatDisplayNumber(item.value)}{unit ? ` ${unit}` : ""}
+                  </Text>
+                </HStack>
               </HStack>
-            );
-          }}
-        />
-      </BarSegment.Content>
+            }
+          >
+            <Box
+              flexShrink="0"
+              flex="var(--bar-percent)"
+              height="var(--bar-size)"
+              bg={item.color}
+              rounded="l1"
+              style={{ ["--bar-percent" as string]: `${chart.getValuePercent("value", item.value)}%` }}
+            />
+          </Tooltip>
+        ))}
+      </HStack>
       <BarSegment.Legend
         showPercent
         gap="1"
