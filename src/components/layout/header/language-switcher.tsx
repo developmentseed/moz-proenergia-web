@@ -1,13 +1,26 @@
 'use client';
 
+import { Suspense } from 'react';
 import { Button } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
+import { useQueryState } from 'nuqs';
+import { langParser } from '@/i18n/query';
 
-export const LanguageSwitcher = () => {
+function LanguageSwitcherInner() {
   const { i18n } = useTranslation();
   const currentLang = i18n.language?.startsWith('pt') ? 'pt' : 'en';
   const nextLang = currentLang === 'pt' ? 'en' : 'pt';
   const currentFlag = currentLang === 'pt' ? '🇲🇿' : '🇬🇧';
+
+  const [, setLang] = useQueryState(
+    'lang',
+    langParser.withOptions({ history: 'replace', shallow: true }),
+  );
+
+  const handleClick = () => {
+    i18n.changeLanguage(nextLang);
+    setLang(nextLang);
+  };
 
   return (
     <Button
@@ -19,7 +32,7 @@ export const LanguageSwitcher = () => {
       _hover={{ bg: "orange.fg", color: "orange.subtle" }}
       color="inherit"
       minW="auto"
-      onClick={() => i18n.changeLanguage(nextLang)}
+      onClick={handleClick}
       aria-label={`Switch to ${nextLang.toUpperCase()}`}
     >
       {currentFlag}{" "}
@@ -27,3 +40,9 @@ export const LanguageSwitcher = () => {
     </Button>
   );
 };
+
+export const LanguageSwitcher = () => (
+  <Suspense fallback={null}>
+    <LanguageSwitcherInner />
+  </Suspense>
+);

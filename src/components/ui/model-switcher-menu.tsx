@@ -2,7 +2,7 @@
 
 import { Text, Box, Flex, MenuRoot, Menu, MenuTrigger, MenuContent, MenuItem } from "@chakra-ui/react";
 import Image from "next/image";
-import NextLink from "next/link";
+import NextLink from "@/components/localized-link";
 import { useModel } from "@/utils/context/model";
 import { slugify } from "@/utils/data-transformation";
 import { useModels } from "@/hooks/use-models";

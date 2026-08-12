@@ -5,7 +5,7 @@ import { Button, Heading, Center, Spinner } from "@chakra-ui/react";
 import { Card } from '@/components/chakra';
 import ReactMarkdown from 'react-markdown';
 
-import NextLink from "next/link";
+import NextLink from "@/components/localized-link";
 import { ChakraDrawer } from '@/components/chakra/drawer';
 import { slugify } from '@/utils/data-transformation';
 import { useModels } from '@/hooks/use-models';

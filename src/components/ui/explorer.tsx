@@ -9,7 +9,7 @@ import { FiltersProvider } from "@/utils/context/filters";
 import { useFilters } from "@/utils/context/filters";
 import { useModel } from "@/utils/context/model";
 import { Flex, Box, IconButton, Skeleton, Text, Button } from "@chakra-ui/react";
-import NextLink from "next/link";
+import NextLink from "@/components/localized-link";
 import MainMap, { type FlyToFn } from "@/components/map";
 import { LuPanelLeftOpen, LuPanelLeftClose, LuPanelRightOpen, LuPanelRightClose } from "react-icons/lu";
 import { useAuth } from "@/utils/context/auth";

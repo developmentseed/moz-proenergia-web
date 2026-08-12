@@ -2,21 +2,24 @@ import { type ReactNode } from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, cleanup, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import { Provider } from "@/components/chakra/provider";
 import { I18nProvider } from "@/i18n/provider";
 import i18n from "@/i18n/config";
 import AppError from "@/app/error";
 
-vi.mock("next/link", () => ({
+vi.mock("@/components/localized-link", () => ({
   default: ({ children, href }: { children: ReactNode; href: string }) => (
     <a href={href}>{children}</a>
   ),
 }));
 
 const Wrapper = ({ children }: { children: ReactNode }) => (
-  <Provider>
-    <I18nProvider>{children}</I18nProvider>
-  </Provider>
+  <NuqsTestingAdapter>
+    <Provider>
+      <I18nProvider>{children}</I18nProvider>
+    </Provider>
+  </NuqsTestingAdapter>
 );
 
 beforeEach(() => {

@@ -43,9 +43,9 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <I18nProvider>
-          <ReactQueryProvider>
-            <NuqsAdapter>
+        <NuqsAdapter>
+          <I18nProvider>
+            <ReactQueryProvider>
               <Provider>
                 <AuthProvider>
                   <TourProvider>
@@ -56,9 +56,9 @@ export default function RootLayout({
                   </TourProvider>
                 </AuthProvider>
               </Provider>
-            </NuqsAdapter>
-          </ReactQueryProvider>
-        </I18nProvider>
+            </ReactQueryProvider>
+          </I18nProvider>
+        </NuqsAdapter>
       </body>
     </html>
   );

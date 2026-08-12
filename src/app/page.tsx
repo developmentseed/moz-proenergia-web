@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Heading, Text, Button, Image, VStack } from "@chakra-ui/react";
-import NextLink from "next/link";
+import NextLink from "@/components/localized-link";
 import { useTranslation } from "react-i18next";
 import { LuInfo, LuMap } from "react-icons/lu";
 import { BASE_PATH } from "@/config/website";

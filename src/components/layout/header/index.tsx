@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Box, Heading, Flex, HStack, Text, Link, Separator, Drawer, CloseButton, IconButton, Portal, VStack, Button } from "@chakra-ui/react";
-import NextLink from "next/link";
+import NextLink from "@/components/localized-link";
 import Image from "next/image";
 import { LuBookOpen, LuDownload, LuInfo, LuMap, LuMenu } from "react-icons/lu";
 import DropdownMenu, { DropdownMenuItems } from "./dropdown-menu";

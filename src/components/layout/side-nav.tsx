@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, VStack } from '@chakra-ui/react';
-import Link from 'next/link';
+import Link from '@/components/localized-link';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { createSerializer } from 'nuqs/server';
