@@ -69,12 +69,12 @@
     "noData": "Falha ao carregar dados de resumo",
     "analysis": "análise",
     "summary": "Resumo",
-    "cluster": "Cluster - {{clusterId}}",
-    "failedClusterData": "Falha ao carregar dados do cluster.",
+    "cluster": "Assentamento - {{clusterId}}",
+    "failedClusterData": "Falha ao carregar dados do assentamento.",
     "onlyBarChart": "Apenas Gráfico de Barras está disponível.",
     "errorNotReady": "Estes dados não parecem estar prontos. Certifique-se de que existem cenários relacionados a este modelo.",
     "returnToModels": "Voltar para modelos",
-    "relatedClusters": "Ver cluster em outros modelos",
+    "relatedClusters": "Ver assentamento em outros modelos",
     "summaryUnavailable": "Resumo indisponível — os resultados não puderam ser calculados para os filtros atuais.",
     "resetFilters": "Redefinir filtros",
     "invalidScenario": "O cenário selecionado não foi encontrado; o cenário padrão foi carregado.",
@@ -142,9 +142,9 @@
     "removeLayer": "Remover camada",
     "centerMap": "Centrar mapa",
     "opacity": "Opacidade: {{value}}%",
-    "navigateTitle": "Navegar para cluster, local ou coordenadas",
-    "navigatePlaceholder": "Introduza ID do cluster ou lat, lng…",
-    "navigateAriaLabel": "Navegar para cluster ou coordenadas",
+    "navigateTitle": "Navegar para assentamento, local ou coordenadas",
+    "navigatePlaceholder": "Introduza ID do assentamento ou lat, lng…",
+    "navigateAriaLabel": "Navegar para assentamento ou coordenadas",
     "navigateHelperText": "As coordenadas devem estar no formato <em>lat, lng</em>",
     "navigateCoordsError": "Coordenadas fora do intervalo. A latitude deve estar entre -90 e 90, a longitude entre -180 e 180.",
     "noDescription": "Sem descrição disponível."
@@ -183,7 +183,7 @@
       "content": "O painel de resumo mostra estatísticas agregadas para todos os assentamentos visíveis com os seus filtros atuais — incluindo desagregação por tecnologia, população e ligações previstas."
     },
     "step7": {
-      "title": "Detalhe do Cluster",
+      "title": "Detalhe do Assentamento",
       "content": "Ao selecionar um assentamento individual, o painel de resumo passa a mostrar os seus atributos específicos — como coordenadas, população e a tecnologia de eletrificação recomendada."
     },
     "step8": {

@@ -7,11 +7,9 @@ import {
   Box,
   Accordion,
   ScrollArea,
-  Text,
-  Button,
-  IconButton,
+  Text
 } from "@chakra-ui/react";
-import { LuChevronUp, LuInfo, LuLayers, LuSettings2 } from "react-icons/lu";
+import { LuChevronUp, LuLayers, LuSettings2 } from "react-icons/lu";
 import { FilterControl } from "./filters/filter-control";
 import { FilterLabel } from "./filters/filter-label";
 import { LayerControl } from "./layers/layer-control";
@@ -21,7 +19,7 @@ import { useFilters } from "@/utils/context/filters";
 import { ApplyActions } from "./apply-actions";
 // FilterType as enum
 import { FilterType, type Filter, type ItemUnit } from "@/app/types";
-import { Tooltip } from "./tooltip";
+import { InfoTip } from '@/components/chakra/toggle-tip';
 import { useTranslation } from "react-i18next";
 import { useLocalize } from "@/utils/i18n";
 
@@ -135,14 +133,7 @@ const CollapsibleGroup = memo(function CollapsibleGroup({
           textStyle="collapsibleGroupTitle"
         />
         {collapsibleItem.description && (
-          <Tooltip
-            content={collapsibleItem.description}
-            contentProps={{ css: { "--tooltip-bg": "colors.bg", color: "fg" } }}
-          >
-            <IconButton as='span' variant="ghost" size="2xs" p={0}>
-              <LuInfo />
-            </IconButton>
-          </Tooltip>
+          <InfoTip content={collapsibleItem.description} />
         )}
         <Accordion.ItemIndicator ml="auto">
           <LuChevronUp />

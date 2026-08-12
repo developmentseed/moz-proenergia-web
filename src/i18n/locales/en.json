@@ -69,12 +69,12 @@
     "noData": "Failed to load summary data",
     "analysis": "analysis",
     "summary": "Summary",
-    "cluster": "Cluster - {{clusterId}}",
-    "failedClusterData": "Failed to load cluster data.",
+    "cluster": "Settlement - {{clusterId}}",
+    "failedClusterData": "Failed to load settlement data.",
     "onlyBarChart": "Only Bar Chart is available.",
     "errorNotReady": "This data doesn't look like it is ready. Make sure there are scenarios related to this model.",
     "returnToModels": "Return to models",
-    "relatedClusters": "View cluster in other models",
+    "relatedClusters": "View settlement in other models",
     "summaryUnavailable": "Summary unavailable — results could not be calculated for the current filters.",
     "resetFilters": "Reset filters",
     "invalidScenario": "Selected scenario was not found; the default scenario has been loaded.",
@@ -142,9 +142,9 @@
     "removeLayer": "Remove layer",
     "centerMap": "Center map",
     "opacity": "Opacity: {{value}}%",
-    "navigateTitle": "Navigate to cluster, site, or coordinates",
-    "navigatePlaceholder": "Enter cluster ID or lat, lng…",
-    "navigateAriaLabel": "Navigate to cluster or coordinates",
+    "navigateTitle": "Navigate to settlement, site, or coordinates",
+    "navigatePlaceholder": "Enter settlement ID or lat, lng…",
+    "navigateAriaLabel": "Navigate to settlement or coordinates",
     "navigateHelperText": "Coordinates must be in <em>lat, lng</em> format",
     "navigateCoordsError": "Coordinates out of range. Latitude must be between -90 and 90, longitude between -180 and 180.",
     "noDescription": "No description available."
@@ -183,7 +183,7 @@
       "content": "The summary panel shows aggregated statistics for all settlements currently visible given your filters — including technology breakdowns, population, and projected connections."
     },
     "step7": {
-      "title": "Cluster Detail",
+      "title": "Settlement Detail",
       "content": "When you select an individual settlement, the summary panel switches to show its specific attributes — such as coordinates, population, and the recommended electrification technology."
     },
     "step8": {
